@@ -1,0 +1,41 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Artsdata</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <form class="d-flex" role="search">
+              <input
+                class="form-control me-2"
+                name="adid"
+                type="search"
+                placeholder="ID"
+                aria-label="Search"
+              />
+              <button class="btn btn-outline-secondary" type="submit">
+                View
+              </button>
+            </form>
+        </ul>
+        <form
+            class="d-flex"
+            role="search"
+            action="http://artsdata-satellite-org-finder.s3-website.ca-central-1.amazonaws.com/"
+        >
+          <input
+            class="form-control me-2"
+            name="query"
+            type="search"
+            placeholder="Name"
+            aria-label="Search"
+          />
+          <input  type="hidden"  name="viewer"  value="true" />
+          <button class="btn btn-outline-primary" type="submit">
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+  </nav>
