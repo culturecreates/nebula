@@ -2,11 +2,12 @@
 class Entity
 
   attr_accessor :entity_uri, :graph
+  @@artsdata_client = ArtsdataApi::V2::Client.new(
+        graph_repository: Rails.application.credentials.graph_repository, 
+        api_endpoint: Rails.application.credentials.graph_api_endpoint)
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
-    @artsdata_client = ArtsdataApi::V2::Client.new(graph_repository: Rails.application.credentials.graph_repository, api_endpoint: Rails.application.credentials.graph_api_endpoint)
-    puts @artsdata_client.inspect
   end
 
   def method_missing(m,*args,&block)
@@ -29,7 +30,7 @@ class Entity
                   'locale_placeholder' , language
                 ])
 
-    response = @artsdata_client.execute_construct_turtle_star_sparql(sparql)
+    response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
 
     @graph = if response[:code] == 200
       RDF::Graph.new do |graph|

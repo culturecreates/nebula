@@ -1,1 +1,72 @@
 @import "bootstrap";
+
+a {
+  text-decoration: none;
+}
+
+.statement {
+  display: flex;
+  flex-direction: row;
+  background-color: rgb(246, 243, 243);
+  border-color: rgb(191, 190, 190);
+  border-width: 1px;
+  border-style: solid;
+  margin: 5px 0px;
+}
+
+.statement-predicate {
+  width: 20%;
+  word-break:break-all;
+  flex-shrink: 0;
+  overflow: auto;
+  padding: 20px;
+}
+
+.statement-objects {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  
+
+}
+
+.statement-object {
+
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 20px;
+  border-color: rgb(191, 190, 190);
+  border-width: 0.5px;
+  border-style: dashed;
+}
+
+.reference.accordion button {
+  font-size: small;
+  padding: 2px;
+}
+.accordion  {
+  font-size: small;
+}
+
+.small-text {
+  font-size: small;
+  margin: 10px 20px;
+}
+
+.accordion-body {
+  background-color: rgb(250, 249, 249);
+}
+
+.accordion-item {
+  border:0px;
+}
+
+.alternate-name {
+  color: rgb(123, 137, 137);
+}
+
+.more-statementss {
+  background-color: rgb(250, 249, 249);
+}
