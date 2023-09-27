@@ -71,3 +71,11 @@ group :test do
 end
 
 gem 'bootstrap', '~> 5.1.3'
+
+gem 'faraday'
+gem 'oj'
+gem 'rdf', '~> 3.2'
+gem 'json-ld', '~> 3.2.4'
+gem 'sparql', '~> 3.1.3'
+gem 'rdf-turtle', '~> 3.2'
+gem 'nokogiri'

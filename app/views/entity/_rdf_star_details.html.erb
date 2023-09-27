@@ -1,0 +1,32 @@
+<div class="statement-predicate">
+  <% if prop.start_with?("http") %>
+    <a href="<%= prop %>"> <%= display_label(prop) %>  </a>
+  <% else %>
+    <%= display_label(prop) %>
+  <% end %>
+</div>
+<div class="statement-objects">
+  <% if value.class == Array %>
+    <% value.each do |statement| %>
+    <div class="statement-object">
+      <% if statement["@id"] %>
+        <% frame_id = rand(10000)%>
+        <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: statement["@id"], frame_id: frame_id)%>>
+        loading...
+        </turbo-frame>
+        
+      <% else %>
+        <a> <%= display_literal(statement) %></a>
+      <% end %>
+      <% if statement["@annotation"] %>
+        <%= render partial: "annotation" , locals: {annotations: statement["@annotation"] }%>
+      <% end %>
+    </div>
+    <% end %>
+  <% else %>
+    <div class="statement-object">
+      <%= value %>
+    </div>
+  <% end %>
+  </div>
+

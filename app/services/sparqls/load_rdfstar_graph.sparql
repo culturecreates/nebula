@@ -1,0 +1,69 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX onto: <http://www.ontotext.com/>
+PREFIX schema: <http://schema.org/>
+
+CONSTRUCT {
+    ?s ?p ?o  .
+    <<?s ?p ?o>> ?a ?b .
+    <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
+    ?c ?cp ?co .
+    ?cp rdfs:label ?cp_label .
+    ?co rdfs:label ?co_label .
+    ?p rdfs:label ?prop_label .
+    ?o rdfs:label ?obj_label ; schema:name ?obj_name .
+    ?a rdfs:label ?a_label .
+    ?b rdfs:label ?b_label .
+
+}
+FROM onto:explicit 
+WHERE {
+    values ?s {
+        <entity_uri_placeholder> 
+    }
+
+    ?s ?p ?o  .
+
+    # main triple labels
+    OPTIONAL {
+        ?o rdfs:label ?obj_label .
+        filter(lang(?obj_label) = "locale_placeholder" ||lang(?prop_label) =  "")
+    }
+    OPTIONAL {
+        ?p rdfs:label ?prop_label .
+        filter(lang(?prop_label) = "locale_placeholder" || lang(?prop_label) =  "")
+    }
+    OPTIONAL {
+        ?o schema:name ?obj_name .
+        filter(lang(?obj_name) = "locale_placeholder" || lang(?obj_name) =  "")
+    }
+
+    # quoted triple labels
+    OPTIONAL {
+        <<?s ?p ?o>> ?a ?b .
+        ?a rdfs:label ?a_label .
+        filter(lang(?a_label) = "locale_placeholder" || lang(?a_label) = "")
+    }
+    OPTIONAL {
+        <<?s ?p ?o>> ?a ?b .
+        ?b rdfs:label ?b_label .
+        filter(lang(?b_label) = "locale_placeholder" || lang(?b_label) = "")
+    }
+
+    # quoted triple reference labels
+    OPTIONAL {
+        <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
+        ?c ?cp ?co .
+    }
+    OPTIONAL {
+        <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
+        ?c ?cp ?co .
+        ?cp rdfs:label ?cp_label .
+        filter(lang(?cp_label) = "locale_placeholder" || lang(?cp_label) = "")
+    }
+    OPTIONAL {
+        <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
+        ?c ?cp ?co .
+        ?co rdfs:label ?co_label .
+        filter(lang(?co_label) = "locale_placeholder" || lang(?co_label) = "")
+    }
+} order by   ?prop_label ?obj_label ?a 
