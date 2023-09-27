@@ -11,7 +11,7 @@
     <div class="statement-object">
       <% if statement["@id"] %>
         <% frame_id = rand(10000)%>
-        <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: statement["@id"], frame_id: frame_id)%>>
+        <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: statement["@id"], frame_id: frame_id)%> loading="lazy" target="_top">
         loading...
         </turbo-frame>
         

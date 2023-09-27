@@ -20,8 +20,9 @@ module EntityHelper
   end
 
   def display_literal(literal)
+    # Todo: Add anchor link button for literals that look like urls
     if literal["@language"]
-      "#{literal['@value'].capitalize} @#{literal['@language']}" 
+      "#{literal['@value'].capitalize} <span style='color:gray;font-size: small'>@#{literal['@language']}</span>".html_safe 
     elsif  literal["@value"]
       literal["@value"]
     else

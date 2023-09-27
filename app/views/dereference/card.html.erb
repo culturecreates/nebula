@@ -1,4 +1,12 @@
 <h1>Card</h1>
 <turbo-frame id="card-<%= @frame_id %>">
-  <p><%= @label %></p>
+
+  <div class="statement-object">
+    <% solution = dereference_helper(@uri)%>
+    <b><%= solution.label %></b> 
+    <div class="alternate-name"><%= solution.type %></div>
+    <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution.type} %>
+  
+  </div>
+
 </turbo-frame>

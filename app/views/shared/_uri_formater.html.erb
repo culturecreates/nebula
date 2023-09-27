@@ -1,0 +1,9 @@
+  <% if uri.starts_with?("_:") %>
+    <%= uri %>
+  <% else %>
+    <% if type.blank? %>
+      <a href=<%=uri%>><%= uri %></a>
+    <% else %>
+      <a href="/entity?uri=<%=uri%>"><%= uri %></a>
+    <% end %>
+  <% end %>

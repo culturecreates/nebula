@@ -1,6 +1,5 @@
 
 class Entity
-
   attr_accessor :entity_uri, :graph
   @@artsdata_client = ArtsdataApi::V2::Client.new(
         graph_repository: Rails.application.credentials.graph_repository, 
@@ -21,6 +20,20 @@ class Entity
   def load_shacl_into_graph(shacl_name) 
     @shacl = "app/services/shacls/#{shacl_name}"
     @graph << RDF::Graph.load(@shacl)
+  end
+
+  def dereference
+    sparql =  SparqlLoader.load('dereference', [
+      'URI_PLACEHOLDER', self.entity_uri
+    ])
+    response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
+    @graph =  if response[:code] == 200
+      RDF::Graph.new do |graph|
+        RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
+      end
+    else
+      RDF::Graph.new
+    end
   end
 
 
