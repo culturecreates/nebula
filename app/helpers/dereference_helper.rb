@@ -13,7 +13,4 @@ module DereferenceHelper
     solution
   end
 
-  def use_prefix(str)
-    str.gsub("http://schema.org/","schema:")
-  end
 end

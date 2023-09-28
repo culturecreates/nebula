@@ -21,13 +21,25 @@ module EntityHelper
 
   def display_literal(literal)
     # Todo: Add anchor link button for literals that look like urls
-    if literal["@language"]
-      "#{literal['@value'].capitalize} <span style='color:gray;font-size: small'>@#{literal['@language']}</span>".html_safe 
-    elsif  literal["@value"]
-      literal["@value"]
+    if literal.class == String || literal.class == Hash
+      if literal["@language"]
+        language_literal(literal['@value'],literal['@language'])
+      elsif  literal["@value"]
+        literal["@value"]
+      else
+        literal
+      end
     else
-      literal
+      if literal.language
+        language_literal(literal.value, literal.language)
+      else
+        literal
+      end
     end
+  end
+
+  def language_literal(string, language)
+    "#{string} <span style='color:gray;font-size: small'>@#{language}</span>".html_safe  
   end
 
   def display_reference(id)

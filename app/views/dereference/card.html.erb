@@ -3,8 +3,8 @@
 
   <div class="statement-object">
     <% solution = dereference_helper(@uri)%>
-    <b><%= solution.label %></b> 
-    <div class="alternate-name"><%= solution.type %></div>
+    <b><%= display_literal(solution.label) %></b> 
+    <div class="alternate-name"><%= render partial: 'shared/uri_formater', locals: {uri: solution.type, type: ""} %></div>
     <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution.type} %>
   
   </div>
