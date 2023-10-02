@@ -1,0 +1,11 @@
+<turbo-frame id="objects-frame-<%= @predicate_hash %>">
+
+  <% @entity.entity_jsonld.each do |prop, value| %>
+  <% if prop != "@id" %>
+     
+        <%= render partial: 'statement_objects', locals: { value: value, predicate_hash: "" }  %>
+      
+  <% end %>
+  <% end %>
+  
+</turbo-frame>

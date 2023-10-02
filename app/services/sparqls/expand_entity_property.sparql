@@ -1,0 +1,50 @@
+PREFIX adr: <http://kg.artsdata.ca/resource/>
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+construct {
+    ?event schema:name ?name .
+    <<  ?event schema:name ?name >> prov:wasDerivedFrom ?c .
+    ?c ?cp ?co .
+    ?cp rdfs:label ?cp_label .
+    ?co rdfs:label ?co_label .
+} 
+where {
+    values ?event {
+        <URI_PLACEHOLDER> 
+    }
+    {
+        graph ?g2 {
+            ?event schema:name ?name .
+        }
+    }
+    UNION
+    {
+        ?event  schema:sameAs ?sameAs .
+        graph ?g2 {
+            ?sameAs schema:name ?name .
+        }
+    }
+    UNION 
+    {
+        ?event  ^schema:sameAs ?sameAs .
+        graph ?g2 {
+            ?sameAs schema:name ?name .
+        }
+    }
+    # quoted triple reference labels
+    OPTIONAL {
+        ?g2 prov:wasDerivedFrom ?c .
+        ?c ?cp ?co .
+    }
+    OPTIONAL {
+        ?c ?cp ?co .
+        ?cp rdfs:label ?cp_label .
+        filter(lang(?cp_label) = "en" || lang(?cp_label) = "")
+    }
+    OPTIONAL {
+        ?c ?cp ?co .
+        ?co rdfs:label ?co_label .
+        filter(lang(?co_label) = "en" || lang(?co_label) = "")
+    }
+}

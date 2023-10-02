@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   root "application#home"
 
   get "entity", to: "entity#show"
-
+  get "entity/expand", to: "entity#expand"
   get "dereference/card", to: "dereference#card"
+
 end

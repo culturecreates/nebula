@@ -1,0 +1,1 @@
+ActionText::Attachment::ATTRIBUTES << 'data-turbo-frame'

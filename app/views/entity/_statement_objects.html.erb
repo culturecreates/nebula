@@ -1,11 +1,5 @@
-<div class="statement-predicate">
-  <% if prop.start_with?("http") %>
-    <a href="<%= prop %>"> <%= display_label(prop) %>  </a>
-  <% else %>
-    <%= display_label(prop) %>
-  <% end %>
-</div>
-<div class="statement-objects">
+  <div class="statement-objects">
+  <turbo-frame id="objects-frame-<%= predicate_hash %>">
   <% if value.class == Array %>
     <% value.each do |statement| %>
     <div class="statement-object">
@@ -28,5 +22,6 @@
       <%= value %>
     </div>
   <% end %>
+    </turbo-frame>
   </div>
 

@@ -26,8 +26,21 @@ class Entity
     sparql =  SparqlLoader.load('dereference', [
       'URI_PLACEHOLDER', self.entity_uri
     ])
+    @graph = construct_turtle(sparql)
+  end
+
+  def expand_entity_property(predicate:)
+    sparql =  SparqlLoader.load('expand_entity_property', [
+      'URI_PLACEHOLDER', self.entity_uri,
+      'schema:name', "<#{predicate}>"
+    ])
+    puts "SPARQL: #{sparql}"
+    @graph = construct_turtle(sparql)
+  end
+
+  def construct_turtle(sparql)
     response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
-    @graph =  if response[:code] == 200
+    if response[:code] == 200
       RDF::Graph.new do |graph|
         RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
       end

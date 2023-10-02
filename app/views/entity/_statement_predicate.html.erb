@@ -1,0 +1,7 @@
+<div class="statement-predicate">
+  <% if prop.start_with?("http") %>
+    <a href="<%= prop %>"> <%= display_label(prop) %>  </a>
+  <% else %>
+    <%= display_label(prop) %>
+  <% end %>
+</div>
