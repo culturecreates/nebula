@@ -1,10 +1,10 @@
 <h1>Card</h1>
+
+Test: 
 <turbo-frame id="card-<%= @frame_id %>">
 
   <div class="statement-object">
     <% solution = dereference_helper(@uri)%>
-   
-    <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution[:type]} %> 
     <% if solution[:streetAddress] %>
       <b><%= solution[:streetAddress] %>, <%= solution[:addressLocality] %></b> 
     <% else %>
@@ -12,9 +12,10 @@
       <b><%= display_literal(solution[:label]) %></b> 
       <% end %>
     <% end %>
-     
+  
     <div class="alternate-name"> <%= render partial: 'shared/uri_formater', locals: {uri: solution[:type], type: ""} %></div>
-    
+    <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution[:type]} %> 
+   
   
   </div>
 

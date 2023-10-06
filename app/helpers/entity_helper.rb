@@ -1,10 +1,8 @@
 module EntityHelper
   def display_label(id)
-    link =  if id.starts_with?("http://kg.artsdata.ca/")
-               entity_path(uri: id)
-            else
-              id    
-            end
+    return nil unless id
+    link = entity_path(uri: id)
+ 
     query = RDF::Query.new do
       pattern [RDF::URI(id), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label, nil, optional: true]
     end

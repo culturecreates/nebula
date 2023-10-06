@@ -10,6 +10,10 @@ construct {
     ?graph rdfs:label ?grap_label .
     
    schema:dataset rdfs:label "Dataset"@en .
+
+    ?a rdfs:label ?a_label . 
+    ?b rdfs:label ?b_label . 
+
 } 
 where {
     values ?event {
@@ -18,11 +22,19 @@ where {
     {
         graph ?graph {
             ?event schema:name ?name .
-            OPTIONAL {
-                <<?event schema:name ?name >> ?a ?b .
-            }
              
         }
+        OPTIONAL {
+             <<?event schema:name ?name >> ?a ?b .
+             OPTIONAL {
+                ?a rdfs:label ?a_label . 
+             }
+              OPTIONAL {
+            ?b rdfs:label ?b_label . 
+              }
+        }
+
+
     }
     UNION
     {
@@ -41,4 +53,5 @@ where {
 
      ?graph rdfs:label ?grap_label .
 
+    
 }
