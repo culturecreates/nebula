@@ -8,4 +8,6 @@ Rails.application.routes.draw do
   get "entity/expand", to: "entity#expand"
   get "dereference/card", to: "dereference#card"
 
+  get "github/callback", to: "github#callback"
+
 end
