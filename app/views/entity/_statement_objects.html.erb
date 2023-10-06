@@ -2,24 +2,27 @@
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
   <% if value.class == Array %>
     <% value.each do |statement| %>
-    <div class="statement-object">
-      <% if statement["@id"] %>
-        <% frame_id = rand(10000)%>
-        <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: statement["@id"], frame_id: frame_id)%> loading="lazy" target="_top">
-        loading...
-        </turbo-frame>
-        
-      <% else %>
-        <a> <%= display_literal(statement) %></a>
-      <% end %>
-      <% if statement["@annotation"] %>
-        <%= render partial: "annotation" , locals: {annotations: statement["@annotation"] }%>
-      <% end %>
-    </div>
+      <div class="statement-object">
+        <% if statement["@id"] %>
+          <% frame_id = rand(10000)%>
+          <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: statement["@id"], frame_id: frame_id)%> loading="lazy" target="_top">
+          loading...
+          </turbo-frame>
+        <% else %>
+          <% if statement.class == String && statement.start_with?("http") %>
+            <%= display_label(statement) %>
+          <% else %>
+            <%= display_literal(statement) %>
+          <% end %>
+        <% end %>
+        <% if statement["@annotation"] %>
+          <%= render partial: "annotation" , locals: {annotations: statement["@annotation"] }%>
+        <% end %>
+      </div>
     <% end %>
   <% else %>
     <div class="statement-object">
-      <%= value %>
+      <%= display_label(value) %>
     </div>
   <% end %>
     </turbo-frame>

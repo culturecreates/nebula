@@ -3,10 +3,25 @@
 
   <div class="statement-object">
     <% solution = dereference_helper(@uri)%>
-    <b><%= display_literal(solution.label) %></b> 
-    <div class="alternate-name"><%= render partial: 'shared/uri_formater', locals: {uri: solution.type, type: ""} %></div>
-    <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution.type} %>
+   
+    <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution[:type]} %> 
+    <% if solution[:streetAddress] %>
+      <b><%= solution[:streetAddress] %>, <%= solution[:addressLocality] %></b> 
+    <% else %>
+      <% if solution[:label] %>
+      <b><%= display_literal(solution[:label]) %></b> 
+      <% end %>
+    <% end %>
+     
+    <div class="alternate-name"> <%= render partial: 'shared/uri_formater', locals: {uri: solution[:type], type: ""} %></div>
+    
   
   </div>
 
 </turbo-frame>
+
+   <pre>
+      <code>
+         <%= @entity.graph.dump(:jsonld) %>
+      </code>
+   </pre>

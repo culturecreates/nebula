@@ -1,19 +1,26 @@
-<h1 id="adid"><%= display_label(@entity.entity_uri)%>  </h1>
+
+<h1><%= @entity.label %>  </h1>
 <a id="aduri"><%= use_prefix(@entity.entity_uri) %></a>
 <div id="desc" class="alternate-name">Another name | Also known as | <a href=<%= derived_link(@entity.entity_uri)%> id="aduriapi">derived statements</a> | <a href=<%= graphdb_link(@entity.entity_uri) %>  id="graphdb">graph db</a></div>
     
 <div class="meta">
    <% @entity.entity_jsonld.each do |prop, value| %>
+      <% next if prop == "@id" %>
+
       <div class="statement">
-        <% predicate_hash = prop.hash %>
-         <%= render partial: 'statement_predicate', locals: { prop: prop }  %>
+         <% predicate_hash = prop.hash %>
        
+         <div class="statement-predicate">
+            <%= display_label(prop) %> 
+         </div>
          <%= render partial: 'statement_objects', locals: { value: value, predicate_hash: predicate_hash }  %>
         
          <div class="statement_buttons">
-          
-            <%= link_to entity_expand_path(subject: @entity.entity_uri, predicate: prop, predicate_hash: predicate_hash), 
-            data: {"turbo-frame" => "objects-frame-#{predicate_hash}"} do %>
+            <%= link_to entity_expand_path(subject: @entity.entity_uri, predicate: prop, predicate_hash: predicate_hash),  
+               data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
+               id: predicate_hash, 
+               onclick: "document.getElementById('#{predicate_hash}').style.display = 'none';" do 
+            %>
                <%= render partial: 'shared/icon_stack'%>
             <% end %>
          </div>

@@ -1,22 +1,34 @@
 module EntityHelper
   def display_label(id)
+    link =  if id.starts_with?("http://kg.artsdata.ca/")
+               entity_path(uri: id)
+            else
+              id    
+            end
     query = RDF::Query.new do
       pattern [RDF::URI(id), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label, nil, optional: true]
     end
     solution = @entity.graph.query(query)
     if solution.count > 0
-      return solution.first[:label].value 
+      response = "<a href='#{link}' target='_top'>#{solution.first[:label].value}</a>".html_safe
     else
       query = RDF::Query.new do
         pattern [RDF::URI(id), RDF::URI("http://schema.org/name"), :name ]
       end
       solution = @entity.graph.query(query)
       if solution.count > 0
-        return solution.first[:name].value 
+        response = "<a href='#{link}' target='_top'>#{solution.first[:name].value}</a>".html_safe
       else
-        return id
+        if id.starts_with?("http")
+          response = "<a href='#{link}' target='_top'>#{id}</a>".html_safe
+        else
+          response = id
+        end
+        
       end
     end
+
+    response
   end
 
   def display_literal(literal)
@@ -39,7 +51,7 @@ module EntityHelper
   end
 
   def language_literal(string, language)
-    "#{string} <span style='color:gray;font-size: small'>@#{language}</span>".html_safe  
+    "<span>#{string} <span style='color:gray;font-size: small'>@#{language}</span></span>".html_safe  
   end
 
   def display_reference(id)

@@ -9,6 +9,38 @@ class Entity
     @entity_uri = h[:entity_uri]
   end
 
+  def label
+    uri = @entity_uri
+    graph = @graph
+
+    query = RDF::Query.new do
+      pattern [RDF::URI(uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label]
+    end
+
+    solution = graph.query(query)
+
+    return  solution.first.label.value if solution.count > 0
+  
+    query = RDF::Query.new do
+      pattern [RDF::URI(uri), RDF::URI("http://schema.org/name"), :name]
+    end
+    solution = graph.query(query)
+    solution.first.name.value if solution.count > 0
+
+  end
+  
+
+  def type
+    uri = @entity_uri
+    graph = @graph
+
+    query = RDF::Query.new do
+      pattern [RDF::URI(uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
+    end
+     solution =  graph.query(query).first
+     solution.type if solution.bound?(:type)
+  end
+
   def method_missing(m,*args,&block)
     if m.to_s == 'main_image'
       ""
@@ -26,6 +58,7 @@ class Entity
     sparql =  SparqlLoader.load('dereference', [
       'URI_PLACEHOLDER', self.entity_uri
     ])
+    puts sparql
     @graph = construct_turtle(sparql)
   end
 

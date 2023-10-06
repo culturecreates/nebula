@@ -10,7 +10,7 @@ CONSTRUCT {
     ?cp rdfs:label ?cp_label .
     ?co rdfs:label ?co_label .
     ?p rdfs:label ?prop_label .
-    ?o rdfs:label ?obj_label ; schema:name ?obj_name .
+    ?o rdfs:label ?obj_label .
     ?a rdfs:label ?a_label .
     ?b rdfs:label ?b_label .
 
@@ -26,27 +26,27 @@ WHERE {
     # main triple labels
     OPTIONAL {
         ?o rdfs:label ?obj_label .
-        filter(lang(?obj_label) = "locale_placeholder" ||lang(?prop_label) =  "")
+        filter(lang(?obj_label) = "en" ||lang(?obj_label) =  "")
     }
     OPTIONAL {
         ?p rdfs:label ?prop_label .
-        filter(lang(?prop_label) = "locale_placeholder" || lang(?prop_label) =  "")
+        filter(lang(?prop_label) = "en" || lang(?prop_label) =  "")
     }
     OPTIONAL {
         ?o schema:name ?obj_name .
-        filter(lang(?obj_name) = "locale_placeholder" || lang(?obj_name) =  "")
+        filter(lang(?obj_name) = "en" || lang(?obj_name) =  "")
     }
 
     # quoted triple labels
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .
         ?a rdfs:label ?a_label .
-        filter(lang(?a_label) = "locale_placeholder" || lang(?a_label) = "")
+        filter(lang(?a_label) = "en" || lang(?a_label) = "")
     }
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .
         ?b rdfs:label ?b_label .
-        filter(lang(?b_label) = "locale_placeholder" || lang(?b_label) = "")
+        filter(lang(?b_label) = "en" || lang(?b_label) = "")
     }
 
     # quoted triple reference labels

@@ -2,7 +2,7 @@
 
   <% annotations.first.each do |key, value| %>
     <% if key == "http://www.w3.org/ns/prov#wasDerivedFrom" %>
-    <% random = rand(10000) %>
+      <% random = rand(10000) %>
     
       <div class="reference accordion"  style=" --bs-accordion-btn-padding-y: 5px;--bs-accordion-border-width: 0px;" id="accordionFlushExample">
        <div class="accordion-item">
@@ -15,12 +15,8 @@
         <div id="collapse<%=random%>" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
           <div class="accordion-body">
               <% value.each do |ref|  %>
-                <% solutions = display_reference(ref["@id"]) %>
-                <% solutions.each do |solution| %>
-                  <% if solution.p.value != "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"  %>
-                    <%= display_label(solution.p.value) %>:  <%= display_label(solution.o.value) %> <br>
-                  <% end %>
-                <% end %>
+                <%= display_label(ref["@id"]) %>
+                <br>
               <% end %>
           </div>
         </div>
@@ -29,10 +25,12 @@
       </div>
     <% else %>
       <% value.each do |qual| %>
-      <% if !key.to_s.include? "/value/"%>
-        <%= display_label(key) %>:  <%= display_label(qual["@id"]) || qual["@value"] %><br>
+      <div style="font-size:small;">
+        <% if !key.to_s.include? "/value/"%>
+          <%= display_label(key) %>: <%= display_label(qual["@id"]) || qual["@value"] %><br>
+        <% end %>
+        </div>
       <% end %>
-       <% end %>
     <% end %>
   <% end %>
 </div>

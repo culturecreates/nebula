@@ -2,3 +2,11 @@
 <%= link_to 'Gregory K1-3', entity_path(uri:"K1-3") %>
 <br>
 <%= link_to 'Event K23-101', entity_path(uri:"K23-101") %>
+<br>
+<%= link_to 'Poutine', entity_path(uri: "https://lepoutinebar.com#Place") %>
+<br>
+<%= link_to 'Poutine Bar address',  entity_path(uri: "https://lepoutinebar.com#Place-PostalAddress") %>
+<h2>Dereference</h2>
+<%= link_to 'Poutine', dereference_card_path(uri: "https://lepoutinebar.com#Place") %>
+<br>
+<%= link_to 'Poutine Bar address',  dereference_card_path(uri: "https://lepoutinebar.com#Place-PostalAddress") %>
