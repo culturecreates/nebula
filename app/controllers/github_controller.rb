@@ -9,11 +9,14 @@ class GithubController < ApplicationController
       token = token_data["access_token"]
       
       user_info = user_info(token)
-      @handle = user_info["login"]
-      @name = user_info["name"]
+      session[:handle] = user_info["login"]
+      session[:name] = user_info["name"]
+      
     else
-      render "Authorized, but unable to exchange code #{code} for token."
+      flash.error "Authorized, but unable to exchange code #{code} for token."
+
     end
+    redirect_to root_path 
   end
 
   private 

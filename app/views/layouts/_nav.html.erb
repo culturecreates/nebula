@@ -38,7 +38,11 @@
         </form>
        
           <span class="nav-item">
+            <% if session[:name] %>
+            <a class="nav-link active" aria-current="page" href="https://github.com/login/oauth/authorize?client_id=<%=  Rails.application.credentials.CLIENT_ID %>"><%= session[:name] %></a>
+            <% else %>
             <a class="nav-link active" aria-current="page" href="https://github.com/login/oauth/authorize?client_id=<%=  Rails.application.credentials.CLIENT_ID %>">GitHub Login</a>
+            <% end %>
           </span>
        
       </div>

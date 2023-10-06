@@ -1,4 +1,6 @@
-<h1>Some links to get started</h1>
+<h1>Dashboard</h1>
+<%= "Welcome back #{session[:name]}!" if session[:name] %>
+<h2>Some links to get started</h2>
 <%= link_to 'Gregory K1-3', entity_path(uri:"K1-3") %>
 <br>
 <%= link_to 'Event K23-101', entity_path(uri:"K23-101") %>
