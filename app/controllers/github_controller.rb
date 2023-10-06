@@ -13,7 +13,7 @@ class GithubController < ApplicationController
       session[:name] = user_info["name"]
       
     else
-      flash.error "Authorized, but unable to exchange code #{code} for token."
+      flash.alert = "Authorized, but unable to exchange code #{code} for token."
 
     end
     redirect_to root_path 

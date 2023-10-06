@@ -35,17 +35,18 @@
             placeholder="Name"
             aria-label="Search"
           />
-          <input  type="hidden"  name="viewer"  value="true" />
+          <input  type="hidden"  name="viewer"  value="<%= entity_url(uri:"") %>" />
           <button class="btn btn-outline-primary" type="submit">
             Search
           </button>
         </form>
        
           <span class="nav-item">
+          <% github_url = "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
             <% if session[:name] %>
-            <a class="nav-link active" aria-current="page" href="https://github.com/login/oauth/authorize?client_id=<%=  Rails.application.credentials.CLIENT_ID %>"><%= session[:name] %></a>
+            <a class="nav-link active" aria-current="page" href="<%= github_url %>"><%= session[:name] %></a>
             <% else %>
-            <a class="nav-link active" aria-current="page" href="https://github.com/login/oauth/authorize?client_id=<%=  Rails.application.credentials.CLIENT_ID %>">GitHub Login</a>
+            <a class="nav-link active" aria-current="page" href="<%= github_url %>">GitHub Login</a>
             <% end %>
           </span>
        

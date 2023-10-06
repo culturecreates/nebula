@@ -17,24 +17,33 @@
             <%= display_label(prop) %> 
          </div>
          <%= render partial: 'statement_objects', locals: { value: value, predicate_hash: predicate_hash }  %>
-        
-         <div class="statement_buttons">
-            <%= link_to entity_expand_path(subject: @entity.entity_uri, predicate: prop, predicate_hash: predicate_hash),  
-               data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
-               title: "Show inferred statements",
-               id: predicate_hash, 
-               onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do 
-            %>
-               <%= render partial: 'shared/icon_stack'%>
-            <% end %>
-         </div>
+
+         <% if prop != "@type" %>
+            <div class="statement_buttons">
+               <%= link_to entity_expand_path(subject: @entity.entity_uri, predicate: prop, predicate_hash: predicate_hash),  
+                  data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
+                  title: "Show all datasets",
+                  id: predicate_hash, 
+                  onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do 
+               %>
+                  <%= render partial: 'shared/icon_stack'%>
+               <% end %>
+            </div>
+         <% end %>
       </div>
    <% end %>
-   <hr>
 </div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
    <pre>
       <code>
-         <%= @entity.graph.dump(:jsonld) %>
+         <% if  @entity.graph.count > 0 %>
+            <%= @entity.graph.dump(:jsonld) %>
+         <% end %>
       </code>
    </pre>
 </div>
