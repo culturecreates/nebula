@@ -1,13 +1,6 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
+Pre-alpha of Artsdata Nebula. Work in progress...
 
 * Configuration
   Steps from scratch:
@@ -30,14 +23,3 @@ Things you may want to cover:
   To edit credentials:
   `EDITOR="code --wait" rails credentials:edit`
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
