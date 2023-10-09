@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "application#home"
 
+  get "test", to: "application#test"
+
   get "entity", to: "entity#show"
   get "entity/expand", to: "entity#expand"
   get "dereference/card", to: "dereference#card"

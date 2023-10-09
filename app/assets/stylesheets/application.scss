@@ -74,9 +74,14 @@ a {
   border:0px;
 }
 
-.alternate-name a {
+
+
+.alternate-name {
   color: rgb(123, 137, 137);
-  text-decoration: none;
+  a {
+    color: rgb(123, 137, 137);
+    text-decoration: none;
+  }
 }
 
 .more-statementss {
