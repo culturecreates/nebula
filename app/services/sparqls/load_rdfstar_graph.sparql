@@ -5,14 +5,15 @@ PREFIX schema: <http://schema.org/>
 CONSTRUCT {
     ?s ?p ?o  .
     <<?s ?p ?o>> ?a ?b .
-    <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
-    ?c ?cp ?co .
-    ?cp rdfs:label ?cp_label .
-    ?co rdfs:label ?co_label .
     ?p rdfs:label ?prop_label .
     ?o rdfs:label ?obj_label .
     ?a rdfs:label ?a_label .
     ?b rdfs:label ?b_label .
+
+    ?s ?p ?bns .
+    ?bns ?bnp ?bno .
+    ?bnp rdfs:label ?bnp_label .
+    ?bno rdfs:label ?bno_label .
 
 }
 FROM onto:explicit 
@@ -26,44 +27,37 @@ WHERE {
     # main triple labels
     OPTIONAL {
         ?o rdfs:label ?obj_label .
-        filter(lang(?obj_label) = "en" ||lang(?obj_label) =  "")
     }
     OPTIONAL {
         ?p rdfs:label ?prop_label .
-        filter(lang(?prop_label) = "en" || lang(?prop_label) =  "")
     }
     OPTIONAL {
         ?o schema:name ?obj_name .
-        filter(lang(?obj_name) = "en" || lang(?obj_name) =  "")
     }
 
     # quoted triple labels
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .
         ?a rdfs:label ?a_label .
-        filter(lang(?a_label) = "en" || lang(?a_label) = "")
     }
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .
         ?b rdfs:label ?b_label .
-        filter(lang(?b_label) = "en" || lang(?b_label) = "")
     }
 
-    # quoted triple reference labels
-    OPTIONAL {
-        <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
-        ?c ?cp ?co .
-    }
-    OPTIONAL {
-        <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
-        ?c ?cp ?co .
-        ?cp rdfs:label ?cp_label .
-        filter(lang(?cp_label) = "locale_placeholder" || lang(?cp_label) = "")
-    }
-    OPTIONAL {
-        <<?s ?p ?o>> <http://www.w3.org/ns/prov#wasDerivedFrom> ?c .
-        ?c ?cp ?co .
-        ?co rdfs:label ?co_label .
-        filter(lang(?co_label) = "locale_placeholder" || lang(?co_label) = "")
-    }
+    # blank nodes
+     OPTIONAL {
+       ?s ?p ?bns .
+       filter(isBLANK(?bns))
+
+       ?bns ?bnp ?bno .
+       OPTIONAL {
+        ?bnp rdfs:label ?bnp_label .
+       }
+       OPTIONAL {
+        ?bno rdfs:label ?bno_label .
+       }
+     }
+
+   
 } order by   ?prop_label ?obj_label ?a 

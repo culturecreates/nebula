@@ -112,6 +112,7 @@ GEM
     ffi (1.16.2)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
@@ -299,6 +300,7 @@ DEPENDENCIES
   capybara
   debug
   faraday
+  htmlbeautifier
   importmap-rails
   jbuilder
   json-ld (~> 3.2.4)

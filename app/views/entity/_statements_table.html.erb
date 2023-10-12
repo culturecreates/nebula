@@ -1,0 +1,27 @@
+<div class="meta">
+   <% entity.entity_jsonld.each do |prop, value| %>
+      <% next if prop == "@id" %>
+
+      <div class="statement">
+         <% predicate_hash = prop.hash %>
+       
+         <div class="statement-predicate">
+            <%= display_label(prop) %> 
+         </div>
+         <%= render partial: 'statement_objects', locals: { value: value, predicate_hash: predicate_hash }  %>
+
+         <% if prop != "@type" %>
+            <div class="statement_buttons">
+                <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: prop, predicate_hash: predicate_hash),  
+                  data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
+                  title: "Show all datasets",
+                  id: predicate_hash, 
+                  onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do 
+                %>
+                  <%= render partial: 'shared/icon_stack'%>
+               <% end %>
+            </div>
+         <% end %>
+      </div>
+   <% end %>
+</div>
