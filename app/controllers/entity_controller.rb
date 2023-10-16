@@ -12,6 +12,8 @@ class EntityController < ApplicationController
    
     @entity = Entity.new(entity_uri: uri)
     @entity.load_graph
+    @entity.replace_blank_nodes
+    @entity.replace_blank_nodes
     #@entity.load_shacl_into_graph("shacl_artsdata.ttl") 
   end
 

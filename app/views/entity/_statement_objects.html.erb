@@ -1,40 +1,22 @@
 <div class="statement-objects">
   <% solutions = SPARQL.execute("SELECT  ?obj WHERE { <#{entity.entity_uri}> <#{predicate}> ?obj }", entity.graph) %>
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
-    <% solutions.each do |statement| %>
+    <% solutions.each do |s| %>
       <div class="statement-object">
-        <% if statement["@id"] %>
-          <% if statement["@id"].start_with?("_:") %>
-            <% new_entity = Entity.new(entity_uri: "blank_node") %>
-            <% new_graph = RDF::Graph.new %>
-            <% node = statement["@id"][2..-1] %>
-            <% bn = RDF::Node.new %>
-            <% bn.id = node %>
-            <% puts bn %>
-            <% solutions = RDF::Query.execute (@entity.graph) do ;  
-                               pattern [:sub, :pred, :obj] ;  
-                                pattern [:obj, RDF.type, RDF::URI("http://schema.org/PostalAddress")] ;  
-                                pattern [ :obj, :bnpred, :bnobj] ; 
-                                end %>
-            <% solutions.each { |s| new_graph <<  [ s[:obj] , s[:bnpred], s[:bnobj] ] }  %>
-            <% new_entity.graph = new_graph %>
-            <% puts new_entity.entity_jsonld %>
-            <%= render partial: "statements_table", locals: {entity: new_entity} %>
-          <% else %>
-            <% frame_id = rand(10000)%>
-            <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: statement["@id"], frame_id: frame_id)%> loading="lazy" target="_top">
-              loading...
-            </turbo-frame>
-          <% end %>
+        <% if s.obj.uri? && s.obj.value.starts_with?("urn") %>
+          <% new_entity = Entity.new(entity_uri: s.obj ) %>
+          <% new_graph = RDF::Graph.new %>
+          <% new_entity.graph = entity.graph %>
+          <%= render partial: "statements_table", locals: {entity: new_entity} %>
+        <% elsif s.obj.uri? %>
+          <% frame_id = rand(10000) %>
+          <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: s.obj.to_s, frame_id: frame_id)%> loading="lazy" target="_top">
+            loading...
+          </turbo-frame>
+        <% elsif s.obj.literal? %>
+          <%= display_literal(s.obj) %>
         <% else %>
-          <% if statement.class == String && statement.start_with?("http") %>
-            <%= display_label(statement) %>
-          <% else %>
-            <%= display_literal(statement) %>
-          <% end %>
-        <% end %>
-        <% if statement["@annotation"] %>
-          <%= render partial: "annotation" , locals: {annotations: statement["@annotation"] }%>
+          <%= s.obj %> (unexpected value)
         <% end %>
       </div>
     <% end %>

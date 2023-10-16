@@ -1,0 +1,19 @@
+DELETE {
+ ?s ?p ?o .
+ ?o ?a ?b .
+}
+INSERT {
+ ?s ?p ?o_uri  .
+ ?o_uri ?a ?b .
+}
+WHERE {
+  {
+    SELECT * WHERE {
+      ?s ?p ?o .
+      filter(isBLANK(?o))
+      filter(isURI(?s))
+      bind(UUID() as ?o_uri)
+    }
+  }
+  ?o ?a ?b .
+}

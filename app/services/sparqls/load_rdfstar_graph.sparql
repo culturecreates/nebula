@@ -15,6 +15,12 @@ CONSTRUCT {
     ?bnp rdfs:label ?bnp_label .
     ?bno rdfs:label ?bno_label .
 
+    ?bns ?bnp ?2bns .
+    ?2bns ?2bnp ?2bno .
+    ?2bnp rdfs:label ?2bnp_label .  
+    ?2bno rdfs:label ?2bno_label .
+         
+
 }
 FROM onto:explicit 
 WHERE {
@@ -47,15 +53,30 @@ WHERE {
 
     # blank nodes
      OPTIONAL {
-       ?s ?p ?bns .
-       filter(isBLANK(?bns))
+        ?s ?p ?bns .
+        filter(isBLANK(?bns))
 
-       ?bns ?bnp ?bno .
-       OPTIONAL {
-        ?bnp rdfs:label ?bnp_label .
-       }
-       OPTIONAL {
-        ?bno rdfs:label ?bno_label .
+        ?bns ?bnp ?bno .
+        OPTIONAL {
+            ?bnp rdfs:label ?bnp_label .
+        }
+        OPTIONAL {
+            ?bno rdfs:label ?bno_label .
+        }
+
+        # second level blank nodes
+        OPTIONAL {
+            ?bns ?bnp ?2bns .
+            filter(isBLANK(?2bns))
+
+            ?2bns ?2bnp ?2bno .
+            OPTIONAL {
+                ?2bnp rdfs:label ?2bnp_label .
+            }
+            OPTIONAL {
+                ?2bno rdfs:label ?2bno_label .
+            }
+
        }
      }
 

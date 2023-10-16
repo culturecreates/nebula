@@ -1,0 +1,59 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://db.artsdata.ca/repositories/artsdata
+    body:
+      encoding: UTF-8
+      string: query=PREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E+%0APREFIX+onto%3A+%3Chttp%3A%2F%2Fwww.ontotext.com%2F%3E%0APREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0A%0ACONSTRUCT+%7B%0A++++%3Fs+%3Fp+%3Fo++.%0A++++%3C%3C%3Fs+%3Fp+%3Fo%3E%3E+%3Fa+%3Fb+.%0A++++%3Fp+rdfs%3Alabel+%3Fprop_label+.%0A++++%3Fo+rdfs%3Alabel+%3Fobj_label+.%0A++++%3Fa+rdfs%3Alabel+%3Fa_label+.%0A++++%3Fb+rdfs%3Alabel+%3Fb_label+.%0A%0A++++%3Fs+%3Fp+%3Fbns+.%0A++++%3Fbns+%3Fbnp+%3Fbno+.%0A++++%3Fbnp+rdfs%3Alabel+%3Fbnp_label+.%0A++++%3Fbno+rdfs%3Alabel+%3Fbno_label+.%0A%0A%7D%0AFROM+onto%3Aexplicit+%0AWHERE+%7B%0A++++values+%3Fs+%7B%0A++++++++%3Chttp%3A%2F%2Fkg.artsdata.ca%2Fresource%2FK23-300%3E+%0A++++%7D%0A%0A++++%3Fs+%3Fp+%3Fo++.%0A%0A++++%23+main+triple+labels%0A++++OPTIONAL+%7B%0A++++++++%3Fo+rdfs%3Alabel+%3Fobj_label+.%0A++++%7D%0A++++OPTIONAL+%7B%0A++++++++%3Fp+rdfs%3Alabel+%3Fprop_label+.%0A++++%7D%0A++++OPTIONAL+%7B%0A++++++++%3Fo+schema%3Aname+%3Fobj_name+.%0A++++%7D%0A%0A++++%23+quoted+triple+labels%0A++++OPTIONAL+%7B%0A++++++++%3C%3C%3Fs+%3Fp+%3Fo%3E%3E+%3Fa+%3Fb+.%0A++++++++%3Fa+rdfs%3Alabel+%3Fa_label+.%0A++++%7D%0A++++OPTIONAL+%7B%0A++++++++%3C%3C%3Fs+%3Fp+%3Fo%3E%3E+%3Fa+%3Fb+.%0A++++++++%3Fb+rdfs%3Alabel+%3Fb_label+.%0A++++%7D%0A%0A++++%23+blank+nodes%0A+++++OPTIONAL+%7B%0A+++++++%3Fs+%3Fp+%3Fbns+.%0A+++++++filter%28isBLANK%28%3Fbns%29%29%0A%0A+++++++%3Fbns+%3Fbnp+%3Fbno+.%0A+++++++OPTIONAL+%7B%0A++++++++%3Fbnp+rdfs%3Alabel+%3Fbnp_label+.%0A+++++++%7D%0A+++++++OPTIONAL+%7B%0A++++++++%3Fbno+rdfs%3Alabel+%3Fbno_label+.%0A+++++++%7D%0A+++++%7D%0A%0A+++%0A%7D+order+by+++%3Fprop_label+%3Fobj_label+%3Fa+%0A
+    headers:
+      User-Agent:
+      - Faraday v2.7.11
+      Accept:
+      - text/x-turtlestar
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Server:
+      - nginx/1.18.0 (Ubuntu)
+      Date:
+      - Sat, 14 Oct 2023 03:02:14 GMT
+      Content-Type:
+      - text/x-turtlestar;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept
+      Cache-Control:
+      - no-store
+      Content-Disposition:
+      - attachment; filename=query-result.ttls
+      X-Xss-Protection:
+      - 1; mode=block
+      - 1; mode=block
+      X-Frame-Options:
+      - DENY
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      - nosniff
+      Content-Language:
+      - en-US
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Referrer-Policy:
+      - origin
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        QHByZWZpeCByZGZzOiA8aHR0cDovL3d3dy53My5vcmcvMjAwMC8wMS9yZGYtc2NoZW1hIz4gLgpAcHJlZml4IG9udG86IDxodHRwOi8vd3d3Lm9udG90ZXh0LmNvbS8+IC4KQHByZWZpeCBzY2hlbWE6IDxodHRwOi8vc2NoZW1hLm9yZy8+IC4KQHByZWZpeCByZGY6IDxodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjPiAuCkBwcmVmaXggcmRmNGo6IDxodHRwOi8vcmRmNGoub3JnL3NjaGVtYS9yZGY0aiM+IC4KQHByZWZpeCBzZXNhbWU6IDxodHRwOi8vd3d3Lm9wZW5yZGYub3JnL3NjaGVtYS9zZXNhbWUjPiAuCkBwcmVmaXggb3dsOiA8aHR0cDovL3d3dy53My5vcmcvMjAwMi8wNy9vd2wjPiAuCkBwcmVmaXggeHNkOiA8aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjPiAuCkBwcmVmaXggZm46IDxodHRwOi8vd3d3LnczLm9yZy8yMDA1L3hwYXRoLWZ1bmN0aW9ucyM+IC4KCjxodHRwOi8va2cuYXJ0c2RhdGEuY2EvcmVzb3VyY2UvSzIzLTMwMD4gYSBzY2hlbWE6RXZlbnQ7CiAgPGh0dHA6Ly93d3cudzMub3JnL25zL3Byb3YjZ2VuZXJhdGVkQXRUaW1lPiAiMjAyMy0wNS0wMlQxNzo1ODoyMi4xNTBaIl5eeHNkOmRhdGVUaW1lOwogIDxodHRwOi8vd3d3LnczLm9yZy8yMDA0LzAyL3Nrb3MvY29yZSNoaXN0b3J5Tm90ZT4gIk1pbnRlZCBBcnN0c2RhdGEgSUQgZm9yIHNjaGVtYTpFdmVudCAnTGUgZMOubmVyIGRlIGNvbnMnIG9uIDIwMjMtMDUtMDJUMTc6NTg6MjIuMTUwWiI7CiAgc2NoZW1hOmxvY2F0aW9uIDxodHRwOi8va2cuYXJ0c2RhdGEuY2EvcmVzb3VyY2UvSzItMTk3PjsKICBzY2hlbWE6bmFtZSAiTGUgZMOubmVyIGRlIGNvbnMiQGZyOwogIHNjaGVtYTpzYW1lQXMgPGh0dHA6Ly9rZy5mb290bGlnaHQuaW8vcmVzb3VyY2UvbWFpc29uZGVsYWN1bHR1cmUtY2FfdGhlYXRyZS1ob3JzLXNlcmllLWxlLWRpbmVyLWRlLWNvbnM+LAogICAgPGh0dHA6Ly9rZy5mb290bGlnaHQuaW8vcmVzb3VyY2UvdG91dGN1bHR1cmUtY2FfbGUtZGluZXItZGUtY29ucy0yMTk3Mj47CiAgc2NoZW1hOnN0YXJ0RGF0ZSAiMjAyMy0wOC0wNVQyMDowMDowMC0wNDowMCJeXnhzZDpkYXRlVGltZSAuCgo8aHR0cDovL3d3dy53My5vcmcvMjAwNC8wMi9za29zL2NvcmUjaGlzdG9yeU5vdGU+IHJkZnM6bGFiZWwgImhpc3Rvcnkgbm90ZSJAZW4gLgoKPDw8aHR0cDovL2tnLmFydHNkYXRhLmNhL3Jlc291cmNlL0syMy0zMDA+IHNjaGVtYTpsb2NhdGlvbiA8aHR0cDovL2tnLmFydHNkYXRhLmNhL3Jlc291cmNlL0syLTE5Nz4+PgogIDxodHRwOi8vd3d3LnczLm9yZy9ucy9wcm92I3dhc0Rlcml2ZWRGcm9tPiA8aHR0cDovL2tnLmFydHNkYXRhLmNhL2RhdGFidXMvY3VsdHVyZS1jcmVhdGVzL2Zvb3RsaWdodC90b3V0Y3VsdHVyZS1jYS8yMDIzLTA0LTI1I0RhdGFJZD4gLgoKc2NoZW1hOmxvY2F0aW9uIHJkZnM6bGFiZWwgImxvY2F0aW9uIiAuCgo8aHR0cDovL2tnLmFydHNkYXRhLmNhL2RhdGFidXMvY3VsdHVyZS1jcmVhdGVzL2Zvb3RsaWdodC90b3V0Y3VsdHVyZS1jYS8yMDIzLTA0LTI1I0RhdGFJZD4KICByZGZzOmxhYmVsICJEYXRhSUQgbWV0YWRhdGEgZm9yIGZvb3RsaWdodC90b3V0Y3VsdHVyZS1jYSJAZW4gLgoKPDw8aHR0cDovL2tnLmFydHNkYXRhLmNhL3Jlc291cmNlL0syMy0zMDA+IHNjaGVtYTpuYW1lICJMZSBkw65uZXIgZGUgY29ucyJAZnI+PiA8aHR0cDovL3d3dy53My5vcmcvbnMvcHJvdiN3YXNEZXJpdmVkRnJvbT4KICAgIDxodHRwOi8va2cuYXJ0c2RhdGEuY2EvZGF0YWJ1cy9jdWx0dXJlLWNyZWF0ZXMvZm9vdGxpZ2h0L3RvdXRjdWx0dXJlLWNhLzIwMjMtMDQtMjUjRGF0YUlkPiAuCgpzY2hlbWE6bmFtZSByZGZzOmxhYmVsICJuYW1lIiAuCgo8PDxodHRwOi8va2cuYXJ0c2RhdGEuY2EvcmVzb3VyY2UvSzIzLTMwMD4gc2NoZW1hOnNhbWVBcyA8aHR0cDovL2tnLmZvb3RsaWdodC5pby9yZXNvdXJjZS9tYWlzb25kZWxhY3VsdHVyZS1jYV90aGVhdHJlLWhvcnMtc2VyaWUtbGUtZGluZXItZGUtY29ucz4+PgogIHNjaGVtYTpkYXRlQ3JlYXRlZCAiMjAyMy0wNS0xMFQxMjo0Mzo0MC4yMTFaIl5eeHNkOmRhdGVUaW1lIC4KCnNjaGVtYTpzYW1lQXMgcmRmczpsYWJlbCAic2FtZUFzIiAuCgpzY2hlbWE6ZGF0ZUNyZWF0ZWQgcmRmczpsYWJlbCAiZGF0ZUNyZWF0ZWQiIC4KCjw8PGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9yZXNvdXJjZS9LMjMtMzAwPiBzY2hlbWE6c2FtZUFzIDxodHRwOi8va2cuZm9vdGxpZ2h0LmlvL3Jlc291cmNlL3RvdXRjdWx0dXJlLWNhX2xlLWRpbmVyLWRlLWNvbnMtMjE5NzI+Pj4KICA8aHR0cDovL3d3dy53My5vcmcvbnMvcHJvdiN3YXNEZXJpdmVkRnJvbT4gPGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9kYXRhYnVzL2N1bHR1cmUtY3JlYXRlcy9mb290bGlnaHQvdG91dGN1bHR1cmUtY2EvMjAyMy0wNC0yNSNEYXRhSWQ+IC4KCjw8PGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9yZXNvdXJjZS9LMjMtMzAwPiBzY2hlbWE6c3RhcnREYXRlICIyMDIzLTA4LTA1VDIwOjAwOjAwLTA0OjAwIl5eeHNkOmRhdGVUaW1lPj4KICA8aHR0cDovL3d3dy53My5vcmcvbnMvcHJvdiN3YXNEZXJpdmVkRnJvbT4gPGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9kYXRhYnVzL2N1bHR1cmUtY3JlYXRlcy9mb290bGlnaHQvdG91dGN1bHR1cmUtY2EvMjAyMy0wNC0yNSNEYXRhSWQ+IC4KCnNjaGVtYTpzdGFydERhdGUgcmRmczpsYWJlbCAic3RhcnREYXRlIiAuCgpyZGY6dHlwZSByZGZzOmxhYmVsICJ0eXBlIiAuCgpzY2hlbWE6RXZlbnQgcmRmczpsYWJlbCAiRXZlbnQiIC4K
+  recorded_at: Sat, 14 Oct 2023 03:02:14 GMT
+recorded_with: VCR 6.2.0

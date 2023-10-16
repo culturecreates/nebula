@@ -54,13 +54,20 @@ class Entity
     @graph << RDF::Graph.load(@shacl)
   end
 
-  def dereference
-    sparql =  SparqlLoader.load('dereference', [
+  def load_card
+    sparql =  SparqlLoader.load('load_card', [
       'URI_PLACEHOLDER', self.entity_uri
     ])
     puts sparql
     @graph = construct_turtle(sparql)
   end
+
+  # load rdf from external URL
+  def dereference
+    
+    
+  end
+
 
   def expand_entity_property(predicate:)
     sparql =  SparqlLoader.load('expand_entity_property', [
@@ -98,6 +105,10 @@ class Entity
     else
       RDF::Graph.new
     end
+  end
+
+  def replace_blank_nodes
+    @graph = SPARQL.execute(SparqlLoader.load('replace_blank_nodes'), @graph, update: true)
   end
 
   def entity_jsonld

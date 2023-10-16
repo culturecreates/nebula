@@ -7,15 +7,17 @@
         <%= display_label(s.pred.to_s) %>
       </div>
       <%= render partial: 'statement_objects', locals: { entity: entity, predicate: s.pred, predicate_hash: predicate_hash }  %>
-      <div class="statement_buttons">
-        <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: s.pred.to_s, predicate_hash: predicate_hash),  
+      <% if !entity.entity_uri.starts_with?("urn:") %>
+        <div class="statement_buttons">
+          <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: s.pred.to_s, predicate_hash: predicate_hash),  
                   data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
                   title: "Show all datasets",
                   id: predicate_hash, 
                   onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do 
                 %>
-        <%= render partial: 'shared/icon_stack'%>
-      </div>
+          <%= render partial: 'shared/icon_stack'%>
+        </div>
+      <% end %>
     <% end %>
   </div>
 <% end %>
