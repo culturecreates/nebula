@@ -18,7 +18,7 @@ module EntityHelper
         response = "<a href='#{link}' target='_top'>#{solution.first[:name].value}</a>".html_safe
       else
         if id.starts_with?("http")
-          response = "<a href='#{link}' target='_top'>#{id}</a>".html_safe
+          response = "<a href='#{link}' target='_top'>#{id.split("/").last.split("#").last}</a>".html_safe
         else
           response = id
         end

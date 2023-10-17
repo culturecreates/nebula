@@ -5,5 +5,5 @@ Options:
   <li>
     Visit <a href='<%= entity.entity_uri %>' target='_blank'><%= entity.entity_uri %></a>
   </li>
-  <li> Dereference </li>
+  <li> Dereference <%= link_to   entity.entity_uri, dereference_external_path(uri: entity.entity_uri ) %></li>
 </ol>

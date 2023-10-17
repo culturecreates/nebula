@@ -1,4 +1,5 @@
 class DereferenceController < ApplicationController
+  rescue_from StandardError, with: :failed_dereference
 
   # /dereference/card?uri=
   def card
@@ -10,8 +11,15 @@ class DereferenceController < ApplicationController
 
   # /dereference/external?uri=
   def external
-    @entity = Entity.new(entity_uri: @uri)
+    @entity = Entity.new(entity_uri:params[:uri])
     @entity.dereference
-    render "entity/show"
+    @entity.replace_blank_nodes # first level
+    @entity.replace_blank_nodes # second level
+  end
+
+  private
+  def failed_dereference(exception)
+    flash[:alert] = exception
+    render dereference_external_path
   end
 end

@@ -1,0 +1,5 @@
+<div class="alternate-name">
+  <%= link_to "Dereference", dereference_external_path(uri: @entity.entity_uri) %> |
+  <a href=<%= @entity.entity_uri %>> external link</a> | 
+    <a href=<%= derived_link(@entity.entity_uri)%> id="aduriapi">derived statements</a> | 
+  <a href=<%= graphdb_link(@entity.entity_uri) %>  id="graphdb">graph db</a></div>

@@ -1,14 +1,11 @@
-
 <h1><%= @entity.label %>  </h1>
 <a><%= use_prefix(@entity.entity_uri) %></a>
-<div class="alternate-name">Another name | Also known as | <a href=<%= derived_link(@entity.entity_uri)%> id="aduriapi">derived statements</a> | <a href=<%= graphdb_link(@entity.entity_uri) %>  id="graphdb">graph db</a></div>
-
+<%= render partial: "entity_nav" %>
 <%= render partial: "external_resource", locals:{ entity: @entity } if @entity.graph.count == 0 %>
- 
 <%= render partial: "statements_table", locals:{ entity: @entity }  %>
 <br>
 <br>
-   <pre>
+<pre>
       <code>
          <% if  @entity.graph.count > 0 %>
             <%= @entity.graph.dump(:jsonld) %>
