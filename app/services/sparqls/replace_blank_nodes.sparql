@@ -11,7 +11,7 @@ WHERE {
     SELECT * WHERE {
       ?s ?p ?o .
       filter(isBLANK(?o))
-      filter(isURI(?s))
+      #filter(isURI(?s))
       bind(UUID() as ?o_uri)
     }
   }

@@ -79,17 +79,8 @@ class Entity
         @graph.from_ttl(result.dump(:turtle))
       rescue  
         raise StandardError, "Failed to load webpage."
-      end
-      
-
+      end 
     end
-    
-   
-   
-
-
-    
-   
   end
 
 
@@ -133,6 +124,10 @@ class Entity
 
   def replace_blank_nodes
     @graph = SPARQL.execute(SparqlLoader.load('replace_blank_nodes'), @graph, update: true)
+  end
+
+  def replace_blank_subject_nodes
+    @graph = SPARQL.execute(SparqlLoader.load('replace_blank_subject_nodes'), @graph, update: true)
   end
 
   def entity_jsonld

@@ -1,0 +1,22 @@
+DELETE {
+ ?s ?p ?o .
+ 
+}
+INSERT {
+ ?s_uri ?p ?o .
+}
+WHERE {
+  {
+    {
+      SELECT distinct ?s  WHERE {
+        ?s ?a ?b .
+        filter(isBLANK(?s))
+        FILTER NOT EXISTS { ?s <http://www.w3.org/1999/xhtml/vocab#role> ?b }
+      }
+    
+    }
+    bind(URI(CONCAT("http://blank.node/",STRUUID())) as ?s_uri)
+  }
+  ?s ?p ?o .
+  
+}

@@ -15,6 +15,7 @@ class DereferenceController < ApplicationController
     @entity.dereference
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
+    @entity.replace_blank_subject_nodes
   end
 
   private
