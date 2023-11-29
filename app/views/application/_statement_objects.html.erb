@@ -18,6 +18,15 @@
         <% else %>
           <%= s.obj %> (unexpected value)
         <% end %>
+          <% stat =  RDF::Statement(RDF::URI(entity.entity_uri), predicate, s.obj) %>
+          <% query  = RDF::Query.new do ; pattern [stat, :pred, :obj] ; end %>
+          <% annotations = query.execute(entity.graph) %>
+          <ul>
+         <% annotations.each do |a| %>
+
+           <li> <%= use_prefix(a.pred.value) %> : <%= use_prefix(a.obj) %></li>
+         <% end %>
+         </ul>
       </div>
     <% end %>
   </turbo-frame>

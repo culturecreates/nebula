@@ -1,0 +1,2 @@
+<http://gregory.com> <http://schema.org/name> "Gregory" .
+<< <http://gregory.com> <http://schema.org/name> "Gregory" >> <http://schema.org/son> "Julien" .

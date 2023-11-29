@@ -18,14 +18,14 @@ class EntityController < ApplicationController
   end
 
   # show all statements from all sources
-  # including unclaimed statements from other sources
+  # including claimed statements from other sources that are not endorsed (quoted only)
   # /entity/expand?subject=[canonical URI]&predicate=[canonical URI]&predicate_hash=[predicate.hash]
   def expand
     uri = params[:subject]
-    predicate = params[:predicate]
+    @predicate = RDF::URI(params[:predicate])
     @predicate_hash = params[:predicate_hash]
     @entity = Entity.new(entity_uri: uri)
-    @entity.expand_entity_property(predicate: predicate)
+    @entity.expand_entity_property(predicate: @predicate)
   end
  
 end

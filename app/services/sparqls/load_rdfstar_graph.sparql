@@ -41,6 +41,10 @@ WHERE {
         ?o schema:name ?obj_name .
     }
 
+
+    OPTIONAL {
+        <<?s ?p ?o>> ?a ?b .
+    }
     # quoted triple labels
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .

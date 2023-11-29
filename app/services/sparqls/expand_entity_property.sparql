@@ -5,9 +5,12 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 construct {
     ?event schema:name ?name .
     << ?event schema:name ?name >> ?a ?b .
-     
+     ?name ?name_pred ?name_obj .
+
+    << ?event schema:name ?name >> schema:id  ?sameAs  .
+
     << ?event schema:name ?name >> schema:dataset ?graph .
-    ?graph rdfs:label ?grap_label .
+    ?graph rdfs:label ?graph_label .
     
    schema:dataset rdfs:label "Dataset"@en .
 
@@ -20,9 +23,13 @@ where {
         <URI_PLACEHOLDER>
     }
     {
+        # assertions - endorsed claims
         graph ?graph {
             ?event schema:name ?name .
-             
+            OPTIONAL {
+                ?name ?name_pred ?name_obj .
+                 filter (isBLANK(?name))
+            }
         }
         OPTIONAL {
              <<?event schema:name ?name >> ?a ?b .
@@ -30,28 +37,50 @@ where {
                 ?a rdfs:label ?a_label . 
              }
               OPTIONAL {
-            ?b rdfs:label ?b_label . 
+                ?b rdfs:label ?b_label . 
               }
         }
-
-
+    }
+    UNION
+   
+    {
+        # claims - claims not endorsed
+        graph ?graph {       
+             <<?event schema:name ?name >> ?a ?b .
+             OPTIONAL {
+                ?a rdfs:label ?a_label . 
+             }
+              OPTIONAL {
+                ?b rdfs:label ?b_label . 
+              }
+        }
     }
     UNION
     {
         ?event  schema:sameAs ?sameAs .
         graph ?graph {
             ?sameAs schema:name ?name .
+             OPTIONAL {
+                ?name ?name_pred ?name_obj .
+                 filter (isBLANK(?name))
+            }
         }
+
     }
     UNION 
     {
         ?event  ^schema:sameAs ?sameAs .
         graph ?graph {
             ?sameAs schema:name ?name .
+             OPTIONAL {
+               
+                ?name ?name_pred ?name_obj .
+                 filter (isBLANK(?name))
+            }
         }
     }
 
-     ?graph rdfs:label ?grap_label .
+     ?graph rdfs:label ?graph_label .
 
     
 }
