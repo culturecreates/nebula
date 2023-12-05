@@ -67,19 +67,9 @@ class Entity
     @graph = RDF::Graph.new 
     # first try proper content negotiation
     begin
-      graph = RDF::Graph.load(self.entity_uri, rdfstar: true)
-      if graph.count > 0 
-        @graph << graph 
-      end
-    rescue 
-      raise StandardError, "Could not dereference."
-      begin
-        # otherwise try loading HTML and extracting structured data
-        result = RDF::RDFa::Reader.open(self.entity_uri)
-        @graph.from_ttl(result.dump(:turtle))
-      rescue  
-        raise StandardError, "Failed to load webpage."
-      end 
+      @graph = RDF::Graph.load(self.entity_uri, rdfstar: true)
+    rescue
+      raise StandardError, "Could not detect structured data."
     end
   end
 
