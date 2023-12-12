@@ -14,4 +14,6 @@ Rails.application.routes.draw do
 
   get "github/callback", to: "github#callback"
 
+  get "query/show", to: "query#show"
+
 end

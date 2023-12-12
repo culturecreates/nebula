@@ -1,5 +1,0 @@
-  <% if uri.starts_with?("_:") %>
-    <%= uri %>
-  <% else %>
-      <a href="/entity?uri=<%= CGI.escape(uri) %>"><%= use_prefix(uri) %></a>
-  <% end %>

@@ -29,27 +29,29 @@ module EntityHelper
     response
   end
 
-  def display_literal(literal)
+  def display_object(obj)
     # Todo: Add anchor link button for literals that look like urls
-    if literal.class == String || literal.class == Hash
-      if literal["@language"]
-        language_literal(literal['@value'],literal['@language'])
-      elsif  literal["@value"]
-        literal["@value"]
-      else
-        literal
-      end
-    else
-      if literal.language
-        language_literal(literal.value, literal.language)
-      else
-        literal
-      end
-    end
+        if obj.uri?
+          if obj.starts_with?("_:") 
+            obj
+          else 
+            uri_link(obj)
+          end
+        else
+          if obj.language
+            language_literal(obj.value, obj.language)
+          else
+            obj
+          end
+        end
   end
 
   def language_literal(string, language)
     "<span>#{string} <span style='color:gray;font-size: small'>@#{language}</span></span>".html_safe  
+  end
+
+  def uri_link(uri)
+    "<a href=\"/entity?uri=#{CGI.escape(uri)}\">#{use_prefix(uri)}</a>".html_safe
   end
 
   def display_reference(id)

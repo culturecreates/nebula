@@ -14,7 +14,7 @@
             loading...
           </turbo-frame>
         <% elsif s.obj.literal? %>
-          <%= display_literal(s.obj) %>
+          <%= display_object(s.obj) %>
         <% else %>
           <%= s.obj %> (unexpected value)
         <% end %>

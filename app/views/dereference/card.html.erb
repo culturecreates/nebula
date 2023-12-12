@@ -1,28 +1,31 @@
 <h1>Card</h1>
-
-Test: 
+Test:
 <turbo-frame id="card-<%= @frame_id %>">
 
   <div class="statement-object">
-    <% solution = dereference_helper(@uri)%>
-    <% if solution[:streetAddress] %>
-      <b><%= solution[:streetAddress] %>, <%= solution[:addressLocality] %></b> 
+    <% solution = dereference_helper(@uri) %>
+    <% if solution && solution[:streetAddress] %>
+      <b>
+        <%= solution[:streetAddress] %>,
+        <%= solution[:addressLocality] %>
+      </b>
+      <%= display_object(RDF.URI(@uri)) %>
+    <% elsif solution && solution[:label] %>
+      <b><%= display_object(solution[:label]) %></b>
+      <div class="alternate-name">
+        <%= display_object(solution[:type]) %>
+      </div>
+      <%= display_object(RDF.URI(@uri)) %>
     <% else %>
-      <% if solution[:label] %>
-      <b><%= display_literal(solution[:label]) %></b> 
-      <% end %>
+      <%= display_object(RDF.URI(@uri)) %>
     <% end %>
-  
-    <div class="alternate-name"> <%= render partial: 'shared/uri_formater', locals: {uri: solution[:type], type: ""} %></div>
-    <%= render partial: 'shared/uri_formater', locals: {uri: @uri, type: solution[:type]} %> 
-   
-  
+
   </div>
 
 </turbo-frame>
 
-   <pre>
-      <code>
-         <%= @entity.graph.dump(:jsonld) %>
-      </code>
-   </pre>
+<pre>
+  <code>
+    <%= @entity.graph.dump(:jsonld) %>
+  </code>
+</pre>

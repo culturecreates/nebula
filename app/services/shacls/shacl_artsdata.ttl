@@ -34,6 +34,8 @@ ads:NameSh
     sh:path schema:name ;
     sh:uniqueLang true ;
     sh:name "Name of event" ;
+    sh:description "The name of the event."@en ;
+    sh:order 1 ;
     sh:minCount 1 ;
     sh:or ( 
         [sh:datatype rdf:langString ;] 

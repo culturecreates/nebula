@@ -20,11 +20,8 @@ module DereferenceHelper
       end
     end
 
-    solution = @entity.graph.query(query).first
-    return solution.to_h unless solution.blank?
-
-    # handle blank
-    {label: nil, type: ""}
+    @entity.graph.query(query).first
+   
   end
 
 end

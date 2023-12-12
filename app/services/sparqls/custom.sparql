@@ -1,0 +1,11 @@
+PREFIX schema: <http://schema.org/>
+SELECT * WHERE {
+    graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
+        ?uri schema:name  ?name ;
+            a schema:Organization .
+        OPTIONAL {
+            ?uri   schema:sameAs ?sameAs .
+            filter(contains(str(?sameAs),"http://kg.artsdata.ca/"))
+        }
+    }
+}
