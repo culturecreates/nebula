@@ -1,0 +1,23 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?uri (sample(?name_language) as ?name) ?sameAs   ?url   ?resultSeverity  WHERE {
+    graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
+        ?uri schema:name  ?name_language ;
+             a schema:Organization .
+        OPTIONAL {
+            ?uri schema:url ?url .
+            filter(!isBLANK(?url))
+        }
+        OPTIONAL {
+            ?uri   schema:sameAs ?sameAs .
+            filter(contains(str(?sameAs),"http://kg.artsdata.ca/"))
+        }
+        OPTIONAL {
+            ?shacl sh:focusNode ?uri ;
+                   sh:value ?obj ;
+                   sh:resultPath ?resultPath ;
+                   sh:resultSeverity ?resultSeverity .
+            ?uri  ?resultPath ?obj .
+        }
+    }
+} GROUP BY ?uri ?sameAs  ?url  ?resultSeverity

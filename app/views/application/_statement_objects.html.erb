@@ -1,32 +1,45 @@
 <div class="statement-objects">
-  <% solutions = SPARQL.execute("SELECT  ?obj WHERE { <#{entity.entity_uri}> <#{predicate}> ?obj }", entity.graph) %>
+  <% solutions =
+    SPARQL.execute(
+      "SELECT  ?obj WHERE { <#{entity.entity_uri}> <#{predicate}> ?obj }",
+      entity.graph,
+    ) %>
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
     <% solutions.each do |s| %>
       <div class="statement-object">
         <% if s.obj.uri? && s.obj.value.starts_with?("urn") %>
-          <% new_entity = Entity.new(entity_uri: s.obj ) %>
+          <% new_entity = Entity.new(entity_uri: s.obj) %>
           <% new_graph = RDF::Graph.new %>
           <% new_entity.graph = entity.graph %>
-          <%= render partial: "statements_table", locals: {entity: new_entity} %>
+          <%= render partial: "statements_table", locals: { entity: new_entity } %>
         <% elsif s.obj.uri? %>
-          <% frame_id = rand(10000) %>
-          <turbo-frame id='card-<%= frame_id %>' src=<%= dereference_card_path(uri: s.obj.to_s, frame_id: frame_id)%> loading="lazy" target="_top">
+          <% frame_id = rand(10_000) %>
+          <turbo-frame
+            id='card-<%= frame_id %>'
+            src=<%= dereference_card_path(uri: s.obj.to_s, frame_id: frame_id)%>
+            loading="lazy"
+            target="_top"
+          >
             loading...
           </turbo-frame>
-        <% elsif s.obj.literal? %>
-          <%= display_object(s.obj) %>
         <% else %>
-          <%= s.obj %> (unexpected value)
+          <%= display_object(s.obj) %>
         <% end %>
-          <% stat =  RDF::Statement(RDF::URI(entity.entity_uri), predicate, s.obj) %>
-          <% query  = RDF::Query.new do ; pattern [stat, :pred, :obj] ; end %>
-          <% annotations = query.execute(entity.graph) %>
-          <ul>
-         <% annotations.each do |a| %>
-
-           <li> <%= use_prefix(a.pred.value) %> : <%= use_prefix(a.obj) %></li>
-         <% end %>
-         </ul>
+        <!-- SHACL -->
+        <%= render partial: "shacl_errors",
+        locals: {
+          entity: entity,
+          predicate: predicate,
+          object: s.obj,
+        } %>
+        <!-- Annotations -->
+        <%= render partial: "annotations2",
+        locals: {
+          entity: entity,
+          predicate: predicate,
+          object: s.obj,
+        } %>
+       
       </div>
     <% end %>
   </turbo-frame>

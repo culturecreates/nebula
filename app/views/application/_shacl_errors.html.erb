@@ -1,0 +1,29 @@
+<% query =
+  RDF::Query.new do
+    pattern [
+      :shacl,
+      RDF.URI("http://www.w3.org/ns/shacl#focusNode"),
+      RDF.URI(entity.entity_uri),
+    ]
+    pattern [
+      :shacl,
+      RDF.URI("http://www.w3.org/ns/shacl#resultMessage"),
+      :resultMessage,
+    ]
+    pattern [
+      :shacl,
+      RDF.URI("http://www.w3.org/ns/shacl#resultPath"),
+      RDF.URI(predicate),
+    ]
+    pattern [:shacl, RDF.URI("http://www.w3.org/ns/shacl#value"), object]
+  end %>
+<% annotations = query.execute(entity.graph) %>
+<% if annotations.count > 0 %>
+  <ul>
+    <% annotations.each do |a| %>
+      <p style="color:red;">
+        <%= a.resultMessage.value %>
+      </p>
+    <% end %>
+  </ul>
+<% end %>

@@ -5,6 +5,7 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 CONSTRUCT {
     ?s ?p ?o  .
+
     <<?s ?p ?o>> ?a ?b .
     ?p rdfs:label ?prop_label .
     ?o rdfs:label ?obj_label .
@@ -21,9 +22,11 @@ CONSTRUCT {
     ?2bnp rdfs:label ?2bnp_label .  
     ?2bno rdfs:label ?2bno_label .
 
+
     ?shacl_bn sh:focusNode ?s ; 
          sh:resultPath ?resultPath ;
-         sh:resultMessage ?resultMessage .
+         sh:resultMessage ?resultMessage ;
+         sh:value ?value .
 
 }
 FROM onto:explicit 
@@ -39,6 +42,12 @@ WHERE {
          sh:resultPath ?resultPath ;
          sh:resultMessage ?resultMessage .
     }
+
+    OPTIONAL {
+        ?shacl_bn sh:focusNode ?s ; 
+         sh:value ?value .
+    }
+
     
 
     # main triple labels
