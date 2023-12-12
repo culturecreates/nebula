@@ -1,6 +1,7 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 CONSTRUCT {
     ?s ?p ?o  .
@@ -19,7 +20,10 @@ CONSTRUCT {
     ?2bns ?2bnp ?2bno .
     ?2bnp rdfs:label ?2bnp_label .  
     ?2bno rdfs:label ?2bno_label .
-         
+
+    ?shacl_bn sh:focusNode ?s ; 
+         sh:resultPath ?resultPath ;
+         sh:resultMessage ?resultMessage .
 
 }
 FROM onto:explicit 
@@ -29,6 +33,13 @@ WHERE {
     }
 
     ?s ?p ?o  .
+
+    OPTIONAL {
+        ?shacl_bn sh:focusNode ?s ; 
+         sh:resultPath ?resultPath ;
+         sh:resultMessage ?resultMessage .
+    }
+    
 
     # main triple labels
     OPTIONAL {

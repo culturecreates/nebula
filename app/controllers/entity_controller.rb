@@ -14,7 +14,7 @@ class EntityController < ApplicationController
     @entity.load_graph
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
-    @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
+  #  @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
   end
 
   # show all statements from all sources
