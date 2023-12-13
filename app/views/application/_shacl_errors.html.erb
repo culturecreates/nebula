@@ -3,21 +3,21 @@
     pattern [
       :shacl,
       RDF.URI("http://www.w3.org/ns/shacl#focusNode"),
-      RDF.URI(entity.entity_uri),
+      RDF.URI(subject),
     ]
     pattern [
       :shacl,
       RDF.URI("http://www.w3.org/ns/shacl#resultMessage"),
       :resultMessage,
     ]
-    pattern [
-      :shacl,
-      RDF.URI("http://www.w3.org/ns/shacl#resultPath"),
-      RDF.URI(predicate),
-    ]
+    # pattern [
+    #   :shacl,
+    #   RDF.URI("http://www.w3.org/ns/shacl#resultPath"),
+    #   predicate,
+    # ]
     pattern [:shacl, RDF.URI("http://www.w3.org/ns/shacl#value"), object]
   end %>
-<% annotations = query.execute(entity.graph) %>
+<% annotations = query.execute(graph) %>
 <% if annotations.count > 0 %>
   <ul>
     <% annotations.each do |a| %>

@@ -24,10 +24,11 @@ CONSTRUCT {
 
 
     ?shacl_bn sh:focusNode ?s ; 
-         sh:resultPath ?resultPath ;
-         sh:resultMessage ?resultMessage ;
-         sh:value ?value .
+        ?shacl_pred ?shal_obj .
 
+    ?shacl_bn2 sh:focusNode ?bns ; 
+        ?shacl_bn2_pred ?shal_bn2_obj .
+    
 }
 FROM onto:explicit 
 WHERE {
@@ -39,8 +40,7 @@ WHERE {
 
     OPTIONAL {
         ?shacl_bn sh:focusNode ?s ; 
-         sh:resultPath ?resultPath ;
-         sh:resultMessage ?resultMessage .
+            ?shacl_pred ?shal_obj .
     }
 
     OPTIONAL {
@@ -79,6 +79,11 @@ WHERE {
      OPTIONAL {
         ?s ?p ?bns .
         filter(isBLANK(?bns))
+
+        OPTIONAL {
+            ?shacl_bn2 sh:focusNode ?bns ; 
+                ?shacl_bn2_pred ?shal_bn2_obj .
+        }
 
         ?bns ?bnp ?bno .
         OPTIONAL {

@@ -117,7 +117,9 @@ class Entity
   end
 
   def replace_blank_subject_nodes
+    # puts "before: #{pp @graph.dump(:turtle)}"
     @graph = SPARQL.execute(SparqlLoader.load('replace_blank_subject_nodes'), @graph, update: true)
+    # puts "after replace blank nodes: #{pp @graph.dump(:turtle)}"
   end
 
   def entity_jsonld

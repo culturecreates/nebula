@@ -28,7 +28,8 @@
         <!-- SHACL -->
         <%= render partial: "shacl_errors",
         locals: {
-          entity: entity,
+          graph: entity.graph,
+          subject: entity.entity_uri,
           predicate: predicate,
           object: s.obj,
         } %>
@@ -39,7 +40,7 @@
           predicate: predicate,
           object: s.obj,
         } %>
-       
+
       </div>
     <% end %>
   </turbo-frame>

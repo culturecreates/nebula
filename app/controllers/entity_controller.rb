@@ -11,9 +11,10 @@ class EntityController < ApplicationController
     end
    
     @entity = Entity.new(entity_uri: uri)
-    @entity.load_graph
+    @entity.load_graph 
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
+    @entity.replace_blank_subject_nodes
   #  @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
   end
 

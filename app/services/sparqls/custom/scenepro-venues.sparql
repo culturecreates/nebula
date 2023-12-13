@@ -14,10 +14,7 @@ SELECT ?uri (sample(?name_language) as ?name) ?sameAs   ?url   ?resultSeverity  
         }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
-                   sh:value ?obj ;
-                   sh:resultPath ?resultPath ;
-                   sh:resultSeverity ?resultSeverity .
-            ?uri  ?resultPath ?obj .
+                sh:resultSeverity ?resultSeverity .
         }
     }
 } GROUP BY ?uri ?sameAs  ?url  ?resultSeverity
