@@ -7,6 +7,7 @@ class Entity
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
+    @graph = h[:graph]
   end
 
   def label
@@ -78,6 +79,14 @@ class Entity
     sparql =  SparqlLoader.load('expand_entity_property', [
       'URI_PLACEHOLDER', self.entity_uri,
       'schema:name', "<#{predicate}>"
+    ])
+    puts "SPARQL: #{sparql}"
+    @graph = construct_turtle(sparql)
+  end
+
+  def load_claims
+    sparql =  SparqlLoader.load('load_rdfstar_claims_graph', [
+      'entity_uri_placeholder', self.entity_uri
     ])
     puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)

@@ -29,6 +29,7 @@ module EntityHelper
       error =  solution.first[:label] || "missing"
       "<a href='#{link}' target='_top'>#{label}</a>#{message}".html_safe
     else
+      uri = uri.value if uri.class == RDF::URI
       if uri.starts_with?("http")
         "<a href='#{link}' target='_top'>#{uri.split("/").last.split("#").last}</a>".html_safe
       else
@@ -37,26 +38,35 @@ module EntityHelper
     end
   end
 
-  # Display objects which may be URIs, language literals, or literals.
+  # Display RDF objects which may be URIs, blank nodes or literals.
   def display_object(obj)
-    if obj.node? 
-      obj
+    if obj.node? # blank node
+      "nested data"
     elsif obj.uri?
-      uri_link(obj)
-    elsif obj.language
-      language_literal(obj.value, obj.language)
+      display_uri(obj)
+    elsif obj.literal?
+      display_literal(obj)
     else
-      obj
+      raise StandardError.new "Unexpected RDF class: #{obj.class.to_s}"
     end
   end
 
-  def language_literal(string, language)
-    "<span>#{string} <span style='color:gray;font-size: small'>@#{language}</span></span>".html_safe  
+  # Display RDF object literal
+  def display_literal(obj)
+    if obj.language
+      "<span>#{obj.value} <span style='color:gray;font-size: small'> #{obj.language}</span></span>".html_safe  
+    elsif obj.value.starts_with?("http")
+      "<span>#{obj.value} <a href='#{obj.value}' target='_blank'> #{ render partial: 'shared/icon_link'}</a></span>".html_safe
+    else
+      "<span>#{obj.value}</span>".html_safe
+    end
   end
 
-  def uri_link(uri)
+
+ # Display RDF::URI as a link
+  def display_uri(uri)
     link = entity_path(uri: uri)
-    "<a href=\"#{link}\">#{use_prefix(uri)}</a>".html_safe
+    "<a href='#{link}' target='_top'>#{use_prefix(uri)}</a>".html_safe
   end
 
   def display_reference(uri)

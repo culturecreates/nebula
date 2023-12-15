@@ -1,11 +1,10 @@
+# replace_blank_subject_nodes
+
 DELETE {
  ?s ?p ?o .
-
- 
 }
 INSERT {
  ?s_uri ?p ?o .
-
 }
 WHERE {
   {
@@ -20,4 +19,6 @@ WHERE {
     bind(URI(CONCAT("http://blank.node/",STRUUID())) as ?s_uri)
   }
   ?s ?p ?o .
+ 
+ 
 }

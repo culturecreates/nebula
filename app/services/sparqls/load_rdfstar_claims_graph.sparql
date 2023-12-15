@@ -1,4 +1,4 @@
-# load_rdfstar_graph
+# load_rdfstar_claims_graph
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
@@ -43,20 +43,6 @@ WHERE {
         <entity_uri_placeholder> 
     }
 
-    ?s ?p ?o  .
-
-    OPTIONAL {
-        ?shacl_bn sh:focusNode ?s ; 
-            ?shacl_pred ?shal_obj .
-    }
-
-    OPTIONAL {
-        ?shacl_bn sh:focusNode ?s ; 
-         sh:value ?value .
-    }
-
-    
-
     # main triple labels
     OPTIONAL {
         ?o rdfs:label ?obj_label .
@@ -69,10 +55,11 @@ WHERE {
     }
 
     # quoted triple
-    OPTIONAL {
-        <<?s ?p ?o>> ?a ?b .
-        filter(!isBLANK(?b))
-    }
+    <<?s ?p ?o>> ?a ?b .
+
+        FILTER NOT EXISTS {?s ?p ?anything }
+     
+  
     # quoted triple labels
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .

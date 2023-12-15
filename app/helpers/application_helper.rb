@@ -2,9 +2,12 @@ module ApplicationHelper
 
 
   def use_prefix(uri)
+
+    return if uri.blank?
+
     uri = uri.value if uri.class != String
 
-    puts uri.inspect
+    
     uri_compact = uri.gsub("http://schema.org/","schema:")
       .gsub("http://kg.artsdata.ca/resource/","")
       .gsub("http://kg.footlight.io/resource/","footlight-console:")

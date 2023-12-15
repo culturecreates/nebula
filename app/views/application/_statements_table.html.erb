@@ -9,10 +9,10 @@
   <% solutions = SPARQL.execute("SELECT distinct ?pred WHERE { <#{entity.entity_uri}> ?pred ?obj }", entity.graph) %>
   <% solutions.each do |s| %>
     <div class="statement">
-      <% predicate_hash = s.pred.to_s.hash %>
       <div class="statement-predicate">
         <%= display_label(s.pred.to_s) %>
       </div>
+      <% predicate_hash = s.pred.to_s.hash %>
       <%= render partial: 'statement_objects', locals: { entity: entity, predicate: s.pred, predicate_hash: predicate_hash }  %>
       <% if !entity.entity_uri.starts_with?("urn:") %>
         <div class="statement_buttons">

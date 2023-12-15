@@ -1,0 +1,28 @@
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX adr: <http://kg.artsdata.ca/resource/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+delete {
+    << ?mint_entity ?props ?obj  >>  prov:wasDerivedFrom ?bn .
+    ?bn wd:P248 ?source_dataset ;
+        ?bnp ?bno .
+}
+where {
+    values ?source_graph {
+        <http://kg.artsdata.ca/culture-creates/huginn/capacoa-members>
+    }
+    ?source_graph prov:wasDerivedFrom/foaf:primaryTopic ?source_dataset .
+    {
+        select ?source_entity ?mint_entity {
+            graph ?source_graph {
+                ?source_entity a schema:Organization ;
+                               schema:sameAs ?mint_entity .
+            }
+        }
+    }
+    << ?mint_entity ?props ?obj  >>  prov:wasDerivedFrom ?bn .
+    ?bn wd:P248 ?source_dataset ;
+        ?bnp ?bno .
+}

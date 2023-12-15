@@ -8,10 +8,7 @@
     <% solutions.each do |s| %>
       <div class="statement-object">
         <% if s.obj.uri? && s.obj.value.starts_with?("urn") %>
-          <% new_entity = Entity.new(entity_uri: s.obj) %>
-          <% new_graph = RDF::Graph.new %>
-          <% new_entity.graph = entity.graph %>
-          <%= render partial: "statements_table", locals: { entity: new_entity } %>
+          <%= render partial: "statements_table", locals: { entity: Entity.new(entity_uri: s.obj, graph: entity.graph ) } %>
         <% elsif s.obj.uri? %>
           <% frame_id = rand(10_000) %>
           <turbo-frame
@@ -34,7 +31,7 @@
           object: s.obj,
         } %>
         <!-- Annotations -->
-        <%= render partial: "annotations2",
+        <%= render partial: "annotations",
         locals: {
           entity: entity,
           predicate: predicate,

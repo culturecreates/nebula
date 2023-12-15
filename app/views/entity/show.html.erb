@@ -3,13 +3,24 @@
 <%= render partial: "entity_nav" %>
 <%= render partial: "external_resource", locals:{ entity: @entity } if @entity.graph.count == 0 %>
 <%= render partial: "statements_table", locals:{ entity: @entity }  %>
+
+
+<turbo-frame
+            id='unsupported-claims'
+            src=<%= entity_unsupported_claims_path(uri: @entity.entity_uri)%>
+            loading="lazy"
+            target="_top"
+          >
+            <h4>Unasserted Properties </h4>
+</turbo-frame>
+
 <br>
 <br>
 <pre>
-      <code>
-         <% if  @entity.graph.count > 0 %>
-            <%= @entity.graph.dump(:jsonld) %>
-         <% end %>
-      </code>
-   </pre>
+   <code>
+      <% if  @entity.graph.count > 0 %>
+         <%= @entity.graph.dump(:jsonld) %>
+      <% end %>
+   </code>
+</pre>
 </div>

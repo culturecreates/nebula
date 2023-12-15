@@ -15,6 +15,7 @@ class EntityController < ApplicationController
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
     @entity.replace_blank_subject_nodes
+    pp @entity.graph.dump(:turtle)
   #  @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
   end
 
@@ -27,6 +28,15 @@ class EntityController < ApplicationController
     @predicate_hash = params[:predicate_hash]
     @entity = Entity.new(entity_uri: uri)
     @entity.expand_entity_property(predicate: @predicate)
+  end
+
+  # supported claims (quoted only)
+  # /entity/unsupported_claims?uri=[canonical URI]
+  def unsupported_claims
+    uri = params[:uri]
+    @entity = Entity.new(entity_uri: uri)
+    @entity.load_claims
+    @entity.replace_blank_nodes # first level
   end
  
 end

@@ -1,0 +1,59 @@
+<div class="annotation">
+
+  <% stat = RDF.Statement(RDF.URI(entity.entity_uri), predicate, object) %>
+  <% query = RDF::Query.new { pattern [stat, :pred, :obj] } %>
+  <% annotations = query.execute(entity.graph) %>
+  <% if annotations.count > 0 %>
+    <% random = rand(10_000) %>
+    <div
+      class="reference accordion"
+      style="--bs-accordion-btn-padding-y: 5px;--bs-accordion-border-width: 0px;"
+      id="accordionFlushExample"
+    >
+      <div class="accordion-item">
+        <h6 class="accordion-header">
+          <button
+            class="accordion-button btn-sm collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse<%=random%>"
+            aria-expanded="false"
+            aria-controls="flush-collapseOne"
+          >
+            <span><%= annotations.count %>
+              <%= "annotation".pluralize(annotations.count) %></span>
+          </button>
+        </h6>
+        <div
+          id="collapse<%=random%>"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionFlushExample"
+        >
+          <% annotations.each do |a| %>
+            <div class="accordion-body">
+
+              <div class="statement">
+                <div class="statement-predicate">
+                  <%= display_object(a.pred) %>
+                </div>
+                <div class="statement-objects">
+                  <div class="statement-object">
+                    <% if a.obj.uri? && a.obj.value.starts_with?("urn") %>
+                      <%= render partial: "statements_table",
+                      locals: {
+                        entity: Entity.new(entity_uri: a.obj, graph: entity.graph),
+                      } %>
+                    <% else %>
+                      <%= display_label(a.obj) %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
