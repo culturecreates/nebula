@@ -30,13 +30,22 @@ class EntityController < ApplicationController
     @entity.expand_entity_property(predicate: @predicate)
   end
 
-  # supported claims (quoted only)
+  # unsupported claims (quoted only)
   # /entity/unsupported_claims?uri=[canonical URI]
   def unsupported_claims
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.load_claims
     @entity.replace_blank_nodes # first level
+  end
+
+  # derived statements (inverse path)
+  # /entity/derived_statements?uri=[canonical URI]
+  def derived_statements
+    uri = params[:uri]
+    @entity = Entity.new(entity_uri: uri)
+    @entity.load_derived_statements
+   #  @entity.replace_blank_nodes # first level
   end
  
 end

@@ -1,0 +1,22 @@
+<h1>Claims for
+  <%= @entity.label %>
+</h1>
+<a><%= use_prefix(@entity.entity_uri) %></a>
+
+<turbo-frame id="reverse-statements">
+  <% if @entity.graph.count > 0 %>
+    <h4>Derived statements
+    </h4>
+    <%= render partial: "statements_table", locals: { entity: @entity } %>
+  <% end %>
+</turbo-frame>
+
+<br>
+<br>
+<pre>
+  <code>
+    <% if  @entity.graph.count > 0 %>
+      <%= @entity.graph.dump(:jsonld) %>
+    <% end %>
+  </code>
+</pre>

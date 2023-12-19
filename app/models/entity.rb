@@ -92,6 +92,14 @@ class Entity
     @graph = construct_turtle(sparql)
   end
 
+  def load_derived_statements
+    sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    puts "SPARQL: #{sparql}"
+    @graph = construct_turtle(sparql)
+  end
+
   def construct_turtle(sparql)
     response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
     if response[:code] == 200

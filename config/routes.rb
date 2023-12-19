@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   get "entity", to: "entity#show"
   get "entity/unsupported_claims", to: "entity#unsupported_claims"
+  get "entity/derived_statements", to: "entity#derived_statements"
   get "entity/expand", to: "entity#expand"
   get "dereference/card", to: "dereference#card"
 

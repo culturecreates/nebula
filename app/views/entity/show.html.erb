@@ -11,16 +11,19 @@
             loading="lazy"
             target="_top"
           >
-            <h4>Unasserted Properties </h4>
+            
 </turbo-frame>
 
 <br>
+<turbo-frame
+            id='reverse-statements'
+            src=<%= entity_derived_statements_path(uri: @entity.entity_uri)%>
+            loading="lazy"
+            target="_top"
+          >
+           
+</turbo-frame>
 <br>
-<pre>
-   <code>
-      <% if  @entity.graph.count > 0 %>
-         <%= @entity.graph.dump(:jsonld) %>
-      <% end %>
-   </code>
-</pre>
+<br>
+
 </div>

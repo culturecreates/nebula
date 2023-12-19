@@ -1,0 +1,25 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?uri (sample(?name_language) as ?name) (sample(?url) as ?webpage)  (sample(?location_name) as ?location)    ?startDate  
+WHERE {
+    graph <http://kg.artsdata.ca/minted/K23> {
+        ?uri schema:name  ?name_language ;
+             a schema:Event ;
+             schema:startDate ?startDate . 
+       
+        OPTIONAL {
+            ?shacl sh:focusNode ?uri ;
+                sh:resultSeverity ?resultSeverity .
+        }
+
+        filter(?startDate > now() )
+    }
+          
+        OPTIONAL {
+            ?uri schema:sameAs/schema:url ?url .
+            filter(!isBLANK(?url))
+        }
+     ?uri  schema:location/schema:name ?location_name .
+
+} GROUP BY ?uri  ?startDate  
+ORDER BY ?startDate

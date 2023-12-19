@@ -5,13 +5,16 @@ construct {
           a ?type ; 
           <http://schema.org/streetAddress> ?street  ;  
           <http://schema.org/addressLocality> ?locality ;  
-          <http://schema.org/postalCode> ?postalCode . 
+          <http://schema.org/postalCode> ?postalCode ;
+           <http://schema.org/startDate> ?startDate .
         } 
         where { 
           OPTIONAL { <URI_PLACEHOLDER> <http://www.w3.org/2000/01/rdf-schema#label> ?c .}
+         
           MINUS { <URI_PLACEHOLDER> <http://www.w3.org/2004/02/skos/core#hiddenLabel> ?c . } 
           graph ?g { 
             <URI_PLACEHOLDER> a ?type .
+            OPTIONAL { <URI_PLACEHOLDER> <http://schema.org/startDate> ?startDate .}
             OPTIONAL { <URI_PLACEHOLDER>   <http://schema.org/streetAddress> ?street ; 
               <http://schema.org/addressLocality> ?locality ; 
               <http://schema.org/postalCode> ?postalCode . }

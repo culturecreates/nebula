@@ -1,0 +1,36 @@
+# load_rdfstar_graph
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX onto: <http://www.ontotext.com/>
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+CONSTRUCT {
+    <entity_uri_placeholder> ?p ?s  .
+
+    ?p rdfs:label ?prop_label .
+    ?s rdfs:label ?sub_label .
+    
+}
+FROM onto:explicit 
+WHERE {
+
+    ?s ?p <entity_uri_placeholder>   .
+
+    # main triple labels
+    OPTIONAL {
+        ?s rdfs:label ?sub_label .
+    }
+    OPTIONAL {
+        ?p rdfs:label ?prop_label_original .
+    }
+    OPTIONAL {
+        ?p schema:inverseOf/rdfs:label ?inverse_label
+    }
+    bind(coalesce(?inverse_label,concat(?prop_label_original," (inverse)")) as ?prop_label)
+
+filter(!isBLANK(?s))
+
+
+   
+} order by   ?prop_label ?sub_label limit 200

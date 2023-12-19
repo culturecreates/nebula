@@ -14,6 +14,9 @@ Test:
       <b><%= display_object(solution[:label]) %></b>
       <div class="alternate-name">
         <%= display_object(solution[:type]) %>
+        <% if solution && solution[:startDate] %>
+          - <%= display_object(solution[:startDate]) %>
+        <% end %>
       </div>
       <%= display_object(RDF.URI(@uri)) %>
     <% else %>
