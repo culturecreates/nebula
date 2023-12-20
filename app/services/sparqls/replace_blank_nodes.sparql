@@ -1,27 +1,28 @@
 # replace_blank_nodes
 
 DELETE {
- ?s ?p ?o .
- ?o ?a ?b .
+ ?x ?y ?o .
+  ?o ?a ?b .
  
 }
 INSERT {
- ?s ?p ?o_uri  .
- ?o_uri ?a ?b .
+ ?x ?y ?o_uri .
+  ?o_uri ?a ?b .
 
 
 }
 WHERE {
   {
-    SELECT * WHERE {
+    SELECT distinct ?o  WHERE {
       ?s ?p ?o .
-      
-      
       filter(isBLANK(?o))
-      #filter(isURI(?s)) # needed to proceed to second level blanks but not for including blank nodes
-      bind(UUID() as ?o_uri)
+      filter(!isBLANK(?s)) # ?s can be a URI or a quoted triple for annotations.
+
     }
+
   }
+   bind(UUID() as ?o_uri)
+  ?x ?y ?o .
   ?o ?a ?b .
   
 }

@@ -15,7 +15,7 @@ class EntityController < ApplicationController
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
     @entity.replace_blank_subject_nodes
-    pp @entity.graph.dump(:turtle)
+    # pp @entity.graph.dump(:turtle)
   #  @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
   end
 
