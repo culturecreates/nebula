@@ -75,14 +75,14 @@ WHERE {
         filter(isBLANK(?qbns))
 
         ?qbns ?qbnp ?qbno .
+       
         OPTIONAL {
-            OPTIONAL {
-                ?qbnp rdfs:label ?qbnp_label .
-            }
-            OPTIONAL {
-                ?qbno rdfs:label ?qbno_label .
-            }
+            ?qbnp rdfs:label ?qbnp_label .
         }
+        OPTIONAL {
+            ?qbno rdfs:label ?qbno_label .
+        }
+        
     }
 
     # blank nodes
