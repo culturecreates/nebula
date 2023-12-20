@@ -54,9 +54,9 @@ module EntityHelper
   # Display RDF object literal
   def display_literal(obj)
     if obj.language
-      "<span>#{obj.value} <span style='color:gray;font-size: small'> #{obj.language}</span></span>".html_safe  
+      "<span>#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{obj.language}</span></span>".html_safe  
     elsif obj.value.starts_with?("http")
-      "<span>#{obj.value} <a href='#{obj.value}' target='_blank'> #{ render partial: 'shared/icon_link'}</a></span>".html_safe
+      "<span>#{obj.value} <a href='#{obj.value}' target='_blank'>&nbsp;#{ render partial: 'shared/icon_link'}</a></span>".html_safe
     else
       "<span>#{obj.value}</span>".html_safe
     end
