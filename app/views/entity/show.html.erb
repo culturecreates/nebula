@@ -1,4 +1,4 @@
-<h1><%= @entity.label %>  </h1>
+<h1><%= @entity.label.html_safe %>  </h1>
 <a><%= use_prefix(@entity.entity_uri) %></a>
 <%= render partial: "entity_nav" %>
 <%= render partial: "external_resource", locals:{ entity: @entity } if @entity.graph.count == 0 %>
