@@ -1,6 +1,6 @@
 <h1><%= @entity.label %>  </h1>
 Crawled data from
-<h5><a><%= use_prefix(@entity.entity_uri) %></a></h5>
+<h5><a><%= use_prefix(@entity.entity_uri).html_safe %></a></h5>
 <div style="background: lightgrey; padding: 5px">
   <%= render partial: "external_resource", locals:{ entity: @entity } if @entity.graph.count == 0 %>
   <% solutions = SPARQL.execute("SELECT distinct ?subject WHERE { ?subject ?pred ?obj }", @entity.graph) %>
