@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT ?uri (sample(?name_language) as ?name) (sample(?url) as ?webpage)  (sample(?location_name) as ?location)    ?startDate  ?resultSeverity
+SELECT ?uri (sample(?name_language) as ?name) (sample(?url) as ?webpage)  (sample(?location_name) as ?location)    ?startDate ?adid ?resultSeverity
 WHERE {
     graph <http://kg.artsdata.ca/culture-creates/artsdata-planet-nac/nac-events> {
         ?uri schema:name  ?name_language ;
@@ -19,7 +19,11 @@ WHERE {
             ?uri schema:url ?url .
             filter(!isBLANK(?url))
         }
+         OPTIONAL {
+            ?adid schema:sameAs ?uri .
+            filter(contains(str(?adid),"http://kg.artsdata.ca/resource/K"))
+        }
      ?uri  schema:location/schema:name ?location_name .
 
-} GROUP BY ?uri  ?startDate    ?resultSeverity
+} GROUP BY ?uri  ?startDate    ?resultSeverity ?adid
 ORDER BY ?startDate
