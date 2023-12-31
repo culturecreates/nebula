@@ -65,6 +65,7 @@ module EntityHelper
 
  # Display RDF::URI as a link
   def display_uri(uri)
+    uri = CGI.unescape(uri) # to correctly display cases with '#this' like http://localhost:3000/entity?uri=https%3A%2F%2Fsaumier.github.io%2Fgregory-saumier-finch.ttl%23this
     link = entity_path(uri: uri)
     "<a href='#{link}' target='_top'>#{use_prefix(uri)}</a>".html_safe
   end
