@@ -1,0 +1,23 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT ?uri (sample(?name_language) as ?name)  ?adid ?resultSeverity
+WHERE {
+    graph <PLACEHOLDER> {
+        ?uri schema:name  ?name_language ;
+             a ?type  . 
+       
+        OPTIONAL {
+            ?shacl sh:focusNode ?uri ;
+                sh:resultSeverity ?resultSeverity .
+        }
+    }
+    ?uri a schema:Organization .      
+       
+         OPTIONAL {
+            ?adid schema:sameAs ?uri .
+            filter(contains(str(?adid),"http://kg.artsdata.ca/resource/K"))
+        }
+    
+
+} GROUP BY ?uri   ?resultSeverity ?adid
+ORDER BY ?uri

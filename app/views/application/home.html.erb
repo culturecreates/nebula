@@ -3,13 +3,13 @@
 
 
 <h2> Datafeeds</h2>
-<%= link_to "Event feeds", query_show_path(sparql: "entity-graphs", placeholder:"Event", api:query_show_url) %>
+<%= link_to "Event feeds", query_show_path(sparql: "entity-graphs", placeholder:"Event", api:query_show_url, title:"Event feeds", sub_sparql:"list_events") %>
 <br>
-<%= link_to "Place feeds", query_show_path(sparql: "entity-graphs", placeholder:"Place", api:query_show_url) %>
+<%= link_to "Place feeds", query_show_path(sparql: "entity-graphs", placeholder:"Place", api:query_show_url,  title:"Place feeds", sub_sparql:"list_places") %>
 <br>
-<%= link_to "Person feeds", query_show_path(sparql: "entity-graphs", placeholder:"Person", api:query_show_url) %>
+<%= link_to "Person feeds", query_show_path(sparql: "entity-graphs", placeholder:"Person", api:query_show_url, title:"People feeds",  sub_sparql:"list_people") %>
 <br>
-<%= link_to "Organization feeds", query_show_path(sparql: "entity-graphs", placeholder:"Organization", api:query_show_url) %>
+<%= link_to "Organization feeds", query_show_path(sparql: "entity-graphs", placeholder:"Organization", api:query_show_url, title:"Organization feeds",sub_sparql:"list_organizations" ) %>
 
 
 <h2>Lists</h2>

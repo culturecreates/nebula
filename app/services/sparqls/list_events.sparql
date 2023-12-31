@@ -11,15 +11,11 @@ WHERE {
             ?shacl sh:focusNode ?uri ;
                 sh:resultSeverity ?resultSeverity .
         }
-
-      
+    } 
+    OPTIONAL {
+      ?adid schema:sameAs ?uri .
+      filter(contains(str(?adid),"http://kg.artsdata.ca/resource/K"))
     }
-          
-       
-         OPTIONAL {
-            ?adid schema:sameAs ?uri .
-            filter(contains(str(?adid),"http://kg.artsdata.ca/resource/K"))
-        }
      ?uri  schema:location/schema:name ?location_name .
 
 } GROUP BY ?uri  ?startDate   ?resultSeverity ?adid
