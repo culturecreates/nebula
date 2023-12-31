@@ -69,8 +69,8 @@ class Entity
     # first try proper content negotiation
     begin
       @graph = RDF::Graph.load(self.entity_uri, rdfstar: true)
-    rescue
-      raise StandardError, "Could not detect structured data."
+    rescue StandardError => e
+      raise StandardError, "Could not detect structured data. #{e}"
     end
   end
 
