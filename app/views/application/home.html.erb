@@ -1,6 +1,17 @@
 <h1>Dashboard</h1>
 <%= "Welcome back #{session[:name]}!" if session[:name] %>
 
+
+<h2> Datafeeds</h2>
+<%= link_to "Event feeds", query_show_path(sparql: "entity-graphs", placeholder:"Event", api:query_show_url) %>
+<br>
+<%= link_to "Place feeds", query_show_path(sparql: "entity-graphs", placeholder:"Place", api:query_show_url) %>
+<br>
+<%= link_to "Person feeds", query_show_path(sparql: "entity-graphs", placeholder:"Person", api:query_show_url) %>
+<br>
+<%= link_to "Organization feeds", query_show_path(sparql: "entity-graphs", placeholder:"Organization", api:query_show_url) %>
+
+
 <h2>Lists</h2>
 <%= link_to "Upcoming Events from Footlight", query_show_path(sparql: "custom/footlight-upcoming-events") %>
 <br>

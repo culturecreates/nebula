@@ -1,4 +1,4 @@
-<% provide(:title, @entity.label) %>
+<% provide(:title, @entity.label&.html_safe) %>
 <h1><%= @entity.label&.html_safe %>  </h1>
 <a><%= use_prefix(@entity.entity_uri) %></a>
 <%= render partial: "entity_nav" %>
