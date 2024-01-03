@@ -2,7 +2,7 @@ module ApplicationHelper
 
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')
-    base_title = "Crawled by Nebula"
+    base_title = "Artsdata"
     base_title += " DEV" if Rails.env.development?
     if page_title.empty?
       base_title
