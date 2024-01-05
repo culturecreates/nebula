@@ -1,7 +1,7 @@
 class QueryController < ApplicationController
 
   def show
-    sparql_file = params[:sparql] ||= "custom/scenepro-orgs"
+    sparql_file = params[:sparql] 
     sub_sparql = params[:sub_sparql] ||= "list_entities"
     @title =  params[:title] ||=  params[:sparql]
 

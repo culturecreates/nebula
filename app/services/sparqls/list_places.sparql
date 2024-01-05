@@ -14,11 +14,19 @@ WHERE {
     ?uri a schema:Place .      
        
     OPTIONAL {
-      ?adid schema:sameAs ?uri .
-      filter(contains(str(?adid),"http://kg.artsdata.ca/resource/K"))
+      ?adid_sub schema:sameAs ?uri .
+      filter(contains(str(?adid_sub),"http://kg.artsdata.ca/resource/K"))
     }
 
-      OPTIONAL {
+    OPTIONAL {
+      ?uri schema:sameAs ?adid_obj .
+      filter(contains(str(?adid_obj),"http://kg.artsdata.ca/resource/K"))
+    }
+
+    bind(COALESCE(?adid_obj, ?adid_sub) as ?adid)
+
+
+    OPTIONAL {
       ?uri schema:address/schema:addressLocality  ?addressLocality .
     }
 

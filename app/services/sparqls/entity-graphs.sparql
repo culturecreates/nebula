@@ -11,6 +11,7 @@ select ?entities (count(?e) as ?PLACEHOLDERs)  ?datafeed ?graph  ?generatedAtTim
     } 
     ?graph rdfs:label ?datafeed ; 
         prov:generatedAtTime ?generatedAtTime .
-    bind(CONCAT("<a href='API?title=PLACEHOLDER entities in ",str(?datafeed),"&sparql=SUB_SPARQL&placeholder=",str(?graph),"'>View</a>") as ?entities)
+    bind(ENCODE_FOR_URI(str(?datafeed)) as ?datafeed_escaped)
+    bind(CONCAT("<a href='API?title=PLACEHOLDER entities in ",str(?datafeed_escaped),"&sparql=SUB_SPARQL&placeholder=",str(?graph),"'>View</a>") as ?entities)
  
 } group by ?graph ?datafeed ?generatedAtTime ?entities order by DESC(?generatedAtTime)
