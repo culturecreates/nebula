@@ -10,10 +10,6 @@ WHERE {
             ?shacl sh:focusNode ?uri ;
                 sh:resultSeverity ?resultSeverity .
         }
-         OPTIONAL {
-            ?uri schema:sameAs ?adid .
-            filter(contains(str(?adid),"http://kg.artsdata.ca/resource/K"))
-        }
     }
     ?uri a schema:Person .      
     
