@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
-select ?entities (count(?e) as ?PLACEHOLDERs)  ?datafeed ?graph  ?generatedAtTime  where 
+select ?entities (count(?e) as ?PLACEHOLDERs)  ?dataset ?graph  ?generatedAtTime  where 
 {
     ?graph a schema:Dataset .
     graph ?graph {
@@ -9,9 +9,12 @@ select ?entities (count(?e) as ?PLACEHOLDERs)  ?datafeed ?graph  ?generatedAtTim
     filter exists {
         ?e a schema:PLACEHOLDER  .
     } 
-    ?graph rdfs:label ?datafeed ; 
-        prov:generatedAtTime ?generatedAtTime .
-    bind(ENCODE_FOR_URI(str(?datafeed)) as ?datafeed_escaped)
-    bind(CONCAT("<a href='API?title=PLACEHOLDER entities in ",str(?datafeed_escaped),"&sparql=SUB_SPARQL&placeholder=",str(?graph),"'>View</a>") as ?entities)
+    ?graph rdfs:label ?dataset .
+    OPTIONAL {
+        ?graph prov:generatedAtTime ?generatedAtTime .
+    }
+    
+    bind(ENCODE_FOR_URI(str(?dataset)) as ?dataset_escaped)
+    bind(CONCAT("<a href='API?title=PLACEHOLDER entities in ",str(?dataset_escaped),"&sparql=SUB_SPARQL&placeholder=",str(?graph),"'>View</a>") as ?entities)
  
-} group by ?graph ?datafeed ?generatedAtTime ?entities order by DESC(?generatedAtTime)
+} group by ?graph ?dataset ?generatedAtTime ?entities order by DESC(?generatedAtTime)

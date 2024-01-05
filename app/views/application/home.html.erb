@@ -2,17 +2,33 @@
 <%= "Welcome back #{session[:name]}!" if session[:name] %>
 
 
-<h2> Datafeeds</h2>
-<%= link_to "Event feeds", query_show_path(sparql: "entity-graphs", placeholder:"Event", api:query_show_url, title:"Event feeds", sub_sparql:"list_events") %>
+<h2> Datasets from external sources</h2>
+<p> Feeds loaded from external sources using the Artsdata Databus.</p>
+<dl>
+<%= link_to "Event Feeds", query_show_path(sparql: "entity-graphs", placeholder:"Event", api:query_show_url, title:"Event Feeds", sub_sparql:"list_events") %>
 <br>
-<%= link_to "Place feeds", query_show_path(sparql: "entity-graphs", placeholder:"Place", api:query_show_url,  title:"Place feeds", sub_sparql:"list_places") %>
+<%= link_to "Place Feeds", query_show_path(sparql: "entity-graphs", placeholder:"Place", api:query_show_url,  title:"Place Feeds", sub_sparql:"list_places") %>
 <br>
-<%= link_to "Person feeds", query_show_path(sparql: "entity-graphs", placeholder:"Person", api:query_show_url, title:"People feeds",  sub_sparql:"list_people") %>
+<%= link_to "People Feeds", query_show_path(sparql: "entity-graphs", placeholder:"Person", api:query_show_url, title:"People Feeds",  sub_sparql:"list_people") %>
 <br>
-<%= link_to "Organization feeds", query_show_path(sparql: "entity-graphs", placeholder:"Organization", api:query_show_url, title:"Organization feeds",sub_sparql:"list_organizations" ) %>
+<%= link_to "Organization Feeds", query_show_path(sparql: "entity-graphs", placeholder:"Organization", api:query_show_url, title:"Organization Feeds",sub_sparql:"list_organizations" ) %>
+</dl>
 
+<h2> Artsdata Entites</h2>
+<p>Entites curated in Artsdata derived from external datasets and minted with Artdata URIs.</p>
+<dl>
+<%= link_to "Events", query_show_path(sparql: "list_events", placeholder:"http://kg.artsdata.ca/minted/K23", title:"Events") %>
+<br>
+<%= link_to "Places", query_show_path(sparql: "list_places", placeholder:"http://kg.artsdata.ca/minted/K11",  title:"Places") %>
+<br>
+<%= link_to "People", query_show_path(sparql: "list_people", placeholder:"http://kg.artsdata.ca/Person", title:"People") %>
+<br>
+<%= link_to "Organizations", query_show_path(sparql: "list_organizations", placeholder:"http://kg.artsdata.ca/Organization", title:"Organizations" ) %>
+</dl>
 
-<h2>Lists</h2>
+<h2>Popular Queries</h2>
+<p>Queries shared by users of Artsdata. <%= "Login to add your own SPARQLs." if !session[:name] %></p>
+<dl>
 <%= link_to "Upcoming Events from Footlight", query_show_path(sparql: "custom/footlight-upcoming-events") %>
 <br>
 <%= link_to "Upcoming Events from National Arts Centre", query_show_path(sparql: "custom/nac-events") %>
@@ -23,3 +39,4 @@
 query_show_path(sparql: "custom/scenepro-orgs") %>
 <br>
 <%= link_to "ScenePro Venues", query_show_path(sparql: "custom/scenepro-venues") %>
+</dl>
