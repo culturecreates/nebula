@@ -1,15 +1,22 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location)    ?startDate ?adid ?resultSeverity
+PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime ?adid ?resultSeverity  
 WHERE {
+    ?uri a schema:Event .
     graph <PLACEHOLDER> {
         ?uri schema:name  ?name_language ;
-             a schema:Event ;
+              a ?additionalType ;
              schema:startDate ?startDate . 
+        bind(STRDT(str(?startDate),xsd:dateTime) as ?startDateTime)
        
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
                 sh:resultSeverity ?resultSeverity .
+        }
+         OPTIONAL {
+          ?uri a ?additionalType .
         }
     } 
     OPTIONAL {
@@ -27,7 +34,10 @@ WHERE {
     OPTIONAL {
         ?uri  schema:location/schema:name ?location_name .
     }
+
+
+   
     
 
-} GROUP BY ?uri  ?startDate   ?resultSeverity ?adid
-ORDER BY ?startDate
+} GROUP BY ?uri  ?startDateTime  ?resultSeverity ?adid 
+ORDER BY DESC(?startDateTime)
