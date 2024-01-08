@@ -2,8 +2,8 @@
 <%= "Welcome back #{session[:name]}!" if session[:name] %>
 
 
-<h2> Datasets from external sources</h2>
-<p> Feeds loaded from external sources using the Artsdata Databus.</p>
+<h2>External Sources</h2>
+<p> Datasets loaded from external sources sent to the Artsdata Databus. These are non-authoritative.</p>
 <dl>
 <%= link_to "Event Feeds", query_show_path(sparql: "entity-graphs", placeholder:"Event", api:query_show_url, title:"Event Feeds", sub_sparql:"list_events") %>
 <br>
@@ -40,3 +40,16 @@ query_show_path(sparql: "custom/scenepro-orgs") %>
 <br>
 <%= link_to "ScenePro Venues", query_show_path(sparql: "custom/scenepro-venues") %>
 </dl>
+
+<h2>View External Sources</h2>
+<p>Paste any URI into the search bar and click "dereference" to view authoritative data from anywhere in the world. Here are some examples:</p>
+<dl>
+  <%= link_to "https://musicbrainz.org/place/4d728a60-361f-42d2-bfa1-38dfd9c74ec6", "/dereference/external?uri=https%3A%2F%2Fmusicbrainz.org%2Fplace%2F4d728a60-361f-42d2-bfa1-38dfd9c74ec6" %>
+  <br> 
+  <%= link_to "http://viaf.org/viaf/1033159474209827661876", "/dereference/external?uri=http%3A%2F%2Fviaf.org%2Fviaf%2F1033159474209827661876" %>
+  <br>
+  <%= link_to "https://placedesarts.com/fr/evenement/elisapie" , "/dereference/external?uri=https%3A%2F%2Fplacedesarts.com%2Ffr%2Fevenement%2Felisapie" %>
+  <br>
+  <%= link_to "http://www.wikidata.org/entity/Q3527509", "/dereference/external?uri=http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ3527509" %>
+</dl>
+  
