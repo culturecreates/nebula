@@ -5,7 +5,7 @@ class EntityController < ApplicationController
     uri = params[:uri] ||= "K1-3"
     uri = "http://kg.artsdata.ca/resource/#{uri}"if uri.starts_with?("K")
 
-    if !uri.start_with?("http")
+    if !uri.starts_with?(/http:|https:|urn:/) 
       flash.alert = "Not an Artsdata ID or URI."
       redirect_to root_path
     end

@@ -41,7 +41,7 @@ module EntityHelper
   # Display RDF objects which may be URIs, blank nodes or literals.
   def display_object(obj)
     if obj.node? # blank node
-      "nested data"
+      "nested node (#{obj.to_s.truncate(20)})"
     elsif obj.uri?
       display_uri(obj)
     elsif obj.literal?
