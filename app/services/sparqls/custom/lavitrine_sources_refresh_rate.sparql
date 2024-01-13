@@ -3,7 +3,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX ofn:<http://www.ontotext.com/sparql/functions/>
 
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-select ?name (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_days) ((xsd:float(?uploads_last_30_days)/xsd:float("30")) * 7 AS ?average_uploads_per_week)  { 
+select ?name ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_days) ((xsd:float(?uploads_last_30_days)/xsd:float("30")) * 7 AS ?average_uploads_per_week)  { 
    
 
    { <http://kg.artsdata.ca/resource/dia-logGraphs>  schema:hasPart ?graph . }
@@ -13,9 +13,10 @@ select ?name (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_da
       <http://kg.artsdata.ca/culture-creates/huginn/derived-grandtheatre-qc-ca>
       <http://kg.artsdata.ca/culture-creates/footlight/hector-charland-com>
       <http://kg.artsdata.ca/culture-creates/footlight/theatredumarais-com>
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/tout-culture-cms-events>
       } 
      }
-	?graph prov:wasDerivedFrom ?dataid ; schema:name ?name .
+	?graph prov:wasDerivedFrom ?dataid ; schema:name ?name ; prov:generatedAtTime  ?latest .
     ?dataid a <http://dataid.dbpedia.org/ns/core#DataId> ;
     <http://xmlns.com/foaf/0.1/primaryTopic> ?dataset .
     ?dataset <http://dataid.dbpedia.org/ns/core#artifact> ?artifact .
@@ -28,4 +29,4 @@ select ?name (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_da
     bind(CONCAT("<a href='/query/show?title=Events in ",str(?name),"&sparql=list_events&placeholder=",str(?graph),"'>View</a>") as ?entities)
  
     
-}  group by ?name ORDER BY DESC(?uploads_last_30_days)
+}  group by ?name ?latest ORDER BY DESC(?uploads_last_30_days) DESC(?latest)
