@@ -29,4 +29,4 @@ select ?name ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_la
     bind(CONCAT("<a href='/query/show?title=Events in ",str(?name),"&sparql=list_events&placeholder=",str(?graph),"'>View</a>") as ?entities)
  
     
-}  group by ?name ?latest ORDER BY DESC(?uploads_last_30_days) DESC(?latest)
+}  group by ?name ?latest ORDER BY DESC(?latest)
