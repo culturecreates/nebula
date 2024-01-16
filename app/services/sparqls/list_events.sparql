@@ -2,7 +2,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime ?adid ?resultSeverity  
+SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms) 
 WHERE {
     ?uri a schema:Event .
     graph <PLACEHOLDER> {
@@ -39,5 +39,5 @@ WHERE {
    
     
 
-} GROUP BY ?uri  ?startDateTime  ?resultSeverity ?adid 
+} GROUP BY ?uri  ?startDateTime   
 ORDER BY DESC(?startDateTime)

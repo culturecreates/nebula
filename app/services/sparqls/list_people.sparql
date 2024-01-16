@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT distinct ?uri (sample(?name_language) as ?name)  ?adid ?resultSeverity
+SELECT distinct ?uri (sample(?name_language) as ?name)  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
 WHERE {
     graph <PLACEHOLDER> {
         ?uri schema:name  ?name_language ;
@@ -27,5 +27,5 @@ WHERE {
 
     
 
-} GROUP BY ?uri   ?resultSeverity ?adid
+} GROUP BY ?uri 
 ORDER BY ?uri
