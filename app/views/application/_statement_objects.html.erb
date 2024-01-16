@@ -7,7 +7,7 @@
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
     <% solutions.each do |s| %>
       <div class="statement-object">
-        <% if s.obj.uri? && s.obj.value.starts_with?("urn:") %>
+        <% if s.obj.uri? && s.obj.value.starts_with?("http://blank.node") %>
           <%= render partial: "statements_table", locals: { entity: Entity.new(entity_uri: s.obj, graph: entity.graph ) } %>
         <% elsif s.obj.uri? %>
           <% frame_id = rand(10_000) %>

@@ -14,7 +14,7 @@
       </div>
       <% predicate_hash = s.pred.to_s.hash %>
       <%= render partial: 'statement_objects', locals: { entity: entity, predicate: s.pred, predicate_hash: predicate_hash }  %>
-      <% if !entity.entity_uri.starts_with?("urn:") %>
+      <% if !entity.entity_uri.starts_with?("http://blank.node") %>
         <div class="statement_buttons">
           <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: s.pred.to_s, predicate_hash: predicate_hash),  
                   data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  

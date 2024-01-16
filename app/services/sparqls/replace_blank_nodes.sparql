@@ -21,7 +21,7 @@ WHERE {
     }
 
   }
-   bind(UUID() as ?o_uri)
+   bind(URI(CONCAT("http://blank.node/",STRUUID())) as ?o_uri)
   ?x ?y ?o .
   ?o ?a ?b .
   
