@@ -12,7 +12,7 @@ WHERE {
         }
     }
     ?uri a schema:Person .      
-    
+    filter(!isBLANK(?uri))
     OPTIONAL {
       ?adid_sub schema:sameAs ?uri .
       filter(contains(str(?adid_sub),"http://kg.artsdata.ca/resource/K"))

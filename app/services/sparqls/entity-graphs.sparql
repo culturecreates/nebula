@@ -9,6 +9,7 @@ select ?entities (count(?e) as ?PLACEHOLDERs)  ?dataset ?graph  ?generatedAtTime
     filter exists {
         ?e a schema:PLACEHOLDER  .
     } 
+    filter(!isBLANK(?e))
     ?graph rdfs:label ?dataset .
     OPTIONAL {
         ?graph prov:generatedAtTime ?generatedAtTime .
