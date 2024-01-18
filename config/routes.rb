@@ -18,4 +18,6 @@ Rails.application.routes.draw do
 
   get "query/show", to: "query#show"
 
+  get "mint/preview", to: "mint#preview"
+
 end

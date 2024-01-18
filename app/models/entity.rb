@@ -117,7 +117,7 @@ class Entity
                   'entity_uri_placeholder', self.entity_uri,
                   'locale_placeholder' , language
                 ])
-    puts sparql
+   
     response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
 
     @graph = if response[:code] == 200

@@ -1,0 +1,2 @@
+module MintHelper
+end

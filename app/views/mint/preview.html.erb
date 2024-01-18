@@ -1,0 +1,55 @@
+<h1>
+Minter Preview
+</h1>
+
+<div id="options" data-controller="visibility">
+  <button class="btn btn-info btn-sm" data-action="visibility#showTargets">Show All</button>
+  <button class="btn btn-info btn-sm" data-action="visibility#hideTargets">Hide All</button>
+  <button class="btn btn-info btn-sm" data-action="visibility#toggleTargets">Toggle</button>
+
+  <h4>Mint a new Artsdata Entity of type...</h4>
+  <p data-visibility-target="hideable">
+  <turbo-frame
+    id='card-1'
+    src=<%= dereference_card_path(uri: "http://schema.org/#{@classToMint}", frame_id: "1")%>
+    loading="lazy"
+    target="_top"
+  >
+    loading...
+  </turbo-frame>
+  </p>
+
+  <h4>Based on</h4>
+  <p data-visibility-target="hideable">
+  <turbo-frame
+    id='card-2'
+    src=<%= dereference_card_path(uri: @externalUri, frame_id: "2")%>
+    loading="lazy"
+    target="_top"
+  >
+    loading...
+  </turbo-frame>
+  </p>
+
+  <h4><%= session[:name] %> acting on behalf of the authority</h4>
+  <p data-visibility-target="hideable">
+  <turbo-frame
+    id='card-3'
+    src=<%= dereference_card_path(uri: @authority, frame_id: "3")%>
+    loading="lazy"
+    target="_top"
+  >
+    loading...
+  </turbo-frame>
+  </p>
+
+</div>
+
+<div data-controller="artsdata">
+  <button data-artsdata-target="button" class="btn btn-danger" data-action="artsdata#mintEntity">mint</button>
+
+
+  <p data-artsdata-target="uri">
+  </p>
+
+</div>
