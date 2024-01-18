@@ -1,5 +1,4 @@
 class MintController < ApplicationController
-
   before_action :authenticate_user! # ensure user is logged in
 
   # show tools to mint a new Artsdata URI
