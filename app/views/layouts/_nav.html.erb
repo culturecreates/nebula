@@ -1,55 +1,60 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">Artsdata</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <form 
-            class="d-flex" 
-            role="search"
-            action="/entity"
-          >
-              <input
-                class="form-control me-2"
-                name="uri"
-                type="search"
-                placeholder="URI"
-                aria-label="Search"
-              />
-              <button class="btn btn-outline-secondary" type="submit">
-                View
-              </button>
-            </form>
-        </ul>
-        <form
-            class="d-flex"
-            role="search"
-            action="https://d1r2akumnqqbuw.cloudfront.net"
-        >
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Artsdata</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <form class="d-flex" role="search" action="/entity">
           <input
             class="form-control me-2"
-            name="query"
+            name="uri"
             type="search"
-            placeholder="Name"
+            placeholder="URI"
             aria-label="Search"
           />
-          <input  type="hidden"  name="viewer"  value="<%= entity_url(uri:"") %>" />
-          <button class="btn btn-outline-primary" type="submit">
-            Search
+          <button class="btn btn-outline-secondary" type="submit">
+            View
           </button>
         </form>
-       
-          <span class="nav-item">
-          <% github_url = "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
-            <% if session[:name] %>
+      </ul>
+      <form
+        class="d-flex"
+        role="search"
+        action="https://d1r2akumnqqbuw.cloudfront.net"
+      >
+        <input
+          class="form-control me-2"
+          name="query"
+          type="search"
+          placeholder="Name"
+          aria-label="Search"
+        />
+        <input type="hidden" name="viewer" value="<%= entity_url(uri:"") %>"/>
+        <button class="btn btn-outline-primary" type="submit">
+          Search
+        </button>
+      </form>
+      <div class="navbar-nav">
+        <a class="nav-link">
+          <% github_url =
+            "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
+          <% if session[:name] %>
             <a class="nav-link active" aria-current="page" href="<%= github_url %>"><%= session[:name] %></a>
-            <% else %>
+          <% else %>
             <a class="nav-link active" aria-current="page" href="<%= github_url %>">GitHub Login</a>
-            <% end %>
-          </span>
-       
+          <% end %>
+        </a>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>
