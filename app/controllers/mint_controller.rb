@@ -8,15 +8,23 @@ class MintController < ApplicationController
     if required.all? { |k| params.key? k }
       @externalUri = params[:externalUri]
       @classToMint = params[:classToMint]
+      @classToMint.prepend("http://schema.org/") if !@classToMint.starts_with?("http")
       if @externalUri.starts_with?("http://scenepro.ca")
         @authority = "http://kg.artsdata.ca/resource/K14-90"
-      else
-        flash.alert = "Missing publisher authority."
-        redirect_to root_path
+      elsif @externalUri.starts_with?("http://kg.footlight.io")
+        @authority = "https://graph.culturecreates.com/id/footlight"
+      elsif @externalUri.starts_with?("http://capacoa.ca")
+        @authority = "https://graph.culturecreates.com/id/capacoa-admin"
+      elsif @externalUri.starts_with?("https://capacoa.ca/member/")
+        @authority = "https://graph.culturecreates.com/id/capacoa-admin"
+      elsif @externalUri.starts_with?("http://wikidata.org")
+        @authority = "http://wikidata.org"
+      else 
+        @authority = "http://kg.artsdata.ca/resource/K1-1"
       end
     else 
       flash.alert = "Missing a required param. Required list: #{required}"
-      redirect_to root_path
+      redirect_back(fallback_location: root_path)
     end
   end
 end

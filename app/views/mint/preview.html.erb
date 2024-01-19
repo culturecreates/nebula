@@ -7,7 +7,7 @@
 <p>
   <turbo-frame
     id='card-1'
-    src=<%= dereference_card_path(uri: "http://schema.org/#{@classToMint}", frame_id: "1")%>
+    src=<%= dereference_card_path(uri: @classToMint, frame_id: "1")%>
     loading="lazy"
     target="_top"
   >
@@ -43,7 +43,7 @@
 <div
   data-controller="artsdata"
   data-artsdata-externaluri-value="<%= @externalUri %>"
-  data-artsdata-classtomint-value="schema:<%= @classToMint %>"
+  data-artsdata-classtomint-value="<%= @classToMint %>"
   data-artsdata-authority-value="<%= @authority %>"
 >
   <button

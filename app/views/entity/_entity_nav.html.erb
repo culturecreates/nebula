@@ -14,6 +14,6 @@
   <% if session[:name] %>
     |
     <%= link_to "minter",
-    mint_preview_path(externalUri: @entity.entity_uri, classToMint: "Place") %>
+    mint_preview_path(externalUri: @entity.entity_uri, classToMint: @entity.type) %>
   <% end %>
 </div>
