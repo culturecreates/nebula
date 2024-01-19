@@ -11,9 +11,9 @@ eagerLoadControllersFrom("controllers", application)
 // lazyLoadControllersFrom("controllers", application)
 
 
-import VisibilityController from "./visibility_controller"
+import VisibilityController from "controllers/visibility_controller"
 application.register("visibility", VisibilityController)
 
 
-import ArtsdataController from "./artsdata_controller"
+import ArtsdataController from "controllers/artsdata_controller"
 application.register("artsdata", ArtsdataController)
