@@ -13,8 +13,8 @@ Pre-alpha of Artsdata Nebula. Work in progress...
   cd nebula
 
   # pin Bootstrap Using Importmap-Rails
-  ./bin/importmap pin bootstrap@5.1.3
-  ./bin/importmap pin @popperjs/core@2.11.2
+  ./bin/importmap pin bootstrap@5.3.2
+  ./bin/importmap pin @popperjs/core@2.11.8
 
   Check [blog](https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-importmap-rails-with-bootstrap-stimulus-turbo-long-tutorial/) for troubleshooting 
 
