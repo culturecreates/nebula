@@ -1,4 +1,8 @@
-@import "bootstrap";
+@import 'custom';
+
+body {
+  font-family: 'Noto Serif', serif;
+}
 
 a {
   text-decoration: none;
