@@ -29,7 +29,7 @@
 <h2>Popular Queries</h2>
 <p>Queries shared by users of Artsdata. <%= "Login to add your own SPARQLs." if !session[:name] %></p>
 <dl>
-<%= link_to "Ville de Laval Events", query_show_path(sparql: "custom/ville-de-laval", title: "Events - Ville de Laval") %>
+<%= link_to "Ville de Laval Events", query_show_path(sparql: "custom/ville-de-laval", title: "Events for Footlight - Ville de Laval") %>
 <br>
 <%= link_to "LaVitrine Pipeline", query_show_path(sparql: "custom/lavitrine_sources_refresh_rate", title:"Sources for LaVitrine") %>
 <br>
