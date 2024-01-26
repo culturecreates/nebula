@@ -20,11 +20,15 @@ export default class extends Controller {
     th.classList.add(`sort-${direction}`)
 
     rows.sort((rowA, rowB) => {
-
       const cellA = rowA.cells[index].textContent.trim()
       const cellB = rowB.cells[index].textContent.trim()
-
-      return cellA > cellB ? 1 : -1
+    
+      // Check if the cells are numbers
+      if (!isNaN(cellA) && !isNaN(cellB)) {
+        return parseFloat(cellA) - parseFloat(cellB)
+      } else {
+        return cellA.localeCompare(cellB)
+      }
     })
 
  
