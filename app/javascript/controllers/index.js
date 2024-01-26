@@ -17,3 +17,6 @@ application.register("visibility", VisibilityController)
 
 import ArtsdataController from "controllers/artsdata_controller"
 application.register("artsdata", ArtsdataController)
+
+import SortableTableController from "controllers/sortable_table_controller"
+application.register("sortable-table", SortableTableController)

@@ -79,14 +79,20 @@ a {
   border:0px;
 }
 
-
-
 .alternate-name {
   color: rgb(123, 137, 137);
   a {
     color: rgb(123, 137, 137);
     text-decoration: none;
   }
+}
+
+.sort-asc::after {
+  content: "▲";
+}
+
+.sort-desc::after {
+  content: "▼";
 }
 
 
