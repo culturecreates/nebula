@@ -11,7 +11,7 @@ class MintController < ApplicationController
       @classToMint.prepend("http://schema.org/") if !@classToMint.starts_with?("http")
       if @externalUri.starts_with?("http://scenepro.ca")
         @authority = "http://kg.artsdata.ca/resource/K14-90"
-      elsif @externalUri.starts_with?("http://kg.footlight.io")
+      elsif @externalUri.starts_with?("http://kg.footlight.io") || @externalUri.starts_with?("http://api.footlight.io")
         @authority = "https://graph.culturecreates.com/id/footlight"
       elsif @externalUri.starts_with?("http://capacoa.ca")
         @authority = "https://graph.culturecreates.com/id/capacoa-admin"
