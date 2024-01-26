@@ -39,7 +39,7 @@ class Entity
       pattern [RDF::URI(uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
     end
      solution =  graph.query(query).first
-     solution.type if solution.bound?(:type)
+     solution.type if solution && solution.bound?(:type)
   end
 
   def method_missing(m,*args,&block)
