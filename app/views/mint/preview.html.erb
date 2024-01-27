@@ -2,57 +2,74 @@
   Minter Preview
 </h1>
 
-<h4>Mint a new Artsdata Entity of type
-  <%= @classToMint %></h4>
-<p>
-  <turbo-frame
-    id='card-1'
-    src=<%= dereference_card_path(uri: @classToMint, frame_id: "1")%>
-    loading="lazy"
-    target="_top"
-  >
-    loading...
-  </turbo-frame>
-</p>
+<div class="row">
+  <div class="col-md">
+    <p>Based on</p>
+    <p>
+      <turbo-frame
+        id='card-2'
+        src="<%= dereference_card_path(uri: @externalUri, frame_id: "2")%>"
+        loading="lazy"
+        target="_top"
+      >
+        loading...
+      </turbo-frame>
+    </p>
 
-<h4>Based on</h4>
-<p>
-  <turbo-frame
-    id='card-2'
-    src=<%= dereference_card_path(uri: @externalUri, frame_id: "2")%>
-    loading="lazy"
-    target="_top"
-  >
-    loading...
-  </turbo-frame>
-</p>
+    <p>Mint a new Artsdata Entity of type
+      <%= @classToMint %></p>
 
-<h4><%= session[:name] %>
-  acting on behalf of the authority</h4>
-<p>
-  <turbo-frame
-    id='card-3'
-    src=<%= dereference_card_path(uri: @authority, frame_id: "3")%>
-    loading="lazy"
-    target="_top"
-  >
-    loading...
-  </turbo-frame>
-</p>
+    <p>
+      <turbo-frame
+        id='card-1'
+        src="<%= dereference_card_path(uri: @classToMint, frame_id: "1")%>"
+        loading="lazy"
+        target="_top"
+      >
+        loading...
+      </turbo-frame>
+    </p>
 
-<div
-  data-controller="artsdata"
-  data-artsdata-externaluri-value="<%= @externalUri %>"
-  data-artsdata-classtomint-value="<%= @classToMint %>"
-  data-artsdata-authority-value="<%= @authority %>"
->
-  <button
-    data-artsdata-target="button"
-    class="btn btn-danger"
-    data-action="artsdata#mintEntity"
-  >mint</button>
+    <p><%= session[:name] %>
+      acting on behalf of the authority</p>
+    <p>
+      <turbo-frame
+        id='card-3'
+        src="<%= dereference_card_path(uri: @authority, frame_id: "3")%>"
+        loading="lazy"
+        target="_top"
+      >
+        loading...
+      </turbo-frame>
+    </p>
 
-  <p data-artsdata-target="uri">
-  </p>
+    <div
+      data-controller="artsdata"
+      data-artsdata-externaluri-value="<%= @externalUri %>"
+      data-artsdata-classtomint-value="<%= @classToMint %>"
+      data-artsdata-authority-value="<%= @authority %>"
+    >
+      <button
+        data-artsdata-target="button"
+        class="btn btn-danger"
+        data-action="artsdata#mintEntity"
+      >mint</button>
 
+      <p data-artsdata-target="uri">
+      </p>
+
+    </div>
+  </div>
+  <div class="col-md">
+    <!-- Second column content goes here -->
+    <p>Reconciliation check...</p>
+    <turbo-frame
+      id='recon_results'
+      src="<%= reconcile_query_path(query: @label, type: @classToMint, externalUri: @externalUri)%>"
+      loading="lazy"
+      target="_top"
+    >
+      loading...
+    </turbo-frame>
+  </div>
 </div>

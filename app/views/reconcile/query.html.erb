@@ -1,0 +1,55 @@
+<h1>
+  Reconciliation Results
+</h1>
+
+<turbo-frame id="recon_results">
+  <div class="accordion" id="reconAccordion">
+    <% @result["result"].each_with_index do |result, index| %>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading<%= index %>">
+          <button
+            class="
+              accordion-button collapsed <%= 'bg-warning' if result["match"] == true %>
+            "
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse<%= index %>"
+            aria-expanded="false"
+            aria-controls="collapse<%= index %>"
+          >
+            <%= result["name"] %>
+            <span class="text-muted ms-2">
+              <%= result["description"] %>
+            </span>
+          </button>
+
+        </h2>
+        <div
+          id="collapse<%= index %>"
+          class="accordion-collapse collapse"
+          aria-labelledby="heading<%= index %>"
+          data-bs-parent="#reconAccordion"
+        >
+          <div class="accordion-body position-relative">
+            <turbo-frame
+              id='card-1'
+              src="<%= dereference_card_path(uri: 'http://kg.artsdata.ca/resource/' + result["id"], frame_id: "1")%>"
+              loading="lazy"
+              target="_top"
+            >
+              loading...
+            </turbo-frame>
+            <%= link_to "link",
+            mint_link_path(
+              externalUri: @externalUri,
+              classToMint: result["type"].first["id"],
+              adUri: "http://kg.artsdata.ca/resource/" + result["id"],
+            ),
+            method: :get,
+            class: "btn btn-tiny btn-danger position-absolute mb-2 me-2 bottom-0 end-0 " %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</turbo-frame>
