@@ -3,7 +3,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-select ?uri ?name ?startDate ?endDate  ?location_name
+select ?uri ?name ?startDate ?endDate  ?location_name ?same_as
 where {
     values ?g {
         <http://kg.artsdata.ca/culture-creates/artsdata-planet-ville-de-laval/calendrier-activites>
@@ -48,4 +48,16 @@ where {
             filter(?g != ?other_g)
         
     }
-} order by ?startDate ?endDate
+    {
+    OPTIONAL {
+        ?uri schema:sameAs+ ?same_as .
+        filter(STRSTARTS(str(?same_as),"http://kg.artsdata.ca/resource/K"))
+    }
+
+    OPTIONAL {
+        ?same_as schema:sameAs+ ?uri .
+         filter(STRSTARTS(str(?same_as),"http://kg.artsdata.ca/resource/K"))
+    }
+    }
+
+} order by ?startDate ?endDate 
