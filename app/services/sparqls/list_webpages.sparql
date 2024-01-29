@@ -1,0 +1,32 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+SELECT distinct ?uri  ?url (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
+WHERE {
+    graph <PLACEHOLDER> {
+        ?uri  a ?type  . 
+        OPTIONAL {
+            ?uri schema:url ?url  .
+        }
+        OPTIONAL {
+            ?shacl sh:focusNode ?uri ;
+                sh:resultSeverity ?resultSeverity .
+        }
+    }
+    ?uri a schema:WebPage .      
+    filter(!isBLANK(?uri))
+    OPTIONAL {
+      ?adid_sub schema:sameAs ?uri .
+      filter(contains(str(?adid_sub),"http://kg.artsdata.ca/resource/K"))
+    }
+
+    OPTIONAL {
+      ?uri schema:sameAs ?adid_obj .
+      filter(contains(str(?adid_obj),"http://kg.artsdata.ca/resource/K"))
+    }
+
+    bind(COALESCE(?adid_obj, ?adid_sub) as ?adid)
+
+    
+
+} GROUP BY ?uri ?url
+ORDER BY ?uri
