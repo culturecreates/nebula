@@ -81,7 +81,9 @@ class MintController < ApplicationController
     elsif externalUri.starts_with?("https://capacoa.ca/member/")
       @authority = "https://graph.culturecreates.com/id/capacoa-admin"
     elsif externalUri.starts_with?("http://wikidata.org")
-      @authority = "http://wikidata.org"
+      @authority = "http://wikidata.org" 
+    elsif externalUri.starts_with?("https://ipaa.ca")
+      @authority = "http://kg.artsdata.ca/resource/K14-165"
     else 
       @authority = "http://kg.artsdata.ca/resource/K1-1"
     end
