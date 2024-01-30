@@ -41,10 +41,13 @@
 <br>
 <%= link_to "CAPACOA Members", query_show_path(sparql: "custom/capacoa-members") %>
 <br>
-<%= link_to "ScenePro Organizations",
+<%= link_to "ScenePro Organizations Report",
+query_show_path(sparql: "custom/scenepro-orgs-report") %>
+<br>
+<%= link_to "ScenePro Organization List",
 query_show_path(sparql: "custom/scenepro-orgs") %>
 <br>
-<%= link_to "ScenePro Venues", query_show_path(sparql: "custom/scenepro-venues") %>
+<%= link_to "ScenePro Venue List", query_show_path(sparql: "custom/scenepro-venues") %>
 </dl>
 
 <h2>View External Sources</h2>

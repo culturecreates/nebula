@@ -1,0 +1,98 @@
+PREFIX schema: <http://schema.org/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+select ?scenepro ?adid ?wikidata ?member ?note ?action where {
+    {
+        values ?note {
+            "adid linked to scenepro"
+        }
+        ?adid schema:sameAs ?scenepro  .
+        filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
+        filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/"))
+#        OPTIONAL {
+#             ?adid schema:sameAs ?wikidata .
+#             filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))
+#        }
+        OPTIONAL {
+             ?scenepro schema:sameAs ?wikidata .
+             filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))
+        }
+        OPTIONAL {
+            values ?member {
+                "member"
+            }
+            graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
+                ?scenepro a schema:Organization .
+            }
+        }
+    } 
+    UNION
+    {
+        values ?note {
+            "additional scenepro linked to adid"
+        }
+        ?adid ^schema:sameAs ?scenepro  .
+        filter not exists {
+            ?adid  schema:sameAs ?scenepro  .
+        }
+        filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
+        filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/"))
+        OPTIONAL {
+            values ?member {
+                "member"
+            }
+            graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
+                ?scenepro a schema:Organization .
+            }
+        }
+         OPTIONAL {
+             ?scenepro schema:sameAs ?wikidata .
+             filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))
+        }
+    } 
+    UNION {
+        values ?note {
+            "scenepro without adid"
+        }
+        values ?action {
+            "mint adid for scenepro"
+        }
+        ?scenepro a schema:Organization .
+        filter not exists {
+            ?adid  schema:sameAs ?scenepro  .
+        }
+        filter not exists {
+            ?adid ^schema:sameAs ?scenepro  .
+        }
+        filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
+        OPTIONAL {
+            values ?member {
+                "member"
+            }
+            graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
+                ?scenepro a schema:Organization .
+            }
+        }
+    } 
+    UNION {
+        values ?note {
+            "Orgs in Wikidata.org without adid but listed as Rideau member"
+        }
+        values ?action {
+            "Decide if adid should be minted?"
+        }
+        SERVICE <https://query.wikidata.org/sparql> {
+            SELECT DISTINCT ?wikidata  WHERE {
+                ?wikidata wdt:P463 wd:Q87727957.
+                SERVICE wikibase:label {
+                    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en".
+                }
+                filter not exists {
+                    ?wikidata wdt:P7627 ?adid .
+                }
+            }
+        }
+    }
+}
