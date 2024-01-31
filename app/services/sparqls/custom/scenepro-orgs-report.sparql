@@ -3,7 +3,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
-select ?scenepro ?adid ?wikidata ?member ?note ?action where {
+select ?scenepro ?adid ?wikidata ?rideau ?note ?action where {
     {
         values ?note {
             "adid linked to scenepro"
@@ -20,7 +20,7 @@ select ?scenepro ?adid ?wikidata ?member ?note ?action where {
              filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))
         }
         OPTIONAL {
-            values ?member {
+            values ?rideau {
                 "member"
             }
             graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
@@ -40,7 +40,7 @@ select ?scenepro ?adid ?wikidata ?member ?note ?action where {
         filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
         filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/"))
         OPTIONAL {
-            values ?member {
+            values ?rideau {
                 "member"
             }
             graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
@@ -68,7 +68,7 @@ select ?scenepro ?adid ?wikidata ?member ?note ?action where {
         }
         filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
         OPTIONAL {
-            values ?member {
+            values ?rideau {
                 "member"
             }
             graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
