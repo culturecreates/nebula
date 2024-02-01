@@ -57,6 +57,8 @@ module EntityHelper
       "<span>#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{obj.language}</span></span>".html_safe  
     elsif obj.value.starts_with?("http")
       "<span>#{obj.value} <a href='#{obj.value}' target='_blank'>&nbsp;#{ render partial: 'shared/icon_link'}</a></span>".html_safe
+    elsif obj.datatype?
+      "<span>#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{use_prefix(obj.datatype)}</span></span>".html_safe 
     else
       "<span>#{obj.value}</span>".html_safe
     end

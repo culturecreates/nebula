@@ -30,6 +30,7 @@ module ApplicationHelper
       .gsub("http://kg.artsdata.ca/databus/culture-creates/","databus:")
       .gsub("http://www.w3.org/ns/shacl#","shacl:")
       .gsub("http://www.wikidata.org/entity/","wd:")
+      .gsub("http://www.w3.org/2001/XMLSchema#", "xsd:")
 
     if uri_compact.present?
       return uri_compact
