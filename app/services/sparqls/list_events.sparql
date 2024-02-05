@@ -2,7 +2,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms) 
+SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime  (sample(?sameas_action) as ?artsdata) (sample(?resultSeverity) as ?conforms) 
 WHERE {
     ?uri a schema:Event .
     graph <PLACEHOLDER> {
@@ -35,7 +35,7 @@ WHERE {
         ?uri  schema:location/schema:name ?location_name .
     }
 
-
+    BIND(COALESCE(?adid, "<button class='btn btn-primary btn-tiny' href='#'>mint</button>") as ?sameas_action)
    
     
 
