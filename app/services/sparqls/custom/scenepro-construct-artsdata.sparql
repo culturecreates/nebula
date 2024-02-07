@@ -1,0 +1,26 @@
+PREFIX schema: <http://schema.org/>
+PREFIX ex: <http://www.example.org#>
+construct {
+    ?adid  a schema:Organization ;
+           a ex:ArtsdataEntity ;
+           schema:name ?ad_name ;
+           schema:sameAs ?scenepro ;
+           schema:sameAs ?wikidata .
+  ?wikidata a ex:WikidataEntity ;
+            schema:sameAs ?adid .
+  ?scenepro a ex:SceneproEntity ;
+           schema:sameAs ?adid . 
+}
+where
+{
+    # Artsdata organizations that have a sameAs ScenePro organization
+    ?adid a schema:Organization ;
+          schema:name ?ad_name .
+    filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/K"))
+    ?adid schema:sameAs ?scenepro .
+    filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
+    OPTIONAL {
+        ?adid schema:sameAs ?wikidata .
+        filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/Q"))
+    }
+}

@@ -44,8 +44,8 @@
 <%= link_to "ScenePro Organizations Report",
 query_show_path(sparql: "custom/scenepro-orgs-report") %>
 <br>
-<%= link_to "ScenePro Wikidata Report",
-query_show_path(sparql: "custom/scenepro-wikidata") %>
+<%= link_to "ScenePro-Artsdata-Wikidata Status",
+query_show_chain_path(constructs: "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata", query:"custom/scenepro-query", title:"ScenePro-Artsdata-Wikidata Status") %>
 <br>
 <%= link_to "ScenePro Organization List",
 query_show_path(sparql: "custom/scenepro-orgs") %>
