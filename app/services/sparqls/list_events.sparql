@@ -35,7 +35,7 @@ WHERE {
         ?uri  schema:location/schema:name ?location_name .
     }
 
-    BIND(COALESCE(?adid, "<button class='btn btn-primary btn-tiny' href='#'>mint</button>") as ?sameas_action)
+    BIND(COALESCE(?adid, concat("<a class='btn btn-primary btn-tiny' href='/mint/preview?externalUri=",str(?uri),"'>mint</a>")) as ?sameas_action)
    
     
 
