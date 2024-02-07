@@ -2,3 +2,6 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "bootstrap"
+import "remove_flash_before_turbo_cache"
+
+
