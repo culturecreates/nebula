@@ -8,19 +8,21 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX schema: <http://schema.org/>
 PREFIX ex: <http://www.example.org#>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 construct {
     ?wikidata schema:name ?wikidataLabel ;
                a schema:Organization ;
                a ex:WikidataEntity ;
               ex:SceneProMemberStatedInLabel ?statedLabel ;
               ex:SceneProMemberRetreivedDate ?date  ;
+              ex:SceneProMemberLatestStartDate ?wdLatestStartDate ;
               schema:sameAs ?aduri .
     ?aduri a ex:ArtsdataEntity ; 
               schema:sameAs ?wikidata .    
 
 } where {
     SERVICE <https://query.wikidata.org/sparql> {
-        SELECT ?wikidata ?wikidataLabel ?statedLabel ?date ?aduri WHERE {
+        SELECT ?wikidata ?wikidataLabel ?statedLabel ?date ?aduri ?wdLatestStartDate WHERE {
             ?wikidata wdt:P463 wd:Q87727957;
                       p:P463 ?statement .
             ?statement ps:P463  wd:Q87727957 .
@@ -32,6 +34,9 @@ construct {
                 ?statement prov:wasDerivedFrom ?ref.
                 ?ref pr:P248 ?stated;
                      pr:P813 ?date.
+            }
+             OPTIONAL {
+                ?statement pq:P8555 ?wdLatestStartDate .
             }
             SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en".

@@ -19,7 +19,7 @@ module ApplicationHelper
 
     
     uri_compact = uri.gsub("http://schema.org/","schema:")
-      .gsub("http://kg.artsdata.ca/resource/","artsdata:")
+      .gsub("http://kg.artsdata.ca/resource/","ad:")
       .gsub("http://kg.footlight.io/resource/","footlight-console:")
       .gsub("http://api.footlight.io/places/","footlight-cms-places:")
       .gsub("http://api.footlight.io/events/","footlight-cms-events:")
@@ -31,6 +31,7 @@ module ApplicationHelper
       .gsub("http://www.w3.org/ns/shacl#","shacl:")
       .gsub("http://www.wikidata.org/entity/","wd:")
       .gsub("http://www.w3.org/2001/XMLSchema#", "xsd:")
+      .gsub("http://scenepro.ca#","sp:")
 
     if uri_compact.present?
       return uri_compact
