@@ -11,6 +11,12 @@ class GithubController < ApplicationController
       user_info = user_info(token)
       session[:handle] = user_info["login"]
       session[:name] = user_info["name"]
+
+      # user_repos = user_repos(token)
+      # session[:repos] = user_repos.map { |repo| repo["name"] }
+
+      nebula_sparqls = nebula_sparqls(token)
+      session[:nebula_sparqls] = nebula_sparqls.map { |sparql| sparql["download_url"].split('app/services/sparqls/')[1].split('.')[0]}
       
     else
       flash.alert = "Authorized, but unable to exchange code #{code} for token."
@@ -23,7 +29,21 @@ class GithubController < ApplicationController
 
   def user_info(token)
     uri = URI("https://api.github.com/user")
-  
+    info(token, uri)
+  end
+
+  def user_repos(token)
+    uri = URI("https://api.github.com/user/repos")
+    info(token, uri)
+  end
+
+  def nebula_sparqls(token) 
+    uri = URI("https://api.github.com/repos/culturecreates/nebula/contents/app/services/sparqls/custom")
+    info(token, uri)
+  end
+
+
+  def info(token, uri)
     result = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
       body = {"access_token" => token}.to_json
   
@@ -35,6 +55,8 @@ class GithubController < ApplicationController
   
     parse_response(result)
   end
+
+  
 
   def parse_response(response)
     case response

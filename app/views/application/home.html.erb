@@ -1,6 +1,17 @@
 <h1>Dashboard</h1>
 <%= "Welcome back #{session[:name]}!" if session[:name] %>
-
+<%= session[:repos] if session[:repos] %>
+<br>
+<% if  session[:nebula_sparqls] %>
+<h2>My Queries</h2>
+      <p> Loaded from Nebula.</p>
+<dl>
+  <% session[:nebula_sparqls].each do |sparql| %>
+    <%= link_to sparql, query_show_path(sparql: sparql) %>
+    <br>  
+      <% end %>
+    </dl>
+<% end %>
 
 <h2>External Sources</h2>
 <p> Datasets loaded from external sources sent to the Artsdata Databus. These are non-authoritative.</p>
