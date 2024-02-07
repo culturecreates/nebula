@@ -7,7 +7,7 @@ class EntityController < ApplicationController
 
     if !uri.starts_with?(/http:|https:|urn:/) 
       flash.alert = "Not an Artsdata ID or URI."
-      redirect_to root_path
+      redirect_back(fallback_location: root_path)
     end
    
     @entity = Entity.new(entity_uri: uri)

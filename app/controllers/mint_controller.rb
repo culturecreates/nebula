@@ -15,8 +15,7 @@ class MintController < ApplicationController
                       end
       @label = params[:label]
     else 
-      flash.alert = "Missing a required param. Required list: #{required}"
-      redirect_back(fallback_location: root_path)
+      flash.now.alert = "Missing a required param. Required list: #{required}"
     end
   end
 

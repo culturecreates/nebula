@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
   def authenticate_user!
     return true if session[:name] || Rails.env.test?
     flash.alert = "You must be logged in to access this section"
-    redirect_to root_path
-    
+    redirect_back(fallback_location: root_path)
   end
 end

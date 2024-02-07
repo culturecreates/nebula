@@ -15,7 +15,7 @@
     <%= render partial: "layouts/nav" %>
 
     <% if flash[:alert] %>
-      <div  class="flash alert alert-warning alert-dismissible fade show" data-turbo-temporary role="alert">
+      <div class="alert alert-warning alert-dismissible fade show" role="alert" data-turbo-temporary>
         <%= flash.alert %>
         <button
           type="button"
@@ -26,7 +26,7 @@
       </div>
     <% end %>
     <% if flash[:notice] %>
-      <div class="flash alert alert-info alert-dismissible fade show" data-turbo-temporary role="alert">
+      <div class="alert alert-info alert-dismissible fade show" role="alert" data-turbo-temporary>
         <%= flash.notice %>
         <button
           type="button"
