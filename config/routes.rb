@@ -14,7 +14,6 @@ Rails.application.routes.draw do
   get "dereference/external", to: "dereference#external"
   get "github/callback", to: "github#callback"
   get "query/show", to: "query#show"
-  get "query/show_chain", to: "query#show_chain"
   get "mint/preview", to: "mint#preview"
   get "mint/link", to: "mint#link"
   get "reconcile/query", to: "reconcile#query"

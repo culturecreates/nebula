@@ -1,40 +1,64 @@
 class QueryController < ApplicationController
+  require 'csv'
 
   def show
+    params.required(:sparql)
+    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format)
     sparql_file = params[:sparql] 
-    sub_sparql = params[:sub_sparql] ||= "list_entities"
-    @title =  params[:title] ||=  params[:sparql]
+    title =  params[:title] ||=  params[:sparql].split("/").last
+    graph = params[:graph]
+    construct_files = params[:constructs].split(",") if params[:constructs]
 
-    # create list for SPARQL template
-    substitute_list = []
-    ["PLACEHOLDER", params[:placeholder]].each { |item| substitute_list << item } if params[:placeholder] 
-    ["API", params[:api]].each { |item| substitute_list << item } if params[:api]
-    ["SUB_SPARQL", sub_sparql].each { |item| substitute_list << item }
-
-    sparql = SPARQL::Client.new("http://db.artsdata.ca/repositories/artsdata")
-    query =  SparqlLoader.load(sparql_file, substitute_list)
-    @solutions = sparql.query(query).limit(1000)
-  end
-
-  # pass a chain of SPARQL queries to the SPARQL endpoint
-  # GET "query/show_chain"
-  def show_chain
-    construct_files = params[:constructs].split(",")
-    puts construct_files
-    query_file = params[:query]
-    @title =  params[:title] ||=  query
-
-    graph = RDF::Graph.new
     sparql_client = SPARQL::Client.new("http://db.artsdata.ca/repositories/artsdata")
-    construct_files.each do |sparql_file|
-      query =  SparqlLoader.load(sparql_file)
-      graph << sparql_client.query(query)
-      puts "query #{sparql_file} added #{graph.count} triples"
-    end
-    # apply final query to local graph
-    query =  SparqlLoader.load(query_file)
-    @solutions =  SPARQL.execute(query,graph)
+    query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph])
+    solutions = if !construct_files
+                  sparql_client.query(query).limit(1000)
+                else
+                  SPARQL.execute(query,local_graph(construct_files,sparql_client) )
+                end
 
-    render :show
+    respond_to do |format|
+      format.html {
+        render :show, locals: {title: title, solutions: solutions, permitted_params: permitted_params}
+      }
+      format.csv {
+        send_data csv_data(solutions), type: 'text/csv; charset=utf-8; header=present', disposition: "attachment; filename=#{sparql_file}.csv"
+      }
+    end
   end
+
+
+
+
+
+
+
+  private
+
+  def local_graph(construct_files = [],sparql_client)
+    graph = RDF::Graph.new
+    construct_files.each do |file|
+      query =  SparqlLoader.load(file)
+      graph << sparql_client.query(query)
+      puts "#{graph.count} triples after construct #{file}"
+    end
+    return graph
+  end
+ 
+
+  def csv_data(solutions)
+    keys = solutions.variable_names
+    CSV.generate(headers: true) do |csv|
+      csv << keys
+      solutions.each do |solution|
+        row = []
+        keys.each do |key|
+          row << solution[key]&.value 
+        end
+        csv << row
+      end
+    end
+    
+  end
+
 end

@@ -2,7 +2,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 SELECT distinct ?uri  ?url (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
 WHERE {
-    graph <PLACEHOLDER> {
+    graph <GRAPH_PLACEHOLDER> {
         ?uri  a ?type  . 
         OPTIONAL {
             ?uri schema:url ?url  .

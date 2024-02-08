@@ -2,7 +2,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 SELECT ?uri (sample(?name_language) as ?name)  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
 WHERE {
-    graph <PLACEHOLDER> {
+    graph <GRAPH_PLACEHOLDER> {
         ?uri schema:name  ?name_language ;
              a ?type  . 
        

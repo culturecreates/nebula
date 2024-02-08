@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
-select ?entities (count(?e) as ?PLACEHOLDERs)  ?dataset ?graph  ?generatedAtTime  where 
+select ?entities (count(?e) as ?People)  ?dataset ?graph  ?generatedAtTime  where 
 {
     ?graph a schema:Dataset .
     filter(!STRSTARTS(str(?graph),"http://kg.artsdata.ca/minted/K"))
@@ -8,7 +8,7 @@ select ?entities (count(?e) as ?PLACEHOLDERs)  ?dataset ?graph  ?generatedAtTime
          ?e a ?type .
     }
     filter exists {
-        ?e a schema:PLACEHOLDER  .
+        ?e a schema:Person  .
     } 
     filter(!isBLANK(?e))
     ?graph rdfs:label ?dataset .
@@ -17,6 +17,6 @@ select ?entities (count(?e) as ?PLACEHOLDERs)  ?dataset ?graph  ?generatedAtTime
     }
     
     bind(ENCODE_FOR_URI(str(?dataset)) as ?dataset_escaped)
-    bind(CONCAT("<a href='API?title=PLACEHOLDER entities in ",str(?dataset_escaped),"&sparql=SUB_SPARQL&placeholder=",str(?graph),"'>View</a>") as ?entities)
+    bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graph),"'>View</a>") as ?entities)
  
 } group by ?graph ?dataset ?generatedAtTime ?entities order by DESC(?generatedAtTime)
