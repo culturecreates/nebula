@@ -1,22 +1,18 @@
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
-select ?entities (count(?e) as ?People)  ?dataset ?graph  ?generatedAtTime  where 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX void: <http://rdfs.org/ns/void#>
+select ?entities (sample(?count) as ?people) ?dataset ?graph  ?generatedAtTime  where 
 {
     ?graph a schema:Dataset .
     filter(!STRSTARTS(str(?graph),"http://kg.artsdata.ca/minted/K"))
-    graph ?graph {
-         ?e a ?type .
-    }
-    filter exists {
-        ?e a schema:Person  .
-    } 
-    filter(!isBLANK(?e))
-    ?graph rdfs:label ?dataset .
-    OPTIONAL {
-        ?graph prov:generatedAtTime ?generatedAtTime .
-    }
-    
+    ?graph rdfs:label ?dataset;
+           prov:generatedAtTime ?generatedAtTime ;
+           prov:wasDerivedFrom/foaf:primaryTopic/void:classPortion  ?classPortion .
+    ?classPortion void:class schema:Person ;
+             void:entities ?count .
+    filter(?count > 0)
     bind(ENCODE_FOR_URI(str(?dataset)) as ?dataset_escaped)
-    bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graph),"'>View</a>") as ?entities)
- 
-} group by ?graph ?dataset ?generatedAtTime ?entities order by DESC(?generatedAtTime)
+    bind(CONCAT("<a href='/query/show?title=People entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graph),"'>View</a>") as ?entities)
+} group by ?entities  ?dataset ?graph  ?generatedAtTime order by DESC(?generatedAtTime)
