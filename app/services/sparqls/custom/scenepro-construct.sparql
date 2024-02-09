@@ -5,7 +5,14 @@ construct {
                 a ex:SceneproEntity ;
                 schema:name ?scenepro_name ;
                 schema:sameAs ?adid ;
-                schema:sameAs ?wikidata .
+                schema:sameAs ?wikidata ;
+                ex:neq ?neq ;
+                schema:telephone ?telephone ;   
+                schema:url ?url ;   
+                ex:address ?address ;       
+                ex:postalCode ?postalCode ; 
+                ex:addressLocality ?addressLocality .
+
     ?adid a ex:ArtsdataEntity ;
               schema:sameAs ?scenepro .   
     ?wikidata a ex:WikidataEntity ;
@@ -23,5 +30,23 @@ where {
     OPTIONAL {
         ?scenepro schema:sameAs ?wikidata .
         filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/Q"))
+    }
+    optional {
+        ?scenepro schema:telephone ?telephone .
+    }
+     optional {
+        ?scenepro schema:url ?url .
+    }
+     optional {
+        ?scenepro schema:address/schema:streetAddress ?address .
+    }
+      optional {
+        ?scenepro schema:address/schema:postalCode ?postalCode .
+    }
+      optional {
+        ?scenepro schema:address/schema:addressLocality ?addressLocality .
+    }
+     optional {
+        ?scenepro <http://www.wikidata.org/prop/direct/P10503> ?neq .
     }
 }

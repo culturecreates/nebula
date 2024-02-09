@@ -89,6 +89,24 @@ select * where {
         OPTIONAL {
             ?scenepro schema:name ?scenepro_name .
         }
+         OPTIONAL {
+            ?scenepro schema:url ?url .
+        }
+         OPTIONAL {
+            ?scenepro schema:telephone ?telephone .
+        }
+         OPTIONAL {
+            ?scenepro  ex:neq ?neq .
+        }
+         OPTIONAL {
+            ?scenepro  ex:address ?address .
+        }
+         OPTIONAL {
+            ?scenepro   ex:postalCode ?postalCode .
+        }
+         OPTIONAL {
+            ?scenepro  ex:addressLocality ?addressLocality .
+        }
         OPTIONAL {
             ?scenepro schema:sameAs ?adid .
             ?adid a ex:ArtsdataEntity .
@@ -101,7 +119,7 @@ select * where {
             }
         }
         OPTIONAL {
-            ?scenepro schema:sameAs ?wikidata .
+          #  ?scenepro schema:sameAs ?wikidata .
             ?wikidata a ex:WikidataEntity .
             OPTIONAL {
                 ?wikidata schema:name ?wikidata_name .
@@ -109,9 +127,9 @@ select * where {
             OPTIONAL {
                 ?wikidata ex:SceneProMemberStatedInLabel ?wdr_statedIn .
             }
-            OPTIONAL {
-                ?wikidata  ex:SceneProMemberRetreivedDate ?wdr_RetreivedDate  .
-            }
+            # OPTIONAL {
+            #     ?wikidata  ex:SceneProMemberRetreivedDate ?wdr_RetreivedDate  .
+            # }
             OPTIONAL {
                 ?wikidata ex:SceneProMemberLatestStartDate ?wdq_LatestStartDate  .
             }  
