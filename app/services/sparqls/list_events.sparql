@@ -2,7 +2,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime  (sample(?sameas_action) as ?artsdata) (sample(?resultSeverity) as ?conforms) 
+SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime  (sample(?sameas_action) as ?artsdata)  (sample(?resultSeverity) as ?conforms) 
 WHERE {
     ?uri a schema:Event .
     graph <GRAPH_PLACEHOLDER> {
@@ -11,6 +11,10 @@ WHERE {
              schema:startDate ?startDate . 
         bind(STRDT(str(?startDate),xsd:dateTime) as ?startDateTime)
        
+        OPTIONAL {
+          FILTER NOT EXISTS { ?series schema:subEvent ?uri }
+          bind(concat("<a class='btn btn-primary btn-tiny' href='/mint/preview?externalUri=",str(?uri),"'>mint</a>") as ?mint_top_level)
+        }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
                 sh:resultSeverity ?resultSeverity .
@@ -35,7 +39,7 @@ WHERE {
         ?uri  schema:location/schema:name ?location_name .
     }
 
-    BIND(COALESCE(?adid, concat("<a class='btn btn-primary btn-tiny' href='/mint/preview?externalUri=",str(?uri),"'>mint</a>")) as ?sameas_action)
+    BIND(COALESCE(?adid, ?mint_top_level) as ?sameas_action)
    
     
 

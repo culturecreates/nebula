@@ -31,4 +31,18 @@ class ReconcileController < ApplicationController
       redirect_back(fallback_location: root_path)
     end
   end
+
+  def postal_code
+    required = [:postal_code]
+    if required.all? { |k| params.key? k }
+      @externalUri = params[:externalUri] # pass through to view for link button
+    
+      # work on creating a SPARQL that responds like con.
+      
+      @result = JSON.parse(response.body)
+    else
+      flash.alert = "Missing a required param. Required list: #{required}"
+      redirect_back(fallback_location: root_path)
+    end
+  end
 end

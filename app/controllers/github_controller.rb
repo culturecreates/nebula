@@ -15,8 +15,8 @@ class GithubController < ApplicationController
       # user_repos = user_repos(token)
       # session[:repos] = user_repos.map { |repo| repo["name"] }
 
-      nebula_sparqls = nebula_sparqls(token)
-      session[:nebula_sparqls] = nebula_sparqls.map { |sparql| sparql["download_url"].split('app/services/sparqls/')[1].split('.')[0]}
+      # nebula_sparqls = nebula_sparqls(token)
+      # session[:nebula_sparqls] = nebula_sparqls.map { |sparql| sparql["download_url"].split('app/services/sparqls/')[1].split('.')[0]}
       
     else
       flash.alert = "Authorized, but unable to exchange code #{code} for token."
