@@ -6,7 +6,7 @@ class ReconcileController < ApplicationController
   # Reconcile
   # GET /reconcile/query?query=&type=
   def query
-    required = [:query, :type]
+    required = [:query]
     if required.all? { |k| params.key? k }
       @externalUri = params[:externalUri] # pass through to view for link button
       uri = URI.parse("https://api.artsdata.ca/recon") 

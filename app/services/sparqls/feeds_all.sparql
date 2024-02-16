@@ -1,0 +1,40 @@
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX void: <http://rdfs.org/ns/void#>
+select  ?dataset (sample(?event) as ?events)  (sample(?organization) as ?orgs) (sample(?person) as ?people) (sample(?place) as ?places) ?graph  ?generatedAtTime  where 
+{
+    ?graph a schema:Dataset .
+    
+    ?graph rdfs:label ?dataset;
+           prov:generatedAtTime ?generatedAtTime ;
+           prov:wasDerivedFrom/foaf:primaryTopic/void:classPortion  ?classPortion .
+    OPTIONAL {
+            ?classPortion void:class ?type ;
+             void:entities ?event_count .
+             filter(?type = schema:Event)
+           }
+            OPTIONAL {
+            ?classPortion void:class ?type ;
+             void:entities ?place_count .
+             filter(?type = schema:Place)
+           }
+            OPTIONAL {
+            ?classPortion void:class ?type ;
+             void:entities ?organization_count .
+             filter(?type = schema:Organization)
+           }
+            OPTIONAL {
+            ?classPortion void:class ?type ;
+             void:entities ?person_count .
+             filter(?type = schema:Person)
+           }
+
+    bind(ENCODE_FOR_URI(str(?dataset)) as ?dataset_escaped)
+    bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graph),"'>",str(?event_count),"</a>") as ?event)
+    bind(CONCAT("<a href='/query/show?title=Place entities in ",str(?dataset_escaped),"&sparql=list_places&graph=",str(?graph),"'>",str(?place_count),"</a>") as ?place)
+    bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graph),"'>",str(?person_count),"</a>") as ?person)
+   bind(CONCAT("<a href='/query/show?title=Organization entities in ",str(?dataset_escaped),"&sparql=list_organizations&graph=",str(?graph),"'>",str(?organization_count),"</a>") as ?organization)
+
+} GROUP BY ?dataset ?graph ?generatedAtTime order by DESC(?generatedAtTime)

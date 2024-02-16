@@ -3,8 +3,10 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 SELECT ?uri (sample(?name_language) as ?name)  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
 WHERE {
     graph <GRAPH_PLACEHOLDER> {
-        ?uri schema:name  ?name_language ;
-             a ?type  . 
+        ?uri  a ?type  .
+        {
+         ?uri  schema:name  ?name_language  . 
+        }
        
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
@@ -12,7 +14,7 @@ WHERE {
         }
     }
     ?uri a schema:Organization .      
-    filter(!isBLANK(?uri))   
+   
     OPTIONAL {
       ?adid_sub schema:sameAs ?uri .
       filter(contains(str(?adid_sub),"http://kg.artsdata.ca/resource/K"))
