@@ -1,76 +1,123 @@
-<h1>Dashboard</h1>
 <%= "Welcome back #{session[:name]}!" if session[:name] %>
-<%= session[:repos] if session[:repos] %>
+
 <br>
 <% if  session[:nebula_sparqls] %>
-<h2>My Queries</h2>
-      <p> Loaded from Nebula.</p>
-<dl>
-  <% session[:nebula_sparqls].each do |sparql| %>
-    <%= link_to sparql, query_show_path(sparql: sparql) %>
-    <br>  
-      <% end %>
-    </dl>
+  <h2>My Queries</h2>
+  <p>
+    Loaded from Nebula.</p>
+  <dl>
+    <% session[:nebula_sparqls].each do |sparql| %>
+      <%= link_to sparql, query_show_path(sparql: sparql) %>
+      <br>
+    <% end %>
+  </dl>
 <% end %>
 
 <h2>External Sources</h2>
-<p> Datasets loaded from external sources sent to the Artsdata Databus. These are non-authoritative.</p>
+<p>
+  Datasets loaded from external sources sent to the Artsdata Databus. These are
+  non-authoritative.</p>
 <dl>
-<%= link_to "Feeds", query_show_path(sparql: "feeds_all", title:"External Feeds") %>
-<br>
-<%= link_to "Place Feeds", query_show_path(sparql: "graphs_places", title:"Place Feeds") %>
-<br>
-<%= link_to "People Feeds", query_show_path(sparql: "graphs_people", title:"Person Feeds") %>
-<br>
-<%= link_to "Organization Feeds", query_show_path(sparql: "graphs_organizations", title:"Organization Feeds") %>
+  <%= link_to "Feeds", query_show_path(sparql: "feeds_all", title: "External Feeds") %>
+  <br>
+  <%= link_to "Place Feeds",
+  query_show_path(sparql: "graphs_places", title: "Place Feeds") %>
+  <br>
+  <%= link_to "People Feeds",
+  query_show_path(sparql: "graphs_people", title: "Person Feeds") %>
+  <br>
+  <%= link_to "Organization Feeds",
+  query_show_path(sparql: "graphs_organizations", title: "Organization Feeds") %>
 </dl>
 
-<h2> Artsdata Entites</h2>
-<p>Entites curated from external datasets and minted with persistent Artsdata identifiers.</p>
+<h2>
+  Artsdata Entites</h2>
+<p>Entites curated from external datasets and minted with persistent Artsdata
+  identifiers.</p>
 <dl>
-<%= link_to "Events", query_show_path(sparql: "list_events", graph:"http://kg.artsdata.ca/minted/K23", title:"Events") %>
-<br>
-<%= link_to "Places", query_show_path(sparql: "list_places", graph:"http://kg.artsdata.ca/minted/K11",  title:"Places") %>
-<br>
-<%= link_to "People", query_show_path(sparql: "list_people", graph:"http://kg.artsdata.ca/Person", title:"People") %>
-<br>
-<%= link_to "Organizations", query_show_path(sparql: "list_organizations", graph:"http://kg.artsdata.ca/minted/K5", title:"Organizations" ) %>
+  <%= link_to "Events",
+  query_show_path(
+    sparql: "list_events",
+    graph: "http://kg.artsdata.ca/minted/K23",
+    title: "Events",
+  ) %>
+  <br>
+  <%= link_to "Places",
+  query_show_path(
+    sparql: "list_places",
+    graph: "http://kg.artsdata.ca/minted/K11",
+    title: "Places",
+  ) %>
+  <br>
+  <%= link_to "People",
+  query_show_path(
+    sparql: "list_people",
+    graph: "http://kg.artsdata.ca/Person",
+    title: "People",
+  ) %>
+  <br>
+  <%= link_to "Organizations",
+  query_show_path(
+    sparql: "list_organizations",
+    graph: "http://kg.artsdata.ca/minted/K5",
+    title: "Organizations",
+  ) %>
 </dl>
 
 <h2>Popular Queries</h2>
-<p>Queries shared by users of Artsdata. <%= "Login to add your own SPARQLs." if !session[:name] %></p>
+<p>Queries shared by users of Artsdata.
+  <%= "Login to add your own SPARQLs." if !session[:name] %></p>
 <dl>
-<%= link_to "Ville de Laval Events", query_show_path(sparql: "custom/ville-de-laval", title: "Events for Footlight - Ville de Laval") %>
-<br>
-<%= link_to "LaVitrine Pipeline", query_show_path(sparql: "custom/lavitrine_sources_refresh_rate", title:"Sources for LaVitrine") %>
-<br>
-<%= link_to "Upcoming Events from Footlight", query_show_path(sparql: "custom/footlight-upcoming-events") %>
-<br>
-<%= link_to "Upcoming Events from National Arts Centre", query_show_path(sparql: "custom/nac-events") %>
-<br>
-<%= link_to "CAPACOA Members", query_show_path(sparql: "custom/capacoa-members") %>
-<br>
-<%= link_to "ScenePro Organizations Report",
-query_show_path(sparql: "custom/scenepro-orgs-report") %>
-<br>
-<%= link_to "ScenePro-Artsdata-Wikidata Status",
-query_show_path(constructs: "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata", sparql:"custom/scenepro-query", title:"ScenePro-Artsdata-Wikidata Status") %>
-<br>
-<%= link_to "ScenePro Organization List",
-query_show_path(sparql: "custom/scenepro-orgs") %>
-<br>
-<%= link_to "ScenePro Venue List", query_show_path(sparql: "custom/scenepro-venues") %>
+  <%= link_to "Ville de Laval Events",
+  query_show_path(
+    sparql: "custom/ville-de-laval",
+    title: "Events for Footlight - Ville de Laval",
+  ) %>
+  <br>
+  <%= link_to "LaVitrine Pipeline",
+  query_show_path(
+    sparql: "custom/lavitrine_sources_refresh_rate",
+    title: "Sources for LaVitrine",
+  ) %>
+  <br>
+  <%= link_to "Upcoming Events from Footlight",
+  query_show_path(sparql: "custom/footlight-upcoming-events") %>
+  <br>
+  <%= link_to "Upcoming Events from National Arts Centre",
+  query_show_path(sparql: "custom/nac-events") %>
+  <br>
+  <%= link_to "CAPACOA Members", query_show_path(sparql: "custom/capacoa-members") %>
+  <br>
+  <%= link_to "ScenePro Organizations Report",
+  query_show_path(sparql: "custom/scenepro-orgs-report") %>
+  <br>
+  <%= link_to "ScenePro-Artsdata-Wikidata Status",
+  query_show_path(
+    constructs:
+      "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata",
+    sparql: "custom/scenepro-query",
+    title: "ScenePro-Artsdata-Wikidata Status",
+  ) %>
+  <br>
+  <%= link_to "ScenePro Organization List",
+  query_show_path(sparql: "custom/scenepro-orgs") %>
+  <br>
+  <%= link_to "ScenePro Venue List", query_show_path(sparql: "custom/scenepro-venues") %>
 </dl>
 
 <h2>View External Sources</h2>
-<p>Paste any URI into the search bar and click "dereference" to view authoritative data from anywhere in the world. Here are some examples:</p>
+<p>Paste any URI into the search bar and click "dereference" to view
+  authoritative data from anywhere in the world. Here are some examples:</p>
 <dl>
-  <%= link_to "https://musicbrainz.org/place/4d728a60-361f-42d2-bfa1-38dfd9c74ec6", "/dereference/external?uri=https%3A%2F%2Fmusicbrainz.org%2Fplace%2F4d728a60-361f-42d2-bfa1-38dfd9c74ec6" %>
-  <br> 
-  <%= link_to "http://viaf.org/viaf/1033159474209827661876", "/dereference/external?uri=http%3A%2F%2Fviaf.org%2Fviaf%2F1033159474209827661876" %>
+  <%= link_to "https://musicbrainz.org/place/4d728a60-361f-42d2-bfa1-38dfd9c74ec6",
+  "/dereference/external?uri=https%3A%2F%2Fmusicbrainz.org%2Fplace%2F4d728a60-361f-42d2-bfa1-38dfd9c74ec6" %>
   <br>
-  <%= link_to "https://placedesarts.com/fr/evenement/elisapie" , "/dereference/external?uri=https%3A%2F%2Fplacedesarts.com%2Ffr%2Fevenement%2Felisapie" %>
+  <%= link_to "http://viaf.org/viaf/1033159474209827661876",
+  "/dereference/external?uri=http%3A%2F%2Fviaf.org%2Fviaf%2F1033159474209827661876" %>
   <br>
-  <%= link_to "http://www.wikidata.org/entity/Q3527509", "/dereference/external?uri=http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ3527509" %>
+  <%= link_to "https://placedesarts.com/fr/evenement/elisapie",
+  "/dereference/external?uri=https%3A%2F%2Fplacedesarts.com%2Ffr%2Fevenement%2Felisapie" %>
+  <br>
+  <%= link_to "http://www.wikidata.org/entity/Q3527509",
+  "/dereference/external?uri=http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ3527509" %>
 </dl>
-  
