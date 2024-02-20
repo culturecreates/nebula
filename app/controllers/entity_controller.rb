@@ -2,7 +2,7 @@ class EntityController < ApplicationController
   # Show an entity's asserted statements
   # /entity?uri=
   def show
-    uri = params[:uri] ||= "K1-3"
+    uri = params[:uri] 
     uri = "http://kg.artsdata.ca/resource/#{uri}"if uri.starts_with?("K")
 
     if !uri.starts_with?(/http:|https:|urn:/) 
