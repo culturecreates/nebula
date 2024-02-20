@@ -18,4 +18,6 @@ Rails.application.routes.draw do
   get "mint/link", to: "mint#link"
   get "reconcile/query", to: "reconcile#query"
 
+  get '/sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/')
+
 end
