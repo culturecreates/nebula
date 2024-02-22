@@ -18,27 +18,29 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <form class="d-flex" role="search" action="/entity">
-          <input
-            class="form-control me-2"
-            name="uri"
-            type="search"
-            placeholder="URI"
-            aria-label="Search"
-          />
-          <button class="btn btn-outline-secondary" type="submit">
-            View
-          </button>
-        </form>
-        <li class="nav-item active">
-          <a class="nav-link" href="/">Feeds</a>
+        <li class="nav-item">
+          <%= link_to "Home", root_path, class: "nav-link" %>
         </li>
+        <li class="nav-item">
+          <%= link_to "Feeds",
+          query_show_path(sparql: "feeds_all", title: "External Feeds"),
+          class: "nav-link" %>
+        </li>
+
       </ul>
-      <form
-        class="d-flex"
-        role="search"
-        action="/reconcile/query" 
-      >
+      <form class="d-flex" role="search" action="/entity">
+        <input
+          class="form-control me-2"
+          name="uri"
+          type="search"
+          placeholder="URI"
+          aria-label="Search"
+        />
+        <button class="btn btn-outline-secondary" type="submit">
+          View
+        </button>
+      </form>
+      <form class="d-flex" role="search" action="/reconcile/query">
         <input
           class="form-control me-2"
           name="query"
