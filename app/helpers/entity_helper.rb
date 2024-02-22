@@ -41,7 +41,7 @@ module EntityHelper
   # Display RDF objects which may be URIs, blank nodes or literals.
   def display_object(obj)
     if obj.node? # blank node
-      "nested node (#{obj.to_s.truncate(20)})"
+      "not clickable (#{obj.to_s.truncate(20)})"
     elsif obj.uri?
       display_uri(obj)
     elsif obj.literal?
@@ -59,6 +59,8 @@ module EntityHelper
       "<span>#{obj.value} <a href='#{obj.value}' target='_blank'>&nbsp;#{ render partial: 'shared/icon_link'}</a></span>".html_safe
     elsif obj.datatype?
       "<span>#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{use_prefix(obj.datatype)}</span></span>".html_safe 
+    elsif obj.value.starts_with?("<a href='/")
+      "<span><a href='/#{ I18n.locale }/#{obj.value.split("<a href='/").last}<span>".html_safe
     else
       "<span>#{obj.value}</span>".html_safe
     end
