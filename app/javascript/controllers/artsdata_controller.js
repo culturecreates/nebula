@@ -25,7 +25,12 @@ export default class extends Controller {
     const res = await fetch(url, options);
     const json = await res.json();
     console.log(json);
-    this.uriTarget.innerHTML = JSON.stringify(json, null, 2);
+    if (json.data.status == "success") {
+      this.uriTarget.innerHTML = "Successfully minted";
+    } else {
+      this.uriTarget.innerHTML = "Error: " + JSON.stringify(json.data.message, null, 2);
+    }
+
 
   }
 
