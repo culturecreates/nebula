@@ -12,12 +12,19 @@ module DereferenceHelper
         pattern [RDF::URI(id), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
         pattern [RDF::URI(id), RDF::URI("http://schema.org/streetAddress"), :streetAddress]
         pattern [RDF::URI(id), RDF::URI("http://schema.org/addressLocality"), :addressLocality]
+        pattern [RDF::URI(id), RDF::URI("http://schema.org/postalCode"), :postalCode]
       end
     elsif solution.present? && solution.type == "http://schema.org/Event"
       query = RDF::Query.new do
         pattern [RDF::URI(id), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label]
         pattern [RDF::URI(id), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
         pattern [RDF::URI(id), RDF::URI("http://schema.org/startDate"), :startDate]
+      end
+    elsif solution.present? && solution.type == "http://schema.org/Place"
+      query = RDF::Query.new do
+        pattern [RDF::URI(id), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label]
+        pattern [RDF::URI(id), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
+        pattern [RDF::URI(id), RDF::URI("http://schema.org/postalCode"), :postalCode]
       end
     else
       query = RDF::Query.new do

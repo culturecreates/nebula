@@ -4,10 +4,12 @@ Test:
 
   <div class="statement-object">
     <% solution = dereference_helper(@uri) %>
+    <% puts "solution: #{solution.inspect}" %>
     <% if solution && solution[:streetAddress] %>
       <b>
         <%= solution[:streetAddress] %>,
-        <%= solution[:addressLocality] %>
+        <%= solution[:addressLocality] %>,
+        <%= solution[:postalCode] %>
       </b>
       <%= display_object(RDF.URI(@uri)) %>
     <% elsif solution && solution[:label] %>
@@ -15,7 +17,12 @@ Test:
       <div class="alternate-name">
         <%= display_object(solution[:type]) %>
         <% if solution && solution[:startDate] %>
-          - <%= display_object(solution[:startDate]) %>
+          -
+          <%= display_object(solution[:startDate]) %>
+        <% end %>
+        <% if solution && solution[:postalCode] %>
+          -
+          <%= display_object(solution[:postalCode]) %>
         <% end %>
       </div>
       <%= display_object(RDF.URI(@uri)) %>

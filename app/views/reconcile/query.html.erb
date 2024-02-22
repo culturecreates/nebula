@@ -4,8 +4,9 @@
 
 <turbo-frame id="recon_results" target="_top">
   <ul class="list-group ">
-    <% @result["result"].each_with_index do |result| %>
+    <% @result["result"].each do |result| %>
       <%= render partial: "result", locals: { result: result } %>
     <% end %>
+    <%= "No matches" if @result["result"].count == 0 %>
   </ul>
 </turbo-frame>

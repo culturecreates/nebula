@@ -16,20 +16,6 @@
       </turbo-frame>
     </p>
 
-    <p>Mint a new Artsdata Entity of type
-      <%= @classToMint %></p>
-
-    <p>
-      <turbo-frame
-        id='card-1'
-        src="<%= dereference_card_path(uri: @classToMint, frame_id: "1")%>"
-        loading="lazy"
-        target="_top"
-      >
-        loading...
-      </turbo-frame>
-    </p>
-
     <p><%= session[:name] %>
       acting on behalf of the authority</p>
     <p>
@@ -62,10 +48,15 @@
   </div>
   <div class="col-md">
     <!-- Second column content goes here -->
-    <p>Reconciliation check</p>
+    <p>Reconciliation check:</p>
+    <ul>
+      <li><%= @label %></li>
+      <li><%= @classToMint %></li>
+      <li><%= @postalCode if @postalCode %><%= @startDate if @startDate %></li>
+    </ul>
     <turbo-frame
       id='recon_results'
-      src="<%= reconcile_query_path(query: @label, type: @classToMint, externalUri: @externalUri)%>"
+      src="<%= reconcile_query_path(query: @label, type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"
       loading="lazy"
       target="_top"
     >
