@@ -16,7 +16,8 @@ construct {
             <URI_PLACEHOLDER> a ?type .
             OPTIONAL { <URI_PLACEHOLDER> <http://schema.org/startDate> ?startDate .}
             OPTIONAL { <URI_PLACEHOLDER>   <http://schema.org/streetAddress> ?street ; 
-              <http://schema.org/addressLocality> ?locality ; 
+              <http://schema.org/addressLocality> ?locality ;
               <http://schema.org/postalCode> ?postalCode . }
+            OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/postalCode> ?postalCode . }
           }
         } 
