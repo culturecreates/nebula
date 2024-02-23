@@ -1,12 +1,14 @@
-<h1>
-  Search Results
-</h1>
+<div class="container">
+  <h1>
+    Search Results
+  </h1>
 
-<turbo-frame id="recon_results" target="_top">
-  <ul class="list-group ">
-    <% @result["result"].each do |result| %>
-      <%= render partial: "result", locals: { result: result } %>
-    <% end %>
-    <%= "No matches" if @result["result"].count == 0 %>
-  </ul>
-</turbo-frame>
+  <turbo-frame id="recon_results" target="_top">
+    <ul class="list-group ">
+      <% @result["result"].each do |result| %>
+        <%= render partial: "result", locals: { result: result } %>
+      <% end %>
+      <%= "No matches" if @result["result"].count == 0 %>
+    </ul>
+  </turbo-frame>
+</div>

@@ -1,17 +1,27 @@
 <% provide(:title, title) %>
-<h1>
-  <%= solutions.count %>
-  <%= title %>
-</h1>
-<%= render partial: "query_nav", locals: {permitted_params: permitted_params}  %>
+<div class="container">
+  <h1>
+    <%= solutions.count %>
+    <%= title %>
+  </h1>
+  <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
+</div>
 
 <div class="table-responsive">
-  <table data-controller="sortable-table" data-sortable-table-target="table" class="table table-hover">
+  <table
+    data-controller="sortable-table"
+    data-sortable-table-target="table"
+    class="table table-hover"
+  >
     <thead>
       <tr>
         <th scope="col">#</th>
         <% solutions.variable_names.each do |head| %>
-          <th scope="col" data-action="click->sortable-table#sort" data-sort-direction="asc"><%= head.to_s %></th>
+          <th
+            scope="col"
+            data-action="click->sortable-table#sort"
+            data-sort-direction="asc"
+          ><%= head.to_s %></th>
         <% end %>
       </tr>
     </thead>

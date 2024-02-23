@@ -12,6 +12,8 @@ class ReconcileController < ApplicationController
       @type = params[:type]
       @externalUri = params[:externalUri] # pass through to view for link button
       @postalCode = params[:postalCode] # restrict reconiliation to a postal code
+
+      redirect_to entity_path(uri: @query) if @query.starts_with?("http") || @query.match?(/^K.*-.*$/)
       
       uri = URI.parse("https://api.artsdata.ca/recon") 
       request = Net::HTTP::Get.new(uri)

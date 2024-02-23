@@ -3,7 +3,7 @@ class EntityController < ApplicationController
   # /entity?uri=
   def show
     uri = params[:uri] 
-    uri = "http://kg.artsdata.ca/resource/#{uri}"if uri.starts_with?("K")
+    uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?("http")
 
     if !uri.starts_with?(/http:|https:|urn:/) 
       flash.alert = "Not an Artsdata ID or URI."
