@@ -1,30 +1,30 @@
 <% provide(:title, @entity.label&.html_safe) %>
-<h1><%= @entity.label&.html_safe %>  </h1>
-<a><%= use_prefix(@entity.entity_uri) %></a>
+<h1>
+  <%= @entity.label&.html_safe %>
+</h1>
+<a>
+  <%= use_prefix(@entity.entity_uri) %>
+</a>
 <%= render partial: "entity_nav" %>
-<%= render partial: "external_resource", locals:{ entity: @entity } if @entity.graph.count == 0 %>
-<%= render partial: "statements_table", locals:{ entity: @entity }  %>
-
+<%= if @entity.graph.count == 0
+  render partial: "external_resource", locals: { entity: @entity }
+end %>
+<%= render partial: "statements_table", locals: { entity: @entity } %>
 
 <turbo-frame
-            id='unsupported-claims'
-            src=<%= entity_unsupported_claims_path(uri: @entity.entity_uri)%>
-            loading="lazy"
-            target="_top"
-          >
-            
+  id='unsupported-claims'
+  src="<%= entity_unsupported_claims_path(uri: @entity.entity_uri)%>"
+  loading="lazy"
+  target="_top"
+>
 </turbo-frame>
-
 <br>
 <turbo-frame
-            id='reverse-statements'
-            src=<%= entity_derived_statements_path(uri: @entity.entity_uri)%>
-            loading="lazy"
-            target="_top"
-          >
-           
+  id='reverse-statements'
+  src="<%= entity_derived_statements_path(uri: @entity.entity_uri)%>"
+  loading="lazy"
+  target="_top"
+>
 </turbo-frame>
 <br>
 <br>
-
-</div>
