@@ -13,9 +13,12 @@
 
   <body>
     <%= render partial: "layouts/nav" %>
-
     <% if flash[:alert] %>
-      <div class="alert alert-warning alert-dismissible fade show" role="alert" data-turbo-temporary>
+      <div
+        class="alert alert-warning alert-dismissible fade show"
+        role="alert"
+        data-turbo-temporary
+      >
         <%= flash.alert %>
         <button
           type="button"
@@ -26,7 +29,11 @@
       </div>
     <% end %>
     <% if flash[:notice] %>
-      <div class="alert alert-info alert-dismissible fade show" role="alert" data-turbo-temporary>
+      <div
+        class="alert alert-info alert-dismissible fade show"
+        role="alert"
+        data-turbo-temporary
+      >
         <%= flash.notice %>
         <button
           type="button"
@@ -36,7 +43,8 @@
         ></button>
       </div>
     <% end %>
-    <div class="container">
+    <br>
+    <div class="container-fluid">
       <%= yield %>
     </div>
   </body>

@@ -7,6 +7,9 @@ body {
 a {
   text-decoration: none;
 }
+a:active {
+  cursor: wait;
+}
 
 .statement {
   display: flex;

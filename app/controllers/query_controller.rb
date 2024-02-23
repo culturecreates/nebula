@@ -3,7 +3,7 @@ class QueryController < ApplicationController
 
   def show
     params.required(:sparql)
-    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format)
+    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale)
     sparql_file = params[:sparql] 
     title =  params[:title] ||=  params[:sparql].split("/").last
     graph = params[:graph]

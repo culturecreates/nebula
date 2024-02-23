@@ -1,68 +1,127 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar bg-body-tertiary">
   <div class="container-fluid">
     <a class="navbar-brand" style="padding:0" href="/">
       <%= image_tag "artsdata_logo_circle.png",
       alt: "Artsdata Logo",
       style: "height: 40px; width: auto;" %>
     </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <%= link_to "Home", root_path, class: "nav-link" %>
-        </li>
-        <li class="nav-item">
-          <%= link_to "Feeds",
-          query_show_path(sparql: "feeds_all", title: "External Feeds"),
-          class: "nav-link" %>
-        </li>
 
-      </ul>
-      <form class="d-flex" role="search" action="/entity">
-        <input
-          class="form-control me-2"
-          name="uri"
-          type="search"
-          placeholder="URI"
-          aria-label="Search"
-        />
-        <button class="btn btn-outline-secondary" type="submit">
-          View
-        </button>
-      </form>
+    <div class="d-none d-md-block" style="margin-left: auto;">
       <form class="d-flex" role="search" action="/reconcile/query">
         <input
           class="form-control me-2"
           name="query"
           type="search"
-          placeholder="Name"
+          placeholder="Name or ID"
           aria-label="Search"
         />
-        <button class="btn btn-outline-secondary" type="submit">
+        <button class="btn btn-outline-secondary me-2" type="submit">
           Search
         </button>
       </form>
-      <div class="navbar-nav">
-        <a class="nav-link">
-          <% github_url =
-            "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
-          <% if session[:name] %>
-            <a class="nav-link active" aria-current="page" href="<%= github_url %>"><%= session[:name] %></a>
-          <% else %>
-            <a class="nav-link active" aria-current="page" href="<%= github_url %>">GitHub Login</a>
-          <% end %>
-        </a>
-      </div>
+    </div>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#offcanvasNavbar"
+      aria-controls="offcanvasNavbar"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </div>
+  <div
+    class="offcanvas offcanvas-end"
+    tabindex="-1"
+    id="offcanvasNavbar"
+    aria-labelledby="offcanvasNavbarLabel"
+  >
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <% github_url =
+          "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
+        <% if session[:name] %>
+          <a class="nav-link active" aria-current="page" href="<%= github_url %>"><%= session[:name] %></a>
+        <% else %>
+          <a class="nav-link active" aria-current="page" href="<%= github_url %>">GitHub Login</a>
+        <% end %>
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="offcanvas"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+        <li class="nav-item">
+          <%= link_to "Home", root_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to "External Feeds",
+          query_show_path(sparql: "feeds_all", title: "External Feeds"),
+          class: "nav-link" %>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Reports
+          </a>
+          <ul class="dropdown-menu">
+            <li><%= link_to "Ville de Laval Events",
+              query_show_path(sparql: "custom/scenepro-orgs", title: "Ville de Laval Events"),
+              class: "dropdown-item" %>
+            </li>
+            <li><%= link_to "LaVitrine Pipeline",
+              query_show_path(
+                sparql: "custom/lavitrine_sources_refresh_rate",
+                title: "LaVitrine Pipeline",
+              ),
+              class: "dropdown-item" %>
+            </li>
+            <li><%= link_to "Upcoming National Arts Centre",
+              query_show_path(
+                sparql: "custom/nac-events",
+                title: "Upcoming Events at National Arts Centre",
+              ),
+              class: "dropdown-item" %>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><%= link_to "CAPACOA Members",
+              query_show_path(sparql: "custom/capacoa-members", title: "CAPACOA Members"),
+              class: "dropdown-item" %>
+            </li>
+
+            <li data-turbo-prefetch="false"><%= link_to "ScenePro-Artsdata-Wikidata Status",
+              query_show_path(
+                constructs:
+                  "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata",
+                sparql: "custom/scenepro-query",
+                title: "ScenePro-Artsdata-Wikidata Status",
+              ),
+              class: "dropdown-item" %>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <form class="d-flex mt-3" role="search">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        >
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
     </div>
   </div>
 </nav>
