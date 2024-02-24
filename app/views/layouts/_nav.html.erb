@@ -42,9 +42,9 @@
         <% github_url =
           "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
         <% if session[:name] %>
-          <a class="nav-link active" aria-current="page" href="<%= github_url %>"><%= session[:name] %></a>
+          <a class="nav-link" href="<%= github_url %>"><%= session[:name] %></a>
         <% else %>
-          <a class="nav-link active" aria-current="page" href="<%= github_url %>">GitHub Login</a>
+          <a class="nav-link" href="<%= github_url %>">Login using Github</a>
         <% end %>
       </h5>
       <button
@@ -63,6 +63,12 @@
           <%= link_to "External Feeds",
           query_show_path(sparql: "feeds_all", title: "External Feeds"),
           class: "nav-link" %>
+        </li>
+        <li class="nav-item d-flex align-items-center">
+          Language:&nbsp;
+          <%= link_to "en", url_for(request.parameters.merge(locale: "en")) %>
+          &nbsp;|&nbsp;
+          <%= link_to "fr", url_for(request.parameters.merge(locale: "fr")) %>
         </li>
         <li class="nav-item dropdown">
           <a
