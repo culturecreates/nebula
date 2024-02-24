@@ -87,6 +87,8 @@ gem 'oj'
 gem 'nokogiri'
 gem 'linkeddata', '~> 3.3.1'
 
+gem 'redcarpet', '~>  3.6.0'
+
 # gem 'rdf', '~> 3.2'
 # gem 'json-ld', '~> 3.2.4'
 # gem 'sparql', '~> 3.1.3'

@@ -1,8 +1,12 @@
+
+
 # ARTSDATA.CA
 
 A national knowledge graph for the arts.
 
 Artsdata.ca aims to empower the Canadian arts sector to actively promote a more fair and equitable digital ecosystem. This initiative is building a linked open data knowledge graph of the arts that is open and accessible to all.
+
+---
 
 ## About Artsdata
 
@@ -42,10 +46,9 @@ The Artsdata.ca knowledge graph enables the arts sector to:
 
 ## Want to know more?
 
-Find out about model classes and properties. Provide feedback and ask questions.
+Find out about model classes and properties. Provide feedback and ask questions. [Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
 
-[Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
-
+---
 
 ## Add your events to Artsdata.ca
 

@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :set_locale
+  append_view_path "doc"
 
   def home; end
 
