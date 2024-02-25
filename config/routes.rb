@@ -13,7 +13,6 @@ Rails.application.routes.draw do
     get "entity/expand", to: "entity#expand"
     get "dereference/card", to: "dereference#card"
     get "dereference/external", to: "dereference#external"
-    get "github/callback", to: "github#callback"
     get "query/show", to: "query#show"
     get "mint/preview", to: "mint#preview"
     get "mint/link", to: "mint#link"
@@ -21,7 +20,7 @@ Rails.application.routes.draw do
   end
 
   get 'sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/')
-
   get "resource/:id", to: "resource#show"
+  get "github/callback", to: "github#callback"
 
 end

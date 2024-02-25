@@ -65,12 +65,11 @@
           query_show_path(sparql: "feeds_all", title: "External Feeds"),
           class: "nav-link" %>
         </li>
-        <li class="nav-item d-flex align-items-center">
-          Language:&nbsp;
-          <%= link_to "en", url_for(request.parameters.merge(locale: "en")) %>
-          &nbsp;|&nbsp;
-          <%= link_to "fr", url_for(request.parameters.merge(locale: "fr")) %>
+
+        <li class="nav-item">
+          <%= link_to "Query Service", sparql_path, class: "nav-link" %>
         </li>
+
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -118,6 +117,13 @@
               class: "dropdown-item" %>
             </li>
           </ul>
+        </li>
+        <hr>
+        <li class="nav-item d-flex align-items-center">
+          Language:&nbsp;
+          <%= link_to "en", url_for(request.parameters.merge(locale: "en")) %>
+          &nbsp;|&nbsp;
+          <%= link_to "fr", url_for(request.parameters.merge(locale: "fr")) %>
         </li>
       </ul>
 
