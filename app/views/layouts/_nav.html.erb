@@ -1,7 +1,6 @@
 <nav class="navbar bg-body-tertiary">
   <div class="container-fluid">
     <%= link_to root_path, class: "navbar-brand", style:"padding:0" do %>
-
       <%= image_tag "artsdata_logo_circle.png",
       alt: "Artsdata Logo",
       style: "height: 40px; width: auto;" %>
@@ -9,16 +8,19 @@
 
     <div class="d-none d-md-block" style="margin-left: auto;">
       <form class="d-flex" role="search" action="/reconcile/query">
-        <input
-          class="form-control me-2"
-          name="query"
-          type="search"
-          placeholder="Name or URI"
-          aria-label="Search"
-        />
-        <button class="btn btn-outline-secondary me-2" type="submit">
-          Search
-        </button>
+        <div class="input-group">
+          <input
+            class="form-control"
+            name="query"
+            type="search"
+            placeholder="Name or URI"
+            aria-label="Search"
+            aria-describedby="button-addon2"
+          />
+          <button id="button-addon2" class="btn btn-outline-secondary me-2" type="submit">
+            Search
+          </button>
+        </div>
       </form>
     </div>
     <button
