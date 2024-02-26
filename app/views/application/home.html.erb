@@ -1,5 +1,10 @@
 <div class="container">
-  <p><%= "Welcome back #{session[:name]}!" if session[:name] %></p>
+  <p>
+    <% if session[:name] %>
+      <%= t("Welcome back") %>
+      <%= session[:name] %>
+    <% end %>
+  </p>
 
   <% if I18n.locale == :fr %>
     <%= render partial: "home-fr" %>

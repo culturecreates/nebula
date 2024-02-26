@@ -7,18 +7,18 @@
     <% end %>
 
     <div class="d-none d-md-block" style="margin-left: auto;">
-      <form class="d-flex" role="search" action="/reconcile/query">
+      <form class="d-flex" role="search" action="<%= reconcile_query_path %>">
         <div class="input-group">
           <input
             class="form-control"
             name="query"
             type="search"
-            placeholder="Name or URI"
+            placeholder='<%= t("Name or URI") %>'
             aria-label="Search"
             aria-describedby="button-addon2"
           />
           <button id="button-addon2" class="btn btn-outline-secondary me-2" type="submit">
-            Search
+            <%= t("Search") %>
           </button>
         </div>
       </form>
