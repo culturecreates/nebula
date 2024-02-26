@@ -61,13 +61,9 @@
           <%= link_to "Home", root_path, class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "External Feeds",
-          query_show_path(sparql: "feeds_all", title: "External Feeds"),
+          <%= link_to "All Data Feeds",
+          query_show_path(sparql: "feeds_all", title: "All Data Feeds"),
           class: "nav-link" %>
-        </li>
-
-        <li class="nav-item">
-          <%= link_to "Query Service", sparql_path, class: "nav-link" %>
         </li>
 
         <li class="nav-item dropdown">
@@ -76,11 +72,19 @@
             href="#"
             role="button"
             data-bs-toggle="dropdown"
-            aria-expanded="false"
+            aria-expanded="true"
           >
             Reports
           </a>
           <ul class="dropdown-menu">
+            <% if !session[:name] %>
+              <li>
+                <a class="dropdown-item disabled" aria-disabled="true">Login to view your favourite reports</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+            <% end %>
             <li><%= link_to "Ville de Laval Events",
               query_show_path(sparql: "custom/scenepro-orgs", title: "Ville de Laval Events"),
               class: "dropdown-item" %>
@@ -99,9 +103,6 @@
               ),
               class: "dropdown-item" %>
             </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
             <li><%= link_to "CAPACOA Members",
               query_show_path(sparql: "custom/capacoa-members", title: "CAPACOA Members"),
               class: "dropdown-item" %>
@@ -118,6 +119,29 @@
             </li>
           </ul>
         </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="true"
+          >
+            External Links
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <%= link_to "SPARQL Query Service", sparql_path, class: "dropdown-item" %>
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                href="https://culturecreates.github.io/artsdata-data-model/"
+              >Artsdata Data Model Documentation</a>
+            </li>
+
+          </ul>
+        </li>
         <hr>
         <li class="nav-item d-flex align-items-center">
           Language:&nbsp;
@@ -125,6 +149,11 @@
           &nbsp;|&nbsp;
           <%= link_to "fr", url_for(request.parameters.merge(locale: "fr")) %>
         </li>
+
+        <li class="nav-item">
+          <a class="nav-link disabled" aria-disabled="true">Logout</a>
+        </li>
+
       </ul>
 
     </div>
