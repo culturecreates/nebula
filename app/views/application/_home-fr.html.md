@@ -30,15 +30,6 @@ Le graphe de connaissances de Artsdata.ca permet au secteur des arts :
 - Créer une bibliothèque d’identifiants pérennes globaux pour les entités du secteur des arts
 - Se lier à d’autres sources de connaissances comme Wikidata
 
-### Artsdata en 2023
-
-- Continuer à intégrer des organismes artistiques à Artsdata.ca
-- Améliorer la qualité des données
-- Accroître le nombre  des sources fournissant des données à Artsdata.ca
-- Développer des applications qui permettent une interaction humaine avec Artsdata.ca
-- Soutenir les applications et les services qui consomment les données provenant d'Artsdata.ca
-- Synchroniser les identifiants d’Artsdata.ca avec d’autres identifiant passerelles afin de faciliter la réconciliation des jeux de données
-
 ## Vous voulez en savoir plus ?
 
 Découvrez les classes et les propriétés du modèle. Donnez votre avis et posez des questions.

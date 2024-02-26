@@ -34,16 +34,6 @@ The Artsdata.ca knowledge graph enables the arts sector to:
 - Create a library of global identifiers for events, places, persons, organizations and works in the Canadian arts sector
 - Link to other knowledge sources like Wikidata; leverage the use of existing global identifiers and linked open data with the goal of creating a substantial web of data
 
-### Artsdata in 2023
-
-- Continue onboarding arts organizations into Artsdata.ca
-- Improve data quality
-- Expand use of data sources including databases, websites and other open data sources
-- Develop applications that enable human interaction with Artsdata
-- Support applications and services that consume data from Artsdata.ca
-- Synchronize global identifiers between Artsdata.ca and Wikidata.org to interlink data about places, artists, organizations and works
-
-
 ## Want to know more?
 
 Find out about model classes and properties. Provide feedback and ask questions. [Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
