@@ -87,8 +87,11 @@
                 <hr class="dropdown-divider">
               </li>
             <% end %>
-            <li><%= link_to "Ville de Laval Events",
-              query_show_path(sparql: "custom/scenepro-orgs", title: "Ville de Laval Events"),
+            <li><%= link_to "ScenePro Organizations",
+              query_show_path(
+                sparql: "custom/scenepro-orgs",
+                title: "ScenePro Organizations",
+              ),
               class: "dropdown-item" %>
             </li>
             <li><%= link_to "LaVitrine Pipeline",
