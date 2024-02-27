@@ -23,7 +23,7 @@ select * where {
         filter(contains(str(?SPWDid),"http://www.wikidata.org/entity/Q"))
     }
     OPTIONAL {
-        ?sceneproId schema:address/schema:addressCounty ?country .
+        ?sceneproId schema:address/schema:addressCountry ?country .
     }
 
 
