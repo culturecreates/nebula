@@ -3,19 +3,19 @@
   <h1><%= @entity.label %></h1>
   Crawled data from
   <h5><a><%= @entity.entity_uri&.html_safe %></a></h5>
-  <%= if @entity.graph.count == 0
-    render partial: "external_resource", locals: { entity: @entity }
-  end %>
-  <% solutions =
-    SPARQL.execute(
-      "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
-      @entity.graph,
-    ) %>
-  <%= if solutions.count > 10
-    "<p> Showing first 10 entities of #{solutions.count}</p>".html_safe
-  end %>
-
   <div style="background: lightgrey; padding: 5px">
+    <%= if @entity.graph.count == 0
+      render partial: "external_resource", locals: { entity: @entity }
+    end %>
+    <% solutions =
+      SPARQL.execute(
+        "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
+        @entity.graph,
+      ) %>
+    <%= if solutions.count > 10
+      "<p> Showing first 10 entities of #{solutions.count}</p>".html_safe
+    end %>
+
     <% solutions.take(10).each do |s| %>
       <% next if s.subject.node? %>
       <% new_entity = Entity.new(entity_uri: s.subject.value) %>

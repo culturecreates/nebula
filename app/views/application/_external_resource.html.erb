@@ -1,9 +1,17 @@
 <br>
 <h3>External Resource</h3>
+<p>
+  The resource
+  <a href='<%= entity.entity_uri %>' target='_blank'><%= entity.entity_uri %></a>
+  is not in the Artsdata database. You can crawl the URL by choosing to
+  dereference.</p>
 Options:
 <ol>
+
   <li>
-    Visit <a href='<%= entity.entity_uri %>' target='_blank'><%= entity.entity_uri %></a>
+    <%= link_to "Dereference", dereference_external_path(uri: entity.entity_uri) %>
   </li>
-  <li> Dereference <%= link_to   entity.entity_uri, dereference_external_path(uri: entity.entity_uri ) %></li>
+  <li>
+    <a href='<%= entity.entity_uri %>' target='_blank'>Visit</a>
+  </li>
 </ol>

@@ -30,7 +30,7 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  Name or URI: "Name or URI"
+  Name or URI: "Name, URI or Web Page"
   Search: "Search"
   Search Results: "Search Results"
   Welcome back: "Welcome back"
