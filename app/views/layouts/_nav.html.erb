@@ -64,7 +64,7 @@
         </li>
         <li class="nav-item">
           <%= link_to "All Data Feeds",
-          query_show_path(sparql: "feeds_all", title: "All Data Feeds"),
+          query_show_path(sparql: "feeds_all", title: "Data Feeds"),
           class: "nav-link" %>
         </li>
 
@@ -110,15 +110,23 @@
               class: "dropdown-item" %>
             </li>
 
-            <li data-turbo-prefetch="false"><%= link_to "ScenePro-Artsdata-Wikidata Status",
+            <li data-turbo-prefetch="false"><%= link_to "Organizations ScenePro-Artsdata-Wikidata",
               query_show_path(
                 constructs:
                   "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata",
                 sparql: "custom/scenepro-query",
-                title: "ScenePro-Artsdata-Wikidata Status",
+                title: "Organizations ScenePro-Artsdata-Wikidata",
               ),
               class: "dropdown-item" %>
             </li>
+            <li data-turbo-prefetch="false"><%= link_to "Venues ScenePro-Artsdata-Wikidata",
+              query_show_path(
+                sparql: "custom/sp-venues-query",
+                title: "Venues ScenePro-Artsdata-Wikidata",
+              ),
+              class: "dropdown-item" %>
+            </li>
+
           </ul>
         </li>
         <li class="nav-item dropdown">

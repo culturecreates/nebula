@@ -11,10 +11,10 @@ select ?scenepro ?adid ?wikidata ?rideau ?note ?action where {
         ?adid schema:sameAs ?scenepro  .
         filter(strstarts(str(?scenepro),"http://scenepro.ca#Organization"))
         filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/"))
-#        OPTIONAL {
-#             ?adid schema:sameAs ?wikidata .
-#             filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))
-#        }
+       OPTIONAL {
+            ?adid schema:sameAs ?wikidata .
+            filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))
+       }
         OPTIONAL {
              ?scenepro schema:sameAs ?wikidata .
              filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity/"))

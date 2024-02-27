@@ -119,7 +119,7 @@ select * where {
             }
         }
         OPTIONAL {
-          #  ?scenepro schema:sameAs ?wikidata .
+           ?scenepro schema:sameAs ?wikidata .
             ?wikidata a ex:WikidataEntity .
             OPTIONAL {
                 ?wikidata schema:name ?wikidata_name .
