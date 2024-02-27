@@ -1,10 +1,10 @@
+<% provide(:title, @entity.label&.html_safe) %>
 <div class="container">
-  <% provide(:title, @entity.label&.html_safe) %>
   <h1>
     <%= @entity.label&.html_safe %>
   </h1>
   <a>
-    <%= use_prefix(@entity.entity_uri) %>
+    <%= @entity.entity_uri %>
   </a>
   <%= render partial: "entity_nav" %>
   <%= if @entity.graph.count == 0
