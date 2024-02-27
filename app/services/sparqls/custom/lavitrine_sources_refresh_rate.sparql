@@ -26,7 +26,7 @@ select ?name ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_la
     filter(ofn:asDays(now() - ?date) <= 30)
 
 
-    bind(CONCAT("<a href='/query/show?title=Events in ",str(?name),"&sparql=list_events&placeholder=",str(?graph),"'>View</a>") as ?entities)
+    bind(CONCAT("<a href='/query/show?title=Events in ",str(?name),"&sparql=list_events&graph=",str(?graph),"'>View</a>") as ?entities)
  
     
 }  group by ?name ?latest ORDER BY DESC(?latest)
