@@ -7,9 +7,20 @@ class ApplicationController < ActionController::Base
   def test; end
 
   def authenticate_user!
-    return true if session[:name] || Rails.env.test?
+    return true if  Rails.env.test?
+
+    if session[:handle]
+      # TODO: Replace with user table
+      if session[:handle] == "saumier" || session[:name] == "sahalali"
+        return true
+      else
+        flash.alert = "#{session[:name]} does not have sufficient permissions to access this section."
+        redirect_back(fallback_location: root_path)
+      end
+    else
     flash.alert = "You must be logged in to access this section"
     redirect_back(fallback_location: root_path)
+    end
   end
 
   def set_locale
