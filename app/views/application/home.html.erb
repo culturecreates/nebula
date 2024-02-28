@@ -11,11 +11,12 @@
       <%= link_to "All Data Feeds",
       query_show_path(sparql: "feeds_all", title: "Data Feeds") %>
     </li>
-  <% else %>
-    <% if I18n.locale == :fr %>
-      <%= render partial: "/home-fr" %>
-    <% else %>
-      <%= render partial: "/home-en" %>
-    <% end %>
+    <hr>
   <% end %>
+  <% if I18n.locale == :fr %>
+    <%= render partial: "/home-fr" %>
+  <% else %>
+    <%= render partial: "/home-en" %>
+  <% end %>
+
 </div>
