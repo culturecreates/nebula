@@ -1,14 +1,21 @@
 <div class="container">
-  <p>
-    <% if session[:name] %>
+  <% if session[:name] %>
+    <h3>
       <%= t("Welcome back") %>
       <%= session[:name] %>
-    <% end %>
-  </p>
-
-  <% if I18n.locale == :fr %>
-    <%= render partial: "home-fr" %>
+    </h3>
+    <p>
+      Personal dashboard coming soon...
+    </p>
+    <li>
+      <%= link_to "All Data Feeds",
+      query_show_path(sparql: "feeds_all", title: "Data Feeds") %>
+    </li>
   <% else %>
-    <%= render partial: "home-en" %>
+    <% if I18n.locale == :fr %>
+      <%= render partial: "/home-fr" %>
+    <% else %>
+      <%= render partial: "/home-en" %>
+    <% end %>
   <% end %>
 </div>

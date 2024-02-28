@@ -4,6 +4,8 @@ Un graphe de connaissances national pour les arts.
 
 Artsdata.ca vise à donner au secteur des arts du Canada la possibilité d’optimiser des données ouvertes liées et à promouvoir activement un écosystème numérique plus juste et équitable. Cette initiative procède à la construction d’un graphe de connaissances pour les arts qui soit lisible par machine, ouvert et accessible à tout le monde.
 
+---
+
 ## À propos d'Artsdata
 
 ### Vision
@@ -34,8 +36,8 @@ Le graphe de connaissances de Artsdata.ca permet au secteur des arts :
 
 Découvrez les classes et les propriétés du modèle. Donnez votre avis et posez des questions.
 
-[Documentation](https://culturecreates.github.io/artsdata-data-model/)
-[Infrastructure](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
+- [Modèle](https://culturecreates.github.io/artsdata-data-model/)
+- [Infrastructure](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
 
 ## Ajoutez vos événements à Artsdata.ca
 

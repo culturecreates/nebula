@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
     if session[:handle]
       # TODO: Replace with user table
-      if session[:handle] == "saumier" || session[:name] == "sahalali"
+      if session[:handle] == "saumier" || session[:handle] == "sahalali"
         return true
       else
         flash.alert = "#{session[:name]} does not have sufficient permissions to access this section."
