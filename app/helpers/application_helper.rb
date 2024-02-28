@@ -1,13 +1,10 @@
 module ApplicationHelper
 
   # Returns the Github callback URL based on the environment
-  def github_callback_url
-    if Rails.env.development?
-      "#{request.protocol}#{request.domain}#{':' + request.port.to_s if request.port.present?}/github/callback"
-    else
-      "#{request.protocol}#{request.domain}/github/callback"
-    end
-  end 
+  def github_url
+    "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{request.base_url}/github/callback"
+  end
+
 
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')

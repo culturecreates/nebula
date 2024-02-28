@@ -42,8 +42,6 @@
   >
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-        <% github_url =
-          "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{github_callback_url}" %>
         <% if session[:name] %>
           <a class="nav-link" href="<%= github_url %>"><%= session[:handle] %></a>
         <% else %>
