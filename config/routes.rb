@@ -17,10 +17,24 @@ Rails.application.routes.draw do
     get "mint/preview", to: "mint#preview"
     get "mint/link", to: "mint#link"
     get "reconcile/query", to: "reconcile#query"
+    
   end
 
   get 'sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/')
-  get "resource/:id", to: "resource#show"
+
   get "github/callback", to: "github#callback"
+
+
+  get "resource", to: "resource#show"
+
+  match "databus/*path", to: "resource#show", via: :get
+  match "shacl/*path", to: "resource#show", via: :get
+  match "ontology/*path", to: "resource#show", via: :get
+  match "minted/*path", to: "resource#show", via: :get
+  match "culture-creates/*path", to: "resource#show", via: :get
+  
+  
+
+
 
 end
