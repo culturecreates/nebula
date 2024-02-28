@@ -23,3 +23,6 @@ Pre-alpha of Artsdata Nebula. Work in progress...
   To edit credentials:
   `EDITOR="code --wait" rails credentials:edit`
 
+  Github App:
+  https://github.com/organizations/culturecreates/settings/apps/artsdata-nebula
+
