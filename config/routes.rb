@@ -25,8 +25,7 @@ Rails.application.routes.draw do
   get "github/callback", to: "github#callback"
 
 
-  get "resource", to: "resource#show"
-
+  match "resource/*path", to: "resource#show", via: :get
   match "databus/*path", to: "resource#show", via: :get
   match "shacl/*path", to: "resource#show", via: :get
   match "ontology/*path", to: "resource#show", via: :get
