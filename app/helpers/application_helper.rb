@@ -1,5 +1,10 @@
 module ApplicationHelper
 
+  # Returns the Github callback URL based on the environment
+  def github_callback_url
+      "#{request.protocol}#{request.domain}#{':' + request.port.to_s if request.port.present?}/github/callback"
+  end
+
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')
     base_title = "Artsdata"
