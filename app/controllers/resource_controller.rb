@@ -12,7 +12,7 @@ class ResourceController < ApplicationController
     
     respond_to do |format|
       puts "request.headers['Accept']: #{request.headers['Accept']}"
-      format.html { redirect_to entity_path(uri: uri) }
+      format.html { redirect_to entity_path(uri: uri), status: 303 }
 
       puts "checking other formats."
       @entity = Entity.new(entity_uri: uri)
