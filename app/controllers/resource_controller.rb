@@ -1,11 +1,15 @@
 class ResourceController < ApplicationController
+
+  # Do content negotiation
+  # Treat entire URI not only /resource/K...
+  # Should process http://kg.artsdata.ca/databus and /shacl and /ontology
+  # Use request header 'Accept' or add .ttl, .jsonld, .rdf to the URI to get the desired format
+  # TODO: Try to replace this with rack/content_netgotiation
   def show
-   # treat entire URI not only http://kg.artsdata.ca/resource/...
-   # should process http://kg.artsdata.ca/databus/ and  http://kg.artsdata.ca/shacl/ as well
-    uri = "http://kg.artsdata.ca" + request.path 
+    uri = "http://kg.artsdata.ca" + request.path.gsub(/.jsonld|.ttl|.rdf/, "") 
 
     puts "request.path #{request.path}"
-    # TODO: Try to replace with rack/content_netgotiation
+    
     request.format = :rdf if request.headers['Accept'].include?('application/rdf+xml')
     request.format = :jsonld if request.headers['Accept'].include?('application/ld+json')
     request.format = :ttl if request.headers['Accept'].include?('text/turtle')
