@@ -3,12 +3,8 @@ class EntityController < ApplicationController
   # /entity?uri=
   def show
     uri = params[:uri] 
-    uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?("http")
+    uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
 
-    if !uri.starts_with?(/http:|https:|urn:/) 
-      flash.alert = "Not an Artsdata ID or URI."
-      redirect_back(fallback_location: root_path)
-    end
    
     @entity = Entity.new(entity_uri: uri)
     @entity.load_graph 
