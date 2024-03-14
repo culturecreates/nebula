@@ -1,4 +1,4 @@
-PREFIX adcv: <http://www.adc659/vocabulary/>
+PREFIX adcv: <http://www.adc659.ca/vocabulary#>
 PREFIX schema: <http://schema.org/>
 
 select * where {
@@ -7,7 +7,7 @@ select * where {
     OPTIONAL { ?uri schema:name ?name }
     OPTIONAL { ?uri adcv:memberType ?memberType }
     OPTIONAL { ?uri adcv:pronounPreference ?pronounPreference }
-    OPTIONAL { ?uri adcv:availableForAssistantassociate ?availableForAssistantAssociate }
+    OPTIONAL { ?uri adcv:availableForAssistantAssociate ?availableForAssistantAssociate }
     OPTIONAL { ?uri adcv:availableForWork ?availableForWork }
     OPTIONAL { ?uri schema:addressRegion ?addressRegion }
     OPTIONAL { ?uri schema:addressLocality ?addressLocality }
