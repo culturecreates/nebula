@@ -64,7 +64,7 @@ module EntityHelper
     else
       word_max = 50
       if obj.value.split.length > word_max
-      "<span title='#{obj.value}'>#{truncate_words(obj.value, 50)}</span>".html_safe
+      "<span title='#{obj.value}'>#{truncate_words(obj.value, word_max)}</span>".html_safe
       else
       "<span>#{obj.value}</span>".html_safe
       end
