@@ -15,8 +15,6 @@ select * where {
     OPTIONAL { ?uri schema:email ?email }
     OPTIONAL { ?uri schema:hasOccupation ?hasOccupation }
     OPTIONAL { ?uri schema:image ?image }
-    OPTIONAL { ?uri schema:mainEntityOfPage/schema:url ?adc_url }
-    OPTIONAL { ?uri schema:mainEntityOfPage/schema:lastReviewed ?lastReviewed }
     OPTIONAL { ?uri schema:url ?personal_url }
     OPTIONAL { ?uri schema:knowsLanguage ?knowsLanguage }
     OPTIONAL { ?uri <http://www.wikidata.org/prop/direct/P2003> ?instagram }
