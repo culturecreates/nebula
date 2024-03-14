@@ -41,7 +41,7 @@ module EntityHelper
   # Display RDF objects which may be URIs, blank nodes or literals.
   def display_object(obj)
     if obj.node? # blank node
-      "no URI (#{obj.to_s.truncate(20)})"
+      "Node (#{obj.to_s.truncate(20)})"
     elsif obj.uri?
       display_uri(obj)
     elsif obj.literal?
@@ -62,8 +62,19 @@ module EntityHelper
     elsif obj.value.starts_with?("<a href='/")
       "<span><a href='/#{ I18n.locale }/#{obj.value.split("<a href='/").last}<span>".html_safe
     else
+      word_max = 50
+      if obj.value.split.length > word_max
+      "<span title='#{obj.value}'>#{truncate_words(obj.value, 50)}</span>".html_safe
+      else
       "<span>#{obj.value}</span>".html_safe
+      end
+
     end
+  end
+
+  def truncate_words(text, num_words, omission: '...')
+    words = text.split
+    words.length > num_words ? words[0...num_words].join(' ') + omission : text
   end
 
 
