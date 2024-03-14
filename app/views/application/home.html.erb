@@ -11,6 +11,10 @@
       <%= link_to "All Data Feeds",
       query_show_path(sparql: "feeds_all", title: "Data Feeds") %>
     </li>
+    <li> 
+      <%= link_to "ADC Member Table",
+      query_show_path(sparql: "custom/adc-members", title: "ADC Member Table") %>
+    </li>
     <hr>
   <% end %>
   <% if I18n.locale == :fr %>

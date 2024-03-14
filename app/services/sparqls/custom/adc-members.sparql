@@ -7,7 +7,7 @@ select * where {
     OPTIONAL { ?uri schema:name ?name }
     OPTIONAL { ?uri adcv:memberType ?memberType }
     OPTIONAL { ?uri adcv:pronounPreference ?pronounPreference }
-    OPTIONAL { ?uri adcv:availableForAssistantassociate ?availableForAssistantassociate }
+    OPTIONAL { ?uri adcv:availableForAssistantassociate ?availableForAssistantAssociate }
     OPTIONAL { ?uri adcv:availableForWork ?availableForWork }
     OPTIONAL { ?uri schema:addressRegion ?addressRegion }
     OPTIONAL { ?uri schema:addressLocality ?addressLocality }
