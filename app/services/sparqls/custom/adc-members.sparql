@@ -1,0 +1,27 @@
+PREFIX adcv: <http://www.adc659/vocabulary/>
+PREFIX schema: <http://schema.org/>
+
+select * where {
+  graph <http://kg.artsdata.ca/culture-creates/huginn/adc659> {
+    ?uri a schema:Person .
+    OPTIONAL { ?uri schema:name ?name }
+    OPTIONAL { ?uri adcv:memberType ?memberType }
+    OPTIONAL { ?uri adcv:pronounPreference ?pronounPreference }
+    OPTIONAL { ?uri adcv:availableForAssistantassociate ?availableForAssistantassociate }
+    OPTIONAL { ?uri adcv:availableForWork ?availableForWork }
+    OPTIONAL { ?uri schema:addressRegion ?addressRegion }
+    OPTIONAL { ?uri schema:addressLocality ?addressLocality }
+    OPTIONAL { ?uri schema:description ?description }
+    OPTIONAL { ?uri schema:email ?email }
+    OPTIONAL { ?uri schema:hasOccupation ?hasOccupation }
+    OPTIONAL { ?uri schema:image ?image }
+    OPTIONAL { ?uri schema:mainEntityOfPage/schema:url ?adc_url }
+    OPTIONAL { ?uri schema:mainEntityOfPage/schema:lastReviewed ?lastReviewed }
+    OPTIONAL { ?uri schema:url ?personal_url }
+    OPTIONAL { ?uri schema:knowsLanguage ?knowsLanguage }
+    OPTIONAL { ?uri <http://www.wikidata.org/prop/direct/P2003> ?instagram }
+    OPTIONAL { ?uri <http://www.wikidata.org/prop/direct/P2013> ?facebook }
+    OPTIONAL { ?uri schema:telephone ?telephone }
+
+  }
+}
