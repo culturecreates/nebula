@@ -1,19 +1,38 @@
 class EntityController < ApplicationController
   # Show an entity's asserted statements
   # /entity?uri=
+  # /entity.ttl?uri=
+  # /entity.jsonld?uri=
+  # /entity.rdf?uri=
   def show
     uri = params[:uri] 
     uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
 
-   
     @entity = Entity.new(entity_uri: uri)
     @entity.load_graph 
-    @entity.replace_blank_nodes # first level
-    @entity.replace_blank_nodes # second level
-    @entity.replace_blank_subject_nodes
-    # pp @entity.graph.dump(:turtle)
-    # TODO: add SHACL validation
-    # @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
+
+    respond_to do |format|
+      format.jsonld {
+        puts "rendering jsonld..."
+        render json: @entity.graph.dump(:jsonld, standard_prefixes: true), content_type: 'application/ld+json'
+      }
+      format.ttl { 
+        puts "rendering turtle..."
+        render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
+      }
+      format.rdf { 
+        puts "rendering rdf..."
+        render xml: @entity.graph.dump(:rdf, standard_prefixes: true), content_type: 'application/rdf+xml'
+      }
+      format.all { 
+        @entity.replace_blank_nodes # first level
+        @entity.replace_blank_nodes # second level
+        @entity.replace_blank_subject_nodes
+        # pp @entity.graph.dump(:turtle)
+        # TODO: add SHACL validation
+        # @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
+       }
+    end
   end
 
   # show all statements from all sources
