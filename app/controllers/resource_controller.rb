@@ -8,11 +8,12 @@ class ResourceController < ApplicationController
   def show
     uri = "http://kg.artsdata.ca" + request.path
 
-    request.format = :rdf if request.headers['Accept'].include?('application/rdf+xml')
-    request.format = :jsonld if request.headers['Accept'].include?('application/ld+json')
-    request.format = :ttl if request.headers['Accept'].include?('text/turtle')
+    format = :html
+    format = :rdf if request.headers['Accept'].include?('application/rdf+xml')
+    format = :jsonld if request.headers['Accept'].include?('application/ld+json')
+    format = :ttl if request.headers['Accept'].include?('text/turtle')
     
-    redirect_to entity_path(uri: uri, format: request.format), status: 303
+    redirect_to entity_path(uri: uri, format: format), status: 303
 
   end
 end
