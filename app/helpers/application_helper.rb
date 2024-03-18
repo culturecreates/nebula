@@ -8,14 +8,25 @@ module ApplicationHelper
 
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')
-    base_title = "Artsdata"
-    base_title += " DEV" if Rails.env.development?
-    if page_title.empty?
-      base_title
-    else
-      page_title + " | " + base_title
+    str = "Artsdata"
+    str += " DEV" if Rails.env.development?
+    if page_title.present?
+      str = "#{page_title} | #{str}"
     end
+    str.html_safe
   end
+
+  def og_meta_properties(og_title,og_image)
+    og_properties = ''
+    if og_title.present?
+      og_properties += "<meta property='og:title' content='#{og_title}' />"
+    end
+    if og_image.present?
+      og_properties += "<meta property='og:image' content='#{og_image}' />"
+    end
+    og_properties.html_safe
+  end
+
 
   def use_prefix(uri)
     return if uri.blank?

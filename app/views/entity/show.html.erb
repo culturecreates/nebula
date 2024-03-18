@@ -1,4 +1,5 @@
-<% provide(:title, @entity.label&.html_safe) %>
+<% provide(:title, @entity.label) %>
+<% provide(:image, @entity.image) %>
 <div class="container">
   <h1>
     <%= @entity.label&.html_safe %>

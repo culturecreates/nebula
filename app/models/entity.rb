@@ -11,23 +11,16 @@ class Entity
   end
 
   def label
-    uri = @entity_uri
-    graph = @graph
-
-    query = RDF::Query.new do
-      pattern [RDF::URI(uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label]
-    end
-
-    solution = graph.query(query)
-
-    return  solution.first.label.value if solution.count > 0
+    solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), :label])
+    return  solution.first.object.value if solution.count > 0
   
-    query = RDF::Query.new do
-      pattern [RDF::URI(uri), RDF::URI("http://schema.org/name"), :name]
-    end
-    solution = graph.query(query)
-    solution.first.name.value if solution.count > 0
+    solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/name"), :name])
+    solution.first.object.value if solution.count > 0
+  end
 
+  def image
+    solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/image"), :image])
+    return  solution.first.object.value if solution.count > 0
   end
   
 
