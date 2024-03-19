@@ -10,6 +10,7 @@ class Entity
     @graph = h[:graph]
   end
 
+  # Try to get a label of name property
   def label
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])
     return  solution.first.object.value if solution.count > 0
@@ -18,15 +19,16 @@ class Entity
     solution.first.object.value if solution.count > 0
   end
 
+  # Try to get image uri from schema.org/image property or schema.org/image/url property
   def image
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/image"), nil])
     if solution.count > 0
       s = solution.first.object
       if s.node? # if blank node
         image = @graph.query([s, RDF::URI("http://schema.org/url"), nil])
-        return image.first.object.value if image.count > 0
+        image.first.object.value if image.count > 0
       else
-        return s.value if !s.value.end_with?("#ImageObject")
+        s.value if !s.value.end_with?("#ImageObject")
       end
     end
   end

@@ -20,6 +20,8 @@ select * where {
     OPTIONAL { ?uri <http://www.wikidata.org/prop/direct/P2003> ?instagram }
     OPTIONAL { ?uri <http://www.wikidata.org/prop/direct/P2013> ?facebook }
     OPTIONAL { ?uri schema:telephone ?telephone }
+    OPTIONAL { ?uri schema:sameAs ?artsdata . FILTER(STRSTARTS(STR(?artsdata), "http://kg.artsdata.ca/"))}
+    OPTIONAL { ?uri schema:sameAs ?wikidata . FILTER(STRSTARTS(STR(?wikidata), "http://www.wikidata.org/"))}
 
   }
 }
