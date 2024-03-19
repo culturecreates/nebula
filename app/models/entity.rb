@@ -83,7 +83,7 @@ class Entity
       'URI_PLACEHOLDER', self.entity_uri,
       'schema:name', "<#{predicate}>"
     ])
-    puts "SPARQL: #{sparql}"
+    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -91,7 +91,7 @@ class Entity
     sparql =  SparqlLoader.load('load_rdfstar_claims_graph', [
       'entity_uri_placeholder', self.entity_uri
     ])
-    puts "SPARQL: #{sparql}"
+    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -99,7 +99,7 @@ class Entity
     sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
       'entity_uri_placeholder', self.entity_uri
     ])
-    puts "SPARQL: #{sparql}"
+    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 

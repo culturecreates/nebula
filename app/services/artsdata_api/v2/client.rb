@@ -74,7 +74,7 @@ module ArtsdataApi
 
       # Send update SPARQL to '/statements' endpoint
       def execute_update_sparql(sparql)
-        @logger.info "sparql update: #{sparql.truncate(8000).squish}"
+        # @logger.info "sparql update: #{sparql.truncate(8000).squish}"
 
         data = request_text(
           http_method: :post,
