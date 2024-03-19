@@ -7,7 +7,7 @@ class EntityController < ApplicationController
   def show
     uri = params[:uri] 
     uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
-
+    uri.gsub!(' ', '+')
     @entity = Entity.new(entity_uri: uri)
     @entity.load_graph 
 
