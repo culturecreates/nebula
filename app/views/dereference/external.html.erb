@@ -18,6 +18,7 @@
 
     <% solutions.take(10).each do |s| %>
       <% next if s.subject.node? %>
+      <% next if s.subject.statement? %>
       <% new_entity = Entity.new(entity_uri: s.subject.value) %>
       <% new_entity.graph = @entity.graph %>
       <h3>
