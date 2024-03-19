@@ -107,10 +107,7 @@ module EntityHelper
   end
 
   def graphdb_link(uri)
-    return "https://db.artsdata.ca/resource?uri=#{uri}"
+    return "https://db.artsdata.ca/resource?uri=#{CGI.escape(uri)}"
   end
 
-  def derived_link(uri)
-    return "https://api.artsdata.ca/resource?uri=#{uri}"
-  end
 end
