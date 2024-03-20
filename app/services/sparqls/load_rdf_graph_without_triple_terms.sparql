@@ -1,0 +1,51 @@
+# load_graph
+# Use this when referencing 
+# Includes URIs with hash and blank nodes
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX onto: <http://www.ontotext.com/>
+PREFIX schema: <http://schema.org/>
+
+CONSTRUCT {
+    ?s ?p ?o  .
+
+    ?s ?p ?o_hash .
+    ?o_hash ?p_hash ?2o_hash .
+
+    ?s ?p ?bns .
+    ?bns ?bnp ?bno .
+
+    ?bns ?bnp ?2bns .
+    ?2bns ?2bnp ?2bno .
+}
+FROM onto:explicit 
+WHERE {
+  values ?s {
+      <entity_uri_placeholder> 
+  }
+
+  ?s ?p ?o  .
+
+  # URIs with Hash
+  OPTIONAL {
+    ?s ?p ?o_hash .
+    filter(contains(str(?o_hash), "#"))
+    ?o_hash ?p_hash ?2o_hash .
+  }
+
+
+  # blank nodes
+  OPTIONAL {
+    ?s ?p ?bns .
+    filter(isBLANK(?bns))
+    ?bns ?bnp ?bno .
+
+
+    # second level blank nodes
+    OPTIONAL {
+        ?bns ?bnp ?2bns .
+        filter(isBLANK(?2bns))
+        ?2bns ?2bnp ?2bno .
+    }
+  }
+}

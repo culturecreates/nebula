@@ -115,7 +115,7 @@ class Entity
   end
 
 
-  def load_graph(approach = "rdfstar", language = "en")
+  def load_graph(language = "en")
     sparql =  SparqlLoader.load('load_rdfstar_graph', [
                   'entity_uri_placeholder', self.entity_uri,
                   'locale_placeholder' , language
@@ -131,6 +131,23 @@ class Entity
       RDF::Graph.new
     end
   end
+
+  def load_graph_without_triple_terms(language = "en")
+    sparql =  SparqlLoader.load('load_rdf_graph_without_triple_terms', [
+                  'entity_uri_placeholder', self.entity_uri,
+                  'locale_placeholder' , language
+                ])
+   
+    response = @@artsdata_client.execute_construct_sparql(sparql)
+
+    @graph = if response[:code] == 200
+      graph = RDF::Graph.new 
+      graph.from_jsonld(response[:message].to_json)
+    else
+      RDF::Graph.new
+    end
+  end
+
 
   def replace_blank_nodes
     @graph = SPARQL.execute(SparqlLoader.load('replace_blank_nodes'), @graph, update: true)

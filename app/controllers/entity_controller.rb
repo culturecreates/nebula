@@ -9,22 +9,36 @@ class EntityController < ApplicationController
     uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
     uri.gsub!(' ', '+')
     @entity = Entity.new(entity_uri: uri)
-    @entity.load_graph 
-
+    
     respond_to do |format|
       format.jsonld {
         puts "rendering jsonld..."
-        render json: @entity.graph.dump(:jsonld, standard_prefixes: true), content_type: 'application/ld+json'
+        @entity.load_graph_without_triple_terms
+        render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
+      }
+      format.jsonlds {
+        puts "rendering jsonld..."
+        @entity.load_graph
+        render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
       }
       format.ttl { 
         puts "rendering turtle..."
+        @entity.load_graph_without_triple_terms
+        render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
+      }
+      format.ttls { 
+        puts "rendering turtle..."
+        @entity.load_graph
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
       format.rdf { 
         puts "rendering rdf..."
-        render xml: @entity.graph.dump(:rdf, standard_prefixes: true), content_type: 'application/rdf+xml'
+        @entity.load_graph_without_triple_terms
+        render xml: @entity.graph.dump(:rdfxml, validate: false, standard_prefixes: true), content_type: 'application/rdf+xml'
       }
+      # render in entity view
       format.all { 
+        @entity.load_graph
         @entity.replace_blank_nodes # first level
         @entity.replace_blank_nodes # second level
         @entity.replace_blank_subject_nodes
