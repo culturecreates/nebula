@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT ?uri (sample(?name_language) as ?name) ?aduri ?wduri  ?url   ?resultSeverity  WHERE {
+SELECT ?uri (sample(?name_language) as ?name) ?aduri (sample(?artsdata_name_language) as ?artsdata_name)  ?wduri  ?url   ?resultSeverity  WHERE {
     graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
         ?uri schema:name  ?name_language ;
              a schema:Organization .
@@ -23,12 +23,17 @@ SELECT ?uri (sample(?name_language) as ?name) ?aduri ?wduri  ?url   ?resultSever
        
     }
      OPTIONAL {
-            ?aduri schema:sameAs ?uri .
+            ?aduri schema:sameAs ?uri  .
             filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
         }
     OPTIONAL {
+         ?aduri schema:name ?artsdata_name_language .
+            filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
+    }
+    OPTIONAL {
                 ?wduri schema:sameAs ?aduri .
                  filter(contains(str(?wduri),"wikidata.org/"))
+                   filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
             }
     OPTIONAL {
              ?wduri schema:sameAs ?uri .
