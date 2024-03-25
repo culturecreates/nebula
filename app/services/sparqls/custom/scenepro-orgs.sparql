@@ -26,7 +26,11 @@ SELECT ?uri (sample(?name_language) as ?name) ?aduri ?wduri  ?url   ?resultSever
             ?aduri schema:sameAs ?uri .
             filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
         }
-        OPTIONAL {
+    OPTIONAL {
+                ?wduri schema:sameAs ?aduri .
+                 filter(contains(str(?wduri),"wikidata.org/"))
+            }
+    OPTIONAL {
              ?wduri schema:sameAs ?uri .
              filter(contains(str(?wduri),"wikidata.org/"))
         }

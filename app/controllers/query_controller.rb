@@ -1,6 +1,13 @@
 class QueryController < ApplicationController
   require 'csv'
 
+  # GET /query
+  # Pass constructs with a list of comma separated construct sparqls.
+  # If contructs are passed, then the sparql parameter will use the local graph created by the contrucuts.
+  # Otherwise, the sparql will execute on the remote sparql endpoint.
+  # Example: GET /query
+  #   ?constructs=custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata
+  #   &sparql=custom/scenepro-query&title=ScenePro
   def show
     params.required(:sparql)
     permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale)

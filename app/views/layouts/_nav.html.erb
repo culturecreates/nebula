@@ -111,19 +111,18 @@
               class: "dropdown-item" %>
             </li>
 
-            <li data-turbo-prefetch="false"><%= link_to "Organizations ScenePro-Artsdata-Wikidata",
+            <li data-turbo-prefetch="false"><%= link_to "ScenePro Organizations",
               query_show_path(
-                constructs:
-                  "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata",
-                sparql: "custom/scenepro-query",
-                title: "Organizations ScenePro-Artsdata-Wikidata",
+                
+                sparql: "custom/scenepro-orgs",
+                title: "ScenePro Organizations",
               ),
               class: "dropdown-item" %>
             </li>
-            <li data-turbo-prefetch="false"><%= link_to "Venues ScenePro-Artsdata-Wikidata",
+            <li data-turbo-prefetch="false"><%= link_to "ScenePro Venues ",
               query_show_path(
-                sparql: "custom/sp-venues-query",
-                title: "Venues ScenePro-Artsdata-Wikidata",
+                sparql: "custom/scenepro-venues",
+                title: "ScenePro Venues",
               ),
               class: "dropdown-item" %>
             </li>

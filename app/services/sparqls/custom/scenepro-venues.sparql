@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT ?uri (sample(?name_language) as ?name)  ?aduri ?wduri   ?url   ?resultSeverity  WHERE {
+SELECT ?uri (sample(?name_language) as ?name) ?aduri ?wduri ?url ?resultSeverity  WHERE {
     graph <http://kg.artsdata.ca/culture-creates/huginn/scenepro-orgs> {
         ?uri schema:name  ?name_language ;
              a schema:Place .
@@ -9,24 +9,44 @@ SELECT ?uri (sample(?name_language) as ?name)  ?aduri ?wduri   ?url   ?resultSev
             filter(!isBLANK(?url))
         }
         OPTIONAL {
-            ?uri   schema:sameAs ?aduri .
-            filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
-        }
-        OPTIONAL {
             ?shacl sh:focusNode ?uri ;
                 sh:resultSeverity ?resultSeverity .
         }
         OPTIONAL {
-             ?uri schema:sameAs ?wduri .
-             filter(contains(str(?wduri),"wikidata.org/"))
-        }
-    }
-     OPTIONAL {
-            ?aduri schema:sameAs ?uri .
+            ?uri schema:sameAs ?aduri .
             filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
         }
         OPTIONAL {
-             ?wduri schema:sameAs ?uri .
+             ?uri schema:sameAs ?wduri1 .
+             filter(contains(str(?wduri1),"wikidata.org/"))
+        }
+    }
+     OPTIONAL {
+        # linked to adid in K16 scenepro authority
+        ?uri schema:sameAs ?aduri .
+        filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
+         OPTIONAL {
+                ?aduri schema:sameAs ?wduri2 .
+                filter(contains(str(?wduri2),"wikidata.org/"))
+            }
+        }
+     OPTIONAL {
+            ?aduri schema:sameAs ?uri .
+            filter(contains(str(?aduri),"http://kg.artsdata.ca/"))
+            OPTIONAL {
+                ?wduri4 schema:sameAs ?aduri .
+                filter(contains(str(?wduri4),"wikidata.org/"))
+            }
+             OPTIONAL {
+                ?aduri schema:sameAs ?wduri4 .
+                filter(contains(str(?wduri4),"wikidata.org/"))
+            }
+        }
+        OPTIONAL {
+             ?wduri3 schema:sameAs ?uri .
              filter(contains(str(?wduri),"wikidata.org/"))
         }
-} GROUP BY ?uri ?aduri ?wduri  ?url  ?resultSeverity
+
+        bind(COALESCE(?wduri2, ?wduri3, ?wduri4, ?wduri1) as ?wduri)
+        
+} GROUP BY ?uri ?aduri ?wduri ?url  ?resultSeverity
