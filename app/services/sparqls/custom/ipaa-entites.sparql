@@ -1,0 +1,27 @@
+PREFIX schema: <http://schema.org/>
+select * where {
+    graph <http://kg.artsdata.ca/culture-creates/artsdata-planet-ipaa/ipaa-entities> {
+        values ?type {
+            schema:Person schema:Organization 
+        } 
+        ?entity a ?type ;
+                schema:name ?name .
+        filter(!isBlank(?entity))
+        OPTIONAL {
+            ?entity schema:sameAs ?ipaa_adid .
+        	filter(strstarts(str(?ipaa_adid),"http://kg.artsdata.ca/resource/K"))
+        }
+        OPTIONAL {
+            ?entity schema:sameAs ?ipaa_wdid .
+        	filter(strstarts(str(?ipaa_wdid),"http://www.wikidata.org/entity/Q"))
+        }
+    }
+    OPTIONAL {
+        ?adid schema:sameAs ?entity .
+        filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/K"))
+        OPTIONAL {
+            ?adid schema:sameAs ?wdid .
+             filter(strstarts(str(?wdid),"http://www.wikidata.org/entity/Q"))
+        }
+    }
+}
