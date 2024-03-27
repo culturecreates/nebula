@@ -85,6 +85,14 @@
                 <hr class="dropdown-divider">
               </li>
             <% end %>
+            <li><%= link_to "Recently Minted Events",
+              query_show_path(
+                sparql: "custom/recent_event_mints",
+                title: "Recently Minted Events",
+              ),
+              class: "dropdown-item" %>
+            </li>
+            
             <li><%= link_to "ScenePro Organizations",
               query_show_path(
                 sparql: "custom/scenepro-orgs",
