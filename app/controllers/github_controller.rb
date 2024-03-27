@@ -11,18 +11,26 @@ class GithubController < ApplicationController
       user_info = user_info(token)
       session[:handle] = user_info["login"]
       session[:name] = user_info["name"]
-
       # user_repos = user_repos(token)
       # session[:repos] = user_repos.map { |repo| repo["name"] }
 
       # nebula_sparqls = nebula_sparqls(token)
       # session[:nebula_sparqls] = nebula_sparqls.map { |sparql| sparql["download_url"].split('app/services/sparqls/')[1].split('.')[0]}
-      
     else
       flash.alert = "Authorized, but unable to exchange code #{code} for token."
-
     end
     redirect_to root_path 
+  end
+
+  def workflows
+    uri = URI("https://api.github.com/repos/culturecreates/footlight-aggregator/actions/runs?per_page=10")
+    req = Net::HTTP::Get.new(uri)
+    req['Accept'] = 'application/vnd.github.v3+json'
+  
+    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') {|http|
+      http.request(req)
+    }
+    @workflows = JSON.parse(res.body)["workflow_runs"]
   end
 
   private 

@@ -1,0 +1,55 @@
+<h3>
+  Workflows for CMS Aggregator
+</h3>
+<turbo-frame id="workflows">
+  <table
+    data-controller="sortable-table"
+    data-sortable-table-target="table"
+    class="table table-hover"
+  >
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Workflow run id</th>
+        <th
+          scope="col"
+          data-action="click->sortable-table#sort"
+          data-sort-direction="asc"
+        >Name</th>
+        <th
+          scope="col"
+          data-action="click->sortable-table#sort"
+          data-sort-direction="asc"
+        >Date</th>
+        <th
+          scope="col"
+          data-action="click->sortable-table#sort"
+          data-sort-direction="asc"
+        >Status</th>
+        <th
+          scope="col"
+          data-action="click->sortable-table#sort"
+          data-sort-direction="asc"
+        >Conclusion</th>
+        <th
+          scope="col"
+          data-action="click->sortable-table#sort"
+          data-sort-direction="asc"
+        >Actor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @workflows.each.with_index do | workflow, index| %>
+        <tr>
+          <th scope="row"><%= index + 1 %></th>
+          <td><a target="_blank" href='<%= workflow["workflow_url"] %>'><%= workflow["id"] %></a></td>
+          <td><%= workflow["name"] %></td>
+          <td><%= workflow["created_at"] %></td>
+          <td><%= workflow["status"] %></td>
+          <td><%= workflow["conclusion"] %></td>
+          <td><%= workflow["actor"]["login"] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</turbo-frame>
