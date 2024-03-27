@@ -7,5 +7,5 @@ select ?event (sample(?name_lang) as ?name) ?mintDate  ?dataFeed where {
     << ?event schema:name ?name_lang >> prov:wasDerivedFrom ?dataFeed .
 } 
 group by ?event ?mintDate ?dataFeed 
-order by desc(?generatedAtTime)  
+order by desc(?mintDate)  
 limit 500
