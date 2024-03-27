@@ -20,7 +20,7 @@ Rails.application.routes.draw do
     
   end
 
-  get 'sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/')
+  get 'sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/', status: 307)
 
   get "github/callback", to: "github#callback"
 
