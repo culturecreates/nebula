@@ -6,7 +6,7 @@
     </h3>
     <hr>
     <h4>
-      Favourite Data Feeds
+      Favourite Reports
     </h4>
     <ul>
       <li>
@@ -14,12 +14,20 @@
         query_show_path(sparql: "feeds_all", title: "Data Feeds") %>
       </li>
       <li>
+        <%= link_to "Recently Minted Events",
+        query_show_path(
+          sparql: "custom/recent_event_mints",
+          title: "Recently Minted Events",
+        ) %>
+      </li>
+
+      <li>
         <%= link_to "ADC Member Table",
         query_show_path(sparql: "custom/adc-members", title: "ADC Member Table") %>
       </li>
     </ul>
     <h4>
-      Recent CMS Workflows
+      Favourite Workflows
     </h4>
     <turbo-frame
       id='workflows'
