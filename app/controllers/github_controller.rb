@@ -10,7 +10,8 @@ class GithubController < ApplicationController
       
       user_info = user_info(token)
       session[:handle] = user_info["login"]
-      session[:name] = user_info["name"]
+      session[:name] = user_info["name"] || user_info["login"]
+
       # user_repos = user_repos(token)
       # session[:repos] = user_repos.map { |repo| repo["name"] }
 

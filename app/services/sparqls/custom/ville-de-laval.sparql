@@ -3,7 +3,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-select ?uri ?name ?startDate ?endDate  ?location_name ?same_as
+select ?uri ?name ?startDate ?endDate  (sample(?location_name) as ?location) ?same_as
 where {
     values ?g {
         <http://kg.artsdata.ca/culture-creates/artsdata-planet-ville-de-laval/calendrier-activites>
@@ -12,10 +12,10 @@ where {
         ?uri a schema:Event .
     }
     ?uri a schema:Event ;
-       schema:startDate ?startDate ;
-       schema:name ?name  ;
-       schema:location/schema:sameAs/schema:address/schema:postalCode ?code ;
-                                                   schema:location/schema:name ?location_name .
+         schema:startDate ?startDate ;
+         schema:name ?name  ;
+         schema:location/^schema:sameAs/schema:address/schema:postalCode ?code ;
+                                                     schema:location/schema:name ?location_name .
     OPTIONAL {
         ?uri   schema:endDate ?endDate 
     }
@@ -25,7 +25,6 @@ where {
         <https://www.laval.ca/52ff792f-a72e-4b2b-859e-2b9faf17491a> # Bibliothèques
         <https://www.laval.ca/03e3e7d7-ad9a-4f10-86db-dfc9d49b7abb>  # Expositions et spectacles
         <https://www.laval.ca/685b3eae-7097-4a44-8e72-1c769ed8f6cf> # Événements et festivals
-       
     }
     ?uri schema:additionalType ?type .
     filter not exists {
@@ -40,24 +39,21 @@ where {
                     schema:name ?name2  ;
                     schema:startDate ?startDate2 .
             bind(strdt(substr(str(?startDate2),1,10),xsd:date) as ?date2 )
-           
         }
-         filter (?date2 = ?date)
-            ?event2   schema:location/schema:address/schema:postalCode ?code .
-            filter (?uri != ?event2)
-            filter(?g != ?other_g)
-        
+        filter (?date2 = ?date)
+        ?event2   schema:location/schema:address/schema:postalCode ?code .
+        filter (?uri != ?event2)
+        filter(?g != ?other_g)
     }
     {
-    OPTIONAL {
-        ?uri schema:sameAs+ ?same_as .
-        filter(STRSTARTS(str(?same_as),"http://kg.artsdata.ca/resource/K"))
+        OPTIONAL {
+            ?uri schema:sameAs+ ?same_as .
+            filter(STRSTARTS(str(?same_as),"http://kg.artsdata.ca/resource/K"))
+        }
+        OPTIONAL {
+            ?same_as schema:sameAs+ ?uri .
+            filter(STRSTARTS(str(?same_as),"http://kg.artsdata.ca/resource/K"))
+        }
     }
-
-    OPTIONAL {
-        ?same_as schema:sameAs+ ?uri .
-         filter(STRSTARTS(str(?same_as),"http://kg.artsdata.ca/resource/K"))
-    }
-    }
-
-} order by ?startDate ?endDate 
+} group by ?uri ?name  ?startDate ?endDate  ?same_as
+order by ?startDate ?endDate
