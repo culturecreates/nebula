@@ -18,6 +18,7 @@ construct {
             OPTIONAL { <URI_PLACEHOLDER>   <http://schema.org/streetAddress> ?street ; 
               <http://schema.org/addressLocality> ?locality ;
               <http://schema.org/postalCode> ?postalCode . }
-            OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/postalCode> ?postalCode . }
+           
           }
+          OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/postalCode> ?postalCode . }
         } 
