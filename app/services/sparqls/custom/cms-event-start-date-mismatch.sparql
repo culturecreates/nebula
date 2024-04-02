@@ -1,0 +1,16 @@
+PREFIX schema: <http://schema.org/>
+select ?cms_graphs ?event ?type (sample(?name) as ?name_sample) ?startDate ?status ?otherEvent ?otherStatus ?otherStartDate where {
+    
+    values ?cms_graphs {
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/tout-culture-cms-events> 
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/signe-laval-cms-events>
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/culture-mauricie-cms-events>}
+    graph ?cms_graphs {
+        ?event a ?type  ; schema:name ?name ; schema:startDate ?startDate ; schema:eventStatus ?status .
+    }
+    ?event a schema:Event .
+    ?event  schema:sameAs+ ?otherEvent . 
+    ?otherEvent schema:eventStatus ?otherStatus ; schema:startDate ?otherStartDate .
+    filter(?startDate != ?otherStartDate || ?status != ?otherStatus)
+    
+} group by ?cms_graphs ?event ?type ?startDate ?status ?otherEvent ?otherStatus ?otherStartDate 
