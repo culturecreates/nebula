@@ -1,27 +1,53 @@
 PREFIX schema: <http://schema.org/>
-select * where {
+PREFIX prov: <http://www.w3.org/ns/prov#>
+select  ?entity ?name ?ipaa_type  ?webpage ?coalesce_adid ?coalesce_wdid where {
     graph <http://kg.artsdata.ca/culture-creates/artsdata-planet-ipaa/ipaa-entities> {
-        values ?type {
-            schema:Person schema:Organization 
+        values ?ipaa_type {
+            schema:Organization  schema:Person
         } 
-        ?entity a ?type ;
+        ?entity a ?ipaa_type ;
                 schema:name ?name .
         filter(!isBlank(?entity))
-        OPTIONAL {
+        ?entity prov:wasDerivedFrom ?webpage .
+       
+    }
+    OPTIONAL {
             ?entity schema:sameAs ?ipaa_adid .
         	filter(strstarts(str(?ipaa_adid),"http://kg.artsdata.ca/resource/K"))
+            OPTIONAL {
+            ?ipaa_adid schema:sameAs ?ad_wdid .
+             filter(strstarts(str(?ad_wdid),"http://www.wikidata.org/entity/Q"))
         }
-        OPTIONAL {
+        }
+    OPTIONAL {
             ?entity schema:sameAs ?ipaa_wdid .
         	filter(strstarts(str(?ipaa_wdid),"http://www.wikidata.org/entity/Q"))
+        }
+    OPTIONAL {
+            ?entity schema:sameAs/^schema:sameAs ?wdid .
+          
+        	filter(strstarts(str(?wdid),"http://www.wikidata.org/entity/Q"))
+        }
+    OPTIONAL {
+        ?adid schema:sameAs ?entity .
+        filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/K"))
+        OPTIONAL {
+            ?adid schema:sameAs ?ad_wdid .
+             filter(strstarts(str(?ad_wdid),"http://www.wikidata.org/entity/Q"))
         }
     }
     OPTIONAL {
         ?adid schema:sameAs ?entity .
         filter(strstarts(str(?adid),"http://kg.artsdata.ca/resource/K"))
         OPTIONAL {
-            ?adid schema:sameAs ?wdid .
-             filter(strstarts(str(?wdid),"http://www.wikidata.org/entity/Q"))
+           ?ad_wdid  schema:sameAs ?adid .
+             filter(strstarts(str(?ad_wdid),"http://www.wikidata.org/entity/Q"))
         }
     }
+    
+    bind(COALESCE(?wdid,?ad_wdid,?ipaa_wdid) as ?coalesce_wdid)
+    bind(COALESCE(?adid,?ipaa_adid) as ?coalesce_adid)
+
+    
+    
 }
