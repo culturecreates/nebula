@@ -2,28 +2,34 @@
 class SparqlLoader
  
   def self.load(filename, substitute_list = [])
-    f = File.read("app/services/sparqls/#{filename}.sparql")
+    if  filename.starts_with?("http")
+      self.load_url(filename, substitute_list)
+    else
+      f = File.read("app/services/sparqls/#{filename}.sparql")
+      make_sparql(f, substitute_list)
+    end
+  end
+
+  def self.load_url(url,  substitute_list = [] )
+    uri = URI(url)
+    f = ''
+    begin
+      response = Net::HTTP.get_response(uri)
+      if response.is_a?(Net::HTTPSuccess)
+        f = response.body
+        make_sparql(f, substitute_list)
+      else
+        return { error: "HTTP Error: #{response.code}" }
+      end
+    rescue => exception
+      return { error: exception.message }
+    end
+  end
+
+  def self.make_sparql(f, substitute_list)
     substitute_list.each_slice(2) do |a, b|
       f.gsub!(a.to_s, b.to_s)
     end
     f
-  end
-
-  def self.load_url(url,  substitute_list = [] )
-    begin
-      result = HTTParty.get(url)
-    rescue => exception
-      return { error: exception.message }
-    end
-    result = HTTParty.get(url)
-    if result.code == 200
-      f = result.body
-      substitute_list.each_slice(2) do |a, b|
-        f.gsub!(a.to_s, b.to_s)
-      end
-      f
-    else
-      { error: result.code, message: result.body.truncate(100).squish }
-    end
   end
 end
