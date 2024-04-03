@@ -36,7 +36,9 @@ The Artsdata.ca knowledge graph enables the arts sector to:
 
 ## Want to know more?
 
-Find out about model classes and properties. Provide feedback and ask questions. [Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
+Find out about the Artsdata data model's classes and properties. Provide feedback and ask questions. 
+
+[Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
 
 ---
 
@@ -44,15 +46,13 @@ Find out about model classes and properties. Provide feedback and ask questions.
 
 ### Need to add structured data to your events?
 
-To structure your events, add JSON-LD or RDFa to your web pages by following Google's instructions. You will need technical expertise and access to your website backend. 
-**Remember!** Use the [Artsdata.ca data model](https://culturecreates.github.io/artsdata-data-model/) when structuring your own events.
+To structure your events, add JSON-LD or RDFa structured data to your web pages. Make sure to follow [Google's guidelines] (https://developers.google.com/search/docs/appearance/structured-data/event), as well as [Artsdata's templates](https://culturecreates.github.io/artsdata-data-model/gabarits-jsonld/README.html). You will need technical expertise and access to your website backend. 
 
-[Structure my own events](https://developers.google.com/search/docs/data-types/event?utm_source=devtools)
+[Structure my own events](https://culturecreates.github.io/artsdata-data-model/gabarits-jsonld/README.html)
 
 ### Already have structured data for events?
 
 Let us know so we can add your events to Artsdata.ca.
-
 
 <!-- HTML button-like link -->
 <a href="mailto:support@culturecreates.com?subject=Artsdata.ca%20participation&body=My%20website%20has%20structured%20data.%20Please%20add%20it%20to%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Contact us</a>
@@ -62,20 +62,23 @@ Let us know so we can add your events to Artsdata.ca.
 - [Linked Digital Future](https://linkeddigitalfuture.ca/)
 - [dia-log](https://dia-log.ca)
 - [Wikidata:WikiProject Performing arts](https://www.wikidata.org/wiki/Wikidata:WikiProject_Performing_arts)
+- [Artsdata Newsletter](https://mailchi.mp/53ff7a0a3ef0/stay-in-the-loop-restez-au-courant)
 
 ## Partners
 
-**Artsdata Interest Group**
+**Artsdata Community Group**
 
-The Artsdata Interest Group acts as a governing body for Artsdata.ca and defines priorities for its development through monthly meetings. The group includes a diversity of stakeholders from the Canadian arts sector, ranging from open data providers to consumers to service organizations.
+The Artsdata Community Group acts as a governing body for Artsdata.ca and defines priorities for its development through monthly meetings. The group includes a diversity of stakeholders from the Canadian arts sector, ranging from open data providers to consumers to service organizations.
 
-As of May 2023, members include Association RIDEAU, CAPACOA, Culture Laval, Culture Outaouais, The National Arts Centre, Synapse C, La Vitrine, and the Government of New Brunswick. If you are interested in joining the Artsdata community group, please contact frederic.julien@capacoa.ca.
+As of March 2024, members include Association RIDEAU, CAPACOA, Culture pour tous, Culture Laval, Culture Outaouais, the Government of New Brunswick, the National Arts Centre, Synapse C, and La Vitrine. Non-voting members include Culture Creates and LaCogency. If you are interested in joining the Artsdata community group, please contact emilie.frenette@capacoa.ca.
 
 **Other Supporters**
 
 Culture Creates is a small team of arts professionals and technologists specialized in RDF-based knowledge graphs and linked open data for the arts. Their mission is to make information on what’s happening in the arts compatible with an AI-powered world.
 
-Artsdata.ca has many data providers across Canada. These include dozens of participants in digital discoverability cohorts led by the Linked Digital Future Initiative and CAPACOA, as well as 13 associations, networks, unions and other service organizations ([click here for a detailed list of data providers](https://docs.google.com/document/d/1MVA6RuX7MEk_ceF3NhiLoZISAj4FtWgPyW1aeDBQpDw/edit#heading=h.78r7woizu9fe)).
+Artsdata.ca has nearly 100 data providers across Canada. These include participants in digital discoverability cohorts led by the Linked Digital Future Initiative and dia-log, as well as more than associations, networks, unions and other service organizations. 
+
+[See the list of data sources](https://kg.artsdata.ca/query/show?sparql=feeds_all&title=Data+Feeds).
 
 **Past Supporters**
 
