@@ -12,11 +12,6 @@
 <p>Queries shared by users of Artsdata.
   <%= "Login to add your own SPARQLs." if !session[:name] %></p>
 <dl>
-  <%= link_to "Ville de Laval Events",
-  query_show_path(
-    sparql: "custom/ville-de-laval",
-    title: "Events for Footlight - Ville de Laval",
-  ) %>
   <br>
   <%= link_to "LaVitrine Pipeline",
   query_show_path(
@@ -32,21 +27,6 @@
   <br>
   <%= link_to "CAPACOA Members", query_show_path(sparql: "custom/capacoa-members") %>
   <br>
-  <%= link_to "ScenePro Organizations Report",
-  query_show_path(sparql: "custom/scenepro-orgs-report") %>
-  <br>
-  <%= link_to "ScenePro-Artsdata-Wikidata Status",
-  query_show_path(
-    constructs:
-      "custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata",
-    sparql: "custom/scenepro-query",
-    title: "ScenePro-Artsdata-Wikidata Status",
-  ) %>
-  <br>
-  <%= link_to "ScenePro Organization List",
-  query_show_path(sparql: "custom/scenepro-orgs") %>
-  <br>
-  <%= link_to "ScenePro Venue List", query_show_path(sparql: "custom/scenepro-venues") %>
 </dl>
 
 <h2>View External Sources</h2>

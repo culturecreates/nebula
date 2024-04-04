@@ -93,13 +93,6 @@
               class: "dropdown-item" %>
             </li>
 
-            <li><%= link_to "ScenePro Organizations",
-              query_show_path(
-                sparql: "custom/scenepro-orgs",
-                title: "ScenePro Organizations",
-              ),
-              class: "dropdown-item" %>
-            </li>
             <li><%= link_to "LaVitrine Pipeline",
               query_show_path(
                 sparql: "custom/lavitrine_sources_refresh_rate",
@@ -118,26 +111,6 @@
               query_show_path(sparql: "custom/capacoa-members", title: "CAPACOA Members"),
               class: "dropdown-item" %>
             </li>
-
-            <li data-turbo-prefetch="false"><%= link_to "ScenePro Organizations",
-              query_show_path(
-                sparql: "custom/scenepro-orgs",
-                title: "ScenePro Organizations",
-              ),
-              class: "dropdown-item" %>
-            </li>
-            <li data-turbo-prefetch="false"><%= link_to "ScenePro Venues ",
-              query_show_path(sparql: "custom/scenepro-venues", title: "ScenePro Venues"),
-              class: "dropdown-item" %>
-            </li>
-            <li data-turbo-prefetch="false"><%= link_to "IPAA Entities",
-              query_show_path(
-                sparql: "custom/ipaa-entites",
-                title: "IPAA People and Organizations",
-              ),
-              class: "dropdown-item" %>
-            </li>
-
           </ul>
         </li>
         <li class="nav-item dropdown">
