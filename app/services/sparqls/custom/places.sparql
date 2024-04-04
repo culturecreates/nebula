@@ -16,4 +16,4 @@ select ?artsdata (sample(?names) as ?name) ?wikidata ?postalCode (sample(?region
         ?artsdata schema:sameAs ?wikidata .
         filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity"))
     }
-}  group by ?artsdata ?wikidata
+}  group by ?artsdata ?wikidata  ?postalCode
