@@ -8,7 +8,8 @@ select ?artsdata (sample(?names) as ?name) ?wikidata (sample(?regions) as ?regio
         ?artsdata a schema:Place ;
                   schema:name ?names ;
                   schema:address/schema:addressRegion  ?regions ;
-                                schema:address/schema:addressLocality  ?localities .
+                  schema:address/schema:addressLocality  ?localities ;
+                  schema:address/schema:addressCountry "CA" .
     }
     optional {
         ?artsdata schema:sameAs ?wikidata .
