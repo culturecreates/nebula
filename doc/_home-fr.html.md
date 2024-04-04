@@ -36,17 +36,16 @@ Le graphe de connaissances de Artsdata.ca permet au secteur des arts :
 
 Découvrez les classes et les propriétés du modèle. Donnez votre avis et posez des questions.
 
-- [Modèle](https://culturecreates.github.io/artsdata-data-model/)
-- [Infrastructure](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
+- [Modèle de données Artsdata](https://culturecreates.github.io/artsdata-data-model/)
+- [Infrastructure Artsdata](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
 
 ## Ajoutez vos événements à Artsdata.ca
 
 ### Besoin de structurer vos événements ?
 
-Pour structurer vos événements, ajoutez JSON-LD ou RDFa à vos pages Web en suivant les instructions de Google. Vous aurez besoin d'une expertise technique et d'un accès au backend de votre site Web. 
-**Rappelez vous !** Utilisez le [modèle Artsdata.ca](https://culturecreates.github.io/artsdata-data-model/) lors de la structuration de vos propres données d'événement.
+Pour structurer vos événements, ajoutez des données au format JSON-LD ou RDFa à vos pages Web en vous assurant de suivre les [instructions de Google](https://developers.google.com/search/docs/appearance/structured-data/event?hl=fr) et les [gabarits Artsdata.ca](https://culturecreates.github.io/artsdata-data-model/gabarits-jsonld/README.fr.html). Vous aurez besoin d'une expertise technique et d'un accès à l'interface administrateur de votre site Web. 
 
-[Structurer mes propres événements](https://developers.google.com/search/docs/data-types/event?utm_source=devtools)
+[Structurer mes propres événements](https://culturecreates.github.io/artsdata-data-model/gabarits-jsonld/README.fr.html)
 
 ### Avez-vous déjà structuré vos événements ?
 
@@ -61,6 +60,7 @@ Nous pouvons les ajouter à Artsdata.ca.
 - [Avenir Numérique Lié](https://linkeddigitalfuture.ca/fr/accueil/)
 - [dia-log](https://dia-log.ca)
 - [Wikidata:WikiProject Arts de la scène](https://www.wikidata.org/wiki/Wikidata:WikiProject_Performing_arts/fr)
+- [Infolettre Artsdata](https://mailchi.mp/53ff7a0a3ef0/stay-in-the-loop-restez-au-courant)
 
 ## Partenaires
 
@@ -68,19 +68,21 @@ Nous pouvons les ajouter à Artsdata.ca.
 
 Le groupe d'intérêt Artsdata agit en tant qu'organe délibérant pour Artsdata.ca et définit les priorités de son développement lors de réunions mensuelles. Le groupe inclut une diversité de parties prenantes du secteur artistique au Canada, allant des fournisseurs de données ouvertes aux consommateurs de données aux organismes de services.
 
-En date de mai 2023, les membres comprennent l'Association RIDEAU, CAPACOA, Culture Laval, Culture Outaouais, le Centre national des Arts, Synapse C, La Vitrine et le gouvernement du Nouveau-Brunswick. Si vous souhaitez vous joindre au groupe d'intérêt, veuillez contacter frederic.julien@capacoa.ca.
+En date de mars 2024, les membres comprennent l'Association RIDEAU, CAPACOA, Culture pour tous, Culture Laval, Culture Outaouais, le Centre national des Arts, le gouvernement du Nouveau-Brunswick, Synapse C et La Vitrine. Sont aussi membres sans droit de vote, LaCogency et La culture crée. Si vous souhaitez vous joindre au groupe d'intérêt, veuillez contacter emilie.frenette@capacoa.ca.
 
 **Autres collaborateurs**
 
 La Culture Crée (Culture Creates) est une petite équipe de professionnels de l’art et de technologues se spécialisant dans les graphes de connaissances fonctionnant à partir de la reconnaissance des formes (RDF) ainsi que dans les données ouvertes et liées sur les arts. Son mandat est de rendre les renseignements sur l’actualité en art compatibles avec le monde propulsé par l’IA.
 
-Artsdata.ca compte de nombreux fournisseurs de données à travers le Canada. Ils comprennent des douzaines de participants aux cohortes de découvrabilité numérique dirigées par l’initiative Un avenir numérique lié et CAPACOA, ainsi que 13 associations, réseaux, syndicats et d’autres organismes de services (cliquez ici pour une liste détaillée des fournisseurs de données).
+Artsdata.ca compte une centaine de fournisseurs de données à travers le Canada. Ils comprennent des participants aux cohortes de découvrabilité numérique dirigées par l’initiative Un avenir numérique lié et CAPACOA, ainsi que des associations, réseaux, syndicats et d’autres organismes de services. 
+
+[Voir la liste des fournisseurs de données](https://kg.artsdata.ca/fr/query/show?sparql=feeds_all&title=Data+Feeds)
 
 **Reconnaissance des premiers partenaires**
 
 De 2017 à 2022, Sherrie Johnson (Crow’s Theatre) a activement piloté, avec plusieurs représentants d’organismes artistiques à travers le pays, l’initiative Artsdata.ca en préparant une série de demandes de subventions multiphases.
 
-De 2018 à 2023, l’initiative Un avenir numérique lié a contribué au développement d’Artsdata.ca, de Wikidata et d’un écosystème plus étendu de données ouvertes liées dans le domaine des arts de la scène.
+De 2018 à 2023, l’initiative Un avenir numérique lié de CAPACOA a contribué au développement d’Artsdata.ca, de Wikidata et d’un écosystème plus étendu de données ouvertes liées dans le domaine des arts de la scène.
 
 ## Soutenu par
 
