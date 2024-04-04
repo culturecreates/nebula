@@ -92,7 +92,10 @@
               ),
               class: "dropdown-item" %>
             </li>
-
+            <li><%= link_to "Places with Events",
+              query_show_path(sparql: "custom/places", title: "Places with Events"),
+              class: "dropdown-item" %>
+            </li>
             <li><%= link_to "LaVitrine Pipeline",
               query_show_path(
                 sparql: "custom/lavitrine_sources_refresh_rate",
