@@ -10,7 +10,8 @@ select ?artsdata (sample(?names) as ?name) ?wikidata ?postalCode (sample(?region
                   schema:address/schema:addressRegion  ?regions ;
                   schema:address/schema:addressLocality  ?localities ;
                   schema:address/schema:postalCode  ?postalCode ;
-                  schema:address/schema:addressCountry "CA" .
+                  schema:address/schema:addressCountry ?country .
+        filter(str(?country) = "CA")
     }
     optional {
         ?artsdata schema:sameAs ?wikidata .
