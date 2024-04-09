@@ -60,6 +60,7 @@ Nous pouvons les ajouter à Artsdata.ca.
 - [Avenir Numérique Lié](https://linkeddigitalfuture.ca/fr/accueil/)
 - [dia-log](https://dia-log.ca)
 - [Wikidata:WikiProject Arts de la scène](https://www.wikidata.org/wiki/Wikidata:WikiProject_Performing_arts/fr)
+- [Outil d'auto-diagnostic de découvrabilité d'Artsdata](https://form.jotform.com/230306144694049)
 - [Infolettre Artsdata](https://mailchi.mp/53ff7a0a3ef0/stay-in-the-loop-restez-au-courant)
 
 ## Partenaires
