@@ -62,6 +62,7 @@ Let us know so we can add your events to Artsdata.ca.
 - [Linked Digital Future](https://linkeddigitalfuture.ca/)
 - [dia-log](https://dia-log.ca)
 - [Wikidata:WikiProject Performing arts](https://www.wikidata.org/wiki/Wikidata:WikiProject_Performing_arts)
+- [Artsdata Self-Diagnostic Discoverability Tool](https://form.jotform.com/230306144694049)
 - [Artsdata Newsletter](https://mailchi.mp/53ff7a0a3ef0/stay-in-the-loop-restez-au-courant)
 
 ## Partners
