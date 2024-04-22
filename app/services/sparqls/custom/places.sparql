@@ -1,20 +1,29 @@
 PREFIX schema: <http://schema.org/>
 PREFIX adm: <http://kg.artsdata.ca/minted/>
-select ?artsdata (sample(?names) as ?name) ?wikidata ?postalCode (sample(?regions) as ?region)  (sample(?localities) as ?locality)where {
+select ?artsdata (sample(?names) as ?name) (sample(?wikidatas) as ?wikidata)  (sample(?streetAddresses) as ?streetAddress)  (sample(?localities) as ?locality) (sample(?regions) as ?region) (sample(?postalCodes) as ?postalCode)   where {
     values ?graph {
         adm:K5 adm:K2 adm:K4 adm:K11 adm:K13 adm:K16  
     }
     graph ?graph {
         ?artsdata a schema:Place ;
-                  schema:name ?names ;
-                  schema:address/schema:addressRegion  ?regions ;
-                  schema:address/schema:addressLocality  ?localities ;
-                  schema:address/schema:postalCode  ?postalCode ;
-                  schema:address/schema:addressCountry ?country .
+                  schema:name ?names .
+        optional {
+                ?artsdata  schema:address/schema:streetAddress  ?streetAddresses .}
+        optional {
+                ?artsdata  schema:address/schema:addressRegion  ?regions .}
+        optional {
+                ?artsdata  schema:address/schema:addressLocality  ?localities .}
+        optional {
+                ?artsdata schema:address/schema:postalCode  ?postalCodes .}
+        optional {
+                ?artsdata schema:address/schema:addressCountry ?country .}
+
         filter(str(?country) = "CA")
     }
+   
     optional {
-        ?artsdata schema:sameAs ?wikidata .
-        filter(strstarts(str(?wikidata),"http://www.wikidata.org/entity"))
+        ?artsdata schema:sameAs ?wikidata_match .
+        filter(strstarts(str(?wikidata_match),"http://www.wikidata.org/entity"))
     }
-}  group by ?artsdata ?wikidata  ?postalCode
+    bind(URI(?wikidata_match) as ?wikidatas)
+}  group by ?artsdata 
