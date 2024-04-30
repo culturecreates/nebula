@@ -1,0 +1,21 @@
+<% solutions =
+  SPARQL.execute(
+    "PREFIX shacl: <http://www.w3.org/ns/shacl#> " \
+      "SELECT distinct  ?resultPath ?resultMessage WHERE { ?bn shacl:focusNode <#{entity.entity_uri}> . ?bn shacl:resultMessage ?resultMessage . ?bn shacl:resultPath ?resultPath }",
+    entity.graph,
+  ) %>
+
+<% if solutions.count  > 0 %>
+  <br>
+  <h5>Validation Errors</h5>
+  <ul>
+    <% solutions.each do |s| %>
+      <p>
+        <%= display_label(s.resultPath, check_shacl: false) %>
+        :
+        <span style="color:red;">
+          <%= s.resultMessage %></span>
+      </p>
+    <% end %>
+  </ul>
+<% end %>
