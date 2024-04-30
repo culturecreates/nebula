@@ -1,11 +1,5 @@
 <div class="meta">
-  <!-- SHACL -->
-  <%= render partial: "shacl_errors",
-  locals: {
-    graph: entity.graph,
-    subject: entity.entity_uri,
-    object: RDF.URI(entity.entity_uri),
-  } %>
+
   <% solutions =
     SPARQL.execute(
       "SELECT distinct ?pred WHERE { <#{entity.entity_uri}> ?pred ?obj }",

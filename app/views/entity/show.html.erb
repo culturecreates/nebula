@@ -11,6 +11,9 @@
   <%= if @entity.graph.count == 0
     render partial: "external_resource", locals: { entity: @entity }
   end %>
+
+  <%= render partial: "entity_errors", locals: { entity: @entity } %>
+
   <%= render partial: "statements_table", locals: { entity: @entity } %>
 
   <turbo-frame

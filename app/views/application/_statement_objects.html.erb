@@ -8,12 +8,15 @@
     <% solutions.each do |s| %>
       <div class="statement-object">
         <% if s.obj.uri? && s.obj.value.starts_with?("http://blank.node") %>
-          <%= render partial: "statements_table", locals: { entity: Entity.new(entity_uri: s.obj, graph: entity.graph ) } %>
+          <%= render partial: "statements_table",
+          locals: {
+            entity: Entity.new(entity_uri: s.obj, graph: entity.graph),
+          } %>
         <% elsif s.obj.uri? %>
           <% frame_id = rand(10_000) %>
           <turbo-frame
             id='card-<%= frame_id %>'
-            src=<%= dereference_card_path(uri: s.obj.to_s, frame_id: frame_id)%>
+            src="<%= dereference_card_path(uri: s.obj.to_s, frame_id: frame_id)%>"
             loading="lazy"
             target="_top"
           >
@@ -22,15 +25,7 @@
         <% else %>
           <%= display_object(s.obj) %>
         <% end %>
-        <!-- SHACL -->
-        <%= render partial: "shacl_errors",
-        locals: {
-          graph: entity.graph,
-          subject: entity.entity_uri,
-          predicate: predicate,
-          object: s.obj,
-        } %>
-        <!-- Annotations -->
+        <!-- SHACL --> <!-- Annotations -->
         <%= render partial: "annotations",
         locals: {
           entity: entity,

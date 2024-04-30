@@ -50,10 +50,10 @@ WHERE {
             ?shacl_pred ?shal_obj .
     }
 
-    OPTIONAL {
-        ?shacl_bn sh:focusNode ?s ; 
-         sh:value ?value .
-    }
+    # OPTIONAL {
+    #     ?shacl_bn sh:focusNode ?s ; 
+    #      sh:value ?value .
+    # }
 
     
 
