@@ -13,11 +13,22 @@ class EntityController < ApplicationController
     respond_to do |format|
       format.jsonld {
         puts "rendering jsonld..."
+        nebula_context_url = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
         @entity.load_graph_without_triple_terms
-        render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
+        expanded_jsonld = JSON::LD::API::fromRdf(@entity.graph)
+        frame = JSON.parse %({"@type": {}})
+        framed_jsonld = JSON::LD::API.frame(expanded_jsonld, frame)
+        compacted_jsonld = JSON::LD::API.compact(framed_jsonld, JSON::LD::Context.new().parse(nebula_context_url))
+        compacted_jsonld['@graph'] = compacted_jsonld['@graph'].first if compacted_jsonld['@graph'].is_a? Array
+        if compacted_jsonld['@graph'].is_a? Hash
+          compacted_jsonld = {'@context' => nebula_context_url}.merge(compacted_jsonld['@graph'])
+        else
+          compacted_jsonld['@context']= nebula_context_url
+        end
+        render json: compacted_jsonld, content_type: 'application/ld+json'
       }
       format.jsonlds {
-        puts "rendering jsonld..."
+        puts "rendering expanded jsonld-star..."
         @entity.load_graph
         render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
       }

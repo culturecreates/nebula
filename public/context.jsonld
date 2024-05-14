@@ -1,0 +1,59 @@
+{
+  "@context": [
+    "http://schema.org",
+    {
+      "prov": "http://www.w3.org/ns/prov#",
+      "xsd": "http://www.w3.org/2001/XMLSchema#"
+    },
+    {
+      "name": {
+        "@container": "@language"
+      },
+      "description": {
+        "@container": "@language"
+      },
+      "generatedAtTime": {
+        "@id": "prov:generatedAtTime",
+        "@type": "xsd:dateTime"
+      },
+      "startDate": {
+        "@id": "startDate",
+        "@type": "xsd:date"
+      },
+      "endDate": {
+        "@id": "endDate",
+        "@type": "xsd:date"
+      },
+      "startDateTime": {
+        "@id": "startDate",
+        "@type": "xsd:dateTime"
+      },
+      "endDateTime": {
+        "@id": "endDate",
+        "@type": "xsd:dateTime"
+      },
+      "lastReviewed": {
+        "@id": "lastReviewed",
+        "@type": "xsd:dateTime"
+      },
+      "eventStatus": {
+        "@id": "eventStatus",
+        "@type": "@vocab"
+      },
+      "location": {
+        "@id": "location",
+        "@type": "@id"
+      },
+      "image": {
+        "@id": "image"
+      },
+      "offers": {
+        "@id": "offers",
+        "@type": "@id"
+      },
+      "url": {
+        "@id": "url"
+      }
+    }
+  ]
+}
