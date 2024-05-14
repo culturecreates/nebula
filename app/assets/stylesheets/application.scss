@@ -40,7 +40,7 @@ a:active {
   display: flex;
   flex-direction: column;
   background-color: white;
-  
+  overflow: hidden;
 
 }
 
@@ -53,6 +53,8 @@ a:active {
   border-color: rgb(191, 190, 190);
   border-width: 0.5px;
   border-style: dashed;
+  overflow: hidden;
+
 }
 
 .annotation {
