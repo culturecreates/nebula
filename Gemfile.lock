@@ -229,6 +229,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.7.3)
     rack (2.2.8)
+    rack-cors (2.0.2)
+      rack (>= 2.0.0)
     rack-test (2.1.0)
       rack (>= 1.3)
     rails (7.0.8)
@@ -444,6 +446,7 @@ DEPENDENCIES
   nokogiri
   oj
   puma (~> 5.0)
+  rack-cors
   rails (~> 7.0.8)
   redcarpet (~> 3.6.0)
   redis (~> 4.0)

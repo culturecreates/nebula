@@ -12,6 +12,7 @@ class EntityController < ApplicationController
     
     respond_to do |format|
       format.jsonld {
+        # see https://json-ld.github.io/json-ld.org/spec/latest/json-ld-api-best-practices/
         puts "rendering jsonld..."
         nebula_context_url = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
         @entity.load_graph_without_triple_terms

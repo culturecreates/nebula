@@ -12,11 +12,11 @@
         "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
         @entity.graph,
       ) %>
-    <%= if solutions.count > 10
-      "<p> Showing first 10 entities of #{solutions.count}</p>".html_safe
+    <%= if solutions.count > 30
+      "<p> Showing first 30 entities of #{solutions.count}</p>".html_safe
     end %>
 
-    <% solutions.take(10).each do |s| %>
+    <% solutions.take(30).each do |s| %>
       <% next if s.subject.node? %>
       <% next if s.subject.statement? %>
       <% new_entity = Entity.new(entity_uri: s.subject.value) %>
