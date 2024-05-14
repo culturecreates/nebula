@@ -19,7 +19,7 @@ class EntityController < ApplicationController
         jsonld = JSON::LD::API::fromRdf(@entity.graph)
         if @entity.type
           frame = JSON.parse %({"@type": "#{@entity.type.value}"})
-          jsonld = JSON::LD::API.frame(expanded_jsonld, frame)
+          jsonld = JSON::LD::API.frame(jsonld, frame)
         end
         compacted_jsonld = JSON::LD::API.compact(jsonld, JSON::LD::Context.new().parse(nebula_context_url))
         if compacted_jsonld['@graph'].is_a? Hash
