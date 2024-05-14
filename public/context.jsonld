@@ -40,6 +40,10 @@
         "@id": "eventStatus",
         "@type": "@vocab"
       },
+      "eventAttendanceMode": {
+        "@id": "eventAttendanceMode",
+        "@type": "@vocab"
+      },
       "location": {
         "@id": "location",
         "@type": "@id"
