@@ -6,12 +6,6 @@
       "xsd": "http://www.w3.org/2001/XMLSchema#"
     },
     {
-      "name": {
-        "@container": "@language"
-      },
-      "description": {
-        "@container": "@language"
-      },
       "generatedAtTime": {
         "@id": "prov:generatedAtTime",
         "@type": "xsd:dateTime"
@@ -48,15 +42,9 @@
         "@id": "location",
         "@type": "@id"
       },
-      "image": {
-        "@id": "image"
-      },
       "offers": {
         "@id": "offers",
         "@type": "@id"
-      },
-      "url": {
-        "@id": "url"
       }
     }
   ]

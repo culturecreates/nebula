@@ -16,11 +16,12 @@ class EntityController < ApplicationController
         puts "rendering jsonld..."
         nebula_context_url = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
         @entity.load_graph_without_triple_terms
-        expanded_jsonld = JSON::LD::API::fromRdf(@entity.graph)
-        frame = JSON.parse %({"@type": {}})
-        framed_jsonld = JSON::LD::API.frame(expanded_jsonld, frame)
-        compacted_jsonld = JSON::LD::API.compact(framed_jsonld, JSON::LD::Context.new().parse(nebula_context_url))
-        compacted_jsonld['@graph'] = compacted_jsonld['@graph'].first if compacted_jsonld['@graph'].is_a? Array
+        jsonld = JSON::LD::API::fromRdf(@entity.graph)
+        if @entity.type
+          frame = JSON.parse %({"@type": "#{@entity.type.value}"})
+          jsonld = JSON::LD::API.frame(expanded_jsonld, frame)
+        end
+        compacted_jsonld = JSON::LD::API.compact(jsonld, JSON::LD::Context.new().parse(nebula_context_url))
         if compacted_jsonld['@graph'].is_a? Hash
           compacted_jsonld = {'@context' => nebula_context_url}.merge(compacted_jsonld['@graph'])
         else
@@ -39,7 +40,7 @@ class EntityController < ApplicationController
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
       format.ttls { 
-        puts "rendering turtle..."
+        puts "rendering turtle-star..."
         @entity.load_graph
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
