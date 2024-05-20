@@ -15,7 +15,7 @@ class ReconcileController < ApplicationController
 
       redirect_to entity_path(uri: @query) if @query.starts_with?("http") || @query.match?(/^K.*-.*$/)
       
-      uri = URI.parse("https://api.artsdata.ca/recon") 
+      uri = URI.parse(Rails.application.credentials.recon_endpoint) 
       request = Net::HTTP::Get.new(uri)
       request["Content-Type"] = "application/json"
 
