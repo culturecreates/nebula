@@ -1,0 +1,41 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX adr: <http://kg.artsdata.ca/resource/>
+insert {
+    graph <http://kg.artsdata.ca/minted/K2> {
+        <http://kg.artsdata.ca/resource/K2-4993> 
+            prov:generatedAtTime ?now ;
+            a schema:Place ;
+          
+            schema:address <http://kg.artsdata.ca/resource/K2-4993#PostalAddress> .
+       <http://kg.artsdata.ca/resource/K2-4993>   schema:sameAs <http://www.wikidata.org/entity/Q3279028> .
+        << <http://kg.artsdata.ca/resource/K2-4993>   schema:sameAs <http://www.wikidata.org/entity/Q3279028> >> prov:wasGeneratedBy ?activity1 .
+        <http://kg.artsdata.ca/resource/K2-4993> schema:name "La Maison Théâtre"@fr .
+        << <http://kg.artsdata.ca/resource/K2-4993> schema:name "La Maison Théâtre"@fr >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
+        <http://kg.artsdata.ca/resource/K2-4993> schema:latitude "45.51454453643317" .
+        << <http://kg.artsdata.ca/resource/K2-4993> schema:latitude "45.51454453643317"
+            >> prov:wasGeneratedBy ?activity1 .
+            <http://kg.artsdata.ca/resource/K2-4993> schema:longitude "-73.56493048525442" .
+            << <http://kg.artsdata.ca/resource/K2-4993> schema:longitude "-73.56493048525442" >> prov:wasGeneratedBy ?activity1  .
+        
+        <http://kg.artsdata.ca/resource/K2-4993#PostalAddress> a schema:PostalAddress .
+            <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>   schema:postalCode "H2X 3Y6" .
+            << <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>   schema:postalCode "H2X 3Y6" >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
+            <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:addressCountry "CA" .
+            <<  <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:addressCountry "CA"  >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
+            <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:addressLocality "Montréal"@fr .
+            <<   <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:addressLocality "Montréal"@fr  >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
+            <http://kg.artsdata.ca/resource/K2-4993#PostalAddress> schema:addressRegion "QC"@fr .
+            <<  <http://kg.artsdata.ca/resource/K2-4993#PostalAddress> schema:addressRegion "QC"@fr  >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
+            <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:streetAddress "245 Rue Ontario E"@fr .
+            <<   <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:streetAddress "245 Rue Ontario E"@fr  >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
+            ?activity1 
+            prov:wasInformedBy adr:K1-102  ;
+            prov:wasAssociatedWith <https://github.com/saumier> ;
+            prov:endedAtTime  ?now .
+    }
+    } where {
+            bind(URI(concat("http://kg.artsdata.ca/resource/" ,strUUID())) as ?activity1)
+            bind(now() as ?now )
+    }

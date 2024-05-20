@@ -1,0 +1,151 @@
+<div class="container">
+  <h1>
+    Mint using Wikidata
+  </h1>
+  <p>
+    If you know the name or Wikidata ID, you can add it to Artsdata here. Start
+    by selecting the type and seaching with the name or Wikidata ID. You will
+    be asked to confirm the Wikidata entity before proceeding to mint an
+    Artsdata Identifier.
+  </p>
+
+  <%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container') do |form| %>
+    <div class="row mb-3">
+      <div class="col">
+        <input
+          type="radio"
+          class="btn-check"
+          name="type"
+          id="place"
+          value="<%= @wikidata_place_type %>"
+          autocomplete="off"
+          <%= "checked" if params[:type] == @wikidata_place_type || params[:type].nil? %>
+        >
+        <%= form.label :place, "Place", class: "btn btn-secondary-outlined w-100" %>
+      </div>
+      <div class="col">
+        <input
+          type="radio"
+          class="btn-check"
+          name="type"
+          id="person"
+          value="<%= @wikidata_person_type %>"
+          autocomplete="off"
+          <%= "checked" if params[:type] == @wikidata_person_type %>
+        >
+        <%= form.label :person, "Person", class: "btn btn-secondary-outlined w-100" %>
+      </div>
+      <div class="col">
+        <input
+          type="radio"
+          class="btn-check"
+          name="type"
+          id="organization"
+          value="<%= @wikidata_person_type %>"
+          autocomplete="off"
+          <%= "checked" if params[:type] == @wikidata_person_type %>
+        >
+        <%= form.label :organization,
+                   "Organization",
+                   class: "btn btn-secondary-outlined w-100" %>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <div class="input-group">
+          <%= form.text_field :wikidata_search,
+                          class: "form-control",
+                          value: params[:wikidata_search],
+                          placeholder: "Name or Wikidata ID" %>
+          <%= form.submit "Search", class: "btn btn-primary w-10" %>
+        </div>
+      </div>
+    </div>
+
+  <% end %>
+
+  <% if @wikidata_data %>
+
+    <h4>
+      Confirm
+    </h4>
+    <turbo-frame
+      id='recon_results'
+      src="<%= reconcile_query_path(reconEndpoint: "https://wikidata.reconci.link/en/api", routeName: "mint_wikidata_path", query: @wikidata_data[:label], type: @wikidata_data[:type])%>"
+      loading="lazy"
+      target="_top"
+    >
+      loading...
+    </turbo-frame>
+  <% end %>
+
+  <% if @external_uri %>
+    <h4>
+      Mint Preview
+    </h4>
+    <div class="row">
+      <div class="col-md">
+        <p>
+          Based on:
+          <div class="statement-object">
+            <b>
+              <%= @name %>
+            </b>
+            <div class="alternate-name">
+              <%= @class_to_mint %>
+            </div>
+            <%= @external_uri %>
+          </div>
+        </p>
+        <!-- Then all Wikidata to get: A label in a language . The annotations
+        can be generated locally using the group and the date. Specific to the
+        type: places need complete address people recommended occupation
+        organization recommended url, location or complete address Use shacl to
+        get the required and recommended fields per class. Display all fields
+        with SHACL violations. All fields editable. Blank fields shown and
+        editable. Show reconcile with Artsdata (and link button to avoid
+        minting): place uses postal code, person uses name, organization uses
+        name. -->
+        <div
+          data-artsdata-mint-endpoint-value="<%= Rails.application.credentials.artsdata_mint_endpoint %>"
+          data-controller="artsdata"
+          data-artsdata-externaluri-value="<%= @external_uri %>"
+          data-artsdata-classtomint-value="<%= @class_to_mint %>"
+          data-artsdata-authority-value="<%=  @group %>"
+          data-artsdata-name-value="<%= @name %>"
+          data-artsdata-language-value="<%= @language %>"
+          data-artsdata-reference-value="<%= @reference %>"
+        >
+          <button
+            data-artsdata-target="button"
+            class="btn btn-danger"
+            data-action="artsdata#mintEntity"
+          >
+            mint
+          </button>
+          <p data-artsdata-target="uri">
+          </p>
+        </div>
+      </div>
+      <div class="col-md">
+        <!-- Second column content goes here -->
+        <p>Checking Artsdata for existing match:</p>
+        <ul>
+          <li><%= @name %></li>
+          <li><%= @class_to_mint %></li>
+
+        </ul>
+        <turbo-frame
+          id='recon_results'
+          src="<%= reconcile_query_path(query: @name, type: @class_to_mint, externalUri: @external_uri)%>"
+          loading="lazy"
+          target="_top"
+        >
+          loading...
+        </turbo-frame>
+      </div>
+    </div>
+
+  <% end %>
+</div>
