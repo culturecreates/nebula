@@ -64,6 +64,7 @@ Let us know so we can add your events to Artsdata.ca.
 - [Wikidata:WikiProject Performing arts](https://www.wikidata.org/wiki/Wikidata:WikiProject_Performing_arts)
 - [Artsdata Self-Diagnostic Discoverability Tool](https://form.jotform.com/230306144694049)
 - [Artsdata Newsletter](https://mailchi.mp/53ff7a0a3ef0/stay-in-the-loop-restez-au-courant)
+- [Artsdata 2023-2024 Annual Report](https://docs.google.com/document/d/1kQM85gQx1A3KcUO26LRKq7aVo2RB7W5ylbRHYjqUoIU/edit?usp=share_link)
 
 ## Partners
 
