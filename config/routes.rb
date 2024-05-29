@@ -17,6 +17,8 @@ Rails.application.routes.draw do
     get "mint/preview", to: "mint#preview"
     get "mint/link", to: "mint#link"
     get "reconcile/query", to: "reconcile#query"
+
+    get "validate", to: "validate#show"
     
   end
 

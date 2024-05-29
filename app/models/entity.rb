@@ -58,6 +58,10 @@ class Entity
     @graph << RDF::Graph.load(@shacl)
   end
 
+  def load_graph_into_graph(graph)
+    @graph << graph
+  end
+
   def load_card
     sparql =  SparqlLoader.load('load_card', [
       'URI_PLACEHOLDER', self.entity_uri
