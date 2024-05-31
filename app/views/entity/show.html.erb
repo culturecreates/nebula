@@ -4,9 +4,18 @@
   <h1>
     <%= @entity.label&.html_safe %>
   </h1>
-  <a>
-    <%= @entity.entity_uri %>
-  </a>
+
+  <div data-controller="clipboard" data-clipboard-success-content-value="URI copied">
+    <span data-clipboard-target="source"><%= @entity.entity_uri %></span>
+    <a
+      class="cursor-pointer"
+      data-action="clipboard#copy"
+      data-clipboard-target="button"
+      title="Copy URI"
+    >
+      <%= render partial: "shared/icon_copy" %></a>
+  </span>
+
   <%= render partial: "entity_nav" %>
   <%= if @entity.graph.count == 0
     render partial: "external_resource", locals: { entity: @entity }

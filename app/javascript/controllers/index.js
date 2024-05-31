@@ -10,13 +10,15 @@ eagerLoadControllersFrom("controllers", application)
 // import { lazyLoadControllersFrom } from "@hotwired/stimulus-loading"
 // lazyLoadControllersFrom("controllers", application)
 
-
 import VisibilityController from "controllers/visibility_controller"
 application.register("visibility", VisibilityController)
-
 
 import ArtsdataController from "controllers/artsdata_controller"
 application.register("artsdata", ArtsdataController)
 
 import SortableTableController from "controllers/sortable_table_controller"
 application.register("sortable-table", SortableTableController)
+
+
+import Clipboard from '@stimulus-components/clipboard'
+application.register('clipboard', Clipboard)

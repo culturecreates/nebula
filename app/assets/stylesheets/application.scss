@@ -11,6 +11,10 @@ a:active {
   cursor: wait;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 .statement {
   display: flex;
   flex-direction: row;
@@ -76,7 +80,6 @@ a:active {
 }
 
 .accordion-body {
-  
   padding: 0;
 }
 
