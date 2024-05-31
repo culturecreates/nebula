@@ -89,4 +89,4 @@ De 2018 à 2023, l’initiative Un avenir numérique lié de CAPACOA a contribu�
 
 ![Canada Council for the Arts](https://canadacouncil.ca/-/media/Images/CCA/Design_Elements/Logos/CCFA-logo-full-en.svg?la=en&hash=F297C9D9740B613B144255DF6A5FDE48869615EC)
 
-![Financé par le gouvernement du Canada.](images/2li_FrEn_Wordmark_C_small.png)
+![Financé par le gouvernement du Canada.](/images/2li_FrEn_Wordmark_C_small.png)

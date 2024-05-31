@@ -91,4 +91,4 @@ From 2018 to 2023, CAPACOA’s Linked Digital Future Initiative contributed to t
 
 ![Canada Council for the Arts](https://canadacouncil.ca/-/media/Images/CCA/Design_Elements/Logos/CCFA-logo-full-en.svg?la=en&hash=F297C9D9740B613B144255DF6A5FDE48869615EC)
 
-![Funded by the Government of Canada.](images/2li_FrEn_Wordmark_C_small.png)
+![Funded by the Government of Canada.](/images/2li_FrEn_Wordmark_C_small.png)
