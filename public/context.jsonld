@@ -45,6 +45,13 @@
       "offers": {
         "@id": "offers",
         "@type": "@id"
+      },
+      "name":{
+        "@id": "schema:name",
+        "@container": "@language"
+      },"description":{
+        "@id": "schema:description",
+        "@container": "@language"
       }
     }
   ]
