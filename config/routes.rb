@@ -6,7 +6,6 @@ Rails.application.routes.draw do
     root "application#home"
 
     get "test", to: "application#test"
-
     get "entity", to: "entity#show"
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
@@ -17,26 +16,21 @@ Rails.application.routes.draw do
     get "mint/preview", to: "mint#preview"
     get "mint/link", to: "mint#link"
     get "reconcile/query", to: "reconcile#query"
-
     get "validate", to: "validate#show"
-    
   end
 
+  # Support legacy urls to Zazuko YASGUI SPARQL UI
   get 'sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/', status: 307)
 
+  # Github OAuth
   get "github/callback", to: "github#callback"
   get "github/workflows", to: "github#workflows"
 
-
+  # The following URI paths are dereferencable and handled by the ResourceController
   match "resource/*path", to: "resource#show", via: :get
   match "databus/*path", to: "resource#show", via: :get
   match "shacl/*path", to: "resource#show", via: :get
   match "ontology/*path", to: "resource#show", via: :get
   match "minted/*path", to: "resource#show", via: :get
   match "culture-creates/*path", to: "resource#show", via: :get
-  
-  
-
-
-
 end
