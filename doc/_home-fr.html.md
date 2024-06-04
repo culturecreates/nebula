@@ -36,7 +36,7 @@ Le graphe de connaissances de Artsdata.ca permet au secteur des arts :
 
 Découvrez les classes et les propriétés du modèle. Donnez votre avis et posez des questions.
 
-- [Modèle de données Artsdata](https://culturecreates.github.io/artsdata-data-model/)
+- [Modèle de données Artsdata](https://culturecreates.github.io/artsdata-data-model/index.fr.html)
 - [Infrastructure Artsdata](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
 
 ## Ajoutez vos événements à Artsdata.ca
