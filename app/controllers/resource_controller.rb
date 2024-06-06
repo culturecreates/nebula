@@ -6,14 +6,16 @@ class ResourceController < ApplicationController
   # Use request header 'Accept'
   # TODO: Try to replace this with rack/content_netgotiation
   def show
-    uri = "http://kg.artsdata.ca" + request.path
-
-    format = :html
-    format = :rdf if request.headers['Accept'].include?('application/rdf+xml')
-    format = :jsonld if request.headers['Accept'].include?('application/ld+json')
-    format = :ttl if request.headers['Accept'].include?('text/turtle')
-    
+    uri = "http://kg.artsdata.ca" + request.path # allow testing on domains like localhost
+    format =  if request.headers['Accept'].include?('application/rdf+xml')
+                :rdf
+              elsif request.headers['Accept'].include?('application/ld+json')
+                :jsonld 
+              elsif request.headers['Accept'].include?('text/turtle')
+                :ttl
+              else
+                :html
+              end
     redirect_to entity_path(uri: uri, format: format), status: 303
-
   end
 end
