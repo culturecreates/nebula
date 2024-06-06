@@ -89,6 +89,8 @@ gem 'linkeddata', '~> 3.3.1'
 
 gem 'redcarpet', '~>  3.6.0'
 
+gem 'httparty'
+
 gem 'rack-cors'
 
 # gem 'rdf', '~> 3.2'

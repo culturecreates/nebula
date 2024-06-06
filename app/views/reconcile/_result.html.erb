@@ -1,6 +1,6 @@
 <div class="position-relative">
   <a
-    href="<%= entity_path(uri: result["id"]) %>"
+    href="<%=  send(@route_name, params: {uri: result["id"]}) %>"
     class="
       list-group-item list-group-item-action <%= 'list-group-item-primary zindex-100 aria-current="true"' if result["match"] == true %>
     "
@@ -9,24 +9,19 @@
       <div class="fw-bold">
         <%= result["name"] %>
       </div>
-      <% if result["id"].starts_with?("K") %>
+      <% if result["id"] # .starts_with?("K") %>
         <small>
           <span class="badge bg-secondary rounded-pill"><%= result["id"] %></span>
         </small>
       <% end %>
     </div>
     <p class="mb-1">
-      <%= result["type"].first["name"] %>
+      <%= result["type"].first["name"] if result["type"].present? %>
       <% if result["description"] != "" %>
         -
         <%= result["description"] %>
       <% end %>
-      <% if !result["id"].starts_with?("K") %>
-        <span class='fw-lighter'>
-          -
-          <%= result["id"] %>
-        </span>
-      <% end %>
+
     </p>
   </a>
   <% if @externalUri %>
@@ -38,4 +33,5 @@
     ),
     class: "btn btn-danger btn-sm position-absolute bottom-0 end-0 mb-1" %>
   <% end %>
+
 </div>

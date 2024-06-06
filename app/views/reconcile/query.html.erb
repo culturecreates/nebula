@@ -8,7 +8,7 @@
       <% @result["result"].each do |result| %>
         <%= render partial: "result", locals: { result: result } %>
       <% end %>
-      <%= "No matches" if @result["result"].count == 0 %>
+      <%= "No matches for #{@query}" if @result["result"].count == 0 %>
     </ul>
   </turbo-frame>
 </div>

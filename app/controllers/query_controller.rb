@@ -16,7 +16,8 @@ class QueryController < ApplicationController
     graph = params[:graph]
     construct_files = params[:constructs].split(",") if params[:constructs]
 
-    sparql_client = SPARQL::Client.new("http://db.artsdata.ca/repositories/artsdata")
+    sparql_endpoint = "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
+    sparql_client = SPARQL::Client.new(sparql_endpoint)
     query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph])
     solutions = if !construct_files
                   sparql_client.query(query).limit(1000)

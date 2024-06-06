@@ -2,15 +2,23 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["uri", "button" ]
-  static values = { externaluri: String, classtomint: String, authority: String}
+  static values = { 
+    externaluri: String, 
+    classtomint: String, 
+    authority: String, 
+    mintEndpoint: String,
+    name: String,
+    language: String,
+    reference: String
+  }
 
   connect() {
-    console.log(this.externaluriValue); // logs the value of @your_variable
+    console.log(this.externaluriValue, this.mintEndpointValue); // logs the value of @your_variable
   }
 
   async mintEntity() {
     this.buttonTarget.disabled = true
-    const url = 'https://api.artsdata.ca/mint';
+    const url = this.mintEndpointValue;
     const options = {
       method: 'POST',
       headers: {
@@ -19,7 +27,10 @@ export default class extends Controller {
       body: JSON.stringify({
         "externalUri": this.externaluriValue,
         "classToMint": this.classtomintValue,
-        "publisher": this.authorityValue
+        "publisher": this.authorityValue,
+        "name": this.nameValue,
+        "language": this.languageValue,
+        "reference": this.referenceValue
       })
     }
     const res = await fetch(url, options);

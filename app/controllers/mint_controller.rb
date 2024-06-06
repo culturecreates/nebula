@@ -51,7 +51,7 @@ class MintController < ApplicationController
       @adUri = params[:adUri]
 
       # call link in mint service
-      uri = URI.parse("https://api.artsdata.ca/link") 
+      uri = URI.parse(Rails.application.credentials.artsdata_link_endpoint) 
 
       request = Net::HTTP::Post.new(uri)
       request["Content-Type"] = "application/json"
@@ -83,12 +83,57 @@ class MintController < ApplicationController
     end
   end
 
+  # Mint an existing Wikidata URI
+  # GET /mint/wikidata?wikidata_id=&classToMint=
+  def wikidata
+    @wikidata_place_type = "Q17350442"
+    @wikidata_person_type = "Q5"
+    @wikidata_organization_type = "Q43229"
+    if params[:uri].present?
+      @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
+      @class_to_mint =  if params[:type] == @wikidata_place_type
+                        "schema:Place"
+                      elsif  params[:type] == @wikidata_person_type
+                        "schema:Person"
+                      elsif params[:type] == @wikidata_organization_type
+                        "schema:Organization"
+                      end
+      @name = "Louise Lecavalier"
+      @language = "fr"
+      @reference = "http://www.wikidata.org/specialcase/#{params[:uri]}"
+      @group = 'http://wikidata.org'
+    end
+    if params[:wikidata_search].present?
+      # reconile name and type against wikidata even when the user entered a QID 
+      # to ensure they have the right entity and type to mint
+      # and show other close matches incase there are duplicated in Wikidata
+      @wikidata_data = {}
+      if params[:wikidata_search] =~ /\AQ\d+\z/ 
+        @wikidata_data[:label] = params[:wikidata_search]
+      elsif params[:wikidata_search] =~ /\Ahttp/
+        qid = params[:wikidata_search].split("/").last
+        @wikidata_data[:label] = convert_id_to_name(qid)
+      else
+        @wikidata_data[:label] = params[:wikidata_search] 
+      end
+      @wikidata_data[:type] = params[:type] if params[:type]
+    end
+  end
+
   private
 
+  def convert_id_to_name(wikidata_id)
+    sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
+    select_query = "select * where {<http://www.wikidata.org/entity/#{wikidata_id}> rdfs:label ?label. filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
+    solutions = sparql.query(select_query)
+    solutions.first.label.to_s if solutions.first&.bound?(:label)
+  end
+
+
   def set_authority
-    externalUri = params[:externalUri]
     return unless params[:externalUri]
 
+    externalUri = params[:externalUri]
     if externalUri.starts_with?("http://scenepro.ca")
       @authority = "http://kg.artsdata.ca/resource/K14-90"
     elsif externalUri.starts_with?("http://kg.footlight.io") || externalUri.starts_with?("http://api.footlight.io")
