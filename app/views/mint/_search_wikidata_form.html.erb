@@ -1,0 +1,58 @@
+<%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container') do |form| %>
+  <div class="row mb-3">
+    <div class="col">
+      <input
+        type="radio"
+        class="btn-check"
+        name="type"
+        id="person"
+        value="<%= @wikidata_person_type %>"
+        autocomplete="off"
+        <%= "checked" if type == @wikidata_person_type || type.nil? %>
+      >
+      <%= form.label :person, "Person", class: "btn btn-secondary-outlined w-100" %>
+    </div>
+    <div class="col">
+      <input
+        disabled
+        type="radio"
+        class="btn-check"
+        name="type"
+        id="organization"
+        value="<%= @wikidata_organization_type %>"
+        autocomplete="off"
+        <%= "checked" if type == @wikidata_organization_type %>
+      >
+      <%= form.label :organization,
+                 "Organization",
+                 class: "btn btn-secondary-outlined w-100" %>
+    </div>
+    <div class="col">
+      <input
+        disabled
+        type="radio"
+        class="btn-check"
+        name="type"
+        id="place"
+        value="<%= wikidata_place_type %>"
+        autocomplete="off"
+        <%= "checked" if type == wikidata_place_type  %>
+      >
+      <%= form.label :place, "Place", class: "btn btn-secondary-outlined w-100" %>
+    </div>
+
+  </div>
+
+  <div class="row mb-3">
+    <div class="col">
+      <div class="input-group">
+        <%= form.text_field :wikidata_search,
+                        class: "form-control",
+                        value: wikidata_search,
+                        placeholder: "Name or Wikidata ID" %>
+        <%= form.submit "Search Wikidata", class: "btn btn-primary w-10" %>
+      </div>
+    </div>
+  </div>
+
+<% end %>

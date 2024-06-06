@@ -1,6 +1,6 @@
 <div class="position-relative">
   <a
-    href="<%=  send(@route_name, params: {uri: result["id"]}) %>"
+    href="<%=  send(@route_name, params: {uri: result["id"], type: type}) %>"
     class="
       list-group-item list-group-item-action <%= 'list-group-item-primary zindex-100 aria-current="true"' if result["match"] == true %>
     "

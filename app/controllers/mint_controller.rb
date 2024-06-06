@@ -89,7 +89,8 @@ class MintController < ApplicationController
     @wikidata_place_type = "Q17350442"
     @wikidata_person_type = "Q5"
     @wikidata_organization_type = "Q43229"
-    if params[:uri].present?
+    # if validating choice
+    if params[:uri].present? 
       @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
       @class_to_mint =  if params[:type] == @wikidata_place_type
                         "schema:Place"
@@ -98,11 +99,19 @@ class MintController < ApplicationController
                       elsif params[:type] == @wikidata_organization_type
                         "schema:Organization"
                       end
-      @name = "Louise Lecavalier"
-      @language = "fr"
-      @reference = "http://www.wikidata.org/specialcase/#{params[:uri]}"
+      
+
+
+      # call wikidata sparql to get more data
+      sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
+      select_query = "select * where {<http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label. filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
+      solutions = sparql.query(select_query)
+      @name = solutions.first.label.to_s if solutions.first&.bound?(:label)
+      @language = "en"
+      @reference = "http://www.wikidata.org/entity/#{params[:uri]}"
       @group = 'http://wikidata.org'
     end
+
     if params[:wikidata_search].present?
       # reconile name and type against wikidata even when the user entered a QID 
       # to ensure they have the right entity and type to mint

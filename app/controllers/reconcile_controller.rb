@@ -22,13 +22,10 @@ class ReconcileController < ApplicationController
       recon_service = ReconService.new(recon_uri)
       response = recon_service.query_party(params)
     
-      if response.code.to_s.include?("200")
-
-      
+      # TODO: bring back this native solution instead of HTTParty
       # uri = URI.parse(Rails.application.credentials.recon_endpoint) 
       # request = Net::HTTP::Get.new(uri)
       # request["Content-Type"] = "application/json"
-
       # body_hash = {
       #   "query" => @query,
       #   "type" =>  @type
@@ -37,15 +34,14 @@ class ReconcileController < ApplicationController
       #   body_hash["properties"] = [{pid: "schema:address/schema:postalCode", v: @postalCode}]
       # end
       # request.body = JSON.dump(body_hash)
-  
       # req_options = {
       #   use_ssl: uri.scheme == "https",
       # }
-
       # response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
       #   http.request(request)
       # end
-     # if response.code == "200"
+
+      if response.code.to_s.include?("200")
         @result = JSON.parse(response.body)
         @result = @result["q0"] if @result["q0"] 
         # puts "@result: #{@result}"

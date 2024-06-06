@@ -5,20 +5,26 @@ export default class extends Controller {
   static values = { 
     externaluri: String, 
     classtomint: String, 
-    authority: String, 
-    mintEndpoint: String,
     name: String,
+    authority: String, 
+    mintendpoint: String,
     language: String,
     reference: String
   }
 
   connect() {
-    console.log(this.externaluriValue, this.mintEndpointValue); // logs the value of @your_variable
+    console.log("externaluri", this.externaluriValue)
+    console.log("classtomint", this.classtomintValue)
+    console.log("name", this.nameValue)
+    console.log("authority", this.authorityValue)
+    console.log("mintendpoint",  this.mintendpointValue)
+    console.log("language", this.languageValue)
+    console.log("reference", this.referenceValue)
   }
 
   async mintEntity() {
     this.buttonTarget.disabled = true
-    const url = this.mintEndpointValue;
+    const url = this.mintendpointValue;
     const options = {
       method: 'POST',
       headers: {

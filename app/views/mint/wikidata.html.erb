@@ -3,72 +3,23 @@
     Mint using Wikidata
   </h1>
   <p>
-    If you know the name or Wikidata ID, you can add it to Artsdata here. Start
-    by selecting the type and seaching with the name or Wikidata ID. You will
-    be asked to confirm the Wikidata entity before proceeding to mint an
-    Artsdata Identifier.
+    Add Wikidata people, places and organizations to Artsdata. Start by
+    selecting the type and entering the name or Wikidata ID. You will be asked
+    to confirm the Wikidata entity before proceeding to mint an Artsdata
+    Identifier.
   </p>
 
-  <%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container') do |form| %>
-    <div class="row mb-3">
-      <div class="col">
-        <input
-          type="radio"
-          class="btn-check"
-          name="type"
-          id="place"
-          value="<%= @wikidata_place_type %>"
-          autocomplete="off"
-          <%= "checked" if params[:type] == @wikidata_place_type || params[:type].nil? %>
-        >
-        <%= form.label :place, "Place", class: "btn btn-secondary-outlined w-100" %>
-      </div>
-      <div class="col">
-        <input
-          type="radio"
-          class="btn-check"
-          name="type"
-          id="person"
-          value="<%= @wikidata_person_type %>"
-          autocomplete="off"
-          <%= "checked" if params[:type] == @wikidata_person_type %>
-        >
-        <%= form.label :person, "Person", class: "btn btn-secondary-outlined w-100" %>
-      </div>
-      <div class="col">
-        <input
-          type="radio"
-          class="btn-check"
-          name="type"
-          id="organization"
-          value="<%= @wikidata_person_type %>"
-          autocomplete="off"
-          <%= "checked" if params[:type] == @wikidata_person_type %>
-        >
-        <%= form.label :organization,
-                   "Organization",
-                   class: "btn btn-secondary-outlined w-100" %>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <div class="input-group">
-          <%= form.text_field :wikidata_search,
-                          class: "form-control",
-                          value: params[:wikidata_search],
-                          placeholder: "Name or Wikidata ID" %>
-          <%= form.submit "Search", class: "btn btn-primary w-10" %>
-        </div>
-      </div>
-    </div>
-
-  <% end %>
+  <%= render partial: "search_wikidata_form",
+  locals: {
+    type: params[:type],
+    wikidata_place_type: @wikidata_place_type,
+    wikidata_search: params[:wikidata_search],
+  } %>
 
   <% if @wikidata_data %>
 
     <h4>
-      Confirm
+      Select the Wikidata entity to mint
     </h4>
     <turbo-frame
       id='recon_results'
@@ -76,7 +27,7 @@
       loading="lazy"
       target="_top"
     >
-      loading...
+      Reconciling with Wikidata...
     </turbo-frame>
   <% end %>
 
@@ -98,18 +49,30 @@
             <%= @external_uri %>
           </div>
         </p>
-        <!-- Then all Wikidata to get: A label in a language . The annotations
+        <p><%= session[:name] %>
+          acting on behalf of the authority</p>
+        <p>
+          <turbo-frame
+            id='card-3'
+            src="<%= dereference_card_path(uri: @group, frame_id: "3")%>"
+            loading="lazy"
+            target="_top"
+          >
+            loading...
+          </turbo-frame>
+        </p>
+        <!-- Then call Wikidata to get: A label in a language . The annotations
         can be generated locally using the group and the date. Specific to the
         type: places need complete address people recommended occupation
-        organization recommended url, location or complete address Use shacl to
-        get the required and recommended fields per class. Display all fields
-        with SHACL violations. All fields editable. Blank fields shown and
-        editable. Show reconcile with Artsdata (and link button to avoid
+        organization recommended url, location or complete address. Use shacl
+        to get the required and recommended fields per class. Display all
+        fields with SHACL violations. All fields editable. Blank fields shown
+        and editable. Show reconcile with Artsdata (and link button to avoid
         minting): place uses postal code, person uses name, organization uses
         name. -->
         <div
-          data-artsdata-mint-endpoint-value="<%= Rails.application.credentials.artsdata_mint_endpoint %>"
           data-controller="artsdata"
+          data-artsdata-mintendpoint-value="<%= Rails.application.credentials.artsdata_mint_endpoint %>"
           data-artsdata-externaluri-value="<%= @external_uri %>"
           data-artsdata-classtomint-value="<%= @class_to_mint %>"
           data-artsdata-authority-value="<%=  @group %>"
@@ -128,14 +91,13 @@
           </p>
         </div>
       </div>
+      <!-- Second column content goes here -->
       <div class="col-md">
-        <!-- Second column content goes here -->
-        <p>Checking Artsdata for existing match:</p>
-        <ul>
-          <li><%= @name %></li>
-          <li><%= @class_to_mint %></li>
 
-        </ul>
+        <h4>Reconcile Check</h4>
+        <p>Check to make sure the entity does not already exist in Artsdata. If
+          it appears in this list then link instead of mint.</p>
+
         <turbo-frame
           id='recon_results'
           src="<%= reconcile_query_path(query: @name, type: @class_to_mint, externalUri: @external_uri)%>"
