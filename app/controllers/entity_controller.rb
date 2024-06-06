@@ -13,12 +13,11 @@ class EntityController < ApplicationController
     respond_to do |format|
       format.jsonld {
         # see https://json-ld.github.io/json-ld.org/spec/latest/json-ld-api-best-practices/
-        puts "rendering jsonld..."
         nebula_context_url = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
         @entity.load_graph_without_triple_terms
         jsonld = JSON::LD::API::fromRdf(@entity.graph)
         if @entity.type
-          frame = JSON.parse %({"@type": "#{@entity.type.value}"})
+          frame = JSON.parse %({"@type": "#{@entity.type.value}",  "@embed": "@once"}) # Default is @once
           jsonld = JSON::LD::API.frame(jsonld, frame)
         end
         compacted_jsonld = JSON::LD::API.compact(jsonld, JSON::LD::Context.new().parse(nebula_context_url))

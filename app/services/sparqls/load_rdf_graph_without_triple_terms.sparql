@@ -17,6 +17,9 @@ CONSTRUCT {
 
     ?bns ?bnp ?2bns .
     ?2bns ?2bnp ?2bno .
+
+    ?2bno ?2bnp ?3bns .
+    ?3bns ?3bnp ?3bno .
 }
 FROM onto:explicit 
 WHERE {
@@ -30,6 +33,7 @@ WHERE {
   OPTIONAL {
     ?s ?p ?o_hash .
     filter(contains(str(?o_hash), "#"))
+    filter(?p != schema:sameAs)
     ?o_hash ?p_hash ?2o_hash .
   }
 
@@ -46,6 +50,16 @@ WHERE {
         ?bns ?bnp ?2bns .
         filter(isBLANK(?2bns))
         ?2bns ?2bnp ?2bno .
+    }
+
+    # third level blank nodes
+    OPTIONAL {
+        ?bns ?bnp ?2bns .
+        filter(isBLANK(?2bns))
+        ?2bns ?2bnp ?2bno .
+        ?2bno ?2bnp ?3bns .
+        filter(isBLANK(?3bns))
+        ?3bns ?3bnp ?3bno .
     }
   }
 }
