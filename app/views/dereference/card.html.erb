@@ -15,10 +15,18 @@ Test:
     <% elsif solution && solution[:label] %>
       <b><%= display_object(solution[:label]) %></b>
       <div class="alternate-name">
-        <%= display_object(solution[:type]) %>
+        <%= solution[:type].to_s.split("/").last %>
+        <% if solution && solution[:location] %>
+          -
+          <%= solution[:location] %>
+        <% end %>
         <% if solution && solution[:startDate] %>
           -
-          <%= display_object(solution[:startDate]) %>
+          <%= solution[:startDate] %>
+        <% end %>
+        <% if solution && solution[:addressLocality] %>
+          -
+          <%= display_object(solution[:addressLocality]) %>
         <% end %>
         <% if solution && solution[:postalCode] %>
           -
