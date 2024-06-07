@@ -41,7 +41,7 @@
           Based on:
           <div class="statement-object">
             <b>
-              <%= @name %>
+              <%= @label %>
             </b>
             <div class="alternate-name">
               <%= @class_to_mint %>
@@ -100,7 +100,7 @@
 
         <turbo-frame
           id='recon_results'
-          src="<%= reconcile_query_path(query: @name, type: @class_to_mint, externalUri: @external_uri)%>"
+          src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri)%>"
           loading="lazy"
           target="_top"
         >

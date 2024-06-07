@@ -33,7 +33,6 @@ class MintController < ApplicationController
           object: nil
         }
         @reference =  @entity.graph.query(reference)&.first&.object.value
-        
       end
 
       if !@label
