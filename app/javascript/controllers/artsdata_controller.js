@@ -5,7 +5,7 @@ export default class extends Controller {
   static values = { 
     externaluri: String, 
     classtomint: String, 
-    name: String,
+    label: String,
     authority: String, 
     mintendpoint: String,
     language: String,
@@ -15,7 +15,7 @@ export default class extends Controller {
   connect() {
     console.log("externaluri", this.externaluriValue)
     console.log("classtomint", this.classtomintValue)
-    console.log("name", this.nameValue)
+    console.log("label", this.labelValue)
     console.log("authority", this.authorityValue)
     console.log("mintendpoint",  this.mintendpointValue)
     console.log("language", this.languageValue)
@@ -34,7 +34,7 @@ export default class extends Controller {
         "externalUri": this.externaluriValue,
         "classToMint": this.classtomintValue,
         "publisher": this.authorityValue,
-        "name": this.nameValue,
+        "name": this.labelValue,
         "language": this.languageValue,
         "reference": this.referenceValue
       })

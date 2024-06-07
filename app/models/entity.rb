@@ -67,7 +67,9 @@ class Entity
       'URI_PLACEHOLDER', self.entity_uri
     ])
     
+    puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
+
   end
 
   # load rdf from external URL

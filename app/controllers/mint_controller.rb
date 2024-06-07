@@ -11,20 +11,30 @@ class MintController < ApplicationController
       @externalUri = params[:externalUri]
       @classToMint = params[:classToMint]
       @label = params[:label]
-
+      @reference =  params[:reference]
       # get extra data about the entity
       # replace this with a SHACL validation
       @entity = Entity.new(entity_uri: @externalUri)
       @entity.load_card
+      puts "GRAPH: #{@entity.graph.dump(:ttl)}"
       solution =  dereference_helper(@externalUri)
       
+      puts "SOLUTION: #{solution}"
+      if !@reference
+        @reference = solution.dataid if solution && solution.bound?(:dataid)
+      end
+
       if !@label
         @label = solution.label if solution.bound?(:label)
       end
+      
+      @language = solution.label&.language&.to_s if solution.bound?(:label)
+  
 
       if !@classToMint
         @classToMint = solution.type if solution.bound?(:type)
       end
+      
       if  !@classToMint.starts_with?("http") 
         @classToMint = "http://schema.org/" + @classToMint
       end
@@ -106,7 +116,7 @@ class MintController < ApplicationController
       sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
       select_query = "select * where {<http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label. filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
       solutions = sparql.query(select_query)
-      @name = solutions.first.label.to_s if solutions.first&.bound?(:label)
+      @label = solutions.first.label.to_s if solutions.first&.bound?(:label)
       @language = "en"
       @reference = "http://www.wikidata.org/entity/#{params[:uri]}"
       @group = 'http://wikidata.org'

@@ -26,11 +26,11 @@ Test:
         <% end %>
         <% if solution && solution[:addressLocality] %>
           -
-          <%= display_object(solution[:addressLocality]) %>
+          <%= solution[:addressLocality] %>
         <% end %>
         <% if solution && solution[:postalCode] %>
           -
-          <%= display_object(solution[:postalCode]) %>
+          <%= solution[:postalCode] %>
         <% end %>
       </div>
       <%= display_object(RDF.URI(@uri)) %>

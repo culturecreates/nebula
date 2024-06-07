@@ -7,7 +7,8 @@ construct {
   <http://schema.org/addressLocality> ?locality ;  
   <http://schema.org/postalCode> ?postalCode ;
   <http://schema.org/startDate> ?startDate ;
-  <http://schema.org/location> ?place_name .
+  <http://schema.org/location> ?place_name ;
+  <http://www.w3.org/ns/prov#wasDerivedFrom> ?dataid .
 } 
 where { 
   OPTIONAL { <URI_PLACEHOLDER> <http://www.w3.org/2000/01/rdf-schema#label> ?c .}
@@ -18,7 +19,9 @@ where {
     OPTIONAL { <URI_PLACEHOLDER>   <http://schema.org/streetAddress> ?street ; 
       <http://schema.org/addressLocality> ?locality ;
       <http://schema.org/postalCode> ?postalCode . } 
+       ?g <http://www.w3.org/ns/prov#wasDerivedFrom> ?dataid .
   }
+ 
   OPTIONAL { <URI_PLACEHOLDER> <http://schema.org/location>/<http://schema.org/name> ?place_name .}
   OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/postalCode> ?postalCode . }
   OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/addressLocality> ?locality . }
