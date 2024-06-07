@@ -45,6 +45,10 @@
             </b>
             <div class="alternate-name">
               <%= @class_to_mint %>
+              <% if @description.present? %>
+                -
+                <%= @description %>
+              <% end %>
             </div>
             <%= @external_uri %>
           </div>

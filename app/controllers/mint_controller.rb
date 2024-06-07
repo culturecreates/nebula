@@ -72,7 +72,8 @@ class MintController < ApplicationController
       @adUri = params[:adUri]
 
       # call link in mint service
-      uri = URI.parse(Rails.application.credentials.artsdata_link_endpoint) 
+      artsdata_link_endpoint = Rails.application.credentials.artsdata_link_endpoint
+      uri = URI.parse(artsdata_link_endpoint) 
 
       request = Net::HTTP::Post.new(uri)
       request["Content-Type"] = "application/json"
@@ -125,9 +126,10 @@ class MintController < ApplicationController
 
       # call wikidata sparql to get more data
       sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
-      select_query = "select * where {<http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label. filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
+      select_query = "select * where {<http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label ; schema:description ?desc . filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
       solutions = sparql.query(select_query)
       @label = solutions.first.label.to_s if solutions.first&.bound?(:label)
+      @description = solutions.first.desc.to_s if solutions.first&.bound?(:desc)
       @language = "en"
       @reference = "http://www.wikidata.org/entity/#{params[:uri]}"
       @group = 'http://wikidata.org'
