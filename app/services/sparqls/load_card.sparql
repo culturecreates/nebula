@@ -19,7 +19,9 @@ where {
     OPTIONAL { <URI_PLACEHOLDER>   <http://schema.org/streetAddress> ?street ; 
       <http://schema.org/addressLocality> ?locality ;
       <http://schema.org/postalCode> ?postalCode . } 
-       ?g <http://www.w3.org/ns/prov#wasDerivedFrom> ?dataid .
+    OPTIONAL {
+      ?g <http://www.w3.org/ns/prov#wasDerivedFrom> ?dataid .
+    }
   }
  
   OPTIONAL { <URI_PLACEHOLDER> <http://schema.org/location>/<http://schema.org/name> ?place_name .}

@@ -44,7 +44,6 @@ class ReconcileController < ApplicationController
       if response.code.to_s.include?("200")
         @result = JSON.parse(response.body)
         @result = @result["q0"] if @result["q0"] 
-        # puts "@result: #{@result}"
       else
         flash.alert = "Error: #{response.code} - #{response.message}"
         redirect_back(fallback_location: root_path)

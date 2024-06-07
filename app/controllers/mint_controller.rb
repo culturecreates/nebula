@@ -3,8 +3,15 @@ class MintController < ApplicationController
   before_action :set_authority, only: [:preview, :link] # known as publisher in Artsdata API
   include DereferenceHelper 
 
-  # show tools to mint a new Artsdata URI
-  # GET /mint/preview?externalUri=&classToMint=
+  # show data before minting a new Artsdata URI
+  # GET /mint/preview
+  #   externalUri (required)
+  #   classToMint
+  #   label
+  #   language
+  #   reference
+  #   postalCode
+  #   startDate
   def preview
     required = [:externalUri]
     if required.all? { |k| params.key? k } && @authority
@@ -12,16 +19,21 @@ class MintController < ApplicationController
       @classToMint = params[:classToMint]
       @label = params[:label]
       @reference =  params[:reference]
+
       # get extra data about the entity
-      # replace this with a SHACL validation
       @entity = Entity.new(entity_uri: @externalUri)
       @entity.load_card
-      puts "GRAPH: #{@entity.graph.dump(:ttl)}"
+     
       solution =  dereference_helper(@externalUri)
-      
-      puts "SOLUTION: #{solution}"
+    
       if !@reference
-        @reference = solution.dataid if solution && solution.bound?(:dataid)
+        reference = {
+          subject: RDF::URI(@externalUri),
+          predicate: RDF::URI("http://www.w3.org/ns/prov#wasDerivedFrom"),
+          object: nil
+        }
+        @reference =  @entity.graph.query(reference)&.first&.object.value
+        
       end
 
       if !@label

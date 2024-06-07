@@ -49,8 +49,21 @@
       "name":{
         "@id": "schema:name",
         "@container": "@language"
-      },"description":{
+      },
+      "description":{
         "@id": "schema:description",
+        "@container": "@language"
+      },
+      "disambiguatingDescription":{
+        "@id": "schema:disambiguatingDescription",
+        "@container": "@language"
+      },
+      "skos:definition":{
+        "@id": "skos:definition",
+        "@container": "@language"
+      },
+      "skos:prefLabel":{
+        "@id": "skos:prefLabel",
         "@container": "@language"
       }
     }

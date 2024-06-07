@@ -4,7 +4,6 @@ Test:
 
   <div class="statement-object">
     <% solution = dereference_helper(@uri) %>
-    <% puts "solution: #{solution.inspect}" %>
     <% if solution && solution[:streetAddress] %>
       <b>
         <%= solution[:streetAddress] %>,
