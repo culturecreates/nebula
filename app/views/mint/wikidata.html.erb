@@ -94,6 +94,17 @@
           <p data-artsdata-target="uri">
           </p>
         </div>
+        <p>
+          <turbo-frame
+            id='card-validation'
+            src="<%= validate_path(uri: @external_uri)%>"
+            loading="lazy"
+            target="_top"
+          >
+            validating...
+          </turbo-frame>
+        </p>
+
       </div>
       <!-- Second column content goes here -->
       <div class="col-md">

@@ -58,6 +58,22 @@
         "@id": "schema:disambiguatingDescription",
         "@container": "@language"
       },
+      "streetAddress":{
+        "@id": "schema:streetAddress",
+        "@container": "@language"
+      },
+      "addressLocality":{
+        "@id": "schema:addressLocality",
+        "@container": "@language"
+      },
+      "addressRegion":{
+        "@id": "schema:addressRegion",
+        "@container": "@language"
+      },
+      "addressCountry":{
+        "@id": "schema:addressCountry",
+        "@container": "@language"
+      },
       "skos:definition":{
         "@id": "skos:definition",
         "@container": "@language"
