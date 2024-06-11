@@ -1,0 +1,21 @@
+# This SPARQL checks if there is a mismatch with bidirectional linking to Wikidata
+# Note: Some wikidata entities have an owl:sameAs
+PREFIX schema: <http://schema.org/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select ?artsdata (sample(?names) as ?name) ?wdid ?wikidata_linked_to  (sample(?wd_ad_name) as ?wikidata_linked_to_name)
+WHERE {
+    ?artsdata schema:sameAs ?wdid ;
+              schema:name ?names .
+    filter(contains(str(?artsdata),"artsdata.ca/resource/K"))
+    filter(contains(str(?wdid),"wikidata.org"))
+    SERVICE <https://query.wikidata.org/sparql>
+    {
+        ?wdid   wdt:P7627   ?adid  .
+    }
+    bind(URI(concat("http://kg.artsdata.ca/resource/",?adid)) as ?wikidata_linked_to)
+    ?wikidata_linked_to schema:name ?wd_ad_name .
+    filter (?artsdata != ?wikidata_linked_to)
+} group by ?artsdata ?wdid ?wikidata_linked_to
