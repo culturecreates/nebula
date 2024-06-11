@@ -40,7 +40,7 @@ class ValidateController < ApplicationController
           <#{uri}> <http://www.wikidata.org/prop/direct/P213> ?isni .
           BIND (URI(CONCAT(\"https://isni.org/isni/\",?isni)) as ?isniuri)
         }
-        OPTIONAL { <#{uri}> <http://www.wikidata.org/prop/direct-normalized/P434> ?music_brainz .
+        OPTIONAL { <#{uri}> <http://www.wikidata.org/prop/direct-normalized/P434> ?music_brainz .}
       }
     SPARQL
       @entity.graph = RDF::Graph.new << response 

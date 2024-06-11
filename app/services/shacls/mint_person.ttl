@@ -15,7 +15,7 @@ ads:PersonShape
 
 ads:SameAsSh
     sh:path schema:sameAs ;
-    sh:minCount 1 ;
+    sh:minCount 0 ;
     sh:not ( [sh:pattern "http://kg.artsdata.ca/.*" ;] ) ;
     sh:not ads:containsSpaces ;
     sh:not ads:containsAtSign ;
