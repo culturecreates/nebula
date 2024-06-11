@@ -66,9 +66,7 @@
           class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "Mint using Wikidata",
-          mint_wikidata_path,
-          class: "nav-link" %>
+          <%= link_to "Mint using Wikidata", mint_wikidata_path, class: "nav-link" %>
         </li>
 
         <li class="nav-item dropdown">
@@ -99,6 +97,10 @@
             </li>
             <li><%= link_to "Places with Events",
               query_show_path(sparql: "custom/places", title: "Places with Events"),
+              class: "dropdown-item" %>
+            </li>
+            <li><%= link_to "Recently added People",
+              query_show_path(sparql: "custom/people", title: "Recently added People"),
               class: "dropdown-item" %>
             </li>
             <li><%= link_to "LaVitrine Pipeline",
