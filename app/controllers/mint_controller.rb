@@ -126,7 +126,14 @@ class MintController < ApplicationController
 
       # call wikidata sparql to get more data
       sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
-      select_query = "select * where {<http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label ; schema:description ?desc . filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
+      select_query = <<-SPARQL
+        select * where {
+          <http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label ; 
+          schema:description ?desc . 
+          filter (lang(?label) = 'en' || lang(?label) = 'fr') 
+          filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
+        }
+      SPARQL
       solutions = sparql.query(select_query)
       @label = solutions.first.label.to_s if solutions.first&.bound?(:label)
       @description = solutions.first.desc.to_s if solutions.first&.bound?(:desc)
