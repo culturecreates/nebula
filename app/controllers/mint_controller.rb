@@ -39,7 +39,7 @@ class MintController < ApplicationController
         @label = solution.label if solution.bound?(:label)
       end
       
-      @language = solution.label&.language&.to_s if solution.bound?(:label)
+      @language = solution.label&.language&.to_s if solution&.bound?(:label)
   
 
       if !@classToMint
@@ -51,8 +51,8 @@ class MintController < ApplicationController
       end
 
 
-      @postalCode = solution.postalCode if solution.bound?(:postalCode)
-      @startDate = solution.startDate if solution.bound?(:startDate)
+      @postalCode = solution.postalCode if solution&.bound?(:postalCode)
+      @startDate = solution.startDate if solution&.bound?(:startDate)
     else 
       flash.now.alert = "Missing a required param. Required list: #{required}"
     end
