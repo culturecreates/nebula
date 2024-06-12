@@ -6,14 +6,13 @@
   </h1>
   <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
 </div>
-
-<div class="table-responsive">
+<div class="table">
   <table
     data-controller="sortable-table"
     data-sortable-table-target="table"
-    class="table table-hover"
+    class="table table-hover table-striped"
   >
-    <thead>
+    <thead class="sticky-top">
       <tr>
         <th scope="col">#</th>
         <% solutions.variable_names.each do |head| %>

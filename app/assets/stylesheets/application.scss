@@ -103,4 +103,9 @@ a:hover {
   content: "▼";
 }
 
+.sticky-top {
+  top: 0;
+  z-index: 1020;
+}
+
 
