@@ -32,13 +32,12 @@
   <% end %>
 
   <% if @external_uri %>
-
     <div class="row">
       <div class="col-md">
         <p>
           <turbo-frame
             id='card-validation'
-            src="<%= validate_path(uri: @external_uri)%>"
+            src="<%= validate_path(uri: @external_uri, class_to_mint: @class_to_mint)%>"
             loading="lazy"
             target="_top"
           >

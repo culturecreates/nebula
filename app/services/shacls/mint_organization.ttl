@@ -1,0 +1,34 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ads: <http://kg.artsdata.ca/shacl/> .
+
+ads:OrganizationShape
+    a sh:NodeShape ;
+    sh:targetClass schema:Organization ;
+    sh:property ads:NameSh, 
+                ads:SameAsSh .
+
+
+ads:SameAsSh
+    sh:path schema:sameAs ;
+    sh:minCount 0 ;
+    sh:not ( [sh:pattern "http://kg.artsdata.ca/.*" ;] ) ;
+    sh:not ads:containsSpaces ;
+    sh:not ads:containsAtSign ;
+    sh:description "sameAs properties must be URIs and start with http and not contain spaces or @" ;
+    sh:nodeKind sh:IRI .
+
+ads:NameSh
+    sh:path schema:name ;
+    sh:uniqueLang true ;
+    sh:name "Name of event" ;
+    sh:description "The name of the event."@en ;
+    sh:minCount 2 ;
+    sh:or ( 
+        [sh:datatype rdf:langString ;] 
+        [sh:datatype xsd:string ;]
+    ) .

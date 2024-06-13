@@ -1,0 +1,36 @@
+ CONSTRUCT { 
+        <EXTERNAL_URI> a schema:Person ; 
+        schema:name ?name ; 
+        schema:sameAs ?aduri ;
+        schema:description ?desc ;
+        schema:gender ?gender ;
+        schema:occupation ?occupation ;
+        schema:birthDate ?birth_date ;
+        schema:birthPlace ?birth_place ;
+        schema:url ?url ;
+        schema:sameAs ?isniuri , ?music_brainz .
+      } 
+      WHERE { 
+        <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
+        filter (lang(?name) = 'en' || lang(?name) = 'fr')
+
+        OPTIONAL { 
+          <EXTERNAL_URI>  schema:description ?desc . 
+          filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
+        }
+          
+        OPTIONAL { 
+          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P7627> ?adid  .
+          BIND (URI(CONCAT("http://kg.artsdata.ca/resource/",?adid)) as ?aduri) 
+        }
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P21> ?gender .}
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P106> ?occupation .}
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P19> ?birth_place .}
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P569> ?birth_date .}
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P856> ?url .}
+        OPTIONAL { 
+          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P213> ?isni .
+          BIND (URI(CONCAT("https://isni.org/isni/",?isni)) as ?isniuri)
+        }
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct-normalized/P434> ?music_brainz .}
+      }
