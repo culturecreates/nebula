@@ -99,8 +99,11 @@
               query_show_path(sparql: "custom/places", title: "Places with Events"),
               class: "dropdown-item" %>
             </li>
-            <li><%= link_to "Recently added People",
-              query_show_path(sparql: "custom/people", title: "Recently added People"),
+            <li><%= link_to "Recently added People/Organizations",
+              query_show_path(
+                sparql: "custom/people_organizations",
+                title: "Recently added People/Organizations",
+              ),
               class: "dropdown-item" %>
             </li>
             <li><%= link_to "LaVitrine Pipeline",
