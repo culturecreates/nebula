@@ -12,6 +12,7 @@
                    "nav-link #{"active" if type == @wikidata_person_type || type.nil?}",
                  data: {
                    bs_toggle: "tab",
+                   bs_target: "#person-content",
                  } %>
     </li>
     <li class="nav-item" role="presentation">
@@ -25,6 +26,7 @@
                  class: "nav-link #{"active" if type == @wikidata_organization_type}",
                  data: {
                    bs_toggle: "tab",
+                   bs_target: "#organization-content",
                  } %>
     </li>
     <li class="nav-item" role="presentation">
@@ -38,9 +40,41 @@
                  class: "nav-link disabled",
                  data: {
                    bs_toggle: "tab",
+                   bs_target: "#place-content",
                  } %>
     </li>
   </ul>
+  <!-- Tab content -->
+  <div class="tab-content" id="myTabContent">
+
+    <div
+      class="tab-pane fade <%= "show active" if type == @wikidata_person_type %>"
+      id="person-content"
+      role="tabpanel"
+    >
+      <!-- Content for the "Person" tab -->
+      <p>Wikidata entities that are instances of human (Q5)
+      </p>
+    </div>
+    <div
+      class="tab-pane fade <%= "show active" if type == @wikidata_organization_type %>"
+      id="organization-content"
+      role="tabpanel"
+    >
+      <!-- Content for the "Organization" tab -->
+      <p>
+        Wikidata entities that are instances of organization (Q43229). This
+        includes groups of performers and presenting organizations.</p>
+    </div>
+    <div
+      class="tab-pane fade <%= "show active" if type == @wikidata_place_type %>"
+      id="place-content"
+      role="tabpanel"
+    >
+      <!-- Content for the "Place" tab --> Venue (Q17350442): place used for
+      some activity
+    </div>
+  </div>
 
   <div class="row mb-3">
     <div class="col">
