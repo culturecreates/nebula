@@ -1,12 +1,9 @@
 <div class="container">
   <h1>
-    Mint using Wikidata
+    <%= t("minting_wikidata.title") %>
   </h1>
   <p>
-    Add Wikidata people, places and organizations to Artsdata. Start by
-    selecting the type and entering the name or Wikidata ID. You will be asked
-    to confirm the Wikidata entity before proceeding to mint an Artsdata
-    Identifier.
+    <%= t("minting_wikidata.sub_title") %>
   </p>
 
   <%= render partial: "search_wikidata_form",

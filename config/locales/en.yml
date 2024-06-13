@@ -35,3 +35,13 @@ en:
   Search Results: "Search Results"
   Welcome back: "Welcome back"
   dashboard_title: "Dashboard for "
+  minting_wikidata:
+    title: "Mint using Wikidata"
+    sub_title: "Add Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to mint an Artsdata Identifier."
+    person_tab: "Person"
+    person_description: "Wikidata entities that are instances of human (Q5)."
+    organization_tab: "Organization"
+    organization_description: "Wikidata entities that are instances of organization (Q43229). This includes groups of performers and presenting organizations."
+    place_tab: "Place"
+    place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
+    search_placeholder: "Name or Wikidata ID"

@@ -7,7 +7,7 @@
                         id: "person",
                         checked: type == @wikidata_person_type || type.nil? %>
       <%= form.label :person,
-                 "Person",
+                 t("minting_wikidata.person_tab"),
                  class:
                    "nav-link #{"active" if type == @wikidata_person_type || type.nil?}",
                  data: {
@@ -22,7 +22,7 @@
                         id: "organization",
                         checked: type == @wikidata_organization_type %>
       <%= form.label :organization,
-                 "Organization",
+                 t("minting_wikidata.organization_tab"),
                  class: "nav-link #{"active" if type == @wikidata_organization_type}",
                  data: {
                    bs_toggle: "tab",
@@ -36,7 +36,7 @@
                         id: "place",
                         disabled: true %>
       <%= form.label :place,
-                 "Place",
+                 t("minting_wikidata.place_tab"),
                  class: "nav-link disabled",
                  data: {
                    bs_toggle: "tab",
@@ -48,12 +48,12 @@
   <div class="tab-content" id="myTabContent">
 
     <div
-      class="tab-pane fade <%= "show active" if type == @wikidata_person_type %>"
+      class="tab-pane fade <%= "show active" if type == @wikidata_person_type || type.nil? %>"
       id="person-content"
       role="tabpanel"
     >
       <!-- Content for the "Person" tab -->
-      <p>Wikidata entities that are instances of human (Q5)
+      <p><%= t("minting_wikidata.person_description") %>
       </p>
     </div>
     <div
@@ -63,16 +63,15 @@
     >
       <!-- Content for the "Organization" tab -->
       <p>
-        Wikidata entities that are instances of organization (Q43229). This
-        includes groups of performers and presenting organizations.</p>
+        <%= t("minting_wikidata.organization_description") %></p>
     </div>
     <div
       class="tab-pane fade <%= "show active" if type == @wikidata_place_type %>"
       id="place-content"
       role="tabpanel"
     >
-      <!-- Content for the "Place" tab --> Venue (Q17350442): place used for
-      some activity
+      <!-- Content for the "Place" tab -->
+      <p><%= t("minting_wikidata.place_description") %></p>
     </div>
   </div>
 
@@ -82,7 +81,7 @@
         <%= form.text_field :wikidata_search,
                         class: "form-control",
                         value: wikidata_search,
-                        placeholder: "Name or Wikidata ID" %>
+                        placeholder: t("minting_wikidata.search_placeholder") %>
         <%= form.submit "Search Wikidata", class: "btn btn-primary w-10" %>
       </div>
     </div>
