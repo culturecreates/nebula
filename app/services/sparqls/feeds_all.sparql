@@ -3,13 +3,29 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
-select  ?dataset (sample(?event) as ?events)  (sample(?organization) as ?orgs) (sample(?person) as ?people) (sample(?place) as ?places) ?graph  ?generatedAtTime  where 
+PREFIX shacl: <http://www.w3.org/ns/shacl#>
+PREFIX dataid: <http://dataid.dbpedia.org/ns/core#>
+
+select  
+  ?group
+  ?dataset 
+  ?triples
+  (sample(?event) as ?events)  
+  (sample(?organization) as ?orgs) 
+  (sample(?person) as ?people) 
+  (sample(?place) as ?places) 
+  ?graph  
+  ?generatedAtTime  
+
+  ?errors
+where 
 {
     ?graph a schema:Dataset .
     
     ?graph rdfs:label ?dataset;
            prov:generatedAtTime ?generatedAtTime ;
-           prov:wasDerivedFrom/foaf:primaryTopic/void:classPortion  ?classPortion .
+           prov:wasDerivedFrom/foaf:primaryTopic ?dataset_id .
+           ?dataset_id void:classPortion  ?classPortion .
     OPTIONAL {
             ?classPortion void:class ?type ;
              void:entities ?event_count .
@@ -30,6 +46,19 @@ select  ?dataset (sample(?event) as ?events)  (sample(?organization) as ?orgs) (
              void:entities ?person_count .
              filter(?type = schema:Person)
            }
+          OPTIONAL {
+            ?dataset_id void:triples ?triples .
+           }
+          OPTIONAL {
+            ?dataset_id shacl:results ?errors .
+           }
+          OPTIONAL{
+            ?dataset_id dataid:group ?group_id .
+              OPTIONAL{
+            ?group_id rdfs:label ?group_label .
+              }
+            bind(COALESCE(?group_label, ?group_id) as ?group)
+           }
 
     bind(ENCODE_FOR_URI(str(?dataset)) as ?dataset_escaped)
     bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graph),"'>",str(?event_count),"</a>") as ?event)
@@ -37,4 +66,4 @@ select  ?dataset (sample(?event) as ?events)  (sample(?organization) as ?orgs) (
     bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graph),"'>",str(?person_count),"</a>") as ?person)
    bind(CONCAT("<a href='/query/show?title=Organization entities in ",str(?dataset_escaped),"&sparql=list_organizations&graph=",str(?graph),"'>",str(?organization_count),"</a>") as ?organization)
 
-} GROUP BY ?dataset ?graph ?generatedAtTime order by DESC(?generatedAtTime)
+} GROUP BY ?dataset ?graph ?generatedAtTime  ?triples  ?errors ?group  order by DESC(?generatedAtTime)
