@@ -62,6 +62,7 @@ Nous pouvons les ajouter à Artsdata.ca.
 - [Wikidata:WikiProject Arts de la scène](https://www.wikidata.org/wiki/Wikidata:WikiProject_Performing_arts/fr)
 - [Outil d'auto-diagnostic de découvrabilité d'Artsdata](https://form.jotform.com/230306144694049)
 - [Infolettre Artsdata](https://mailchi.mp/53ff7a0a3ef0/stay-in-the-loop-restez-au-courant)
+- [Rapport annuel d'Artsdata 2023-2024 – disponible en anglais seulement](https://docs.google.com/document/d/1kQM85gQx1A3KcUO26LRKq7aVo2RB7W5ylbRHYjqUoIU/edit?usp=share_link)
 
 ## Partenaires
 
