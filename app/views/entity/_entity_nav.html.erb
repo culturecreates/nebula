@@ -5,6 +5,11 @@
     <a href=<%= @entity.entity_uri %>>
       Visit</a>
     |
+  <% else %>
+    <% if  ranked_link(@entity) %>
+      <%= link_to "Ranked", dereference_external_path(uri: ranked_link(@entity)) %>
+      |
+    <% end %>
   <% end %>
   <a
     href="#"

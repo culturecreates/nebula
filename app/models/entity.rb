@@ -19,6 +19,10 @@ class Entity
     solution.first.object.value if solution.count > 0
   end
 
+  def k_number
+     return @entity_uri.split("http://kg.artsdata.ca/resource/").last
+  end
+
   # Try to get image uri from schema.org/image property or schema.org/image/url property
   def image
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/image"), nil])
@@ -41,8 +45,17 @@ class Entity
     query = RDF::Query.new do
       pattern [RDF::URI(uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
     end
-     solution =  graph.query(query).first
-     solution.type if solution && solution.bound?(:type)
+    solution =  graph.query(query)
+    
+    type = solution&.first&.type 
+    # try to return top level type
+    if type
+      solution.each do |s|
+        type = s.type if ["http://schema.org/Place","http://schema.org/Person","http://schema.org/Organization"].include?(s.type)
+      end
+    end
+
+    return type
   end
 
   def method_missing(m,*args,&block)

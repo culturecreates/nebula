@@ -25,6 +25,8 @@ module Nebula
         resource '/context.jsonld', headers: :any, methods: [:get, :options]
       end
     end
+    config.i18n.default_locale = :en
+    config.i18n.available_locales = [:en, :fr]
 
   end
 end
