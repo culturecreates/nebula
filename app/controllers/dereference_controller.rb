@@ -22,6 +22,6 @@ class DereferenceController < ApplicationController
   private
   def failed_dereference(exception)
     flash[:alert] = exception
-    render dereference_external_path
+    redirect_back(fallback_location: root_path)
   end
 end
