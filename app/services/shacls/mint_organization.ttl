@@ -27,7 +27,7 @@ ads:NameSh
     sh:uniqueLang true ;
     sh:name "Name of event" ;
     sh:description "The name of the event."@en ;
-    sh:minCount 2 ;
+    sh:minCount 1 ;
     sh:or ( 
         [sh:datatype rdf:langString ;] 
         [sh:datatype xsd:string ;]
