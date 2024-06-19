@@ -27,7 +27,7 @@
         <%= new_entity.label %>
       </h3>
       <% if !(s.subject.value.include?("blank")) %>
-        <span class='badge bg-primary'>id</span>
+        <span class='badge bg-primary'>URI</span>
         <%= use_prefix(s.subject.value) %>
       <% else %>
         Blank node

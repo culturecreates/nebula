@@ -18,6 +18,7 @@ class DereferenceController < ApplicationController
     @entity.replace_blank_subject_nodes
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
+    @entity.replace_blank_nodes # third level
 
     
     shacl = SHACL.open( "app/services/shacls/shacl_artsdata_external.ttl")
