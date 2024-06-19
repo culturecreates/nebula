@@ -12,6 +12,7 @@ class DereferenceController < ApplicationController
   # /dereference/external?uri=
   # This can be a resource that is a graph of entities on the web
   def external
+    @max_entities_per_page = 40
     @entity = Entity.new(entity_uri:params[:uri])
     @entity.dereference
     @entity.replace_blank_subject_nodes

@@ -12,13 +12,15 @@
         "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
         @entity.graph,
       ) %>
-    <%= if solutions.count > 40
-      "<p> Showing first 30 entities of #{solutions.count}</p>".html_safe
+    <%= if solutions.count > @max_entities_per_page
+      "<p> Showing first #{@max_entities_per_page} entities of #{solutions.count}</p>".html_safe
     end %>
 
-    <% solutions.take(40).each do |s| %>
+    <% solutions.take(@max_entities_per_page).each do |s| %>
       <% next if s.subject.node? %>
       <% next if s.subject.statement? %>
+      <% next if s.subject.value.start_with?("http://blank.node") %>
+
       <% new_entity = Entity.new(entity_uri: s.subject.value) %>
       <% new_entity.graph = @entity.graph %>
       <h3>
