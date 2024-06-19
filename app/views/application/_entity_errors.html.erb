@@ -6,15 +6,14 @@
   ) %>
 
 <% if solutions.count  > 0 %>
-  <h4>Validation Errors</h4>
-  <ul>
-    <% solutions.each do |s| %>
-      <p>
-        <%= display_label(s.resultPath, check_shacl: false) %>
-        :
-        <span style="color:red;">
-          <%= s.resultMessage %></span>
-      </p>
-    <% end %>
-  </ul>
+
+  <% solutions.each do |s| %>
+    <p>
+      <span style="margin: 5px;"><%= render partial: "shared/icon_circle_exclamation" %></span><%= display_label(s.resultPath, check_shacl: false) %>
+      :
+      <span style="color:red;">
+        <%= s.resultMessage %></span>
+    </p>
+  <% end %>
+
 <% end %>
