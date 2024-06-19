@@ -1,5 +1,5 @@
 <div class="meta">
-
+  <%= render partial: "entity_errors", locals: { entity: entity } %>
   <% solutions =
     SPARQL.execute(
       "SELECT distinct ?pred WHERE { <#{entity.entity_uri}> ?pred ?obj }",

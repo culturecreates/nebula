@@ -2,7 +2,6 @@
   <h1>SHACL Validation</h1>
 
   <turbo-frame id="card-validation">
-    <%= render partial: "entity_errors", locals: { entity: @entity } %>
     <%= "<h4>Data Conforms</h4>".html_safe if @report.conform? %>
     <%= render partial: "statements_table", locals: { entity: @entity } %>
   </turbo-frame>

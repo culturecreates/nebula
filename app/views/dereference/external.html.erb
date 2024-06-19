@@ -31,8 +31,6 @@
         Blank node
         <%= new_entity.type %>
       <% end %>
-
-      <%= render partial: "entity_errors", locals: { entity: new_entity } %>
       <%= render partial: "statements_table", locals: { entity: new_entity } %>
     <% end %>
     <br>
