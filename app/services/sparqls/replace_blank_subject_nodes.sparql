@@ -13,10 +13,11 @@ WHERE {
         ?s ?a ?b .
         filter(isBLANK(?s))
         FILTER NOT EXISTS { ?s <http://www.w3.org/1999/xhtml/vocab#role> ?b }
+        FILTER NOT EXISTS { ?any_subject ?any_predicate ?s }
       }
     
     }
-    bind(URI(CONCAT("http://blank.node/",STRUUID())) as ?s_uri)
+    bind(URI(CONCAT("http://top.blank.node/",STRUUID())) as ?s_uri)
   }
   ?s ?p ?o .
  

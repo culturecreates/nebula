@@ -7,10 +7,6 @@
 @prefix ads: <http://kg.artsdata.ca/shacl/> .
 @prefix wdt: <http://www.wikidata.org/prop/direct/> .
 
-####################################################
-# Artsdata Events SHACL v4 enhanced
-####################################################
-
 ################
 # Super Property Shapes
 # used by more than one shape class
@@ -60,7 +56,7 @@ ads:subEventPropertySh
 ads:EventShape
     # TODO: Check that Event ID ends with #Event
     a sh:NodeShape ;
-     sh:closed true ;
+   #  sh:closed true ;
 
     # Sub-types of Event
     sh:targetClass  schema:Event, 
@@ -83,7 +79,7 @@ ads:EventShape
                     schema:SportsEvent, 
                     schema:VisualArtsEvent ;
 
-    sh:ignoredProperties ( rdf:type ) ;
+ #   sh:ignoredProperties ( rdf:type ) ;
     
     # Required Properties
     sh:property ads:NameSh, 
@@ -103,8 +99,8 @@ ads:EventShape
 ads:StartDateSh
     sh:path schema:startDate ;
     sh:or (
-        [ sh:datatype xsd:dateTime ; ]
-        [ sh:datatype xsd:date ; ]
+        [ sh:datatype  xsd:dateTime ; ]
+        [ sh:datatype schema:Date ; ]
     ) ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -114,7 +110,7 @@ ads:EndDateSh
     sh:path schema:endDate ;
     sh:or (
         [ sh:datatype xsd:dateTime ; ]
-        [ sh:datatype xsd:date ; ]
+        [ sh:datatype schema:Date ; ]
     ) ;
     sh:maxCount 1 ;
     sh:minCount 0 .
@@ -138,11 +134,11 @@ ads:EventStatusSh
     sh:maxCount  1 ;
     sh:minCount 0 ;
    # sh:class schema:EventStatusType ;
-    sh:in  (    schema:EventPostponed  
-                schema:EventScheduled  
-                schema:EventCancelled  
-                schema:EventRescheduled  
-                schema:EventMovedOnline )  .
+    sh:in  (    "https://schema.org/EventPostponed" 
+                "https://schema.org/EventScheduled"
+                "https://schema.org/EventCancelled"  
+                "https://schema.org/EventRescheduled"  
+                "https://schema.org/EventMovedOnline" )  .
 
 
 ads:EventAttendanceModeSh
@@ -150,9 +146,9 @@ ads:EventAttendanceModeSh
     sh:maxCount  1 ;
     sh:minCount 0 ;
    # sh:class schema:EventAttendanceModeEnumeration ;
-    sh:in  (    schema:OfflineEventAttendanceMode  
-                schema:OnlineEventAttendanceMode 
-                schema:MixedEventAttendanceMode )  .
+    sh:in  (     "https://schema.org/OfflineEventAttendanceMode"  
+                 "https://schema.org/OnlineEventAttendanceMode" 
+                 "https://schema.org/MixedEventAttendanceMode" )  .
 
 
 ads:UrlWarningSh
@@ -194,6 +190,11 @@ ads:PerformerSh
         [ sh:node ads:IdSh ; ]
     ) ;
     sh:message "performer is not a valid Person or Organizatinon or Id." .
+
+ads:ImageSh
+   sh:path schema:image ;
+    sh:pattern "^http" ;
+    sh:minCount  1 .
 
 ads:ImageWarningSh
    sh:path schema:image ;

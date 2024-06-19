@@ -12,23 +12,32 @@
         "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
         @entity.graph,
       ) %>
-    <%= if solutions.count > 30
+    <%= if solutions.count > 40
       "<p> Showing first 30 entities of #{solutions.count}</p>".html_safe
     end %>
 
-    <% solutions.take(30).each do |s| %>
+    <% solutions.take(40).each do |s| %>
       <% next if s.subject.node? %>
       <% next if s.subject.statement? %>
       <% new_entity = Entity.new(entity_uri: s.subject.value) %>
       <% new_entity.graph = @entity.graph %>
       <h3>
-        <%= new_entity.label %></h3>
-      <%= use_prefix(s.subject.value) %>
+        <%= new_entity.label %>
+      </h3>
+      <% if !(s.subject.value.include?("blank")) %>
+        <span class='badge bg-primary'>id</span>
+        <%= use_prefix(s.subject.value) %>
+      <% else %>
+        Blank node
+        <%= new_entity.type %>
+      <% end %>
+
+      <%= render partial: "entity_errors", locals: { entity: new_entity } %>
       <%= render partial: "statements_table", locals: { entity: new_entity } %>
     <% end %>
     <br>
     <br>
-    <pre>
+    <pre style="display: none;">
       <code>
         <% if  @entity.graph.count > 0 %>
           <%= @entity.graph.dump(:jsonld) %>

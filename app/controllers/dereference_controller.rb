@@ -14,9 +14,14 @@ class DereferenceController < ApplicationController
   def external
     @entity = Entity.new(entity_uri:params[:uri])
     @entity.dereference
+    @entity.replace_blank_subject_nodes
     @entity.replace_blank_nodes # first level
     @entity.replace_blank_nodes # second level
-    @entity.replace_blank_subject_nodes
+
+    
+    shacl = SHACL.open( "app/services/shacls/shacl_artsdata_external.ttl")
+    @report = shacl.execute(@entity.graph)
+    @entity.load_graph_into_graph(@report)
   end
 
   private
