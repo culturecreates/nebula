@@ -30,6 +30,8 @@ ads:NameSh
     sh:path schema:name ;
     sh:uniqueLang true ;
     sh:name "Name of event" ;
+    sh:not [ sh:hasValue ""  ] ;
+    sh:message "Name is required, and there can only be one name per lanaguge." ;
     sh:description "The name of the event."@en ;
     sh:order 1 ;
     sh:minCount 1 ;
@@ -196,19 +198,13 @@ ads:ImageSh
     sh:pattern "^http" ;
     sh:minCount  1 .
 
-ads:ImageWarningSh
-   sh:path schema:image ;
-    sh:severity sh:Warning ;
-    sh:minCount  1 .
-
 ################
 # WebPage Shape
 ################
+
 ads:WebPageShape
     a sh:NodeShape ;
-    # sh:ignoredProperties ( rdf:type ) ;
     sh:targetClass schema:WebPage ;
-   # sh:closed true ;
     sh:property ads:LastReviewedSh,
 				ads:DateModifiedSh,
                 ads:WebPageUrlSh, 
@@ -285,7 +281,7 @@ ads:PlaceShape
                 ads:SameAsSh,
                 ads:PlaceUrlSh ;
     sh:or  (   
-        [ sh:property ads:MultiAddress  ; ]
+        [ sh:property ads:TextAddress  ; ]
         [ sh:property  ads:AddressObj  ; ]
     ) .
 
@@ -296,15 +292,14 @@ ads:VirtualLocationSh
 ads:AddressObj
     sh:path schema:address ;
     sh:minCount 1 ;
+     sh:maxCount 1 ;
     sh:node ads:PostalAddressShape .
   
-ads:MultiAddress 
+ads:TextAddress 
     sh:path schema:address ;
-    sh:minCount 2 ;
-    sh:or (
-        [ sh:node ads:PostalAddressShape ;]
-        [ sh:datatype xsd:string ; ]
-    ) .
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
 
 ads:PlaceNameSh
     sh:path schema:name ;
