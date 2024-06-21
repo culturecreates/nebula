@@ -102,6 +102,7 @@ ads:StartDateSh
     sh:path schema:startDate ;
     sh:or (
         [ sh:datatype  xsd:dateTime ; ]
+        [ sh:datatype  xsd:date ; ]
         [ sh:datatype schema:Date ; ]
     ) ;
     sh:maxCount 1 ;
@@ -112,6 +113,7 @@ ads:EndDateSh
     sh:path schema:endDate ;
     sh:or (
         [ sh:datatype xsd:dateTime ; ]
+        [ sh:datatype  xsd:date ; ]
         [ sh:datatype schema:Date ; ]
     ) ;
     sh:maxCount 1 ;
