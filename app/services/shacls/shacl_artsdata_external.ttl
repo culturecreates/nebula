@@ -137,34 +137,17 @@ ads:EventStatusSh
     sh:path schema:eventStatus ;
     sh:maxCount  1 ;
     sh:minCount 0 ;
-   # sh:class schema:EventStatusType ;
-    sh:in  (    "https://schema.org/EventPostponed" 
-                "https://schema.org/EventScheduled"
-                "https://schema.org/EventCancelled"  
-                "https://schema.org/EventRescheduled"  
-                "https://schema.org/EventMovedOnline"
-                 # http protocol
-                "http://schema.org/EventPostponed" 
-                "http://schema.org/EventScheduled"
-                "http://schema.org/EventCancelled"  
-                "http://schema.org/EventRescheduled"  
-                "http://schema.org/EventMovedOnline" )  .
+    # sh:class schema:EventStatusType ;
+    sh:pattern "^https?://schema.org/Event(Postponed|Scheduled|Cancelled|Rescheduled|MovedOnline)$" .
 
 
 ads:EventAttendanceModeSh
     sh:path schema:eventAttendanceMode ;
     sh:maxCount  1 ;
     sh:minCount 0 ;
-   # sh:class schema:EventAttendanceModeEnumeration ;
-    sh:in  (    "https://schema.org/OfflineEventAttendanceMode"  
-                "https://schema.org/OnlineEventAttendanceMode" 
-                "https://schema.org/MixedEventAttendanceMode" 
-                # http protocol
-                "http://schema.org/OfflineEventAttendanceMode"  
-                "http://schema.org/OnlineEventAttendanceMode" 
-                "http://schema.org/MixedEventAttendanceMode" )  .
-
-
+    # sh:class schema:EventAttendanceModeEnumeration ;
+    sh:pattern "^https?://schema.org/(Offline|Online|Mixed)EventAttendanceMode$" .
+  
 ads:UrlWarningSh
     sh:path schema:url ;
     sh:severity sh:Warning ;
