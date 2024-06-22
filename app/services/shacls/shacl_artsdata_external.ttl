@@ -156,7 +156,10 @@ ads:UrlWarningSh
 ads:MainEntityOfPageSh
     sh:path schema:mainEntityOfPage ;
     sh:minCount  0 ;
-    sh:node ads:WebPageShape .
+     sh:or ( 
+        [ sh:node ads:WebPageShape ; ]
+        [ sh:pattern  "^http" ;] )
+   .
 
 ads:OffersSh
     # TODO: Add Offer node shape
