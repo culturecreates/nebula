@@ -29,12 +29,12 @@ export default class extends Controller {
       })
     }
     const res = await fetch(url, options);
-    console.log("res=", res);
-    const json = await res.json();
-    console.log("res.json()=", json);
-    if (json.status == "204") {
-      this.resultTarget.innerHTML = "Successfully triggered the action";
+    console.log("res:", res);
+    if (res.status == 204) {
+      this.resultTarget.innerHTML = "Successfully ran the action. View all <a href='https://github.com/culturecreates/artsdata-google-workspace-smart-chip/actions'>workflows</a>.";
     } else {
+      const json = await res.json();
+
       this.resultTarget.innerHTML = "Error: " + JSON.stringify(json, null, 2);
     }
 
