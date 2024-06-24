@@ -48,4 +48,6 @@ GoDaddy does NOT support HTTPS forwarding for domains, so https://artsdata.ca wi
   `EDITOR="code --wait" rails credentials:edit`
 
 
+# Github App
 
+https://github.com/apps/artsdata-nebula

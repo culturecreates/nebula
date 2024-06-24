@@ -1,5 +1,6 @@
 class GithubController < ApplicationController
 
+  # See more https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app#using-the-web-application-flow-to-generate-a-user-access-token
   def callback
     code = params["code"]
 
@@ -11,6 +12,7 @@ class GithubController < ApplicationController
       user_info = user_info(token)
       session[:handle] = user_info["login"]
       session[:name] = user_info["name"] || user_info["login"]
+      session[:token] = token
 
       # user_repos = user_repos(token)
       # session[:repos] = user_repos.map { |repo| repo["name"] }
