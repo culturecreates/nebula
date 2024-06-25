@@ -59,7 +59,7 @@ ads:EventShape
     # TODO: Check that Event ID ends with #Event
     a sh:NodeShape ;
    #  sh:closed true ;
-
+ #   sh:ignoredProperties ( rdf:type ) ;
     # Sub-types of Event
     sh:targetClass  schema:Event, 
                     schema:EventSeries, 
@@ -81,7 +81,7 @@ ads:EventShape
                     schema:SportsEvent, 
                     schema:VisualArtsEvent ;
 
- #   sh:ignoredProperties ( rdf:type ) ;
+
     
     # Required Properties
     sh:property ads:NameSh, 
@@ -97,6 +97,8 @@ ads:EventShape
                 ads:PerformerSh, 
                 ads:EndDateSh, 
                 ads:OffersSh  .
+
+
 
 ads:StartDateSh
     sh:path schema:startDate ;
@@ -297,6 +299,9 @@ ads:TextAddress
     sh:path schema:address ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
+    sh:not [
+		  sh:hasValue ""  
+	] ;
     sh:datatype xsd:string .
 
 ads:PlaceNameSh
@@ -332,7 +337,7 @@ ads:VirtualLocationUrlSh
 ads:PostalAddressShape
     a sh:NodeShape ;
     sh:targetClass schema:PostalAddress ;
- sh:closed true ;
+    sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:property ads:StreetAddressSh, 
                 ads:addressCountrySh, 
