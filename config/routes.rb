@@ -27,6 +27,9 @@ Rails.application.routes.draw do
   get "github/callback", to: "github#callback"
   get "github/workflows", to: "github#workflows"
 
+  # Footlight Aggregator
+  get "footlight/export", to: "footlight#export"
+
   # The following URI paths are dereferencable and handled by the ResourceController
   match "resource/*path", to: "resource#show", via: :get
   match "databus/*path", to: "resource#show", via: :get

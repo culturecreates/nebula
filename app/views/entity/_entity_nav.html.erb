@@ -5,6 +5,10 @@
     <a href=<%= @entity.entity_uri %>>
       Visit</a>
     |
+    <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
+    |
+    <%= link_to "CMS v3", footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+    |
   <% else %>
     <% if  ranked_link(@entity) %>
       <%= link_to "Ranked", dereference_external_path(uri: ranked_link(@entity)) %>
