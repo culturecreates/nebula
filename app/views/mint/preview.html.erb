@@ -4,6 +4,16 @@
 
 <div class="row">
   <div class="col-md">
+    <p>
+      <turbo-frame
+        id='card-validation'
+        src="<%= validate_path(uri: @externalUri, class_to_mint: @class_to_mint)%>"
+        loading="lazy"
+        target="_top"
+      >
+        validating...
+      </turbo-frame>
+    </p>
     <p>Based on</p>
     <p>
       <turbo-frame
