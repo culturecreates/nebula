@@ -1,10 +1,11 @@
  CONSTRUCT { 
-        <EXTERNAL_URI> a schema:Organization ; 
+        <EXTERNAL_URI> a schema:Place ; 
         schema:name ?name ; 
         schema:sameAs ?aduri ;
         schema:url ?url ;
         schema:sameAs ?isniuri , ?music_brainz ;
-        schema:description ?desc .
+        schema:description ?desc ;
+        schema:address ?address .
       } 
       WHERE { 
         <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
@@ -16,6 +17,11 @@
         }
           
         OPTIONAL { 
+          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P6375> ?address . 
+          filter (lang(?address) = 'en' || lang(?address) = 'fr'  || lang(?address) = '') 
+        }
+
+        OPTIONAL { 
           <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P7627> ?adid  .
           BIND (URI(CONCAT("http://kg.artsdata.ca/resource/",?adid)) as ?aduri) 
         }
@@ -25,5 +31,5 @@
           <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P213> ?isni .
           BIND (URI(CONCAT("https://isni.org/isni/",?isni)) as ?isniuri)
         }
-        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct-normalized/P434> ?music_brainz .}
+        OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct-normalized/P1004> ?music_brainz .}
       }
