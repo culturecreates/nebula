@@ -3,6 +3,17 @@ class ValidateController < ApplicationController
   def show
     uri = params[:uri] 
     @entity = Entity.new(entity_uri: uri)
+    # Call Artsdata API to get the RDF graph for the entity
+    mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
+    url = "#{mint_endpoint}/test_event?uri=#{CGI.escape(uri)}"
+    response = HTTParty.get(url)
+    @entity.graph = RDF::Graph.new
+    @entity.graph.from_jsonld(JSON.parse(response.body)['data'].to_json)
+  end
+
+  def wikidata
+    uri = params[:uri] 
+    @entity = Entity.new(entity_uri: uri)
     @class_to_mint = params[:class_to_mint] # i.e. schema:Person
 
     wikidata_sparql_endpoint= "https://query.wikidata.org/sparql"

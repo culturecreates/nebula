@@ -1,8 +1,8 @@
 <div class="container">
-  <h1>SHACL Validation</h1>
+  <h1>SHACL Validation for Wikidata</h1>
 
   <turbo-frame id="card-validation">
-
+    <%= "<h4>Data Conforms</h4>".html_safe if @report.conform? %>
     <%= render partial: "statements_table", locals: { entity: @entity } %>
   </turbo-frame>
 </div>
