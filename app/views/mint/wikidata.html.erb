@@ -29,103 +29,100 @@
   <% end %>
 
   <% if @external_uri %>
-    <div class="row">
-      <h3>Step 1</h3>
-      <p>Check data passes validation.</p>
-      <div class="col-md">
-        <p>
-          <turbo-frame
-            id='card-validation'
-            src="<%= validate_path(uri: @external_uri, class_to_mint: @class_to_mint)%>"
-            loading="lazy"
-            target="_top"
-          >
-            validating...
-          </turbo-frame>
-        </p>
 
-        <h3>
-          Step 3
-        </h3>
-        <p>
-          If the entity passed validation and cannot be linked to another
-          existing entity, then click the mint button to add it to Artsdata.</p>
-        <p>
-          <div class="statement-object">
-            <b>
-              <%= @label %>
-            </b>
-            <div class="alternate-name">
-              <%= @class_to_mint %>
-              <% if @description.present? %>
-                -
-                <%= @description %>
-              <% end %>
-            </div>
-            <%= @external_uri %>
-          </div>
-        </p>
-        <p><%= session[:name] %>
-          acting on behalf of the authority</p>
-        <p>
-          <turbo-frame
-            id='card-3'
-            src="<%= dereference_card_path(uri: @group, frame_id: "3")%>"
-            loading="lazy"
-            target="_top"
-          >
-            loading...
-          </turbo-frame>
-        </p>
-        <!-- Then call Wikidata to get: A label in a language . The annotations
-        can be generated locally using the group and the date. Specific to the
-        type: places need complete address people recommended occupation
-        organization recommended url, location or complete address. Use shacl
-        to get the required and recommended fields per class. Display all
-        fields with SHACL violations. All fields editable. Blank fields shown
-        and editable. Show reconcile with Artsdata (and link button to avoid
-        minting): place uses postal code, person uses name, organization uses
-        name. -->
-        <div
-          data-controller="artsdata"
-          data-artsdata-mintendpoint-value="<%= Rails.application.credentials.artsdata_mint_endpoint %>"
-          data-artsdata-externaluri-value="<%= @external_uri %>"
-          data-artsdata-classtomint-value="<%= @class_to_mint %>"
-          data-artsdata-authority-value="<%=  @group %>"
-          data-artsdata-label-value="<%= @label %>"
-          data-artsdata-language-value="<%= @language %>"
-          data-artsdata-reference-value="<%= @reference %>"
-        >
-          <button
-            data-artsdata-target="button"
-            class="btn btn-danger"
-            data-action="artsdata#mintEntity"
-          >
-            mint
-          </button>
-          <p data-artsdata-target="uri">
-          </p>
+    <h3>Step 1</h3>
+    <p>Check that the data from Wikidata conforms. There should be no errors in
+      the following table. If there are errors then they should be fixed in
+      Wikidata before proceesing to mint in Artsdata.</p>
+
+    <p>
+      <turbo-frame
+        id='card-validation'
+        src="<%= validate_path(uri: @external_uri, class_to_mint: @class_to_mint)%>"
+        loading="lazy"
+        target="_top"
+      >
+        validating...
+      </turbo-frame>
+    </p>
+
+    <h3>Step 2</h3>
+
+    <p>Check to make sure the entity does not already exist in Artsdata. If it
+      appears in this list then click the link button instead of minting a new
+      entity.</p>
+
+    <p>
+      <turbo-frame
+        id='recon_results'
+        src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri)%>"
+        loading="lazy"
+        target="_top"
+      >
+        loading...
+      </turbo-frame>
+    </p>
+
+    <h3>
+      Step 3
+    </h3>
+    <p>
+      If the entity passed validation and cannot be linked to another existing
+      entity, then click the mint button below to add it to Artsdata.</p>
+    <p>
+      <div class="statement-object">
+        <b>
+          <%= @label %>
+        </b>
+        <div class="alternate-name">
+          <%= @class_to_mint %>
+          <% if @description.present? %>
+            -
+            <%= @description %>
+          <% end %>
         </div>
-
+        <%= @external_uri %>
       </div>
-      <!-- Second column content goes here -->
-      <div class="col-md">
-
-        <h3>Step 2</h3>
-
-        <p>Check to make sure the entity does not already exist in Artsdata. If
-          it appears in this list then click the link button instead of minting
-          a new entity.</p>
-
-        <turbo-frame
-          id='recon_results'
-          src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri)%>"
-          loading="lazy"
-          target="_top"
-        >
-          loading...
-        </turbo-frame>
-      </div>
+    </p>
+    <p><%= session[:name] %>
+      acting on behalf of the authority</p>
+    <p>
+      <turbo-frame
+        id='card-3'
+        src="<%= dereference_card_path(uri: @group, frame_id: "3")%>"
+        loading="lazy"
+        target="_top"
+      >
+        loading...
+      </turbo-frame>
+    </p>
+    <!-- Then call Wikidata to get: A label in a language . The annotations can
+    be generated locally using the group and the date. Specific to the type:
+    places need complete address people recommended occupation organization
+    recommended url, location or complete address. Use shacl to get the
+    required and recommended fields per class. Display all fields with SHACL
+    violations. All fields editable. Blank fields shown and editable. Show
+    reconcile with Artsdata (and link button to avoid minting): place uses
+    postal code, person uses name, organization uses name. -->
+    <div
+      data-controller="artsdata"
+      data-artsdata-mintendpoint-value="<%= Rails.application.credentials.artsdata_mint_endpoint %>"
+      data-artsdata-externaluri-value="<%= @external_uri %>"
+      data-artsdata-classtomint-value="<%= @class_to_mint %>"
+      data-artsdata-authority-value="<%=  @group %>"
+      data-artsdata-label-value="<%= @label %>"
+      data-artsdata-language-value="<%= @language %>"
+      data-artsdata-reference-value="<%= @reference %>"
+    >
+      <button
+        data-artsdata-target="button"
+        class="btn btn-danger"
+        data-action="artsdata#mintEntity"
+      >
+        mint
+      </button>
+      <p data-artsdata-target="uri">
+      </p>
     </div>
 
   <% end %>
