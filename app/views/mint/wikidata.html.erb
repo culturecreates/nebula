@@ -35,16 +35,19 @@
       the following table. If there are errors then they should be fixed in
       Wikidata before proceeding to mint in Artsdata.</p>
 
-    <p>
-      <turbo-frame
-        id='card-validation'
-        src="<%= validate_path(uri: @external_uri, class_to_mint: @class_to_mint)%>"
-        loading="lazy"
-        target="_top"
-      >
-        validating...
-      </turbo-frame>
-    </p>
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <p>
+          <turbo-frame
+            id='card-validation'
+            src="<%= validate_path(uri: @external_uri, class_to_mint: @class_to_mint)%>"
+            loading="lazy"
+            target="_top"
+          >
+            validating...
+          </turbo-frame>
+        </p>
+      </div></div>
 
     <h3>Step 2</h3>
 
@@ -52,17 +55,19 @@
       appears in this list then click the link button instead of minting a new
       entity.</p>
 
-    <p>
-      <turbo-frame
-        id='recon_results'
-        src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri)%>"
-        loading="lazy"
-        target="_top"
-      >
-        loading...
-      </turbo-frame>
-    </p>
-
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <p>
+          <turbo-frame
+            id='recon_results'
+            src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri)%>"
+            loading="lazy"
+            target="_top"
+          >
+            loading...
+          </turbo-frame>
+        </p>
+      </div></div>
     <h3>
       Step 3
     </h3>
@@ -70,6 +75,8 @@
       If the entity passed validation and cannot be linked to another existing
       entity, then click the mint button below to add it to Artsdata.</p>
     <p>
+      <div class="row justify-content-center">
+      <div class="col-md-10">
       <div class="statement-object">
         <b>
           <%= @label %>
@@ -124,6 +131,6 @@
       <p data-artsdata-target="uri">
       </p>
     </div>
-
+</div></div>
   <% end %>
 </div>
