@@ -53,7 +53,8 @@
       role="tabpanel"
     >
       <!-- Content for the "Person" tab -->
-      <p><%= t("minting_wikidata.person_description") %>
+      <p>
+        <%= t("minting_wikidata.person_description") %>
       </p>
     </div>
     <div
@@ -63,7 +64,8 @@
     >
       <!-- Content for the "Organization" tab -->
       <p>
-        <%= t("minting_wikidata.organization_description") %></p>
+        <%= t("minting_wikidata.organization_description") %>
+      </p>
     </div>
     <div
       class="tab-pane fade <%= "show active" if type == @wikidata_place_type %>"
@@ -71,7 +73,9 @@
       role="tabpanel"
     >
       <!-- Content for the "Place" tab -->
-      <p><%= t("minting_wikidata.place_description") %></p>
+      <p>
+        <%= t("minting_wikidata.place_description") %>
+      </p>
     </div>
   </div>
 

@@ -32,18 +32,22 @@ class MintController < ApplicationController
           predicate: RDF::URI("http://www.w3.org/ns/prov#wasDerivedFrom"),
           object: nil
         }
-        @reference =  @entity.graph.query(reference)&.first&.object.value
+        @reference =  @entity.graph.query(reference)&.first&.object&.value
       end
 
       if !@label
-        @label = solution.label if solution.bound?(:label)
+        @label = solution.label if solution&.bound?(:label)
       end
       
       @language = solution.label&.language&.to_s if solution&.bound?(:label)
   
 
       if !@classToMint
-        @classToMint = solution.type if solution.bound?(:type)
+        @classToMint =  if solution&.bound?(:type) 
+                          solution.type
+                        else
+                          "Thing"
+                        end
       end
       
       if  !@classToMint.starts_with?("http") 
