@@ -17,7 +17,7 @@
         predicate: s.pred,
         predicate_hash: predicate_hash,
       } %>
-      <% if !entity.entity_uri.starts_with?("http://blank.node") %>
+      <% if !entity.entity_uri.starts_with?("http://blank.node") && @show_expand_button %>
         <div class="statement_buttons">
           <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: s.pred.to_s, predicate_hash: predicate_hash),  
                   data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  

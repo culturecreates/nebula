@@ -54,6 +54,7 @@ class EntityController < ApplicationController
         @entity.replace_blank_nodes # first level
         @entity.replace_blank_nodes # second level
         @entity.replace_blank_subject_nodes
+        @show_expand_button = true
         # pp @entity.graph.dump(:turtle)
         # TODO: add SHACL validation
         # @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
