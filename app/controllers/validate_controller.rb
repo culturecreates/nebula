@@ -27,6 +27,8 @@ class ValidateController < ApplicationController
       SparqlLoader.load("validate_controller/external_person_data", ["EXTERNAL_URI", uri])
     when "schema:Organization"
       SparqlLoader.load("validate_controller/external_organization_data", ["EXTERNAL_URI", uri])
+    when "schema:Place"
+      SparqlLoader.load("validate_controller/external_place_data", ["EXTERNAL_URI", uri])
     end
   end
 
@@ -36,6 +38,8 @@ class ValidateController < ApplicationController
       "app/services/shacls/mint_person.ttl"
     when "schema:Organization"
       "app/services/shacls/mint_organization.ttl"
+    when "schema:Place"
+      "app/services/shacls/mint_place.ttl"
     end
 
   end

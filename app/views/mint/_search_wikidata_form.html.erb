@@ -34,10 +34,10 @@
                         @wikidata_place_type,
                         class: "d-none",
                         id: "place",
-                        disabled: true %>
+                        checked: type == @wikidata_place_type %>
       <%= form.label :place,
                  t("minting_wikidata.place_tab"),
-                 class: "nav-link disabled",
+                 class: "nav-link #{"active" if type == @wikidata_place_type}",
                  data: {
                    bs_toggle: "tab",
                    bs_target: "#place-content",

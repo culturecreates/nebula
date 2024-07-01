@@ -30,6 +30,8 @@
 
   <% if @external_uri %>
     <div class="row">
+      <h3>Step 1</h3>
+      <p>Check data passes validation.</p>
       <div class="col-md">
         <p>
           <turbo-frame
@@ -43,7 +45,7 @@
         </p>
 
         <h3>
-          Confirm the entity to mint
+          Step 3
         </h3>
         <p>
           If the entity passed validation and cannot be linked to another
@@ -109,9 +111,11 @@
       <!-- Second column content goes here -->
       <div class="col-md">
 
-        <h4>Reconcile Check</h4>
+        <h3>Step 2</h3>
+
         <p>Check to make sure the entity does not already exist in Artsdata. If
-          it appears in this list then link instead of mint.</p>
+          it appears in this list then click the link button instead of minting
+          a new entity.</p>
 
         <turbo-frame
           id='recon_results'
