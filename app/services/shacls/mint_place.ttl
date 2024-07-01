@@ -24,6 +24,14 @@
         sh:minCount 1 ;
      ] .
 
+<#MustHavePostalCode> 
+    a sh:NodeShape ;
+     sh:targetClass schema:PostalAddress ;
+     sh:property [
+		sh:path  schema:postalCode ;
+        sh:minCount 1 ;
+     ] .
+
 
 <#MayHaveSameAs> 
     a sh:NodeShape ;
@@ -31,6 +39,14 @@
     sh:property [
         sh:path schema:sameAs ;
         sh:minCount 0 ;
-        sh:not ( [sh:pattern "http://kg.artsdata.ca/.*" ;] ) ;
         sh:nodeKind sh:IRI ; 
+    ] .
+    
+<#NotAlreadyMinted> 
+    a sh:NodeShape ;
+    sh:targetClass schema:Place ;
+    sh:message "Cannot be already minted in Artsdata." ;
+    sh:property [
+        sh:path schema:sameAs ;
+        sh:not ( [sh:pattern "http://kg.artsdata.ca/.*" ;] ) 
     ] .
