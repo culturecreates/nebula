@@ -43,7 +43,7 @@ export default class extends Controller {
     const json = await res.json();
     console.log(json);
     if (json.data.status == "success") {
-      this.uriTarget.innerHTML = "Successfully minted";
+      this.uriTarget.innerHTML = "Successfully minted <a href='" + json.new_uri + "'>" + json.new_uri + "</a>";
     } else {
       this.uriTarget.innerHTML = "Error: " + JSON.stringify(json.data.message, null, 2);
     }

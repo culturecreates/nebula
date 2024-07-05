@@ -14,6 +14,9 @@ class ReconService
     if params[:type]
       query["q0"]["type"] = params[:type]
     end
+    if params[:postalCode]
+      query["q0"]["properties"] = [{pid: "schema:address/schema:postalCode", v: params[:postalCode]}]
+    end
 
    # Build the URL
    @recon_uri.query = "queries=" + CGI.escape(query.to_json)
