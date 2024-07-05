@@ -20,10 +20,9 @@ class MintController < ApplicationController
       @label = params[:label]
       @reference =  params[:reference]
 
-      # get extra data about the entity
+      # get extra data about the entity in the event only externalUri is provided
       @entity = Entity.new(entity_uri: @externalUri)
       @entity.load_card
-     
       solution =  dereference_helper(@externalUri)
     
       if !@reference
@@ -41,7 +40,6 @@ class MintController < ApplicationController
       
       @language = solution.label&.language&.to_s if solution&.bound?(:label)
   
-
       if !@classToMint
         @classToMint =  if solution&.bound?(:type) 
                           solution.type
@@ -51,9 +49,10 @@ class MintController < ApplicationController
       end
       
       if  !@classToMint.starts_with?("http") 
+        @classToMint = solution.type if solution&.bound?(:type)
+      elsif  !@classToMint&.starts_with?("http") 
         @classToMint = "http://schema.org/" + @classToMint
       end
-
 
       @postalCode = solution.postalCode if solution&.bound?(:postalCode)
       @startDate = solution.startDate if solution&.bound?(:startDate)
