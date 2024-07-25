@@ -6,12 +6,14 @@
     ) %>
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
     <% solutions.each do |s| %>
+      <% @httpMethod = s.obj.to_s if predicate == "http://schema.org/httpMethod" %>
       <div class="statement-object">
         <% if predicate == "http://schema.org/urlTemplate" %>
           <div
             data-controller="githubapi"
             data-githubapi-token-value="<%= session[:token] %>"
             data-githubapi-url-value="<%= s.obj.to_s %>"
+            data-githubapi-method-value="<%= @httpMethod %>"
           >
 
             <button
