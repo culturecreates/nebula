@@ -42,14 +42,13 @@ export default class extends Controller {
       console.log("res:", res);
      
       if (res.status == 204) {
-        this.resultTarget.innerHTML = "Successfully ran the action." + JSON.stringify(res, null, 2);
+        this.resultTarget.innerHTML = "Successfully ran the action. " + JSON.stringify(res, null, 2);
       } else {
-        const json = await res.json();
-        this.resultTarget.innerHTML = JSON.stringify(json, null, 2);
+        this.resultTarget.innerHTML = JSON.stringify(res, null, 2);
       }
     } catch (error) {
       console.error('Fetch error:', error);
-      this.resultTarget.innerHTML = JSON.stringify(error, null, 2);
+      this.resultTarget.innerHTML = error.message;
     }
   }
 
