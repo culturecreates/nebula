@@ -17,9 +17,10 @@ export default class extends Controller {
   async runAction() {
     this.buttonTarget.disabled = true
     const url = this.urlValue;
+    const httpMethod = this.methodValue ||= "GET";
     // const url = "https://api.github.com/repos/culturecreates/artsdata-google-workspace-smart-chip/actions/workflows/push-to-artsdata.yml/dispatches"
     const options = {
-      method: this.methodValue,
+      method: httpMethod,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + this.tokenValue,
@@ -27,10 +28,11 @@ export default class extends Controller {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     }
-    if (this.methodValue == "POST") {
-      options.body = JSON.stringify({
+    // todo: make this more generic
+    if (httpMethod == "POST") {
+      options.body = {
         'ref': 'main'
-      })
+      }
     }
     try {
       const res = await fetch(url, options);
@@ -48,7 +50,6 @@ export default class extends Controller {
     } catch (error) {
       console.error('Fetch error:', error);
       this.resultTarget.innerHTML = JSON.stringify(error, null, 2);
-  
     }
   }
 
