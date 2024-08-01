@@ -5,39 +5,68 @@
     <%= @entity.label&.html_safe %>
   </h1>
 
-  <div data-controller="clipboard" data-clipboard-success-content-value="URI copied">
-    <span data-clipboard-target="source"><%= @entity.entity_uri %></span>
-    <a
-      class="cursor-pointer"
-      data-action="clipboard#copy"
-      data-clipboard-target="button"
-      title="Copy URI"
-    >
-      <%= render partial: "shared/icon_copy" %></a>
-  </span>
-
-  <%= render partial: "entity_nav" %>
-  <%= if @entity.graph.count == 0
-    render partial: "external_resource", locals: { entity: @entity }
-  end %>
-
-  <%= render partial: "statements_table", locals: { entity: @entity } %>
-
-  <turbo-frame
-    id='unsupported-claims'
-    src="<%= entity_unsupported_claims_path(uri: @entity.entity_uri)%>"
-    loading="lazy"
-    target="_top"
+  <div
+    data-controller="clipboard"
+    data-clipboard-success-content-value="URI copied"
   >
-  </turbo-frame>
-  <br>
-  <turbo-frame
-    id='reverse-statements'
-    src="<%= entity_derived_statements_path(uri: @entity.entity_uri)%>"
-    loading="lazy"
-    target="_top"
-  >
-  </turbo-frame>
-  <br>
-  <br>
-</div>
+    <span data-clipboard-target="source">
+      <%= @entity.entity_uri %>
+
+      <a
+        class="cursor-pointer"
+        data-action="clipboard#copy"
+        data-clipboard-target="button"
+        title="Copy URI"
+      >
+        <%= render partial: "shared/icon_copy" %>
+      </a>
+    </span>
+
+    <%= render partial: "entity_nav" %>
+
+    <% if @entity.graph.count == 0 %>
+      <%= render partial: "external_resource", locals: { entity: @entity } %>
+      <br>
+      <turbo-frame
+        id='reverse-statements'
+        src="<%= entity_derived_statements_path(uri: @entity.entity_uri)%>"
+        loading="lazy"
+        target="_top"
+      >
+      </turbo-frame>
+      <br>
+      Also checking URLs:
+      <br>
+      <turbo-frame
+        id='recon_results'
+        src="<%= reconcile_query_path(query: " " + @entity.entity_uri) %>"
+        loading="lazy"
+        target="_top"
+      >
+        loading...
+      </turbo-frame>
+    <% else %>
+
+      <%= render partial: "statements_table", locals: { entity: @entity } %>
+
+      <turbo-frame
+        id='unsupported-claims'
+        src="<%= entity_unsupported_claims_path(uri: @entity.entity_uri) %>"
+        loading="lazy"
+        target="_top"
+      >
+      </turbo-frame>
+      <br>
+      <turbo-frame
+        id='reverse-statements'
+        src="<%= entity_derived_statements_path(uri: @entity.entity_uri)%>"
+        loading="lazy"
+        target="_top"
+      >
+      </turbo-frame>
+
+    <% end %>
+
+    <br>
+    <br>
+  </div>

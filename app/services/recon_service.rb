@@ -4,10 +4,11 @@ class ReconService
   end
 
   def query_party(params)
+    q = params[:query].gsub("?","") # Need more investigation: even though query gets CGI.escaped below, it is necessary to remove ? character to reconcile urls with query strings
     headers = { "Content-Type" => "application/json" }
     query =   {
         "q0" => {
-          "query" => params[:query]
+          "query" => q
         }
       }
    

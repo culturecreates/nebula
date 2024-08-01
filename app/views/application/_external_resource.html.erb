@@ -1,13 +1,13 @@
 <br>
 <h3>External Resource</h3>
 <p>
-  The resource
+  The URI
   <a href='<%= entity.entity_uri %>' target='_blank'><%= entity.entity_uri %></a>
-  is not in the Artsdata database. You can crawl the URL by choosing to
-  dereference.</p>
-Options:
-<ol>
+  is not in the Artsdata database. You can crawl the URI by choosing to
+  dereference.
+</p>
 
+<ol>
   <li>
     <%= link_to "Dereference", dereference_external_path(uri: entity.entity_uri) %>
   </li>

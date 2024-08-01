@@ -43,7 +43,10 @@ class ReconcileController < ApplicationController
 
       if response.code.to_s.include?("200")
         @result = JSON.parse(response.body)
-        @result = @result["q0"] if @result["q0"] 
+        @result = @result["q0"]["result"] if @result["q0"] 
+        if params[:match] == "true"
+          @result.select! { |r| r["match"] == true }
+        end
       else
         flash.alert = "Error: #{response.code} - #{response.message}"
         redirect_back(fallback_location: root_path)
