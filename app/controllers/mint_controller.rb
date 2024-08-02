@@ -20,7 +20,7 @@ class MintController < ApplicationController
       @label = params[:label]
       @reference =  params[:reference]
 
-      # get extra data about the entity in the event only externalUri is provided
+      # get extra data about the entity when only externalUri is provided
       @entity = Entity.new(entity_uri: @externalUri)
       @entity.load_card
       solution =  dereference_helper(@externalUri)
