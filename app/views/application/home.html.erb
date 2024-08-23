@@ -25,6 +25,15 @@
         query_show_path(sparql: "custom/adc-members", title: "ADC Member Table") %>
       </li>
     </ul>
+    <turbo-frame
+      id='sparqls'
+      src="<%= github_sparqls_path %>"
+      loading="lazy"
+      target="_blank"
+    >
+      loading...
+    </turbo-frame>
+
     <h4>
       Favourite Workflows
     </h4>

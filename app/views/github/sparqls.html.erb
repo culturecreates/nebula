@@ -1,0 +1,15 @@
+<h3>
+  SPARQLs
+</h3>
+<turbo-frame id="sparqls">
+  <ul>
+    <% @sparqls.each do |sparql| %>
+      <li>
+        <a href="/query/show?sparql=<%= sparql["download_url"] %>" target="_top">
+          <%= humanize(sparql["download_url"]) %>
+        </a>
+        (<a href="<%= sparql["html_url"] %>" target="_blank">edit</a>)
+      </li>
+    <% end %>
+  </ul>
+</turbo-frame>

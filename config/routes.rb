@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   # Github OAuth
   get "github/callback", to: "github#callback"
   get "github/workflows", to: "github#workflows"
+  get "github/sparqls", to: "github#sparqls"
 
   # Footlight Aggregator
   get "footlight/export", to: "footlight#export"

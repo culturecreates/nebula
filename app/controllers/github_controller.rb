@@ -16,9 +16,6 @@ class GithubController < ApplicationController
 
       # user_repos = user_repos(token)
       # session[:repos] = user_repos.map { |repo| repo["name"] }
-
-      # nebula_sparqls = nebula_sparqls(token)
-      # session[:nebula_sparqls] = nebula_sparqls.map { |sparql| sparql["download_url"].split('app/services/sparqls/')[1].split('.')[0]}
     else
       flash.alert = "Authorized, but unable to exchange code #{code} for token."
     end
@@ -36,6 +33,11 @@ class GithubController < ApplicationController
     @workflows = JSON.parse(res.body)["workflow_runs"]
   end
 
+  def sparqls
+      uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
+      @sparqls = info(session[:token], uri)
+  end
+
   private 
 
   def user_info(token)
@@ -48,10 +50,6 @@ class GithubController < ApplicationController
     info(token, uri)
   end
 
-  def nebula_sparqls(token) 
-    uri = URI("https://api.github.com/repos/culturecreates/nebula/contents/app/services/sparqls/custom")
-    info(token, uri)
-  end
 
 
   def info(token, uri)
