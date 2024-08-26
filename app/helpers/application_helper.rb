@@ -5,6 +5,9 @@ module ApplicationHelper
     "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{request.base_url}/github/callback"
   end
 
+  def humanize_url(url)
+    url.split("/").last.split(".").first.humanize
+  end
 
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')

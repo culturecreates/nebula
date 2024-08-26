@@ -3,6 +3,10 @@
   <h1><%= @entity.label %></h1>
   Crawled data from
   <h5><a><%= @entity.entity_uri&.html_safe %></a></h5>
+  <%= "<p> Using <a href='#{@shacl_url}'>#{humanize_url(@shacl_url)}</a></p>".html_safe %>
+  <%= if @post_sparql
+    "<p> Using <a href='#{@post_sparql}'>#{humanize_url(@post_sparql)}</a></p>".html_safe
+  end %>
   <div style="background: lightgrey; padding: 5px">
     <%= if @entity.graph.count == 0
       render partial: "external_resource", locals: { entity: @entity }
@@ -30,7 +34,7 @@
         <span class='badge bg-primary'>URI</span>
         <%= use_prefix(s.subject.value) %>
       <% else %>
-        Blank node
+        Blank node of type
         <%= new_entity.type %>
       <% end %>
       <%= render partial: "statements_table", locals: { entity: new_entity } %>

@@ -75,6 +75,13 @@ class Entity
     @graph << graph
   end
 
+  # Apply the contruct sparql (url) to the local graph inorder to add new triples
+  def construct_sparql(sparql_url)
+    sparql = SparqlLoader.load_url(sparql_url)
+    puts "SPARQL contruct: #{sparql}"
+    @graph = SPARQL.execute(sparql, @graph, update: true)
+  end
+
   def load_card
     sparql =  SparqlLoader.load('load_card', [
       'URI_PLACEHOLDER', self.entity_uri
