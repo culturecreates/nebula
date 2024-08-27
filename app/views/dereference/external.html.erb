@@ -4,9 +4,18 @@
   Crawled data from
   <h5><a><%= @entity.entity_uri&.html_safe %></a></h5>
   <%= "<p> Using <a href='#{@shacl_url}'>#{humanize_url(@shacl_url)}</a></p>".html_safe %>
-  <%= if @post_sparql
-    "<p> Using <a href='#{@post_sparql}'>#{humanize_url(@post_sparql)}</a></p>".html_safe
-  end %>
+  <% if @post_sparql %>
+    <p> Using <a href='<%= @post_sparql %>'><%= humanize_url(@post_sparql) %></a></p>
+  <% else %>
+    <%= link_to "Compute score",
+    dereference_external_path(
+      uri: @entity.entity_uri,
+      shacl: "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/shacl/shacl_for_scoring.ttl",
+      post_sparql:
+        "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/sparql/score_algorithm.sparql",
+    ) %>
+  </li>
+  <% end %>
   <div style="background: lightgrey; padding: 5px">
     <%= if @entity.graph.count == 0
       render partial: "external_resource", locals: { entity: @entity }
