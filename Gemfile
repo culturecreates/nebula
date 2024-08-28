@@ -53,10 +53,6 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
 end
 
-# group :test do
-  gem 'webmock'
-  gem "vcr"
-# end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
@@ -75,8 +71,13 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
-  gem "selenium-webdriver"
+  gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'simplecov', require: false
+  gem 'minitest-rails'
+  gem 'webmock'
+  gem 'mocha'
+  gem "vcr"
 end
 
 gem 'bootstrap', '~> 5.3.2'
