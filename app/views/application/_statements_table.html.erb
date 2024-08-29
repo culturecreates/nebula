@@ -17,8 +17,28 @@
         predicate: s.pred,
         predicate_hash: predicate_hash,
       } %>
+
       <% if !entity.entity_uri.starts_with?("http://blank.node") && @show_expand_button %>
+        <% if @url %>
+          <div
+            data-controller="githubapi"
+            data-githubapi-token-value="<%= session[:token] %>"
+            data-githubapi-url-value="<%= @url %>"
+            data-githubapi-method-value="<%= @httpMethod %>"
+            data-githubapi-httpbody-value="<%= @httpBody %>"
+          >
+            <button
+              data-githubapi-target="button"
+              class="btn btn-danger m-3"
+              data-action="githubapi#runAction"
+            >Run Action</button>
+
+            <p class="m-3" data-githubapi-target="result">
+            </p>
+          </div>
+        <% end %>
         <div class="statement_buttons">
+
           <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: s.pred.to_s, predicate_hash: predicate_hash),  
                   data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
                   title: "Show all datasets",

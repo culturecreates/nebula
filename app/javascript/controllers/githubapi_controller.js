@@ -5,34 +5,35 @@ export default class extends Controller {
   static values = { 
     token: String, 
     url: String,
-    method: String
+    method: String,
+    httpbody: String
   }
 
   connect() {
     console.log("token", this.tokenValue)
     console.log("url", this.urlValue)
     console.log("httpMethod", this.methodValue)
+    console.log("httpBody", this.httpbodyValue)
   }
 
   async runAction() {
     this.buttonTarget.disabled = true
     const url = this.urlValue;
     const httpMethod = this.methodValue ||= "GET";
+    const httpBody = this.httpbodyValue ||= "{'ref': 'main'}";
     // const url = "https://api.github.com/repos/culturecreates/artsdata-google-workspace-smart-chip/actions/workflows/push-to-artsdata.yml/dispatches"
     const options = {
       method: httpMethod,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + this.tokenValue,
-        'Accept': 'application/vnd.github+json',
+        'Accept': 'application/vnd.github.v3+json',
         'X-GitHub-Api-Version': '2022-11-28'
       }
     }
     // todo: make this more generic
     if (httpMethod == "POST") {
-      options.body = {
-        'ref': 'main'
-      }
+      options.body = httpBody;
     }
     try {
       const res = await fetch(url, options);
