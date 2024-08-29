@@ -4,10 +4,12 @@
     |
     <a href=<%= @entity.entity_uri %>>
       Visit</a>
-    |
-    <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
-    |
-    <%= link_to "CMS v3", footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+    <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' %>
+      |
+      <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
+      |
+      <%= link_to "CMS v3", footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+    <% end %>
     |
   <% else %>
     <% if  ranked_link(@entity) %>
