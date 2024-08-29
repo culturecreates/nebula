@@ -38,7 +38,8 @@ export default class extends Controller {
     try {
       const res = await fetch(url, options);
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        const errorText = await res.text();
+        throw new Error(`HTTP error ${res.status}! ${errorText}`);
       }
       console.log("res:", res);
      
