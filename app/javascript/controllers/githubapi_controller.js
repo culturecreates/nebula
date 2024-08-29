@@ -41,15 +41,15 @@ export default class extends Controller {
         const errorText = await res.text();
         throw new Error(`HTTP error ${res.status}! ${errorText}`);
       }
-      console.log("res:", res);
+      const resText = await res.text();
+      console.log("resText:", resText);
      
       if (res.status == 204) {
-        this.resultTarget.innerHTML = "Successfully ran the action. " + JSON.stringify(res, null, 2);
+        this.resultTarget.innerHTML = `Successfully ran the action. ${resText}`;
       } else {
-        this.resultTarget.innerHTML = JSON.stringify(res, null, 2);
+        this.resultTarget.innerHTML = `${resText}`;
       }
     } catch (error) {
-      console.error('Fetch error:', error);
       this.resultTarget.innerHTML = error.message;
     }
   }
