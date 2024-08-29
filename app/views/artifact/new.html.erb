@@ -1,0 +1,63 @@
+<div class="container">
+  <h1>New Artifact</h1>
+  <%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container') do |form| %>
+
+    <div class="mb-3">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name,
+                      class: "form-control",
+                      value: nil,
+                      placeholder: "Enter name" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :description, class: "form-label" %>
+      <%= form.text_area :description,
+                     class: "form-control",
+                     value: nil,
+                     placeholder: "Enter description",
+                     rows: 5 %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :download_url, class: "form-label" %>
+      <%= form.text_field :download_url,
+                      class: "form-control",
+                      value: nil,
+                      placeholder: "Download URL" %>
+    </div>
+    <div class="mb-3">
+      <%= form.label :type, "Type", class: "form-label" %>
+      <%= form.select :type,
+                  options_for_select(
+                    [%w[Website website], %w[Spreadsheet spreadsheet]],
+                  ),
+                  { include_blank: "Select type" },
+                  class: "form-control",
+                  id: "type-select" %>
+    </div>
+
+    <div class="mb-3" id="website-url-field" style="display: none;">
+      <%= form.label :website_url, "Website URL", class: "form-label" %>
+      <%= form.text_field :website_url,
+                      class: "form-control",
+                      placeholder: "Enter website URL" %>
+    </div>
+    <%= form.submit "Create", class: "btn btn-primary" %>
+  <% end %>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const typeSelect = document.getElementById("type-select");
+    const websiteUrlField = document.getElementById("website-url-field");
+
+    typeSelect.addEventListener("change", function() {
+      if (typeSelect.value === "website") {
+        websiteUrlField.style.display = "block";
+      } else {
+        websiteUrlField.style.display = "none";
+      }
+    });
+  });
+</script>

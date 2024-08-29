@@ -19,6 +19,9 @@ Rails.application.routes.draw do
     get "reconcile/query", to: "reconcile#query"
     get "validate/wikidata", to: "validate#wikidata"
     get "validate", to: "validate#show"
+
+    resources :artifact
+    
   end
 
   # Support legacy urls to Zazuko YASGUI SPARQL UI
