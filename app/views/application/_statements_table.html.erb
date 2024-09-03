@@ -25,7 +25,7 @@
             data-githubapi-token-value="<%= session[:token] %>"
             data-githubapi-url-value="<%= @url %>"
             data-githubapi-method-value="<%= @httpMethod %>"
-            data-githubapi-httpbody-value="<%= @httpBody %>"
+            data-githubapi-httpbody-value="<%= @httpBody.gsub("{{PublisherWebID}}","https://github.com/#{session[:handle]}#this") %>"
           >
             <button
               data-githubapi-target="button"
