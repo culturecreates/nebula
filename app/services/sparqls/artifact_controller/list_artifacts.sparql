@@ -1,0 +1,15 @@
+PREFIX schema: <http://schema.org/>
+select ?account ?group ?artifact ?version ?publisher   ?action where { 
+	values ?account { "DATABUS_ACCOUNT" }
+	?dataset <http://dataid.dbpedia.org/ns/core#account> ?account ; <http://dataid.dbpedia.org/ns/core#artifact> ?artifact_uri .
+	?dataset  <http://purl.org/dc/terms/publisher> ?publisher ; <http://purl.org/dc/terms/hasVersion> ?version .
+    OPTIONAL {
+       ?artifact_uri schema:name ?name .
+    }
+		bind(STRAFTER(str(?artifact_uri),CONCAT(?account,"/")) as ?last_part)
+		bind(concat("<a href='",str(?artifact_uri),"'>",STRAFTER(str(?last_part),"/"),"</a>") as ?artifact)
+		bind(STRBEFORE(str(?last_part),"/") as ?group)
+		bind(concat("<a class='btn btn-primary btn-sm' href='#'>import</a>&nbsp;<a class='btn btn-danger btn-sm' href='#'>delete</a>") as ?action)
+
+	
+} limit 100 

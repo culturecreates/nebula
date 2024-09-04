@@ -1,6 +1,6 @@
 <div class="container">
   <h1>New Artifact</h1>
-  <%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container') do |form| %>
+  <%= form_with(url: artifact_index_path, method: :post, local: true, class: 'container') do |form| %>
 
     <div class="mb-3">
       <%= form.label :name, class: "form-label" %>
@@ -20,13 +20,6 @@
     </div>
 
     <div class="mb-3">
-      <%= form.label :download_url, class: "form-label" %>
-      <%= form.text_field :download_url,
-                      class: "form-control",
-                      value: nil,
-                      placeholder: "Download URL" %>
-    </div>
-    <div class="mb-3">
       <%= form.label :type, "Type", class: "form-label" %>
       <%= form.select :type,
                   options_for_select(
@@ -37,12 +30,21 @@
                   id: "type-select" %>
     </div>
 
-    <div class="mb-3" id="website-url-field" style="display: none;">
-      <%= form.label :website_url, "Website URL", class: "form-label" %>
-      <%= form.text_field :website_url,
+    <div class="mb-3" id="sheet-url-field" style="display: none;">
+      <%= form.label :sheet_url, "Sheet URL", class: "form-label" %>
+      <%= form.text_field :sheet_url,
                       class: "form-control",
-                      placeholder: "Enter website URL" %>
+                      placeholder: "Enter Google sheet URL" %>
     </div>
+
+    <div class="mb-3" id="prefix-field" style="display: none;">
+      <%= form.label :prefix, class: "form-label" %>
+      <%= form.text_field :prefix,
+                      class: "form-control",
+                      value: nil,
+                      placeholder: "Enter a base prefix for each row" %>
+    </div>
+
     <%= form.submit "Create", class: "btn btn-primary" %>
   <% end %>
 </div>
@@ -50,13 +52,16 @@
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const typeSelect = document.getElementById("type-select");
-    const websiteUrlField = document.getElementById("website-url-field");
+    const sheetUrlField = document.getElementById("sheet-url-field");
+    const prefixField = document.getElementById("prefix-field");
 
     typeSelect.addEventListener("change", function() {
-      if (typeSelect.value === "website") {
-        websiteUrlField.style.display = "block";
+      if (typeSelect.value === "spreadsheet") {
+        sheetUrlField.style.display = "block";
+        prefixField.style.display = "block";
       } else {
-        websiteUrlField.style.display = "none";
+        sheetUrlField.style.display = "none";
+        prefixField.style.display = "none";
       }
     });
   });

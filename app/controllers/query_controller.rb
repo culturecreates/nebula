@@ -10,15 +10,21 @@ class QueryController < ApplicationController
   #   &sparql=custom/scenepro-query&title=ScenePro
   def show
     params.required(:sparql)
-    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale)
+    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale, :databus_account)
     sparql_file = params[:sparql] 
     title =  params[:title] ||=  params[:sparql].split("/").last
+
+    # Placeholders in SPARQL query
     graph = params[:graph]
+    databus_account = params[:databus_account].downcase if params[:databus_account]
     construct_files = params[:constructs].split(",") if params[:constructs]
 
     sparql_endpoint = "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
     sparql_client = SPARQL::Client.new(sparql_endpoint)
-    query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph])
+    
+    query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "DATABUS_ACCOUNT", databus_account])
+
+
     solutions = if !construct_files
                   sparql_client.query(query).limit(1000)
                 else

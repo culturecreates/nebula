@@ -44,7 +44,7 @@ module ApplicationHelper
       .gsub("http://www.w3.org/2002/07/owl#","owl:")
       .gsub("http://www.w3.org/2004/02/skos/core#","skos:")
       .gsub("http://www.w3.org/ns/prov#","prov:")
-      .gsub("http://kg.artsdata.ca/databus/culture-creates/","databus:")
+      .gsub("http://kg.artsdata.ca/databus/","databus:")
       .gsub("http://www.w3.org/ns/shacl#","shacl:")
       .gsub("http://www.wikidata.org/entity/","wd:")
       .gsub("http://www.w3.org/2001/XMLSchema#", "xsd:")

@@ -1,5 +1,5 @@
 class Artifact
-  attr_accessor :name, :group, :description, :account
+  attr_accessor :name, :type, :description, :sheet_url
 
   def initialize(hsh = {})
     hsh.each do |key, value|
@@ -7,8 +7,9 @@ class Artifact
     end
   end
 
-  def self.all
-    # This is a dummy method that returns an empty array
-    []
+  def save
+    # Save the artifact to the database
+    
+    return true
   end
 end
