@@ -1,3 +1,6 @@
 <div class="alternate-name">
-  <%= link_to "Download CSV", query_show_path(params: permitted_params, format: :csv) %> 
+  <%= link_to "Download CSV", query_show_path(params: permitted_params, format: :csv) %>
+  |
+  <%= link_to "SPARQL",
+  "http://artsdata-trifid-production.herokuapp.com/sparql/#query=#{URI.encode_www_form_component(@query)}" %>
 </div>

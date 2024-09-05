@@ -22,13 +22,13 @@ class QueryController < ApplicationController
     sparql_endpoint = "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
     sparql_client = SPARQL::Client.new(sparql_endpoint)
     
-    query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "DATABUS_ACCOUNT", databus_account])
+    @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "DATABUS_ACCOUNT", databus_account])
 
 
     solutions = if !construct_files
-                  sparql_client.query(query).limit(1000)
+                  sparql_client.query(@query).limit(1000)
                 else
-                  SPARQL.execute(query,local_graph(construct_files,sparql_client) )
+                  SPARQL.execute(@query,local_graph(construct_files,sparql_client) )
                 end
 
     respond_to do |format|
