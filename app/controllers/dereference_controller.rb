@@ -9,7 +9,7 @@ class DereferenceController < ApplicationController
     @entity.load_card
   end
 
-  # /dereference/external?uri=
+  # /dereference/external[.jsonld]?uri=
   # This can be a resource that is a graph of entities on the web
   def external
     @shacl_url = params[:shacl] || "app/services/shacls/shacl_artsdata_external.ttl"
@@ -26,16 +26,29 @@ class DereferenceController < ApplicationController
     @report = shacl.execute(@entity.graph)
     @entity.load_graph_into_graph(@report)
 
-    
     if @post_sparql
       sparql_url = @post_sparql
       @entity.construct_sparql(sparql_url)
       @entity.replace_blank_nodes # first level
     end
+    respond_to do |format|
+      format.jsonld {
+        puts "rendering jsonld..."
+        render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
+      }
+      format.all { }
+    end
+
   end
 
   private
   def failed_dereference(exception)
+     # Get the format of the initial request
+    request_format = request.format.symbol
+    if request_format == :jsonld
+      render json: { error: exception }, status: :internal_server_error
+      return
+    end
     flash[:alert] = exception
     redirect_back(fallback_location: root_path)
   end
