@@ -42,15 +42,13 @@ class MintController < ApplicationController
   
       if !@classToMint
         @classToMint =  if solution&.bound?(:type) 
-                          solution.type
+                          top_type(solution.type.value)
                         else
                           "Thing"
                         end
       end
       
-      if  !@classToMint.starts_with?("http") 
-        @classToMint = solution.type if solution&.bound?(:type)
-      elsif  !@classToMint&.starts_with?("http") 
+      if !@classToMint&.starts_with?("http") 
         @classToMint = "http://schema.org/" + @classToMint
       end
 
