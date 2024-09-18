@@ -1,7 +1,7 @@
 <% solutions =
   SPARQL.execute(
     "PREFIX shacl: <http://www.w3.org/ns/shacl#> " \
-      "SELECT distinct ?resultPath ?resultMessage WHERE { ?bn shacl:focusNode  ?any . ?bn shacl:resultMessage ?resultMessage . OPTIONAL { ?bn shacl:resultPath ?resultPath } }",
+      "SELECT distinct ?resultPath ?resultMessage WHERE { ?bn shacl:focusNode  ?any . ?bn shacl:resultMessage ?resultMessage . OPTIONAL { ?bn shacl:resultPath ?resultPath } FILTER( NOT EXISTS { ?bn shacl:focusNode <#{entity.entity_uri}> }) }",
     entity.graph,
   ) %>
 
