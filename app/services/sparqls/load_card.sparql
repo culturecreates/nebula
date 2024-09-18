@@ -1,30 +1,41 @@
-# load_card
+# load_card query is used to load the card data for dereferencing a given URI
+# If there is a nested location, then the location name is flattened.
+# If there is a nested address, then the postalCode and addressLocality is flattened.
+# Flatenning is done to make the data more readable and to avoid nested objects in the card.
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 construct { 
-  <URI_PLACEHOLDER> <http://www.w3.org/2000/01/rdf-schema#label> ?c ; 
-  a ?type ; 
-  <http://schema.org/streetAddress> ?street  ;  
-  <http://schema.org/addressLocality> ?locality ;  
-  <http://schema.org/postalCode> ?postalCode ;
-  <http://schema.org/startDate> ?startDate ;
-  <http://schema.org/location> ?place_name ;
-  <http://www.w3.org/ns/prov#wasDerivedFrom> ?dataid .
+  ?entity rdfs:label ?c ; 
+    a ?type ; 
+  schema:additionalType ?inferred_type ;
+  schema:streetAddress ?street  ;  
+  schema:addressLocality ?locality ;  
+  schema:postalCode ?postalCode ;
+  schema:startDate ?startDate ;
+  schema:endDate ?endDate ;
+  schema:location ?place_name ;
+  prov:wasDerivedFrom ?dataid .
 } 
 where { 
-  OPTIONAL { <URI_PLACEHOLDER> <http://www.w3.org/2000/01/rdf-schema#label> ?c .}
-  MINUS { <URI_PLACEHOLDER> <http://www.w3.org/2004/02/skos/core#hiddenLabel> ?c . } 
+  VALUES ?entity { <URI_PLACEHOLDER> }
+  OPTIONAL { ?entity rdfs:label ?c .}
+  MINUS { ?entity skos:hiddenLabel ?c . }   
+  ?entity a ?inferred_type .
   graph ?g { 
-    <URI_PLACEHOLDER> a ?type .
-    OPTIONAL { <URI_PLACEHOLDER> <http://schema.org/startDate> ?startDate .}           
-    OPTIONAL { <URI_PLACEHOLDER>   <http://schema.org/streetAddress> ?street ; 
-      <http://schema.org/addressLocality> ?locality ;
-      <http://schema.org/postalCode> ?postalCode . } 
-    OPTIONAL {
-      ?g <http://www.w3.org/ns/prov#wasDerivedFrom> ?dataid .
-    }
+    ?entity a ?type .
+    OPTIONAL { ?entity schema:startDate ?startDate .} 
+    OPTIONAL { ?entity schema:endDate ?endDate .}              
+    OPTIONAL { ?entity schema:streetAddress ?street .} 
+    OPTIONAL { ?entity schema:addressLocality ?locality .} 
+    OPTIONAL { ?entity schema:postalCode ?postalCode .} 
+    OPTIONAL { ?g prov:wasDerivedFrom ?dataid .}
   }
  
-  OPTIONAL { <URI_PLACEHOLDER> <http://schema.org/location>/<http://schema.org/name> ?place_name .}
-  OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/postalCode> ?postalCode . }
-  OPTIONAL { <URI_PLACEHOLDER>  <http://schema.org/address>/<http://schema.org/addressLocality> ?locality . }
+  OPTIONAL { ?entity schema:location/schema:name ?place_name .}
+  OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode . }
+  OPTIONAL { ?entity  schema:address/schema:addressLocality ?locality . }
 } 

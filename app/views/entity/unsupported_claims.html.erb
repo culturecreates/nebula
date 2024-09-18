@@ -1,5 +1,5 @@
 <h1>Claims for
-  <%= @entity.label %>
+  <%= @entity.label&.value %>
 </h1>
 <a><%= use_prefix(@entity.entity_uri) %></a>
 

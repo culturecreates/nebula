@@ -7,6 +7,7 @@ class ValidateController < ApplicationController
     mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
     url = "#{mint_endpoint}/test_event?uri=#{CGI.escape(uri)}"
     response = HTTParty.get(url)
+    @report = JSON.parse(response.body)['message']
     @entity.graph = RDF::Graph.new
     @entity.graph.from_jsonld(JSON.parse(response.body)['data'].to_json)
   end

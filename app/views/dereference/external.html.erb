@@ -1,20 +1,23 @@
-<% provide(:title, @entity.label) %>
+<% provide(:title, @entity.label&.value) %>
 <div class="container">
-  <h1><%= @entity.label %></h1>
+  <h1><%= @entity.label&.value %></h1>
   Crawled data from
   <h5><a><%= @entity.entity_uri&.html_safe %></a></h5>
-  <%= "<p> Using <a href='#{@shacl_url}'>#{humanize_url(@shacl_url)}</a></p>".html_safe %>
+  <%= "<p> Using <a href='#{@shacl_url}'>#{humanize_url(@shacl_url) if @shacl_url}</a></p>".html_safe %>
   <% if @post_sparql %>
-    <p> Using <a href='<%= @post_sparql %>'><%= humanize_url(@post_sparql) %></a></p>
+    <p>
+      Using
+      <a href='<%= @post_sparql %>'><%= humanize_url(@post_sparql) %></a></p>
   <% else %>
     <%= link_to "Compute score",
     dereference_external_path(
       uri: @entity.entity_uri,
-      shacl: "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/shacl/shacl_for_scoring.ttl",
+      shacl:
+        "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/shacl/shacl_for_scoring.ttl",
       post_sparql:
         "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/sparql/score_algorithm.sparql",
     ) %>
-  </li>
+
   <% end %>
   <div style="background: lightgrey; padding: 5px">
     <%= if @entity.graph.count == 0
@@ -25,7 +28,7 @@
         "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
         @entity.graph,
       ) %>
-    <%= if solutions.count > @max_entities_per_page
+    <%= if solutions.count > @max_entities_per_page ||= 40
       "<p> Showing first #{@max_entities_per_page} entities of #{solutions.count}</p>".html_safe
     end %>
 

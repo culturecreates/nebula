@@ -1,6 +1,6 @@
 
 class Entity
-  attr_accessor :entity_uri, :graph
+  attr_accessor :entity_uri, :graph, :start_date, :card
   @@artsdata_client = ArtsdataApi::V2::Client.new(
         graph_repository: Rails.application.credentials.graph_repository, 
         api_endpoint: Rails.application.credentials.graph_api_endpoint)
@@ -8,15 +8,17 @@ class Entity
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
     @graph = h[:graph]
+    @card = {}
   end
 
   # Try to get a label of name property
+  # Return RDF::Literal that may contain language
   def label
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])
-    return  solution.first.object.value if solution.count > 0
+    return  solution.first.object if solution.count > 0
   
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/name"), nil])
-    solution.first.object.value if solution.count > 0
+    solution.first.object if solution.count > 0
   end
 
   def k_number
@@ -38,24 +40,41 @@ class Entity
   end
   
 
-  def type
-    uri = @entity_uri
-    graph = @graph
-
-    query = RDF::Query.new do
-      pattern [RDF::URI(uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :type]
-    end
-    solution =  graph.query(query)
-    
-    type = solution&.first&.type 
-    # try to return top level type
-    if type
-      solution.each do |s|
-        type = s.type if ["http://schema.org/Place","http://schema.org/Person","http://schema.org/Organization"].include?(s.type)
+  # Try to get a top level type of the entity
+  def top_level_type
+    # The card sparql adds inferred types to additionalType
+    solution =  @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/additionalType"), :nil])
+  
+    # try to return top level type using inferred types
+    top_type = nil
+    solution.each do |s|
+      if ["http://schema.org/Event",
+          "http://schema.org/EventSeries",
+          "http://schema.org/Place",
+          "http://schema.org/Person",
+          "http://schema.org/Organization"].include?(s.object.value)
+          top_type = s.object
+        break
       end
     end
 
-    return type
+    if top_type
+      return top_type
+    elsif solution.count > 0
+      return solution.first.object
+    else
+      return RDF.URI("http://schema.org/Thing")
+    end
+  end
+
+  def type
+    solution =  @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :nil])
+    type = solution&.first&.object
+    if type
+      return type
+    else
+      return RDF.URI("http://schema.org/Thing")
+    end
   end
 
   def method_missing(m,*args,&block)
@@ -82,13 +101,21 @@ class Entity
     @graph = SPARQL.execute(sparql, @graph, update: true)
   end
 
+  # Cards are short summaries of entities
   def load_card
     sparql =  SparqlLoader.load('load_card', [
       'URI_PLACEHOLDER', self.entity_uri
     ])
-    
     @graph = construct_turtle(sparql)
 
+    @card[:start_date] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/startDate"), nil])&.first&.object&.value
+    @card[:end_date] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/endDate"), nil])&.first&.object&.value
+    @card[:location_name] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/location"), nil])&.first&.object&.value
+    @card[:postal_code] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/postalCode"), nil])&.first&.object&.value
+    @card[:locality] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/addressLocality"), nil])&.first&.object&.value
+    @card[:street_address] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/streetAddress"), nil])&.first&.object&.value
+
+    @card[:name_language] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])&.first&.object&.language
   end
 
   # load rdf from external URL
@@ -191,5 +218,35 @@ class Entity
       [] # return empty array
     end
   end
+
+  # # converts a type a top level type
+  # # if type is a sub type of Event, Place, Organization
+  # # Params: type - RDF::URI
+  # def top_type(type)
+  #   if [  "http://schema.org/TheaterEvent",
+  #         "http://schema.org/DanceEvent",
+  #         "http://schema.org/MusicEvent",
+  #         "http://schema.org/EventSeries" ].include?(type.value)
+  #      RDF.URI("http://schema.org/Event")
+  #   elsif [ "http://schema.org/PerformingArtsTheater",
+  #           "http://schema.org/Museum",
+  #           "http://schema.org/MusicVenue",
+  #           "http://schema.org/CivicStructure",
+  #           "http://schema.org/EventVenue"].include?(type.value)
+  #      RDF.URI("http://schema.org/Place")
+  #   elsif [ "http://schema.org/PerformingGroup",
+  #           "http://schema.org/DanceGroup",
+  #           "http://schema.org/MusicGroup",
+  #           "http://schema.org/TheaterGroup",
+  #           "http://schema.org/Corporation",
+  #           "http://schema.org/GovernmentOrganization",
+  #           "http://schema.org/NGO"].include?(type.value)
+  #      RDF.URI("http://schema.org/Organization")
+  #   elsif type&.value&.blank?
+  #     RDF.URI("http://schema.org/Thing")
+  #   else
+  #     type
+  #   end
+  # end
 
 end

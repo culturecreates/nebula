@@ -5,6 +5,10 @@ module ApplicationHelper
     "https://github.com/login/oauth/authorize?client_id=#{Rails.application.credentials.CLIENT_ID}&redirect_uri=#{request.base_url}/github/callback"
   end
 
+  def display_warning(message)
+    "<i style='color: red'>#{message}</i>".html_safe
+  end
+
   def humanize_url(url)
     url.split("/").last.split(".").first.humanize
   end

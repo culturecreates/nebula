@@ -9,7 +9,7 @@ class MintController < ApplicationController
   #   classToMint
   #   label
   #   language
-  #   reference
+  #   reference = the prov#wasDerivedFrom URI of the entity
   #   postalCode
   #   startDate
   def preview
@@ -17,13 +17,14 @@ class MintController < ApplicationController
     if required.all? { |k| params.key? k } && @authority
       @externalUri = params[:externalUri]
       @classToMint = params[:classToMint]
+
       @label = params[:label]
       @reference =  params[:reference]
 
       # get extra data about the entity when only externalUri is provided
       @entity = Entity.new(entity_uri: @externalUri)
       @entity.load_card
-      solution =  dereference_helper(@externalUri)
+      
     
       if !@reference
         reference = {
@@ -35,25 +36,22 @@ class MintController < ApplicationController
       end
 
       if !@label
-        @label = solution.label if solution&.bound?(:label)
+        @label = @entity.label.&value
       end
       
-      @language = solution.label&.language&.to_s if solution&.bound?(:label)
-  
+      @language = @entity&.label&.language 
+      
       if !@classToMint
-        @classToMint =  if solution&.bound?(:type) 
-                          top_type(solution.type.value)
-                        else
-                          "Thing"
-                        end
+        @classToMint = @entity.top_level_type 
       end
       
+      # if classToMint was passed in as a parameter wihtout a full URI, add schema.org prefix
       if !@classToMint&.starts_with?("http") 
         @classToMint = "http://schema.org/" + @classToMint
       end
 
-      @postalCode = solution.postalCode if solution&.bound?(:postalCode)
-      @startDate = solution.startDate if solution&.bound?(:startDate)
+      @postalCode = @entity.card[:postal_code]
+      @startDate =  @entity.card[:start_date]
     else 
       flash.now.alert = "Missing a required param. Required list: #{required}"
     end
