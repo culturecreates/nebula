@@ -1,5 +1,6 @@
 class IcalController < ApplicationController
-
+  before_action :authenticate_user!, only: [:external] # ensure user is logged in
+  
   def index
     uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/ical")
     @icals = GithubService.info(session[:token], uri)
