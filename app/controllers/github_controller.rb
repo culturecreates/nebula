@@ -35,49 +35,21 @@ class GithubController < ApplicationController
 
   def sparqls
       uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
-      @sparqls = info(session[:token], uri)
+      @sparqls = GithubService.info(session[:token], uri)
   end
 
   private 
 
   def user_info(token)
     uri = URI("https://api.github.com/user")
-    info(token, uri)
+    GithubService.info(token, uri)
   end
 
   def user_repos(token)
     uri = URI("https://api.github.com/user/repos")
-    info(token, uri)
+    GithubService.info(token, uri)
   end
 
-
-
-  def info(token, uri)
-    result = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
-      body = {"access_token" => token}.to_json
-  
-      auth = "Bearer #{token}"
-      headers = {"Accept" => "application/json", "Content-Type" => "application/json", "Authorization" => auth}
-  
-      http.send_request("GET", uri.path, body, headers)
-    end
-  
-    parse_response(result)
-  end
-
-  
-
-  def parse_response(response)
-    case response
-    when Net::HTTPOK
-      JSON.parse(response.body)
-    else
-      puts response
-      puts response.body
-      {}
-    end
-  end
-  
   def exchange_code(code)
     params = {
       "client_id" => Rails.application.credentials.CLIENT_ID,
@@ -90,6 +62,6 @@ class GithubController < ApplicationController
       {"Accept" => "application/json"}
     )
   
-    parse_response(result)
+    GithubService.parse_response(result)
   end
 end

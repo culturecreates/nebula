@@ -1,0 +1,40 @@
+<div class="container">
+  <h1>
+    <%= t("ical.ical_feeds") %>
+  </h1>
+  <p>
+    <%= t("ical.description").html_safe %>
+  </p>
+
+  <ul>
+    <% @icals.each do |ical| %>
+      <li>
+        <div data-controller="clipboard" data-clipboard-success-content-value="copied">
+          <%= humanize_url(ical["download_url"]) %>
+
+          <a href="<%= ical[:jsonld_url] %>" target="_blank">
+            JSON-LD
+          </a>
+          |
+          <a href="<%= ical["html_url"] %>" target="_blank">
+            SPARQL
+          </a>
+          |
+          <a href="<%= ical[:feed_url] %>" target="_blank">
+            iCal Feed
+          </a>
+
+          <div data-clipboard-target="source" style="display: none;"><%= ical[:feed_url] %></div>
+          <a
+            class="cursor-pointer"
+            data-action="clipboard#copy"
+            data-clipboard-target="button"
+            title="Copy URI"
+          ><%= render partial: "shared/icon_copy" %>
+          </a>
+        </div>
+
+      </li>
+    <% end %>
+  </ul>
+</div>

@@ -45,3 +45,6 @@ en:
     place_tab: "Place"
     place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
     search_placeholder: "Name or Wikidata ID"
+  ical:
+    description: |
+      List of iCal feeds created for Artsdata. To create a new iCal feed, add a SPARQL to this <a href='https://github.com/artsdata-stewards/artsdata-actions/tree/main/ical'>Github repository</a>.

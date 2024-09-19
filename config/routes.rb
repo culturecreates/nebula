@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     get "validate", to: "validate#show"
 
     resources :artifact
+    resources :ical
     
   end
 
