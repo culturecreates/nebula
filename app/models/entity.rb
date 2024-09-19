@@ -70,11 +70,7 @@ class Entity
   def type
     solution =  @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :nil])
     type = solution&.first&.object
-    if type
-      return type
-    else
-      return RDF.URI("http://schema.org/Thing")
-    end
+    type || RDF.URI("http://schema.org/Thing")
   end
 
   def method_missing(m,*args,&block)
@@ -86,12 +82,12 @@ class Entity
   end
 
   def load_shacl_into_graph(shacl_name) 
-    @shacl = "app/services/shacls/#{shacl_name}"
-    @graph << RDF::Graph.load(@shacl)
+    shacl = "app/services/shacls/#{shacl_name}"
+    @graph << RDF::Graph.load(shacl)
   end
 
-  def load_graph_into_graph(graph)
-    @graph << graph
+  def load_graph_into_graph(graph_part)
+    @graph << graph_part
   end
 
   # Apply the contruct sparql (url) to the local graph inorder to add new triples
@@ -101,7 +97,7 @@ class Entity
     @graph = SPARQL.execute(sparql, @graph, update: true)
   end
 
-  # Cards are short summaries of entities
+  # Cards are short summaries of entities loaded from the triple store
   def load_card
     sparql =  SparqlLoader.load('load_card', [
       'URI_PLACEHOLDER', self.entity_uri
@@ -114,7 +110,6 @@ class Entity
     @card[:postal_code] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/postalCode"), nil])&.first&.object&.value
     @card[:locality] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/addressLocality"), nil])&.first&.object&.value
     @card[:street_address] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/streetAddress"), nil])&.first&.object&.value
-
     @card[:name_language] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])&.first&.object&.language
   end
 
@@ -219,34 +214,5 @@ class Entity
     end
   end
 
-  # # converts a type a top level type
-  # # if type is a sub type of Event, Place, Organization
-  # # Params: type - RDF::URI
-  # def top_type(type)
-  #   if [  "http://schema.org/TheaterEvent",
-  #         "http://schema.org/DanceEvent",
-  #         "http://schema.org/MusicEvent",
-  #         "http://schema.org/EventSeries" ].include?(type.value)
-  #      RDF.URI("http://schema.org/Event")
-  #   elsif [ "http://schema.org/PerformingArtsTheater",
-  #           "http://schema.org/Museum",
-  #           "http://schema.org/MusicVenue",
-  #           "http://schema.org/CivicStructure",
-  #           "http://schema.org/EventVenue"].include?(type.value)
-  #      RDF.URI("http://schema.org/Place")
-  #   elsif [ "http://schema.org/PerformingGroup",
-  #           "http://schema.org/DanceGroup",
-  #           "http://schema.org/MusicGroup",
-  #           "http://schema.org/TheaterGroup",
-  #           "http://schema.org/Corporation",
-  #           "http://schema.org/GovernmentOrganization",
-  #           "http://schema.org/NGO"].include?(type.value)
-  #      RDF.URI("http://schema.org/Organization")
-  #   elsif type&.value&.blank?
-  #     RDF.URI("http://schema.org/Thing")
-  #   else
-  #     type
-  #   end
-  # end
 
 end

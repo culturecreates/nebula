@@ -2,6 +2,7 @@
 # If there is a nested location, then the location name is flattened.
 # If there is a nested address, then the postalCode and addressLocality is flattened.
 # Flatenning is done to make the data more readable and to avoid nested objects in the card.
+# TODO: detect Wikidata URIs and call the Wikidata SPARQL endpoint
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>
