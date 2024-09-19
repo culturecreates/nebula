@@ -12,8 +12,9 @@ WHERE {
         bind(STRDT(str(?startDate),xsd:dateTime) as ?startDateTime)
        
         OPTIONAL {
-          FILTER NOT EXISTS { ?series schema:subEvent ?uri }
-          bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
+          FILTER NOT EXISTS { ?series schema:subEvent ?uri . }
+          bind(concat("mint") as ?mint_top_level)
+          #  bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
         }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
