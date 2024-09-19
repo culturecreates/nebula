@@ -15,3 +15,23 @@
     <a href='<%= entity.entity_uri %>' target='_blank'>Visit</a>
   </li>
 </ol>
+
+<br>
+<turbo-frame
+  id='reverse-statements'
+  src="<%= entity_derived_statements_path(uri: entity.entity_uri)%>"
+  loading="lazy"
+  target="_top"
+>
+</turbo-frame>
+<br>
+Also checking URLs:
+<br>
+<turbo-frame
+  id='recon_results'
+  src="<%= reconcile_query_path(query: " " + entity.entity_uri) %>"
+  loading="lazy"
+  target="_top"
+>
+  loading...
+</turbo-frame>

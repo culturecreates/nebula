@@ -16,15 +16,24 @@
             entity: Entity.new(entity_uri: s.obj, graph: entity.graph),
           } %>
         <% elsif s.obj.uri? %>
-          <% frame_id = rand(10_000) %>
-          <turbo-frame
-            id='card-<%= frame_id %>'
-            src="<%= dereference_card_path(uri: s.obj.to_s, frame_id: frame_id)%>"
-            loading="lazy"
-            target="_top"
-          >
-            <%= s.obj.to_s %>
-          </turbo-frame>
+          <% @frame_id ||= 0 %>
+          <% @frame_id += 1 %>
+          <% if  @frame_id < 8 %>
+            <!-- Limit the number of frames -->
+            <turbo-frame
+              id='card-<%= @frame_id %>'
+              src="<%= dereference_card_path(uri: s.obj.to_s, frame_id: @frame_id)%>"
+              loading="lazy"
+              target="_top"
+            >
+              <%= s.obj.to_s %>
+            </turbo-frame>
+          <% else %>
+            <span>
+              <%= display_object(s.obj) %>
+              (expand)
+            </span>
+          <% end %>
         <% else %>
           <%= display_object(s.obj) %>
         <% end %>
