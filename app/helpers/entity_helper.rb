@@ -84,7 +84,13 @@ module EntityHelper
   def display_uri(uri)
     uri = CGI.unescape(uri) # to correctly display cases with '#this' like http://localhost:3000/entity?uri=https%3A%2F%2Fsaumier.github.io%2Fgregory-saumier-finch.ttl%23this
     link = entity_path(uri: uri)
-    "<a href='#{link}' target='_top'>#{use_prefix(uri)}</a>".html_safe
+    char_max = 40
+    if uri.length > char_max
+      "<a href='#{link}' target='_top'>#{use_prefix(uri).truncate(char_max)}</a>".html_safe
+    else
+      "<a href='#{link}' target='_top'>#{use_prefix(uri)}</a>".html_safe
+    end
+    
   end
 
   def display_reference(uri)
