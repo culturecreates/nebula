@@ -21,8 +21,9 @@ Test:
         <%= @entity.card[:location_name] %>
         -
         <%= @entity.card[:start_date] %>
-        <% if type == "http://schema.org/EventSeries" %>
-          "- #{@entity.card[:end_date]}"
+        <% if @entity.card[:end_date] %>
+          to
+          <%= @entity.card[:end_date] %>
         <% end %>
       <% else %>
         <% if @entity.card[:disambiguating_description].present? %>
