@@ -22,8 +22,17 @@ Test:
         -
         <%= @entity.card[:start_date] %>
         <% if @entity.card[:end_date] %>
-          to
-          <%= @entity.card[:end_date] %>
+          -
+          <% days =
+            1 +
+              (
+                (
+                  Time.parse(@entity.card[:end_date]) -
+                    Time.parse(@entity.card[:start_date])
+                ) / (60 * 60 * 24)
+              ).to_i %>
+          <%= days > 1 ? "span #{days} days" : "single day" %>
+
         <% end %>
       <% else %>
         <% if @entity.card[:disambiguating_description].present? %>
