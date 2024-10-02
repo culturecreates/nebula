@@ -67,7 +67,8 @@
     <ul>
       <li><%= @label %></li>
       <li><%= @classToMint %></li>
-      <li><%= @postalCode if @postalCode %><%= @startDate if @startDate %></li>
+      <%= "<li> #{@postalCode}</li>".html_safe if @postalCode %>
+      <%= "<li> #{@startDate}</li>".html_safe if @startDate %>
     </ul>
     <turbo-frame
       id='recon_results'

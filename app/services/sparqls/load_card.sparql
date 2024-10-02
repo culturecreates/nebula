@@ -41,6 +41,7 @@ where {
   OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription .}
  
   OPTIONAL { ?entity schema:location/schema:name ?place_name .}
+  OPTIONAL { ?entity schema:location/schema:address/schema:postalCode ?postalCode .}
   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode . }
   OPTIONAL { ?entity  schema:address/schema:addressLocality ?locality . }
 } 
