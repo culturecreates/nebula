@@ -18,17 +18,13 @@ class QueryController < ApplicationController
     graph = params[:graph]
     databus_account = params[:databus_account].downcase if params[:databus_account]
     construct_files = params[:constructs].split(",") if params[:constructs]
-
-    sparql_endpoint = "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
-    sparql_client = SPARQL::Client.new(sparql_endpoint)
     
     @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "DATABUS_ACCOUNT", databus_account])
 
-
     solutions = if !construct_files
-                  sparql_client.query(@query).limit(1000)
+                  helpers.artsdata_sparql_client.query(@query).limit(1000)
                 else
-                  SPARQL.execute(@query,local_graph(construct_files,sparql_client) )
+                  SPARQL.execute(@query,local_graph(construct_files, helpers.artsdata_sparql_client) )
                 end
 
     respond_to do |format|

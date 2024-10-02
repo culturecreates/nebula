@@ -13,6 +13,7 @@ construct {
   ?entity rdfs:label ?c ; 
     a ?type ; 
   schema:additionalType ?inferred_type ;
+  schema:disambiguatingDescription ?disambiguatingDescription ;
   schema:streetAddress ?street  ;  
   schema:addressLocality ?locality ;  
   schema:postalCode ?postalCode ;
@@ -34,7 +35,10 @@ where {
     OPTIONAL { ?entity schema:addressLocality ?locality .} 
     OPTIONAL { ?entity schema:postalCode ?postalCode .} 
     OPTIONAL { ?g prov:wasDerivedFrom ?dataid .}
+
   }
+  
+  OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription .}
  
   OPTIONAL { ?entity schema:location/schema:name ?place_name .}
   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode . }

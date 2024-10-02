@@ -24,7 +24,8 @@ class ReconService
 
    # Print the URL
    puts "URL: #{@recon_uri}"
-
+   
+   # TODO: bring back  Net::HTTP::Get.new(uri) native solution instead of HTTParty
    HTTParty.get(@recon_uri, :headers => headers)
     
   end

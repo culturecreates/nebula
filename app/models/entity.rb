@@ -110,6 +110,7 @@ class Entity
     @card[:postal_code] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/postalCode"), nil])&.first&.object&.value
     @card[:locality] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/addressLocality"), nil])&.first&.object&.value
     @card[:street_address] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/streetAddress"), nil])&.first&.object&.value
+    @card[:disambiguating_description] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/disambiguatingDescription"), nil])&.first&.object&.value
     @card[:name_language] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])&.first&.object&.language
   end
 

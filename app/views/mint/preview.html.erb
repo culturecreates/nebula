@@ -6,23 +6,23 @@
   <div class="col-md">
     <p>
       <turbo-frame
-        id='card-validation'
-        src="<%= validate_path(uri: @externalUri)%>"
-        loading="lazy"
-        target="_top"
-      >
-        validating...
-      </turbo-frame>
-    </p>
-    <p>Based on</p>
-    <p>
-      <turbo-frame
         id='card-2'
         src="<%= dereference_card_path(uri: @externalUri, frame_id: "2")%>"
         loading="lazy"
         target="_top"
       >
         loading...
+      </turbo-frame>
+    </p>
+    <p>Based on</p>
+    <p>
+      <turbo-frame
+        id='card-validation'
+        src="<%= validate_path(uri: @externalUri)%>"
+        loading="lazy"
+        target="_top"
+      >
+        validating...
       </turbo-frame>
     </p>
 

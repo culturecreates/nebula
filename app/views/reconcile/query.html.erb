@@ -6,7 +6,7 @@
   <turbo-frame id="recon_results" target="_top">
     <ul class="list-group ">
       <% @result.each do |result| %>
-        <%= render partial: "result", locals: { result: result, type: @type } %>
+        <%= render partial: "result", locals: { result: result, type: @type, query: @query } %>
       <% end %>
       <%= "No matches for #{@query}" if @result.count == 0 %>
     </ul>

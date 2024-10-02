@@ -15,20 +15,25 @@ Test:
         -
         <%= @entity.card[:postal_code] ||= display_warning("POSTAL CODE") %>
       <% end %>
+
       <% if type == "http://schema.org/Event" ||   type == "http://schema.org/EventSeries" %>
         -
         <%= @entity.card[:location_name] %>
         -
         <%= @entity.card[:start_date] %>
-        <%= if @entity.type == "http://schema.org/EventSeries"
+        <% if type == "http://schema.org/EventSeries" %>
           "- #{@entity.card[:end_date]}"
-        end %>
-      <% end %>
-      <% if @entity.type == "http://schema.org/Place" %>
-        -
-        <%= @entity.card[:locality] ||= display_warning("LOCALITY") %>
-        -
-        <%= @entity.card[:postal_code] ||= display_warning("POSTAL CODE") %>
+        <% end %>
+      <% else %>
+        <% if @entity.card[:disambiguating_description].present? %>
+          -
+          <%= @entity.card[:disambiguating_description] %>
+        <% elsif @entity.type == "http://schema.org/Place" %>
+          -
+          <%= @entity.card[:locality] ||= display_warning("LOCALITY") %>
+          -
+          <%= @entity.card[:postal_code] ||= display_warning("POSTAL CODE") %>
+        <% end %>
       <% end %>
     </div>
 

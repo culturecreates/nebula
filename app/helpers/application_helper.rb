@@ -60,4 +60,12 @@ module ApplicationHelper
       return uri
     end
   end
+
+  def sparql_endpoint
+    "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
+  end
+
+  def artsdata_sparql_client
+    SPARQL::Client.new(sparql_endpoint)
+  end
 end

@@ -6,10 +6,8 @@ class FootlightController < ApplicationController
     uri = params[:uri]
 
     # get the source graph from URI
-    sparql_endpoint = "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
-    sparql_client = SPARQL::Client.new(sparql_endpoint)
     select_query = "select ?graph where { graph ?graph { <#{uri}> a ?type } }"
-    solutions = sparql_client.query(select_query)
+    solutions = helpers.artsdata_sparql_client.query(select_query)
     source = solutions.first.graph.value if solutions.first&.bound?(:graph)
 
     # source = "http://kg.artsdata.ca/culture-creates/artsdata-planet-ville-de-laval/calendrier-activites"

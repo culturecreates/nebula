@@ -1,0 +1,38 @@
+<div class="position-relative">
+  <a
+    href="<%=  send(@route_name, params: {uri: result["id"], type: type}) %>"
+    class="
+      list-group-item list-group-item-action <%= 'list-group-item-primary zindex-100 aria-current="true"' if result["match"] == true %>
+    "
+  >
+    <div class="d-flex w-100 justify-content-between">
+      <div class="fw-bold">
+        <%= result["name"] %>
+      </div>
+      <% if result["id"] # .starts_with?("K") %>
+        <small>
+          <span class="badge bg-secondary rounded-pill"><%= result["id"] %></span>
+        </small>
+      <% end %>
+    </div>
+    <p class="mb-1">
+      <%= result["type"].first["name"] if result["type"].present? %>
+      <% if result["description"] != "" %>
+        -
+        <%= result["description"] %>
+      <% end %>
+
+    </p>
+  </a>
+  <% if @externalUri %>
+    <%= link_to "link",
+    mint_link_path(
+      externalUri: @externalUri,
+      classToMint: result["type"].first["id"],
+      adUri: "http://kg.artsdata.ca/resource/" + result["id"],
+    ),
+    class: "btn btn-danger btn-sm position-absolute bottom-0 end-0 mb-1",
+    style: "z-index: 1;" %>
+  <% end %>
+
+</div>
