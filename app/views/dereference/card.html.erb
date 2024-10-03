@@ -31,7 +31,7 @@ Test:
                     Time.parse(@entity.card[:start_date])
                 ) / (60 * 60 * 24)
               ).to_i %>
-          <%= days > 1 ? "span #{days} days" : "single day" %>
+          <%= days > 1 ? "spans #{days} days" : "single day" %>
 
         <% end %>
       <% else %>
