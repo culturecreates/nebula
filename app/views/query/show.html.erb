@@ -2,7 +2,7 @@
 <div class="container">
   <h1>
     <%= solutions.count %>
-    <%= title %>
+    <%= title&.humanize&.gsub(".sparql", "") %>
   </h1>
   <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
 </div>
