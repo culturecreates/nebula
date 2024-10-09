@@ -13,7 +13,7 @@ class ReconcileController < ApplicationController
       @query = params[:query] # pass through to view
       @type = params[:type] # pass through to view
       @externalUri = params[:externalUri] # pass through to view for link button
-      @postalCode = params[:postalCode] # restrict reconiliation to a postal code
+      @postalCode = params[:postalCode] # restrict reconciliation to a postal code
       match = params[:match] || false # to set to return only matches
       
 
