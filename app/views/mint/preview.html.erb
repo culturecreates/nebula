@@ -70,9 +70,12 @@
       <%= "<li> #{@postalCode}</li>".html_safe if @postalCode %>
       <%= "<li> #{@startDate}</li>".html_safe if @startDate %>
     </ul>
+    <!-- HACK: Remove commas from @label (@label.gsub(","," ")) to avoid
+    triggering Application Firewalls (WAF) like Securi even with percent
+    encoding -->
     <turbo-frame
       id='recon_results'
-      src="<%= reconcile_query_path(query: @label, type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"
+      src="<%= reconcile_query_path(query: @label.gsub(","," "), type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"
       loading="lazy"
       target="_top"
     >
