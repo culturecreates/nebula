@@ -30,11 +30,11 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  Name or URI: "Name, URI or Web Page"
-  Search: "Search"
-  Search Results: "Search Results"
-  Welcome back: "Welcome back"
+  search_for: "Name, URI or Web Page"
+  search: "Search"
+  search_results: "Search Results"
   dashboard_title: "Dashboard for "
+  favourite_reports: "Favourite Reports"
   minting_wikidata:
     title: "Mint using Wikidata"
     sub_title: "Add Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to mint an Artsdata Identifier."

@@ -1,5 +1,6 @@
 fr:
-  Name or URI: "Nom, URI ou page Web"
-  Search: "Rechercher"
-  Search Results: "Résultas de recherche"
-  Welcome back: "Bienvenue"
+  search_for: "Nom, URI ou page Web"
+  search: "Rechercher"
+  search_results: "Résultas de recherche"
+  dashboard_title: Tableau de bord pour
+  favourite_reports: "Rapports favoris"
