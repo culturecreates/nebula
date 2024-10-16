@@ -35,7 +35,7 @@ class GithubController < ApplicationController
 
   def sparqls
       uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
-      @sparqls = GithubService.info(session[:token], uri)
+      @sparqls = GithubService.info(nil, uri)
   end
 
   private 
