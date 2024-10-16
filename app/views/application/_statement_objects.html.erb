@@ -16,10 +16,8 @@
             entity: Entity.new(entity_uri: s.obj, graph: entity.graph),
           } %>
         <% elsif s.obj.uri? %>
-          <% @frame_id ||= 0 %>
-          <% @frame_id += 1 %>
-          <% if  @frame_id < 8 %>
-            <!-- Limit the number of frames -->
+          <% if auto_dereference %>
+            <!-- automatically dereference -->
             <turbo-frame
               id='card-<%= @frame_id %>'
               src="<%= dereference_card_path(uri: s.obj.to_s, frame_id: @frame_id)%>"
@@ -29,6 +27,7 @@
               <%= s.obj.to_s %>
             </turbo-frame>
           <% else %>
+            <!-- click button to dereference -->
             <turbo-frame id='card-<%= @frame_id %>' target="_top">
               <%= display_object(s.obj) %>
               <%= link_to "&nbsp;#{render partial: "shared/icon_expand"}".html_safe,
@@ -36,9 +35,7 @@
               data: {
                 turbo_frame: "card-#{@frame_id}",
               } %>
-
             </turbo-frame>
-
           <% end %>
         <% else %>
           <%= display_object(s.obj) %>

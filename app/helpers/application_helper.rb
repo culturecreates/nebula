@@ -68,4 +68,20 @@ module ApplicationHelper
   def artsdata_sparql_client
     SPARQL::Client.new(sparql_endpoint)
   end
+
+  # sets a limit on the number of dereferences per table.
+  # Note that derived statements are a separate table.
+  # The offset is used to ensure that multiple tables have different frame_ids
+  def auto_dereference
+    @max ||= 8
+    if @frame_id
+      @frame_id += 1 
+      return false if @frame_id >  @offset +  @max
+    else
+      @offset = rand(1000..9999)
+      @frame_id = @offset
+    end
+    return true
+  end
+    
 end
