@@ -29,10 +29,16 @@
               <%= s.obj.to_s %>
             </turbo-frame>
           <% else %>
-            <span>
+            <turbo-frame id='card-<%= @frame_id %>' target="_top">
               <%= display_object(s.obj) %>
-              (expand)
-            </span>
+              <%= link_to "&nbsp;#{render partial: "shared/icon_expand"}".html_safe,
+              dereference_card_path(uri: s.obj.to_s, frame_id: @frame_id),
+              data: {
+                turbo_frame: "card-#{@frame_id}",
+              } %>
+
+            </turbo-frame>
+
           <% end %>
         <% else %>
           <%= display_object(s.obj) %>
