@@ -1,24 +1,46 @@
 <% provide(:title, @entity.label&.value) %>
 <div class="container">
   <h1><%= @entity.label&.value %></h1>
-  Crawled data from
-  <h5><a><%= @entity.entity_uri&.html_safe %></a></h5>
-  <%= "<p> Using <a href='#{@shacl_url}'>#{humanize_url(@shacl_url) if @shacl_url}</a></p>".html_safe %>
-  <% if @post_sparql %>
-    <p>
-      Using
-      <a href='<%= @post_sparql %>'><%= humanize_url(@post_sparql) %></a></p>
-  <% else %>
-    <%= link_to "Compute score",
-    dereference_external_path(
-      uri: @entity.entity_uri,
-      shacl:
-        "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/shacl/shacl_for_scoring.ttl",
-      post_sparql:
-        "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/sparql/score_algorithm.sparql",
-    ) %>
+  <div class="d-flex justify-content-between">
+    <div class="p-2">
+      Crawled data from
+      <h5><%= @entity.entity_uri&.html_safe %></h5>
+    </div>
+    <div class="p-2">
+      <button
+        class="btn btn-sm btn-primary"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseExample"
+        aria-expanded="false"
+        aria-controls="collapseExample"
+      >
+        Plugins
+      </button>
+    </div>
+  </div>
 
-  <% end %>
+  <div class="collapse" id="collapseExample">
+    <div class="card card-body">
+      <%= "<p> Using <a href='#{@shacl_url}'>#{humanize_url(@shacl_url) if @shacl_url}</a></p>".html_safe %>
+      <% if @post_sparql %>
+        <p>
+          Using
+          <a href='<%= @post_sparql %>'><%= humanize_url(@post_sparql) %></a></p>
+      <% else %>
+        <%= link_to "Compute score",
+        dereference_external_path(
+          uri: @entity.entity_uri,
+          shacl:
+            "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/shacl/shacl_for_scoring.ttl",
+          post_sparql:
+            "https://raw.githubusercontent.com/culturecreates/artsdata-score/main/sparql/score_algorithm.sparql",
+        ) %>
+
+      <% end %>
+    </div>
+  </div>
+
   <div style="background: lightgrey; padding: 5px">
     <%= if @entity.graph.count == 0
       render partial: "external_resource", locals: { entity: @entity }
