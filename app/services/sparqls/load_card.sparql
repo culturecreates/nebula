@@ -26,9 +26,11 @@ where {
   VALUES ?entity { <URI_PLACEHOLDER> }
   OPTIONAL { ?entity rdfs:label ?c .}
   MINUS { ?entity skos:hiddenLabel ?c . }   
-  ?entity a ?inferred_type .
+  OPTIONAL {?entity a ?inferred_type .}
+  
   graph ?g { 
-    ?entity a ?type .
+    ?entity ?a ?b .
+    OPTIONAL { ?entity a ?type .}
     OPTIONAL { ?entity schema:startDate ?startDate .} 
     OPTIONAL { ?entity schema:endDate ?endDate .}              
     OPTIONAL { ?entity schema:streetAddress ?street .} 

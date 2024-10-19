@@ -104,6 +104,16 @@ class Entity
     ])
     @graph = construct_turtle(sparql)
 
+    if @graph.count == 0 # then try Wikidata
+      puts "Trying Wikidata for #{self.entity_uri}"
+      if self.entity_uri =~ /wikidata/
+        sparql =  SparqlLoader.load('load_card_wikidata', [
+          'URI_PLACEHOLDER', self.entity_uri
+        ])
+        @graph = construct_turtle(sparql,"wikidata")
+      end
+    end
+
     @card[:start_date] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/startDate"), nil])&.first&.object&.value
     @card[:end_date] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/endDate"), nil])&.first&.object&.value
     @card[:location_name] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/location"), nil])&.first&.object&.value
@@ -151,15 +161,27 @@ class Entity
     @graph = construct_turtle(sparql)
   end
 
-  def construct_turtle(sparql)
-    response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
-    if response[:code] == 200
-      RDF::Graph.new do |graph|
-        RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
+  def construct_turtle(sparql, sparql_endpoint = nil)
+    if sparql_endpoint == "wikidata"
+      @@wikidata_client ||= SPARQL::Client.new("https://query.wikidata.org/sparql")
+      solutions = @@wikidata_client.query(sparql)
+      graph = RDF::Graph.new
+      solutions.each do |solution|
+        graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
       end
+      graph
     else
-      RDF::Graph.new
+      response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
+      if response[:code] == 200
+        RDF::Graph.new do |graph|
+          RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
+        end
+      else
+        RDF::Graph.new
+      end
     end
+   
+    
   end
 
 
