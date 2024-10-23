@@ -1,6 +1,9 @@
 <% provide(:title, @entity.label&.value) %>
 <% provide(:image, @entity.image) %>
-<div class="container">
+<div
+  class="container"
+  <%= "style='background: lightgrey; padding: 5px'".html_safe if !@entity.entity_uri.starts_with?("http://kg.artsdata.ca") %>
+>
   <h1>
     <%= @entity.label&.value&.html_safe %>
   </h1>
