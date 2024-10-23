@@ -7,19 +7,19 @@ class QueryController < ApplicationController
   # Otherwise, the 'sparql=' param will execute on the remote sparql endpoint.
   # Example: GET /query
   #   ?constructs=custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata
-  #   &sparql=custom/scenepro-query&title=ScenePro
+  #   &sparql=custom/scenepro-query
+  #   &title=ScenePro
   def show
     params.required(:sparql)
-    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale, :databus_account)
+    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale)
     sparql_file = params[:sparql] 
-    title =  params[:title] ||=  params[:sparql].split("/").last
+    title =  params[:title] ||=  params[:sparql].split("/").last&.humanize&.gsub(".sparql", "")
 
     # Placeholders in SPARQL query
     graph = params[:graph]
-    databus_account = params[:databus_account].downcase if params[:databus_account]
     construct_files = params[:constructs].split(",") if params[:constructs]
     
-    @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "DATABUS_ACCOUNT", databus_account])
+    @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph])
 
     solutions = if !construct_files
                   helpers.artsdata_sparql_client.query(@query).limit(1000)

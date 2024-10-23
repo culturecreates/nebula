@@ -1,15 +1,30 @@
 PREFIX schema: <http://schema.org/>
-select ?account ?group ?artifact ?version ?publisher   ?action where { 
+SELECT 
+	?account 
+	?group 
+	?artifact 
+	(max(?version) as ?latest_version) 
+	(count(?dataset) as ?versions) 
+	(GROUP_CONCAT(distinct ?publisher ; separator=", ") as ?publishers) 
+	?action
+ 
+WHERE { 
 	values ?account { "DATABUS_ACCOUNT" }
-	?dataset <http://dataid.dbpedia.org/ns/core#account> ?account ; <http://dataid.dbpedia.org/ns/core#artifact> ?artifact_uri .
-	?dataset  <http://purl.org/dc/terms/publisher> ?publisher ; <http://purl.org/dc/terms/hasVersion> ?version .
-    OPTIONAL {
-       ?artifact_uri schema:name ?name .
-    }
+	?artifact_uri a <http://dataid.dbpedia.org/ns/core#Artifact> .
+	 filter(STRSTARTS(str(?artifact_uri), CONCAT("http://kg.artsdata.ca/databus/",str(?account))))
+
+	OPTIONAL {
+		?dataset <http://dataid.dbpedia.org/ns/core#account> ?account ;
+	 	<http://dataid.dbpedia.org/ns/core#artifact> ?artifact_uri ;
+	  <http://purl.org/dc/terms/publisher> ?publisher ; 
+		<http://purl.org/dc/terms/hasVersion> ?version .
+	}
+   
 		bind(STRAFTER(str(?artifact_uri),CONCAT(?account,"/")) as ?last_part)
 		bind(concat("<a href='",str(?artifact_uri),"'>",STRAFTER(str(?last_part),"/"),"</a>") as ?artifact)
 		bind(STRBEFORE(str(?last_part),"/") as ?group)
-		bind(concat("<a class='btn btn-primary btn-sm' href='#'>import</a>&nbsp;<a class='btn btn-danger btn-sm' href='#'>delete</a>") as ?action)
+		bind(concat("<a class='btn btn-primary btn-sm' href='#'>import</a>&nbsp;<a class='btn btn-danger btn-sm disabled' href='#'>delete</a>") as ?action)
 
 	
-} limit 100 
+} group by  ?artifact_uri ?account  ?group 
+	?artifact ?action limit 100

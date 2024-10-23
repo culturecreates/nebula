@@ -1,4 +1,10 @@
+<% title = "#{pluralize(@artifacts.count, "#{@databus_account} Artifact")}" %>
+<% provide(:title, title) %>
 <div class="container">
-  <h1>Artifacts</h1>
-  Create a new artifact
+  <h1>
+    <%= title %>
+  </h1>
+
 </div>
+<a class="btn btn-primary" href='<%= new_artifact_path %>'>Create artifact</a>
+<%= render partial: "query_table", locals: { solutions: @artifacts } %>

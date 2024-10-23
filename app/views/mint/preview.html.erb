@@ -75,7 +75,7 @@
     encoding -->
     <turbo-frame
       id='recon_results'
-      src="<%= reconcile_query_path(query: @label.gsub(","," "), type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"
+      src="<%= reconcile_query_path(query: @label&.gsub(","," "), type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"
       loading="lazy"
       target="_top"
     >

@@ -1,0 +1,32 @@
+<div class="table-responsive-sm">
+  <table
+    data-controller="sortable-table"
+    data-sortable-table-target="table"
+    class="table table-hover table-striped"
+  >
+    <thead class="sticky-top">
+      <tr>
+        <th scope="col">#</th>
+        <% solutions.variable_names.each do |head| %>
+          <th
+            scope="col"
+            data-action="click->sortable-table#sort"
+            data-sort-direction="asc"
+          ><%= head.to_s %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% solutions.each.with_index do | solution, index| %>
+        <tr>
+          <th scope="row"><%= index + 1 %></th>
+          <% solutions.variable_names.each do |key| %>
+            <td>
+              <%= display_object(solution[key]) if solution[key] %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -36,7 +36,7 @@ class MintController < ApplicationController
       end
 
       if !@label
-        @label = @entity.label.&value
+        @label = @entity.label&.value
       end
       
       @language = @entity&.label&.language 
