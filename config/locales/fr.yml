@@ -4,3 +4,7 @@ fr:
   search_results: "Résultas de recherche"
   dashboard_title: Tableau de bord pour
   favourite_reports: "Rapports favoris"
+  ical:
+    ical_feeds: "iCal Feeds"
+    description: |
+      List of iCal feeds created for Artsdata. To create a new iCal feed, add a CONSTRUCT SPARQL to this <a href='https://github.com/artsdata-stewards/artsdata-actions/tree/main/ical'>Github repository</a>. To test an iCal Feed, copy the URL and paste it into this free Wordpress calendar plugin: <a href='https://icscalendar.com/preview/'>ICS Calendar</a>.
