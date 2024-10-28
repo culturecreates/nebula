@@ -13,9 +13,9 @@ select ?name ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_la
       <http://kg.artsdata.ca/culture-creates/huginn/derived-grandtheatre-qc-ca>
       <http://kg.artsdata.ca/culture-creates/footlight/hector-charland-com>
       <http://kg.artsdata.ca/culture-creates/footlight/theatredumarais-com>
-      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/tout-culture-cms-events>
-      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/signe-laval-cms-events>
-      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/culture-mauricie-cms-events>
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/tout-culture>
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/signe-laval>
+      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/culture-mauricie>
       } 
      }
 	?graph prov:wasDerivedFrom ?dataid ; schema:name ?name ; prov:generatedAtTime  ?latest .
