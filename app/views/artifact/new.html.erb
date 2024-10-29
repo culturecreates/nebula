@@ -2,8 +2,10 @@
   <h1>New Artifact</h1>
 
   <% if @artifact.errors %>
-    Errors:
-    <%= @artifact.errors %>
+    <div style="color: red;">
+      Errors:
+      <%= @artifact.errors %>
+    </div>
   <% end %>
 
   <%= form_with(url: artifact_index_path, method: :post, local: true, class: 'container',  data: { turbo: false }) do |form| %>
