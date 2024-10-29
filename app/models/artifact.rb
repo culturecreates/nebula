@@ -12,24 +12,46 @@ class Artifact
   # Save the artifact to the databus using the Artsdata API
   def save
     name = self.name
-    description = self.description
-   
+    if name.blank?
+      self.errors = "Name is required"
+      return false
+    end
     artifact_id = self.name.downcase.gsub(" ", "-")
-    httpBody = {}
+
+    description = self.description
     publisher = "https://github.com/#{self.user}#this"
  
-    # TODO: base these on type of artifact
-    group_id = "a10s-google-sheet"
-    action_name = "Load #{artifact_id} Google Sheet"
-    action_url = "https://api.github.com/repos/artsdata-stewards/a10s-google-sheet-importer/actions/workflows/databus-a10-sheet-importer.yml/dispatches"
-    httpBody = {
-      ref: "main",
-      inputs: {
-        artifact: artifact_id,
-        spreadsheet_url: self.sheet_url,
-        publisher: "{{PublisherWebID}}"
+    if self.type == "spreadsheet-a10s" && self.sheet_url.present?
+      group_id = "a10s-google-sheet"
+      action_name = "Load #{artifact_id} A10s Google Sheet"
+      action_url = "https://api.github.com/repos/artsdata-stewards/a10s-google-sheet-importer/actions/workflows/databus-a10-sheet-importer.yml/dispatches"
+      httpBody = {
+        ref: "main",
+        inputs: {
+          artifact: artifact_id,
+          spreadsheet_url: self.sheet_url,
+          publisher: "{{PublisherWebID}}"
+        }
       }
-    }
+    elsif self.type == "spreadsheet-smart-chip" && self.sheet_url.present?
+      group_id = "spreadsheet-smart-chip"
+      action_name = "Load #{artifact_id} Smart Chip Google Sheet"
+      action_url = "https://api.github.com/repos/culture-creates/artsdata-google-workspace-smart-chip/actions/workflows/push-to-artsdata.yml/dispatches"
+      httpBody = {
+        ref: "main",
+        inputs: {
+          artifact: artifact_id,
+          spreadsheet_url: self.sheet_url,
+          publisher: "{{PublisherWebID}}"
+        }
+      }
+    elsif self.type == "website"
+      self.errors = "website artifacts not yet supported."
+      return false
+    else
+      self.errors = "Invalid artifact. Please review your input."
+      return false
+    end
    
     
     # Call the API to save the artifact

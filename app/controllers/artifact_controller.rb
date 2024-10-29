@@ -3,15 +3,11 @@ class ArtifactController < ApplicationController
 
   def index
     @databus_account = params[:databus_account] || "capacoa"
-    # redirect_to query_show_path(sparql: "artifact_controller/list_artifacts", databus_account: databus_account, title: "#{databus_account} Artifacts")
-   
     sparql_file =  "artifact_controller/list_artifacts"
 
     # Placeholders in SPARQL query
     query =  SparqlLoader.load(sparql_file, [ "DATABUS_ACCOUNT", @databus_account.downcase])
     @artifacts = helpers.artsdata_sparql_client.query(query).limit(1000) # TODO: fix limit
-   
-      
   end
 
   def new
@@ -24,7 +20,7 @@ class ArtifactController < ApplicationController
     @artifact = Artifact.new(artifact_params, session[:handle])
     
     if @artifact.save
-      flash.notice = "Created artifact '#{@artifact.name}'. Load action #{@artifact.artifact_create_action_uri}"
+      flash.notice = "Created artifact '#{@artifact.name}'. You may now load the artifact as a dataset into Artsdata."
       redirect_to artifact_index_path
     else
       render 'new'

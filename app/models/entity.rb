@@ -44,7 +44,6 @@ class Entity
   def top_level_type
     # The card sparql adds inferred types to additionalType
     solution =  @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/additionalType"), :nil])
-  
     # try to return top level type using inferred types
     top_type = nil
     solution.each do |s|
@@ -68,9 +67,24 @@ class Entity
   end
 
   def type
-    solution =  @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), :nil])
+    solution =  @graph.query([RDF::URI(@entity_uri), RDF.type, :nil])
     type = solution&.first&.object
-    type || RDF.URI("http://schema.org/Thing")
+    solution.each do |s|
+      if ["http://schema.org/Event",
+          "http://schema.org/EventSeries",
+          "http://schema.org/Place",
+          "http://schema.org/Person",
+          "http://schema.org/Organization"].include?(s.object.value)
+        type = s.object
+        break
+      end
+    end
+
+    if type
+      return type
+    else
+      return RDF::URI("http://schema.org/Thing")
+    end
   end
 
   def method_missing(m,*args,&block)
