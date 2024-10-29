@@ -72,7 +72,7 @@
     </ul>
     <!-- HACK: Remove commas from @label (@label.gsub(","," ")) to avoid
     triggering Application Firewalls (WAF) like Securi even with percent
-    encoding -->
+    encoding. This may be removed if there is no WAF problem. -->
     <turbo-frame
       id='recon_results'
       src="<%= reconcile_query_path(query: @label&.gsub(","," "), type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"

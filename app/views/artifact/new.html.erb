@@ -41,12 +41,34 @@
                   id: "type-select" %>
     </div>
 
-    <div class="mb-3" id="sheet-url-field">
+    <div class="mb-3" id="website-url-field" style="display: none;">
+      <hr>
+      <p>Coming soon...</p>
+    </div>
+
+    <div class="mb-3" id="sheet-url-field" style="display: none;">
+      <hr>
       <%= form.label :sheet_url, "Google Sheet URL", class: "form-label" %>
       <%= form.text_field :sheet_url,
                       class: "form-control",
                       value: @artifact.sheet_url,
                       placeholder: "Enter Google sheet URL" %>
+
+      <br>
+      <%= t("artifact.new.smart_chip").html_safe %>
+      <%= t("artifact.new.format_url").html_safe %>
+    </div>
+
+    <div class="mb-3" id="a10s-sheet-url-field" style="display: none;">
+      <hr>
+      <%= form.label :sheet_url, "Google Sheet URL", class: "form-label" %>
+      <%= form.text_field :sheet_url,
+                      class: "form-control",
+                      value: @artifact.sheet_url,
+                      placeholder: "Enter Google sheet URL for JSON-LD tab" %>
+      <br>
+      <%= t("artifact.new.a10s").html_safe %>
+      <%= t("artifact.new.format_url").html_safe %>
     </div>
 
     <%= form.submit "Create", class: "btn btn-primary" %>
@@ -56,19 +78,26 @@
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const typeSelect = document.getElementById("type-select");
+    const websiteUrlField = document.getElementById("website-url-field");
     const sheetUrlField = document.getElementById("sheet-url-field");
+    const a10sSheetUrlField = document.getElementById("a10s-sheet-url-field");
 
 
     typeSelect.addEventListener("change", function() {
       if (typeSelect.value === "spreadsheet-a10s") {
-        sheetUrlField.style.display = "block";
+        websiteUrlField.style.display = "none";
+        a10sSheetUrlField.style.display = "block";
+        sheetUrlField.style.display = "none";
       
       } else if (typeSelect.value === "spreadsheet-smart-chip") {
+         websiteUrlField.style.display = "none";
+        a10sSheetUrlField.style.display = "none";
         sheetUrlField.style.display = "block";
      
       } else {
+         websiteUrlField.style.display = "block";
+         a10sSheetUrlField.style.display = "none";
         sheetUrlField.style.display = "none";
-      
       }
     });
   });

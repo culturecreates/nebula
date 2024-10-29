@@ -49,3 +49,11 @@ en:
     ical_feeds: "iCal Feeds"
     description: |
       List of iCal feeds created for Artsdata. To create a new iCal feed, add a CONSTRUCT SPARQL to this <a href='https://github.com/artsdata-stewards/artsdata-actions/tree/main/ical'>Github repository</a>. To test an iCal Feed, copy the URL and paste it into this free Wordpress calendar plugin: <a href='https://icscalendar.com/preview/'>ICS Calendar</a>.
+  artifact:
+    new:
+      a10s: |
+        <h4>A10s Google Sheet Instructions</h4> <p>Enter the URL of the Google Sheet that contains the data for this artifact. Be careful to select the URL of the tab JSON-LD. The name of the column with the JSON-LD MUST be called <code>jsonld</code>. </p> 
+      format_url: |
+        <p>Format the URL by replacing <code>/edit</code> with <code>/export?format=csv</code>. You can test the URL in your browser to ensure it works. The properly formated URL will download a CSV file to your computer. </p>
+      smart_chip: |
+        <h4>Smart-Chip Instructions</h4><p> Enter the URL of the Google Sheet that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>
