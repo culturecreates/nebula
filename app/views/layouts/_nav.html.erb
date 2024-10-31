@@ -69,7 +69,12 @@
           <%= link_to "iCal Feeds", ical_index_path, class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "Mint using Wikidata", mint_wikidata_path, class: "nav-link" %>
+          <%= link_to "Mint using Wikidata",
+          mint_wikidata_path,
+          class: "nav-link",
+          data: {
+            turbo: false,
+          } %>
         </li>
 
         <li class="nav-item dropdown">
@@ -161,7 +166,12 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Logout</a>
+          <% if session[:handle] %>
+            <a class="nav-link disabled" aria-disabled="true">Logout</a>
+          <% else %>
+            <a class="nav-link" href="<%= github_url %>">Login</a>
+          <% end %>
+
         </li>
 
       </ul>
