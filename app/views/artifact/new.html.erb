@@ -28,7 +28,7 @@
     </div>
 
     <div class="mb-3">
-      <%= form.label :type, "Type", class: "form-label" %>
+      <%= form.label :type, "Data pipeline", class: "form-label" %>
       <%= form.select :type,
                   options_for_select(
                     [
@@ -54,7 +54,7 @@
       <%= form.label :link_identifier, "Link identifier", class: "form-label" %>
       <%= form.text_field :sheet_url,
                       class: "form-control",
-                      placeholder: "Enter CSS to select links to individual entites" %>
+                      placeholder: "Enter CSS to select links to individual entities" %>
       <br>
 
       <%= form.label :headless, "Headless browser", class: "form-label" %>
@@ -62,9 +62,7 @@
       <%= form.label :pagination, "Use pagination", class: "form-label" %>
       <%= form.radio_button :pagination, class: "form-control" %>
       <br>
-      <br>
-      <h4>Orion JSON-LD Instructions</h4>
-      <p>Enter the URL...</p>
+
     </div>
 
     <div class="mb-3" id="sheet-url-field" style="display: none;">
