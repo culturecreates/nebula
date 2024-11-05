@@ -23,7 +23,7 @@ WHERE {
 		bind(STRAFTER(str(?artifact_uri),CONCAT(?account,"/")) as ?last_part)
 		bind(concat("<a href='",str(?artifact_uri),"'>",STRAFTER(str(?last_part),"/"),"</a>") as ?artifact)
 		bind(STRBEFORE(str(?last_part),"/") as ?group)
-		bind(concat("<a class='btn btn-primary btn-sm disabled' href='#'>import</a>&nbsp;<a class='btn btn-danger btn-sm disabled' href='#'>delete</a>") as ?action)
+		bind(concat("<div class='d-flex'><a class='btn btn-primary btn-sm disabled me-1' href='#'>import</a> <a class='btn btn-danger btn-sm disabled' href='#'>delete</a></div>") as ?action)
 
 	
 } group by  ?artifact_uri ?account  ?group 
