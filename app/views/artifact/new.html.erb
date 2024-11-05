@@ -81,11 +81,13 @@
   document.addEventListener("DOMContentLoaded", function() {
     const typeSelect = document.getElementById("type-select");
     const websiteUrlField = document.getElementById("website-url-field");
-    const sheetUrlField = document.getElementById("sheet-url-field");
     const a10sSheetUrlField = document.getElementById("a10s-sheet-url-field");
+    const sheetUrlField = document.getElementById("sheet-url-field");
+    
 
 
     typeSelect.addEventListener("change", function() {
+      console.log (typeSelect.value);
       if (typeSelect.value === "spreadsheet-a10s") {
         websiteUrlField.style.display = "none";
         a10sSheetUrlField.style.display = "block";
@@ -96,9 +98,13 @@
         a10sSheetUrlField.style.display = "none";
         sheetUrlField.style.display = "block";
      
-      } else {
+      } else if (typeSelect.value === "website") {
          websiteUrlField.style.display = "block";
          a10sSheetUrlField.style.display = "none";
+        sheetUrlField.style.display = "none";
+      } else {
+        websiteUrlField.style.display = "none";
+        a10sSheetUrlField.style.display = "none";
         sheetUrlField.style.display = "none";
       }
     });

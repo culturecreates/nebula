@@ -9,7 +9,11 @@
 
 <ol>
   <li>
-    <%= link_to "Dereference", dereference_external_path(uri: entity.entity_uri) %>
+    <%= link_to "Dereference",
+    dereference_external_path(uri: entity.entity_uri),
+    data: {
+      turbo: false,
+    } %>
   </li>
   <li>
     <a href='<%= entity.entity_uri %>' target='_blank'>Visit</a>
