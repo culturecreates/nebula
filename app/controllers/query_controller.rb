@@ -1,6 +1,6 @@
 class QueryController < ApplicationController
   require 'csv'
-
+  include ActionView::Helpers::SanitizeHelper
   # GET /query
   # Pass 'constructs=' param with a list of comma separated construct sparqls.
   # If contructs are passed, then the 'sparql=' param will use the local graph created by the contrucuts.
@@ -63,7 +63,7 @@ class QueryController < ApplicationController
       solutions.each do |solution|
         row = []
         keys.each do |key|
-          row << solution[key]&.value 
+          row << sanitize(solution[key]&.value, tags: ['p','br','em','strong','h1','h2','h3','h4','h5','h6','ul','ol','li','blockquote','code'])
         end
         csv << row
       end
