@@ -276,6 +276,7 @@ ads:CanadianBusinessNumberSh
 ads:PlaceShape
     a sh:NodeShape ;
     sh:targetClass schema:Place ;
+    sh:severity sh:Warning ;
     # sh:ignoredProperties ( rdf:type ) ;
     sh:property ads:PlaceNameSh, 
                 ads:SameAsSh,
@@ -291,8 +292,9 @@ ads:VirtualLocationSh
 
 ads:AddressObj
     sh:path schema:address ;
+    sh:severity sh:Warning ;
     sh:minCount 1 ;
-     sh:maxCount 1 ;
+    sh:maxCount 1 ;
     sh:node ads:PostalAddressShape .
   
 ads:TextAddress 
@@ -334,6 +336,49 @@ ads:VirtualLocationUrlSh
 ################
 # PostalAddress Shape 
 ################
+
+ads:PostalAddressShapeCheckProvince
+    a sh:NodeShape ;
+    sh:targetClass schema:PostalAddress ;
+    sh:severity sh:Warning ;
+    sh:or (
+        [
+            sh:property [
+                sh:path schema:addressCountry ;
+                sh:hasValue "CA" ;
+            ] ;
+            sh:property [
+                sh:path schema:addressRegion ;
+                sh:pattern "^AB|BC|MB|NB|NL|NS|NT|NU|ON|QC|PE|SK|YT$" ;
+                sh:message "The addressRegion must be one of the Canadian provinces or territories ISO 3166-2 code when the addressCountry is 'CA'." ;
+            ]
+        ]
+        [
+            sh:or (
+                [
+                    sh:property [
+                        sh:path schema:addressCountry ;
+                        sh:pattern "^CA$" ;
+                    ]
+                ]
+            )
+        ]
+    ) .
+
+ads:PostalAddressShapeCheckCanada
+    a sh:NodeShape ;
+    sh:targetClass schema:PostalAddress ;
+    sh:severity sh:Warning ;
+    
+    sh:property [
+        sh:path schema:addressCountry ;
+        
+        sh:not [
+            sh:message "The addressCountry should be 'CA'" ;
+            sh:pattern "^Canada$" ;
+        ] ;
+    ]  .
+
 ads:PostalAddressShape
     a sh:NodeShape ;
     sh:targetClass schema:PostalAddress ;
