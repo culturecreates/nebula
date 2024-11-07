@@ -28,3 +28,14 @@
   target="_top"
 >
 </turbo-frame>
+<br>
+Also checking URLs:
+<br>
+<turbo-frame
+  id='recon_results'
+  src="<%= reconcile_query_path(query: " " + entity.entity_uri) %>"
+  loading="lazy"
+  target="_top"
+>
+  loading...
+</turbo-frame>
