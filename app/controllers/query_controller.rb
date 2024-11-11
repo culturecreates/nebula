@@ -22,7 +22,12 @@ class QueryController < ApplicationController
     @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph])
 
     solutions = if !construct_files
-                  helpers.artsdata_sparql_client.query(@query).limit(1000)
+                  begin
+                    helpers.artsdata_sparql_client.query(@query).limit(1000)
+                  rescue SPARQL::Client::ServerError => e
+                    flash.alert = e.message[0..100]
+                    return redirect_to root_path,  data: { turbo: false }
+                  end
                 else
                   SPARQL.execute(@query,local_graph(construct_files, helpers.artsdata_sparql_client) )
                 end
