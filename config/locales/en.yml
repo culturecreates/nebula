@@ -50,6 +50,9 @@ en:
     description: |
       List of iCal feeds created for Artsdata. To create a new iCal feed, add a CONSTRUCT SPARQL to this <a href='https://github.com/artsdata-stewards/artsdata-actions/tree/main/ical'>Github repository</a>. To test an iCal Feed, copy the URL and paste it into this free Wordpress calendar plugin: <a href='https://icscalendar.com/preview/'>ICS Calendar</a>.
   artifact:
+    title: "Databus Artifact"
+    description: |
+      <p>Artifacts linked to your Databus account. To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.</p>
     new:
       a10s: |
         <h4>A10s Google Sheet Instructions</h4> <p>Enter the URL of the Google Sheet that contains the data for this artifact. Be careful to select the URL of the tab JSON-LD. The name of the column with the JSON-LD MUST be called <code>jsonld</code>. </p> 

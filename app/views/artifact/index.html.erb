@@ -1,9 +1,10 @@
-<% title = "#{pluralize(@artifacts.count, "Databus Artifact")}" %>
+<% title = "#{pluralize(@artifacts.count, t("artifact.title"))}" %>
 <% provide(:title, title) %>
 <div class="container">
   <h1>
     <%= title %>
   </h1>
+  <%= t("artifact.description").html_safe %>
 
 </div>
 <%= link_to "Create artifact",
