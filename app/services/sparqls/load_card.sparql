@@ -2,7 +2,6 @@
 # If there is a nested location, then the location name is flattened.
 # If there is a nested address, then the postalCode and addressLocality is flattened.
 # Flatenning is done to make the data more readable and to avoid nested objects in the card.
-# TODO: detect Wikidata URIs and call the Wikidata SPARQL endpoint
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>
@@ -26,24 +25,25 @@ where {
   VALUES ?entity { <URI_PLACEHOLDER> }
   OPTIONAL { ?entity rdfs:label ?c .}
   MINUS { ?entity skos:hiddenLabel ?c . }   
+  OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription .}
   OPTIONAL {?entity a ?inferred_type .}
   
   graph ?g { 
-    ?entity ?a ?b .
     OPTIONAL { ?entity a ?type .}
+    OPTIONAL { ?g prov:wasDerivedFrom ?dataid .}
+    # When entity is an Event
     OPTIONAL { ?entity schema:startDate ?startDate .} 
-    OPTIONAL { ?entity schema:endDate ?endDate .}              
+    OPTIONAL { ?entity schema:endDate ?endDate .}    
+    # When entity is a PostalAddress
     OPTIONAL { ?entity schema:streetAddress ?street .} 
     OPTIONAL { ?entity schema:addressLocality ?locality .} 
     OPTIONAL { ?entity schema:postalCode ?postalCode .} 
-    OPTIONAL { ?g prov:wasDerivedFrom ?dataid .}
-
   }
   
-  OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription .}
- 
+  # When entity is an Event then flatten nested location and PostalAddress
   OPTIONAL { ?entity schema:location/schema:name ?place_name .}
   OPTIONAL { ?entity schema:location/schema:address/schema:postalCode ?postalCode .}
+  # When entity is a Place then flatten nested PostalAdress
   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode . }
   OPTIONAL { ?entity  schema:address/schema:addressLocality ?locality . }
 } 
