@@ -18,19 +18,17 @@ construct {
   schema:postalCode ?postalCode ;
   schema:startDate ?startDate ;
   schema:endDate ?endDate ;
-  schema:location ?place_name ;
-  prov:wasDerivedFrom ?dataid .
+  schema:location ?place_name .
 } 
 where { 
   VALUES ?entity { <URI_PLACEHOLDER> }
   OPTIONAL { ?entity rdfs:label ?c .}
   MINUS { ?entity skos:hiddenLabel ?c . }   
   OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription .}
-  OPTIONAL {?entity a ?inferred_type .}
-  
+  ?entity a ?inferred_type .
   graph ?g { 
     OPTIONAL { ?entity a ?type .}
-    OPTIONAL { ?g prov:wasDerivedFrom ?dataid .}
+  
     # When entity is an Event
     OPTIONAL { ?entity schema:startDate ?startDate .} 
     OPTIONAL { ?entity schema:endDate ?endDate .}    

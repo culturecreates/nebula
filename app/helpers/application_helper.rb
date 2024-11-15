@@ -72,11 +72,12 @@ module ApplicationHelper
   # sets a limit on the number of dereferences per table.
   # Note that derived statements are a separate table.
   # The offset is used to ensure that multiple tables have different frame_ids
-  def auto_dereference
+  def auto_dereference(string)
     @max ||= 8
     if @frame_id
       @frame_id += 1 
       return false if @frame_id >  @offset +  @max
+      return false if string.include?("wikidata.org")
     else
       @offset = rand(1000..9999)
       @frame_id = @offset

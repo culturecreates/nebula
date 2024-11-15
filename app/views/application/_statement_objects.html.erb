@@ -16,7 +16,7 @@
             entity: Entity.new(entity_uri: s.obj, graph: entity.graph),
           } %>
         <% elsif s.obj.uri? %>
-          <% if auto_dereference %>
+          <% if auto_dereference(s.obj.to_s) %>
             <!-- automatically dereference -->
             <turbo-frame
               id='card-<%= @frame_id %>'

@@ -118,7 +118,7 @@ class Entity
     ])
     @graph = construct_turtle(sparql)
 
-    if @graph.count == 0 # then try Wikidata
+    if @graph.count < 2 # then try Wikidata
       if self.entity_uri =~ /wikidata/
         sparql =  SparqlLoader.load('load_card_wikidata', [
           'URI_PLACEHOLDER', self.entity_uri
