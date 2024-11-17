@@ -22,6 +22,13 @@ class MintController < ApplicationController
       @reference =  params[:reference]
 
       # get extra data about the entity when only externalUri is provided
+      # Need: 
+      # - reference (i.e. artifact)
+      # - label (i.e. name)
+      # - language (of name)
+      # - classToMint (i.e. type)
+      # - postalCode
+      # - startDate
       @entity = Entity.new(entity_uri: @externalUri)
       @entity.load_card
       
