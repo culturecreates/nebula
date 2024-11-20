@@ -142,7 +142,8 @@ class Entity
     @graph = RDF::Graph.new 
     # first try proper content negotiation
     begin
-      @graph = RDF::Graph.load(self.entity_uri, rdfstar: true)
+      options = { rdfstar: true, headers: {"User-Agent" => "artsdata-crawler" } }
+      @graph = RDF::Graph.load(self.entity_uri, **options)
     rescue StandardError => e
       raise StandardError, "Could not detect structured data. #{e}"
     end
