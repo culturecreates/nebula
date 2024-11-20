@@ -1,19 +1,21 @@
 <% solutions =
   SPARQL.execute(
     "PREFIX shacl: <http://www.w3.org/ns/shacl#> " \
-      "SELECT distinct ?resultPath ?resultMessage WHERE { ?bn shacl:focusNode <#{entity.entity_uri}> . ?bn shacl:resultMessage ?resultMessage . OPTIONAL { ?bn shacl:resultPath ?resultPath } }",
+      "SELECT distinct ?resultPath ?resultMessage ?resultSeverity WHERE { ?bn shacl:focusNode <#{entity.entity_uri}> . ?bn shacl:resultMessage ?resultMessage . ?bn shacl:resultSeverity ?resultSeverity . OPTIONAL { ?bn shacl:resultPath ?resultPath } }",
     entity.graph,
   ) %>
 
 <% if solutions.count  > 0 %>
 
   <% solutions.each do |s| %>
+    <% severity = s.resultSeverity.to_s.include?("Warning") ? "warning" : "error" %>
     <p>
       <% if s.bound?(:resultPath) %>
-        <span style="margin: 5px;"><%= render partial: "shared/icon_circle_exclamation" %></span><%= display_label(s.resultPath, check_shacl: false) %>
+        <% icon = severity == "warning" ? "icon_triangle" : "icon_circle_exclamation" %>
+        <span title="<%= severity %>" style="margin: 5px;"><%= render partial: "shared/#{icon}" %></span><%= display_label(s.resultPath, check_shacl: false) %>
         :
       <% end %>
-      <span style="color:red;">
+      <span <%= 'style="color:red;"'.html_safe if severity == "error" %>>
         <%= s.resultMessage %>
       </span>
     </p>
