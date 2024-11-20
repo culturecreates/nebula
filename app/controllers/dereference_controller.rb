@@ -27,6 +27,7 @@ class DereferenceController < ApplicationController
     @report = shacl.execute(@entity.graph)
     @entity.load_graph_into_graph(@report)
 
+    # SPARQL to run after dereferencing (post dereferce)
     if @post_sparql
       sparql_url = @post_sparql
       @entity.construct_sparql(sparql_url)
