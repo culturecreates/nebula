@@ -100,3 +100,5 @@ gem 'rack-cors'
 # gem 'rdf-turtle', '~> 3.2'
 # gem 'rdf-rdfa', '~> 3.3'
 # gem 'rdf-microdata'
+
+gem "ffi", "< 1.17.0" # until Heroku upgrades to rubygems version 3.3.22.
