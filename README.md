@@ -52,6 +52,3 @@ GoDaddy does NOT support HTTPS forwarding for domains, so https://artsdata.ca wi
 
 https://github.com/apps/artsdata-nebula
 
-# Deploying to Heroku
-
-If the build on Heroku is complaining about the rubygems version, add an environment variable `heroku config:set BUNDLE_RUBYGEMS__VERSION=3.3.22` 
