@@ -10,9 +10,10 @@
   <% solutions.each do |s| %>
     <% severity = s.resultSeverity.to_s.include?("Warning") ? "warning" : "error" %>
     <p>
+      <% icon = severity == "warning" ? "icon_triangle" : "icon_circle_exclamation" %>
+      <span title="<%= severity %>" style="margin: 5px;"><%= render partial: "shared/#{icon}" %></span>
       <% if s.bound?(:resultPath) %>
-        <% icon = severity == "warning" ? "icon_triangle" : "icon_circle_exclamation" %>
-        <span title="<%= severity %>" style="margin: 5px;"><%= render partial: "shared/#{icon}" %></span><%= display_label(s.resultPath, check_shacl: false) %>
+        <%= display_label(s.resultPath, check_shacl: false) %>
         :
       <% end %>
       <span <%= 'style="color:red;"'.html_safe if severity == "error" %>>
