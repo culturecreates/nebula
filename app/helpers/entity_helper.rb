@@ -30,12 +30,7 @@ module EntityHelper
       label =  solution.first[:name]  ||  solution.first[:label] || "missing"
       "<a href='#{link}' target='_top'>#{label}</a>#{message}".html_safe
     else
-      uri = uri.value if uri.class == RDF::URI
-      if uri.starts_with?("http")
-        "<a href='#{link}' target='_top'>#{uri.split("/").last.split("#").last}</a>".html_safe
-      else
-        uri
-      end
+      display_object(RDF::URI(uri))
     end
   end
 
