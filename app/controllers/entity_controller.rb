@@ -16,7 +16,7 @@ class EntityController < ApplicationController
         nebula_context_url = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
         @entity.load_graph_without_triple_terms
         jsonld = JSON::LD::API::fromRdf(@entity.graph)
-        if @entity.type
+        if @entity.type && @entity.type != "http://schema.org/Thing"
           frame = JSON.parse %({"@type": "#{@entity.type.value}",  "@embed": "@once"}) # Default is @once
           jsonld = JSON::LD::API.frame(jsonld, frame)
         end

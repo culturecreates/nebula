@@ -224,12 +224,12 @@ class Entity
    
     response = @@artsdata_client.execute_construct_sparql(sparql)
 
-    @graph = if response[:code] == 200
-      graph = RDF::Graph.new 
-      graph.from_jsonld(response[:message].to_json)
-    else
-      RDF::Graph.new
-    end
+    @graph =  if response[:code] == 200
+                graph = RDF::Graph.new 
+                graph.from_jsonld(response[:message].to_json)
+              else
+                RDF::Graph.new
+              end
   end
 
 
