@@ -6,9 +6,7 @@
     ) %>
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
     <% solutions.each do |s| %>
-      <% @httpMethod = s.obj.to_s if predicate == "http://schema.org/httpMethod" %>
-      <% @httpBody = s.obj.to_s if predicate == "http://schema.org/httpBody" %>
-      <% @url = s.obj.to_s if predicate == "http://schema.org/urlTemplate" %>
+      <% setup_action(s, predicate) %>
       <div class="statement-object">
         <% if s.obj.uri? && s.obj.value.starts_with?("http://blank.node") %>
           <%= render partial: "statements_table",

@@ -84,5 +84,37 @@ module ApplicationHelper
     end
     return true
   end
+
+  # For UI portion of schema:Action
+  def setup_action(s, predicate)
+    @httpMethod = s.obj.to_s if predicate == "http://schema.org/httpMethod"
+    @httpBody = s.obj.to_s if predicate == "http://schema.org/httpBody"
+    @url = s.obj.to_s if predicate == "http://schema.org/urlTemplate"
+  end
+
+  def generate_action_div
+    if @url
+      user_id = "https://github.com/#{session[:handle]}#this"
+      <<-HTML.html_safe
+        <div
+          data-controller="githubapi"
+          data-githubapi-token-value="#{session[:token]}"
+          data-githubapi-url-value="#{@url}"
+          data-githubapi-method-value="#{@httpMethod}"
+          data-githubapi-httpbody-value="#{@httpBody.gsub('{{PublisherWebID}}',user_id)}"
+        >
+          <button
+            data-githubapi-target="button"
+            class="btn btn-danger m-3"
+            data-action="githubapi#runAction"
+          >Run Action</button>
+
+          <p class="m-3" data-githubapi-target="result">
+          </p>
+        </div>
+      HTML
+    end
+  end
+        
     
 end
