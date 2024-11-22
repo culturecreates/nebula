@@ -86,10 +86,10 @@ module ApplicationHelper
   end
 
   # For UI portion of schema:Action
-  def setup_action(s, predicate)
-    @httpMethod = s.obj.to_s if predicate == "http://schema.org/httpMethod"
-    @httpBody = s.obj.to_s if predicate == "http://schema.org/httpBody"
-    @url = s.obj.to_s if predicate == "http://schema.org/urlTemplate"
+  def setup_action(s, p)
+    @httpMethod = s.to_s if p.to_s == "http://schema.org/httpMethod"
+    @httpBody = s.to_s if  p.to_s == "http://schema.org/httpBody"
+    @url = s.to_s if  p.to_s == "http://schema.org/urlTemplate"
   end
 
   def generate_action_div

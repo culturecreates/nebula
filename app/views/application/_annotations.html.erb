@@ -1,8 +1,6 @@
+<!-- Input: annotations -->
 <div class="annotation">
 
-  <% stat = RDF.Statement(RDF.URI(entity.entity_uri), predicate, object) %>
-  <% query = RDF::Query.new { pattern [stat, :pred, :obj] } %>
-  <% annotations = query.execute(entity.graph) %>
   <% if annotations.count > 0 %>
     <% random = rand(10_000) %>
     <div
@@ -34,17 +32,18 @@
 
               <div class="statement">
                 <div class="statement-predicate">
-                  <%= display_object(a.pred) %>
+                  <%= display_object(a.predicate) %>
                 </div>
                 <div class="statement-objects">
                   <div class="statement-object">
-                    <% if a.obj.uri? && a.obj.value.starts_with?("urn") %>
+                    <% if a.object.node? %>
                       <%= render partial: "statements_table",
                       locals: {
-                        entity: Entity.new(entity_uri: a.obj, graph: entity.graph),
+                        triples: graph.query([a.object, nil, nil]),
+                        graph: graph,
                       } %>
                     <% else %>
-                      <%= display_label(a.obj) %>
+                      <%= display_label(a.object) %>
                     <% end %>
                   </div>
                 </div>

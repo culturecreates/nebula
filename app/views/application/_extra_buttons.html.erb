@@ -1,0 +1,14 @@
+<!-- Inputs: subject RDF::URI, predicate RDF::URI, predicate_hash -->
+<% if subject.uri? && @show_expand_button %>
+  <%= generate_action_div %>
+  <div class="statement_buttons">
+
+    <%= link_to entity_expand_path(subject: subject.to_s, predicate: predicate.to_s, predicate_hash: predicate_hash),  
+                  data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
+                  title: "Show all datasets",
+                  id: predicate_hash, 
+                  onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do %>
+      <%= render partial: "shared/icon_stack" %>
+    <% end %>
+  </div>
+<% end %>

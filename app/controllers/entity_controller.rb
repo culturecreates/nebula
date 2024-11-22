@@ -51,9 +51,6 @@ class EntityController < ApplicationController
       # render in entity view
       format.all { 
         @entity.load_graph
-        @entity.replace_blank_nodes # first level
-        @entity.replace_blank_nodes # second level
-        @entity.replace_blank_subject_nodes
         @show_expand_button = true
         # pp @entity.graph.dump(:turtle)
         # TODO: add SHACL validation
@@ -79,7 +76,6 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.load_claims
-    @entity.replace_blank_nodes # first level
   end
 
   # derived statements (inverse path)
@@ -88,7 +84,6 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.load_derived_statements
-   #  @entity.replace_blank_nodes # first level
   end
  
 end

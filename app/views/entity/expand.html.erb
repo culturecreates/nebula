@@ -1,15 +1,16 @@
 <h1>Expand view</h1>
 
 <turbo-frame id="objects-frame-<%= @predicate_hash %>">
-  <%= render partial: 'statement_objects', locals: { entity: @entity, predicate: @predicate, predicate_hash: @predicate_hash }  %>
-  
-
-  
+  <%= render partial: "statement_objects",
+  locals: {
+    entity: @entity,
+    predicate: @predicate,
+    predicate_hash: @predicate_hash,
+  } %>
 </turbo-frame>
 
-   <pre>
-      <code>
-         <%= @entity.graph.dump(:jsonld) %>
-      </code>
-   </pre>
-
+<pre>
+  <code>
+    <%= @entity.graph.dump(:jsonld) %>
+  </code>
+</pre>

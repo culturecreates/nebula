@@ -1,25 +1,26 @@
-<% solutions =
-  SPARQL.execute(
-    "PREFIX shacl: <http://www.w3.org/ns/shacl#> " \
-      "SELECT distinct ?resultPath ?resultMessage ?resultSeverity WHERE { ?bn shacl:focusNode <#{entity.entity_uri}> . ?bn shacl:resultMessage ?resultMessage . ?bn shacl:resultSeverity ?resultSeverity . OPTIONAL { ?bn shacl:resultPath ?resultPath } }",
-    entity.graph,
-  ) %>
+<% if subject.uri? %>
+  <% solutions =
+    SPARQL.execute(
+      "PREFIX shacl: <http://www.w3.org/ns/shacl#> " \
+        "SELECT distinct ?resultPath ?resultMessage ?resultSeverity WHERE { ?bn shacl:focusNode <#{subject.value}> . ?bn shacl:resultMessage ?resultMessage . ?bn shacl:resultSeverity ?resultSeverity . OPTIONAL { ?bn shacl:resultPath ?resultPath } }",
+      graph,
+    ) %>
 
-<% if solutions.count  > 0 %>
+  <% if solutions.count  > 0 %>
 
-  <% solutions.each do |s| %>
-    <% severity = s.resultSeverity.to_s.include?("Warning") ? "warning" : "error" %>
-    <p>
-      <% icon = severity == "warning" ? "icon_triangle" : "icon_circle_exclamation" %>
-      <span title="<%= severity %>" style="margin: 5px;"><%= render partial: "shared/#{icon}" %></span>
-      <% if s.bound?(:resultPath) %>
-        <%= display_label(s.resultPath, check_shacl: false) %>
-        :
-      <% end %>
-      <span <%= 'style="color:red;"'.html_safe if severity == "error" %>>
-        <%= s.resultMessage %>
-      </span>
-    </p>
+    <% solutions.each do |s| %>
+      <% severity = s.resultSeverity.to_s.include?("Warning") ? "warning" : "error" %>
+      <p>
+        <% icon = severity == "warning" ? "icon_triangle" : "icon_circle_exclamation" %>
+        <span title="<%= severity %>" style="margin: 5px;"><%= render partial: "shared/#{icon}" %></span>
+        <% if s.bound?(:resultPath) %>
+          <%= display_label(s.resultPath, check_shacl: false) %>
+          :
+        <% end %>
+        <span <%= 'style="color:red;"'.html_safe if severity == "error" %>>
+          <%= s.resultMessage %>
+        </span>
+      </p>
+    <% end %>
   <% end %>
-
 <% end %>

@@ -1,52 +1,49 @@
+<!-- Inputs: triples = class RDF::Solutions, predicate_hash = unique turbo
+frame id, graph = class RDF::Graph -->
 <div class="statement-objects">
-  <% solutions =
-    SPARQL.execute(
-      "SELECT  ?obj WHERE { <#{entity.entity_uri}> <#{predicate}> ?obj }",
-      entity.graph,
-    ) %>
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
-    <% solutions.each do |s| %>
-      <% setup_action(s, predicate) %>
+    <% triples.each do |triple| %>
+      <% setup_action(triple.subject, triple.predicate) %>
       <div class="statement-object">
-        <% if s.obj.uri? && s.obj.value.starts_with?("http://blank.node") %>
+        <% if triple.object.node? %>
           <%= render partial: "statements_table",
           locals: {
-            entity: Entity.new(entity_uri: s.obj, graph: entity.graph),
+            triples: graph.query([triple.object, nil, nil]),
+            graph: graph,
           } %>
-        <% elsif s.obj.uri? %>
-          <% if auto_dereference(s.obj.to_s) %>
-            <!-- automatically dereference -->
+        <% elsif triple.object.uri? %>
+          <% if auto_dereference(triple.object.to_s) %>
             <turbo-frame
               id='card-<%= @frame_id %>'
-              src="<%= dereference_card_path(uri: s.obj.to_s, frame_id: @frame_id)%>"
+              src="<%= dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id)%>"
               loading="lazy"
               target="_top"
             >
-              <%= s.obj.to_s %>
+              <%= triple.object.to_s %>
             </turbo-frame>
           <% else %>
             <!-- click button to dereference -->
             <turbo-frame id='card-<%= @frame_id %>' target="_top">
-              <%= display_object(s.obj) %>
+              <%= display_object(triple.object) %>
               <%= link_to "&nbsp;#{render partial: "shared/icon_expand"}".html_safe,
-              dereference_card_path(uri: s.obj.to_s, frame_id: @frame_id),
+              dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id),
               data: {
                 turbo_frame: "card-#{@frame_id}",
               } %>
             </turbo-frame>
           <% end %>
         <% else %>
-          <%= display_object(s.obj) %>
+          <%= display_object(triple.object) %>
         <% end %>
         <!-- SHACL --> <!-- Annotations -->
+        <% annotation_subject =
+          RDF.Statement(triple.subject, triple.predicate, triple.object) %>
         <%= render partial: "annotations",
         locals: {
-          entity: entity,
-          predicate: predicate,
-          object: s.obj,
+          annotations: graph.query([annotation_subject, nil, nil]),
+          graph: graph,
         } %>
       </div>
     <% end %>
   </turbo-frame>
-
 </div>

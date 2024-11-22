@@ -1,36 +1,28 @@
+<!-- Inputs: triples class RDF::Solutions, graph class RDF::Graph -->
 <div class="meta">
-  <%= render partial: "entity_errors", locals: { entity: entity } %>
-  <% solutions =
-    SPARQL.execute(
-      "SELECT distinct ?pred WHERE { <#{entity.entity_uri}> ?pred ?obj }",
-      entity.graph,
-    ) %>
-  <% solutions.each do |s| %>
+  <%= render partial: "entity_errors",
+  locals: {
+    subject: triples.first.subject,
+    graph: graph,
+  } %>
+  <% properties = triples.map { |s| s.predicate }.uniq %>
+  <% properties.each do |prop| %>
     <div class="statement">
       <div class="statement-predicate">
-        <%= display_label(s.pred.to_s) %>
+        <%= display_label(prop) %>
       </div>
-      <% predicate_hash = s.pred.to_s.hash %>
       <%= render partial: "statement_objects",
       locals: {
-        entity: entity,
-        predicate: s.pred,
-        predicate_hash: predicate_hash,
+        triples: triples.select { |s| s.predicate == prop },
+        predicate_hash: prop.to_s.hash,
+        graph: graph,
       } %>
-
-      <% if !entity.entity_uri.starts_with?("http://blank.node") && @show_expand_button %>
-        <%= generate_action_div %>
-        <div class="statement_buttons">
-
-          <%= link_to entity_expand_path(subject: entity.entity_uri, predicate: s.pred.to_s, predicate_hash: predicate_hash),  
-                  data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
-                  title: "Show all datasets",
-                  id: predicate_hash, 
-                  onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do %>
-            <%= render partial: "shared/icon_stack" %>
-          <% end %>
-        </div>
-      <% end %>
+      <%= render partial: "extra_buttons",
+      locals: {
+        subject: triples.first.subject,
+        predicate: prop,
+        predicate_hash: prop.to_s.hash,
+      } %>
     </div>
   <% end %>
 </div>

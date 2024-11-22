@@ -25,11 +25,12 @@
 
   <% if @entity.graph.count == 0 %>
     <%= render partial: "external_resource", locals: { entity: @entity } %>
-
   <% else %>
-
-    <%= render partial: "statements_table", locals: { entity: @entity } %>
-
+    <%= render partial: "statements_table",
+    locals: {
+      triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
+      graph: @entity.graph,
+    } %>
     <turbo-frame
       id='unsupported-claims'
       src="<%= entity_unsupported_claims_path(uri: @entity.entity_uri) %>"
@@ -48,13 +49,6 @@
 
   <% end %>
 
-  <br>
-  <br>
-  <pre>
-    <code>
-      <% if  @entity.graph.count > 0 %>
-        <%= @entity.graph.dump(:jsonld) %>
-      <% end %>
-    </code>
-  </pre>
 </div>
+<br>
+<br>
