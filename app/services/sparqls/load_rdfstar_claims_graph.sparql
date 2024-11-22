@@ -1,4 +1,5 @@
 # load_rdfstar_claims_graph
+# Loads unasserted rdf* triples for a given entity
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>

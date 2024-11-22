@@ -50,4 +50,11 @@
 
   <br>
   <br>
+  <pre>
+    <code>
+      <% if  @entity.graph.count > 0 %>
+        <%= @entity.graph.dump(:jsonld) %>
+      <% end %>
+    </code>
+  </pre>
 </div>
