@@ -3,6 +3,10 @@
 
   <turbo-frame id="card-validation">
     <%= "<h4>Data Conforms</h4>".html_safe if @report.conform? %>
-    <%= render partial: "statements_table", locals: { entity: @entity } %>
+    <%= render partial: "statements_table",
+    locals: {
+      triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
+      graph: @entity.graph,
+    } %>
   </turbo-frame>
 </div>
