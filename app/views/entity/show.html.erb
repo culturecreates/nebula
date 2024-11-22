@@ -1,9 +1,8 @@
 <% provide(:title, @entity.label&.value) %>
 <% provide(:image, @entity.image) %>
-<div
-  class="container"
-  <%= "style='background: lightgrey; padding: 5px'".html_safe if !@entity.entity_uri.starts_with?("http://kg.artsdata.ca") %>
->
+
+<div class="container">
+
   <h1>
     <%= @entity.label&.value&.html_safe %>
   </h1>
@@ -26,6 +25,7 @@
   <% if @entity.graph.count == 0 %>
     <%= render partial: "external_resource", locals: { entity: @entity } %>
   <% else %>
+    <%= check_if_authoritative %>
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),

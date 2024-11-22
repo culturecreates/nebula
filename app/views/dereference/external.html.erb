@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <div style="background: lightgrey; padding: 5px">
+  <div style="background: #EEEE; padding: 5px">
     <%= if @entity.graph.count == 0
       render partial: "external_resource", locals: { entity: @entity }
     end %>
@@ -71,7 +71,11 @@
         Blank node of type
         <%= new_entity.type %>
       <% end %>
-      <%= render partial: "statements_table", locals: { entity: new_entity } %>
+      <%= render partial: "statements_table",
+      locals: {
+        triples: @entity.graph.query([s.subject, nil, nil]),
+        graph: @entity.graph,
+      } %>
     <% end %>
     <br>
     <br>
