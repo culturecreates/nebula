@@ -54,6 +54,7 @@ module ApplicationHelper
       .gsub("http://www.w3.org/ns/shacl#","shacl:")
       .gsub("http://www.wikidata.org/entity/","wd:")
       .gsub("http://www.w3.org/2001/XMLSchema#", "xsd:")
+      .gsub("http://example.org/","ex:")
       .gsub("http://scenepro.ca#","sp:")
 
     if uri_compact.present?

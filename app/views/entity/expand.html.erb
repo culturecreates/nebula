@@ -3,9 +3,9 @@
 <turbo-frame id="objects-frame-<%= @predicate_hash %>">
   <%= render partial: "statement_objects",
   locals: {
-    entity: @entity,
-    predicate: @predicate,
+    triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
     predicate_hash: @predicate_hash,
+    graph: @entity.graph,
   } %>
 </turbo-frame>
 
