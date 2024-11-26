@@ -2,7 +2,7 @@
 <div class="meta">
   <%= render partial: "entity_errors",
   locals: {
-    subject: triples.first.subject,
+    subject: triples.first&.subject,
     graph: graph,
   } %>
   <% properties = triples.map { |s| s.predicate }.uniq %>
