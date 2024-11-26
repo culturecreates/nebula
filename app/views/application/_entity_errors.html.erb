@@ -1,4 +1,4 @@
-<% if subject.uri? %>
+<% if subject&.uri? %>
   <% solutions =
     SPARQL.execute(
       "PREFIX shacl: <http://www.w3.org/ns/shacl#> " \
