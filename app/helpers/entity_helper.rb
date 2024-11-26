@@ -43,6 +43,8 @@ module EntityHelper
       display_uri(obj)
     elsif obj.literal?
       display_literal(obj)
+    elsif obj.statement?
+      display_statement(obj)
     else
       raise StandardError.new "Unexpected RDF class: #{obj.class.to_s}"
     end
@@ -94,6 +96,11 @@ module EntityHelper
     end
     @entity.graph.query(query)
   end
+
+  def display_statement(statement)
+    "<< #{display_object(statement.subject)} #{display_object(statement.predicate)} #{display_object(statement.object)} >>".html_safe
+  end
+
 
   def date_display(date_time)
     begin
