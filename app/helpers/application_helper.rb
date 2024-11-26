@@ -56,6 +56,11 @@ module ApplicationHelper
       .gsub("http://www.w3.org/2001/XMLSchema#", "xsd:")
       .gsub("http://example.org/","ex:")
       .gsub("http://scenepro.ca#","sp:")
+      .gsub("http://purl.org/dc/terms/","dc:")
+      .gsub("http://xmlns.com/foaf/0.1/","foaf:")
+      .gsub("http://dataid.dbpedia.org/ns/core#","dataid:")
+      .gsub("http://rdfs.org/ns/void#","void:")
+      .gsub("http://www.w3.org/ns/dcat#","dcat:")
 
     if uri_compact.present?
       return uri_compact
