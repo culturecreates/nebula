@@ -61,6 +61,7 @@ module ApplicationHelper
       .gsub("http://dataid.dbpedia.org/ns/core#","dataid:")
       .gsub("http://rdfs.org/ns/void#","void:")
       .gsub("http://www.w3.org/ns/dcat#","dcat:")
+      .gsub("http://ogp.me/ns#", "og:")
 
     if uri_compact.present?
       return uri_compact
