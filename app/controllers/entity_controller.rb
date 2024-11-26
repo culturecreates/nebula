@@ -53,9 +53,8 @@ class EntityController < ApplicationController
       # render in entity view
       format.all { 
         @entity.load_graph
-        @show_expand_button = true
-        # pp @entity.graph.dump(:turtle)
-        # TODO: add SHACL validation
+        @show_expand_button = true if user_signed_in?
+        # TODO: add SHACL validation if artsdata entity
         # @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
        }
     end

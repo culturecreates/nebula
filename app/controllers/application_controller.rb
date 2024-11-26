@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
 
   def test; end
 
+  def user_signed_in?
+    session[:handle].present?
+  end
+
   def authenticate_user!
     return true if  Rails.env.test?
 
