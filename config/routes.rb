@@ -22,6 +22,7 @@ Rails.application.routes.draw do
 
     resources :artifact
     resources :ical
+    resources :sparql_manager
     
   end
 

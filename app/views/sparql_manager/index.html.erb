@@ -1,0 +1,16 @@
+<% title = "#{pluralize(@sparqls.count, "SPARQL")}" %>
+<% provide(:title, title) %>
+<div class="container">
+  <h1>
+    <%= title %>
+  </h1>
+  <%= t("sparql.description").html_safe %>
+
+</div>
+<%= link_to "Create SPARQL",
+new_sparql_manager_path,
+class: "btn btn-primary",
+data: {
+  turbo: false,
+} %>
+<%= render partial: "query_table", locals: { solutions: @sparqls } %>

@@ -1,0 +1,7 @@
+PREFIX ado: <http://kg.artsdata.ca/ontology/>
+PREFIX schema: <http://schema.org/>
+
+select * 
+where {
+  ?sparql a ado:Sparql ; schema:name ?name ; schema:url ?url .
+}
