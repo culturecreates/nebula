@@ -1,5 +1,4 @@
 class EntityController < ApplicationController
-  before_action :authenticate_user!, only: [:expand] # ensure user is logged in
 
   # Show an entity's asserted statements
   # /entity?uri=

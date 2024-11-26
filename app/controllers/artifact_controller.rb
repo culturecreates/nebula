@@ -1,5 +1,5 @@
 class ArtifactController < ApplicationController
-  before_action :authenticate_user! # ensure user is logged in
+  before_action :authenticate_user! # ensure user has permissions
 
   def index
     @databus_account = params[:databus_account] || "capacoa"

@@ -1,5 +1,5 @@
 class IcalController < ApplicationController
-  before_action :authenticate_user!, only: [:index] # ensure user is logged in
+  before_action :authenticate_user!, only: [:index] # ensure user has permissions
   
   def index
     uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/ical")

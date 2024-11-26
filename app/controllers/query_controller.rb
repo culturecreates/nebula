@@ -1,6 +1,7 @@
 class QueryController < ApplicationController
   require 'csv'
   include ActionView::Helpers::SanitizeHelper
+  
   # GET /query
   # Pass 'constructs=' param with a list of comma separated construct sparqls.
   # If contructs are passed, then the 'sparql=' param will use the local graph created by the contrucuts.

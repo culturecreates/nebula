@@ -1,5 +1,5 @@
 class MintController < ApplicationController
-  before_action :authenticate_user! # ensure user is logged in
+  before_action :authenticate_user! # ensure user has permissions
   before_action :set_authority, only: [:preview, :link] # known as publisher in Artsdata API
   include DereferenceHelper 
 
