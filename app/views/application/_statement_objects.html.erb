@@ -3,7 +3,7 @@ frame id, graph = class RDF::Graph -->
 <div class="statement-objects">
   <turbo-frame id="objects-frame-<%= predicate_hash %>">
     <% triples.each do |triple| %>
-      <% setup_action(triple.subject, triple.predicate) %>
+      <% setup_action(triple.object, triple.predicate) %>
       <div class="statement-object">
         <% if triple.object.node? %>
           <%= render partial: "statements_table",

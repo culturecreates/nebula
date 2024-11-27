@@ -95,22 +95,23 @@ module ApplicationHelper
   end
 
   # For UI portion of schema:Action
-  def setup_action(s, p)
-    @httpMethod = s.to_s if p.to_s == "http://schema.org/httpMethod"
-    @httpBody = s.to_s if  p.to_s == "http://schema.org/httpBody"
-    @url = s.to_s if  p.to_s == "http://schema.org/urlTemplate"
+  def setup_action(o, p)
+    @httpMethod = o.to_s if p.to_s == "http://schema.org/httpMethod"
+    @httpBody = o.to_s if p.to_s == "http://schema.org/httpBody"
+    @url = o.to_s if p.to_s == "http://schema.org/urlTemplate"
   end
 
   def generate_action_div
     if @url
       user_id = "https://github.com/#{session[:handle]}#this"
+      escaped_http_body = CGI.escapeHTML(@httpBody&.gsub('{{PublisherWebID}}', user_id))
       <<-HTML.html_safe
         <div
           data-controller="githubapi"
           data-githubapi-token-value="#{session[:token]}"
           data-githubapi-url-value="#{@url}"
           data-githubapi-method-value="#{@httpMethod}"
-          data-githubapi-httpbody-value="#{@httpBody.gsub('{{PublisherWebID}}',user_id)}"
+          data-githubapi-httpbody-value="#{escaped_http_body}"
         >
           <button
             data-githubapi-target="button"
