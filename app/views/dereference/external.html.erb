@@ -50,7 +50,7 @@
         "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject a <http://www.w3.org/ns/shacl#ValidationResult> } filter not exists {  ?subject a <http://www.w3.org/ns/shacl#ValidationReport> } filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
         @entity.graph,
       ) %>
-    <%= if solutions.count > @max_entities_per_page ||= 40
+    <%= if solutions.count > @max_entities_per_page
       "<p> Showing first #{@max_entities_per_page} entities of #{solutions.count}</p>".html_safe
     end %>
 
