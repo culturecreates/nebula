@@ -62,6 +62,7 @@ module ApplicationHelper
       .gsub("http://rdfs.org/ns/void#","void:")
       .gsub("http://www.w3.org/ns/dcat#","dcat:")
       .gsub("http://ogp.me/ns#", "og:")
+      .gsub("http://purl.org/vocab/vann/", "vann:")
 
     if uri_compact.present?
       return uri_compact
