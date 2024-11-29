@@ -47,7 +47,7 @@
     end %>
     <% solutions =
       SPARQL.execute(
-        "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
+        "SELECT distinct ?subject WHERE { ?subject ?pred ?obj . filter not exists {  ?subject a <http://www.w3.org/ns/shacl#ValidationResult> } filter not exists {  ?subject a <http://www.w3.org/ns/shacl#ValidationReport> } filter not exists {  ?subject <http://www.w3.org/1999/xhtml/vocab#role> ?obj } }",
         @entity.graph,
       ) %>
     <%= if solutions.count > @max_entities_per_page ||= 40
@@ -55,21 +55,22 @@
     end %>
 
     <% solutions.take(@max_entities_per_page).each do |s| %>
-      <% next if s.subject.node? %>
-      <% next if s.subject.statement? %>
-      <% next if s.subject.value.start_with?("http://blank.node") %>
-
-      <% new_entity = Entity.new(entity_uri: s.subject.value) %>
-      <% new_entity.graph = @entity.graph %>
+      <% type = @entity.graph.query([s.subject, RDF.type, nil]).first&.object&.value %>
+      <% next if !type %>
       <h3>
-        <%= new_entity.label %>
+        <%= @entity
+          .graph
+          .query([s.subject, RDF::Vocab::SCHEMA.name, nil])
+          .first
+          &.object
+          &.value %>
       </h3>
-      <% if !(s.subject.value.include?("blank")) %>
+      <% if s.subject.uri? %>
         <span class='badge bg-primary'>URI</span>
         <%= use_prefix(s.subject.value) %>
       <% else %>
         Blank node of type
-        <%= new_entity.type %>
+        <%= type %>
       <% end %>
       <%= render partial: "statements_table",
       locals: {
