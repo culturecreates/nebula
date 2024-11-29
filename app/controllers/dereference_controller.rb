@@ -1,6 +1,6 @@
 class DereferenceController < ApplicationController
   rescue_from StandardError, with: :failed_dereference
-  before_action :user_signed_in?, only: [:external] # ensure user has permissions
+  before_action :user_signed_in!, only: [:external] # ensure user has permissions
 
   # /dereference/card?uri=
   def card
