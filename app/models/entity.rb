@@ -222,11 +222,16 @@ class Entity
                   'locale_placeholder' , language
                 ])
    
-    response = @@artsdata_client.execute_construct_sparql(sparql)
+    response = @@artsdata_client.execute_construct_turtle_sparql(sparql)
 
     @graph =  if response[:code] == 200
-                graph = RDF::Graph.new 
-                graph.from_jsonld(response[:message].to_json)
+                graph = RDF::Graph.new
+                RDF::Turtle::Reader.new(response[:message]) do |reader|
+                  reader.each_statement do |statement|
+                    graph << statement
+                  end
+                end
+                graph
               else
                 RDF::Graph.new
               end
