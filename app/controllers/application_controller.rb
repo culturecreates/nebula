@@ -19,9 +19,12 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-    user_signed_in!
     return true if  Rails.env.test?
-  
+    
+    unless user_signed_in?
+      user_signed_in!
+      return # Stop further execution
+    end
     # TODO: Replace with user table
     if ["dlh28",
       "MorganPann",
