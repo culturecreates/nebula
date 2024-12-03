@@ -81,20 +81,20 @@ module ArtsdataApi
           endpoint: "/repositories/#{@graph_repository}",
           params: { 'query': escape_sparql(sparql) }
         )
-
         { code: data.status, message: data.body }
       end
 
+      ##### INSERT TRANSACTION STUFF HERE
+
       # Send update SPARQL to '/statements' endpoint
       def execute_update_sparql(sparql)
-        # @logger.info "sparql update: #{sparql.truncate(8000).squish}"
-
+        escaped_sparql = escape_sparql(sparql)
+        @logger.info "sparql update: #{escaped_sparql.truncate(8000).squish}"
         data = request_text(
           http_method: :post,
           endpoint: "/repositories/#{@graph_repository}/statements",
-          params: { 'update': escape_sparql(sparql) }
+          params: { 'update': escape_sparql(escaped_sparql) }
         )
-        
         { code: data.status, message: data.body }
       end
 
@@ -121,6 +121,23 @@ module ArtsdataApi
         { code: data.status, message: data.body }
       end
 
+      def rebuild_lucene_index
+        data = request_text(
+          http_method: :post,
+          endpoint: "/repositories/#{@graph_repository}/statements",
+          params: { 'update': "INSERT DATA { <http://www.ontotext.com/owlim/lucene#Name> <http://www.ontotext.com/owlim/lucene#updateIndex> _:b1 . }" }
+        )
+        { code: data.status, message: data.body }
+      end
+
+      # Format str to not interfere with SPARQL
+      def escape_sparql sparql
+        sparql.gsub(/'/, "\\\\'") # escape single quote
+              .gsub('\\', ' ') # remove double backslash
+              .gsub('-COLON-', '\\\\\:')  # escape pre-converted colon (see reconciliation service)
+              .gsub('-EXCL-', '\\\\\!')  # escape pre-converted colon (see reconciliation service)
+      end
+
       private
 
       def client
@@ -132,12 +149,6 @@ module ArtsdataApi
         end
       end
 
-      # Format str to not interfere with SPARQL
-      def escape_sparql sparql
-        sparql.gsub(/'/, "\\\\'") # escape single quote
-              .gsub('\\', ' ') # remove double backslash
-      end
-
       def request_text(http_method:, endpoint:, params: {})
         client.headers['Accept'] = 'application/json'
         client.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -147,7 +158,6 @@ module ArtsdataApi
       def request_json(http_method:, endpoint:, params: {})
         client.headers['Accept'] = 'application/json'
         client.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-
         client.public_send(http_method, endpoint, params)
       end
 
