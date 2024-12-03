@@ -7,31 +7,21 @@ class ApplicationController < ActionController::Base
   def test; end
 
   def user_signed_in?
-    if session[:handle].present?
-      return true
-    else
-     return false
-    end
+    session[:handle].present?
   end
 
   def user_signed_in!
     unless user_signed_in?
       flash.alert = "You must be logged in to access this section"
-      
       redirect_back(fallback_location: root_path)
       return # Stop further execution
     end
   end
 
   def authenticate_user!
+    user_signed_in!
     return true if  Rails.env.test?
-
-    # Redirect if not signed in
-    unless user_signed_in?
-      user_signed_in!
-      return # Stop further execution
-    end
-
+  
     # TODO: Replace with user table
     if ["dlh28",
       "MorganPann",
