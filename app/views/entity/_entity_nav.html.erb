@@ -23,7 +23,11 @@
     id="aduriapi"
   >Discussion</a>
   |
-  <%= link_to "JSON", entity_path(uri: @entity.entity_uri, format: :jsonld) %>
+  <%= link_to "JSON",
+  entity_path(uri: @entity.entity_uri, format: :jsonld),
+  data: {
+    turbo_prefetch: false,
+  } %>
   |
   <a href=<%= graphdb_link(@entity.entity_uri) %> id="graphdb">GraphDB</a>
   <% if session[:name] %>
