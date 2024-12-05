@@ -10,7 +10,7 @@ module ArtsdataApi
       def initialize(oauth_token: nil, graph_repository:, api_endpoint:)
         @oauth_token = oauth_token
         @graph_repository = graph_repository
-        @api_endpoint = api_endpoint
+        @api_endpoint = api_endpoint #  "http://localhost:7200"
         @logger = Rails.logger
       end
 

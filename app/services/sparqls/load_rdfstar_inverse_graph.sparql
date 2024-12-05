@@ -28,9 +28,5 @@ WHERE {
         ?p schema:inverseOf/rdfs:label ?inverse_label
     }
     bind(coalesce(?inverse_label,concat(?prop_label_original," (inverse)")) as ?prop_label)
-
-filter(!isBLANK(?s))
-
-
    
 } order by   ?prop_label ?sub_label limit 200
