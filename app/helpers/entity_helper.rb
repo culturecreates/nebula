@@ -28,7 +28,7 @@ module EntityHelper
     solution = @entity.graph.query(query)
     if solution.first.count > 0
       label =  solution.first[:name]  ||  solution.first[:label] || "missing"
-      "<a href='#{link}' target='_top'>#{label}</a>#{message}".html_safe
+      "<a href='#{link}' rel='nofollow' target='_top'>#{label}</a>#{message}".html_safe
     else
       display_object(RDF::URI(uri))
     end
@@ -82,12 +82,9 @@ module EntityHelper
     uri = CGI.unescape(uri) # to correctly display cases with '#this' like http://localhost:3000/entity?uri=https%3A%2F%2Fsaumier.github.io%2Fgregory-saumier-finch.ttl%23this
     link = entity_path(uri: uri)
     char_max = 60
-    if uri.length > char_max
-      "<a href='#{link}' target='_top'>#{use_prefix(uri).truncate(char_max)}</a>".html_safe
-    else
-      "<a href='#{link}' target='_top'>#{use_prefix(uri)}</a>".html_safe
-    end
-    
+    display_uri = use_prefix(uri)
+    display_uri = display_uri.truncate(char_max) if display_uri.length > char_max
+    "<a href='#{link}' rel='nofollow' target='_top'>#{display_uri}</a>".html_safe
   end
 
   def display_reference(uri)
