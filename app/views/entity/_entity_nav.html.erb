@@ -1,6 +1,8 @@
 <div class="alternate-name">
   <% if !@entity.entity_uri.starts_with?("http://kg.artsdata.ca/") %>
-    <%= link_to "Dereference", dereference_external_path(uri: @entity.entity_uri) %>
+    <%= link_to "Dereference",
+    dereference_external_path(uri: @entity.entity_uri),
+    rel: "nofollow" %>
     |
     <a href=<%= @entity.entity_uri %>>
       Visit</a>
@@ -13,7 +15,9 @@
     |
   <% else %>
     <% if  ranked_link(@entity) %>
-      <%= link_to "Ranked", dereference_external_path(uri: ranked_link(@entity)) %>
+      <%= link_to "Ranked",
+      dereference_external_path(uri: ranked_link(@entity)),
+      rel: "nofollow" %>
       |
     <% end %>
   <% end %>
@@ -29,10 +33,11 @@
     turbo_prefetch: false,
   } %>
   |
-  <a href=<%= graphdb_link(@entity.entity_uri) %> id="graphdb">GraphDB</a>
+  <a href="<%= graphdb_link(@entity.entity_uri) %>" rel="nofollow" id="graphdb">GraphDB</a>
   <% if session[:name] %>
     |
     <%= link_to "minter",
-    mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value) %>
+    mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
+    rel: "nofollow" %>
   <% end %>
 </div>
