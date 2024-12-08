@@ -4,7 +4,7 @@
     dereference_external_path(uri: @entity.entity_uri),
     rel: "nofollow" %>
     |
-    <a href=<%= @entity.entity_uri %>>
+    <a href="<%= @entity.entity_uri %>" rel="nofollow">
       Visit</a>
     <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' %>
       |
@@ -14,7 +14,7 @@
     <% end %>
     |
   <% else %>
-    <% if  ranked_link(@entity) %>
+    <% if ranked_link(@entity) %>
       <%= link_to "Ranked",
       dereference_external_path(uri: ranked_link(@entity)),
       rel: "nofollow" %>
