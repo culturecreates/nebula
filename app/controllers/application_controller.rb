@@ -52,7 +52,7 @@ class ApplicationController < ActionController::Base
       return # Stop further execution
     end
   
-    if session[:accounts]&.count > 0
+    if session[:accounts].present?
       return true
     else
       flash.alert = "Please request that #{session[:name]} be linked to an Artsdata Databus account."
