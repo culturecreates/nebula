@@ -1,8 +1,8 @@
 class ArtifactController < ApplicationController
-  before_action :authenticate_user! # ensure user has permissions
+  before_action :authenticate_databus_user! # ensure user has permissions
 
   def index
-    @databus_account = params[:databus_account] || "capacoa"
+    @databus_account = session[:accounts].first
     sparql_file =  "artifact_controller/list_artifacts"
 
     # Placeholders in SPARQL query

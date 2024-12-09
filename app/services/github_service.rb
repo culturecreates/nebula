@@ -5,7 +5,7 @@ class GithubService
       if token
         body = {"access_token" => token}.to_json
         auth = "Bearer #{token}"
-        headers = {"Accept" => "application/json", "Content-Type" => "application/json", "Authorization" => auth}
+        headers = {"Accept" => "application/vnd.github+json", "X-GitHub-Api-Version" => "2022-11-28","Content-Type" => "application/json", "Authorization" => auth}
         http.send_request("GET", uri.path, body, headers)
       else
         headers = {"Accept" => "application/json", "Content-Type" => "application/json"}
@@ -23,7 +23,7 @@ class GithubService
       JSON.parse(response.body)
     else
       puts response
-      JSON.parse(response)
+      response.message
     end
   end
 

@@ -44,6 +44,23 @@ class ApplicationController < ActionController::Base
    
   end
 
+  def authenticate_databus_user!
+    return true if  Rails.env.test?
+    
+    unless user_signed_in?
+      user_signed_in!
+      return # Stop further execution
+    end
+  
+    if session[:accounts].count > 0
+      return true
+    else
+      flash.alert = "Please request that #{session[:name]} be linked to an Artsdata Databus account."
+      redirect_back(fallback_location: root_path)
+    end
+   
+  end
+
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
   end

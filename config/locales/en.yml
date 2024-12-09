@@ -52,7 +52,12 @@ en:
   artifact:
     title: "Databus Artifact"
     description: |
-      <p>Artifacts linked to your Databus account. To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.</p>
+      <p>The Artsdata Databus stores metadata about your datasets. It does not store the data itself. Before using the databus you must first publish your data somewhere on the Web. Databus organizes datasets by <code><< group >> << artifact >> << version >></code>. 
+      Each versioned artifact has a download URL that must not change. The Artsdata knowledge graph may subscribe to your dataset and load artifacts in the background as new versions become available.</p> 
+      <p>Please manage Artifacts with the <a href='https://culturecreates.github.io/artsdata-data-model/architecture/graph-store-api.html'>Artsdata Databus API</a>. 
+      To create a new version use the <a href='https://documenter.getpostman.com/view/3157443/TVep7mv3#f12d3dc0-5c37-496b-985f-95388660b984'>POST /databus</a> endpoint with <code>publisher=</code> set to your Databus Account URI. 
+      To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.  
+      An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google speadsheet.</p>
     new:
       a10s: |
         <h4>A10s Google Sheet Instructions</h4> <p>Enter the URL of the Google Sheet that contains the data for this artifact. Be careful to select the URL of the tab JSON-LD. The name of the column with the JSON-LD MUST be called <code>jsonld</code>. </p> 

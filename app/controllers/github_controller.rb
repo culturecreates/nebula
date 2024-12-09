@@ -13,6 +13,11 @@ class GithubController < ApplicationController
       session[:handle] = user_info["login"]
       session[:name] = user_info["name"] || user_info["login"]
       session[:token] = token
+      teams = user_teams(token)
+      databus_accounts = teams.select{ |t| t.dig("parent","slug") == "databus"}.map {|t| t["slug"]}
+      puts "databus_accounts: #{databus_accounts}"
+
+      session[:accounts] = databus_accounts
 
       # user_repos = user_repos(token)
       # session[:repos] = user_repos.map { |repo| repo["name"] }
@@ -47,6 +52,12 @@ class GithubController < ApplicationController
 
   def user_repos(token)
     uri = URI("https://api.github.com/user/repos")
+    GithubService.info(token, uri)
+  end
+
+  def user_teams(token)
+   # /orgs/{org}/teams
+    uri = URI("https://api.github.com/user/teams")
     GithubService.info(token, uri)
   end
 
