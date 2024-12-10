@@ -35,7 +35,8 @@ class ApplicationController < ActionController::Base
       "sahalali",
       "tammy-culture",
       "MichifDorian",
-      "troughc"].include?(session[:handle])
+      "troughc",
+      "dev-aravind"].include?(session[:handle])
       return true
     else
       flash.alert = "#{session[:name]} does not have sufficient permissions to access this section."

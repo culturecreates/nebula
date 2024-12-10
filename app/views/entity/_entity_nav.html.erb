@@ -6,7 +6,7 @@
     |
     <a href="<%= @entity.entity_uri %>" rel="nofollow">
       Visit</a>
-    <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' %>
+    <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' || session[:handle] == 'dev-aravind' %>
       |
       <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
       |
