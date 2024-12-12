@@ -43,5 +43,6 @@ Rails.application.routes.draw do
   match "shacl/*path", to: "resource#show", via: :get
   match "ontology/*path", to: "resource#show", via: :get
   match "minted/*path", to: "resource#show", via: :get
-  match "culture-creates/*path", to: "resource#show", via: :get
+  match "culture-creates/*path", to: "resource#show", via: :get ## TODO: Move towards a prefix graph/*path
+  match "core/*path", to: "resource#show", via: :get ## TODO: Should use graph/core and remove this line? 
 end
