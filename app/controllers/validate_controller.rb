@@ -22,7 +22,7 @@ class ValidateController < ApplicationController
 
     response = wikidata_sparql.query(sparql_by_class_to_mint(@class_to_mint, uri))
     @entity.graph = RDF::Graph.new << response 
-    @entity.replace_blank_nodes # first level
+   
     begin
       shacl = SHACL.open(shacl_by_class_to_mint(@class_to_mint))
       @report = shacl.execute(@entity.graph)

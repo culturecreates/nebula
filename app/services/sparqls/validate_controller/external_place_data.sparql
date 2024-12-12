@@ -7,7 +7,7 @@
         schema:sameAs ?isniuri , ?music_brainz ;
         schema:description ?desc ;
         schema:address ?bn .
-        ?bn  a schema:PostalAddress ;
+        ?bn a schema:PostalAddress ;
           schema:streetAddress ?address ;
           schema:addressLocality ?territory ;
           schema:addressCountry ?country ;

@@ -114,55 +114,54 @@ class MintController < ApplicationController
   # Mint an existing Wikidata URI
   # GET /mint/wikidata?wikidata_id=&classToMint=
   def wikidata
+    #mapping table for wikidata types
     @wikidata_place_type = "Q17350442"
     @wikidata_person_type = "Q5"
     @wikidata_organization_type = "Q43229"
-    # if validating choice
+
+    # Search wikidata
+    #  - reconile name and type against wikidata(even when the user entered a QID) 
+    #    and show other close matches incase there are duplicates in Wikidata
+    if params[:wikidata_search].present?
+     
+      @wikidata_data = {}
+      if params[:wikidata_search] =~ /\AQ\d+\z/ # Wikidata ID
+        @wikidata_data[:label] = params[:wikidata_search]
+      elsif params[:wikidata_search] =~ /\Ahttp/ # Wikidata URI
+        qid = params[:wikidata_search].split("/").last
+        @wikidata_data[:label] = convert_id_to_name(qid)
+      else # Wikidata label
+        @wikidata_data[:label] = params[:wikidata_search] 
+      end
+      @wikidata_data[:type] = params[:type] if params[:type]
+    end
+   
+    # Continue after user selects a wikidata entity from initial search results
     if params[:uri].present? 
       @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
-      @class_to_mint =  if params[:type] == @wikidata_place_type
-                        "schema:Place"
-                      elsif  params[:type] == @wikidata_person_type
-                        "schema:Person"
-                      elsif params[:type] == @wikidata_organization_type
-                        "schema:Organization"
-                      end
-      
-
+      @class_to_mint = map_wikidata_type_to_schema(params[:type])
 
       # call wikidata sparql to get more data
       sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
       select_query = <<-SPARQL
         select * where {
-          <http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label ; 
-          schema:description ?desc . 
+          <http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label .
+          OPTIONAL {
+            <http://www.wikidata.org/entity/#{params[:uri]}> schema:description ?desc . 
+            filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
+          }
           filter (lang(?label) = 'en' || lang(?label) = 'fr') 
-          filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
         }
       SPARQL
       solutions = sparql.query(select_query)
-      @label = solutions.first.label.to_s if solutions.first&.bound?(:label)
-      @description = solutions.first.desc.to_s if solutions.first&.bound?(:desc)
+      @label = solutions.map { |s| s.label.to_s if s.bound?(:label) }.first 
+      @description = solutions.map { |s| s.desc.to_s if s.bound?(:desc) }.first 
       @language = "en"
       @reference = "http://www.wikidata.org/entity/#{params[:uri]}"
       @group = 'http://wikidata.org'
     end
 
-    if params[:wikidata_search].present?
-      # reconile name and type against wikidata even when the user entered a QID 
-      # to ensure they have the right entity and type to mint
-      # and show other close matches incase there are duplicated in Wikidata
-      @wikidata_data = {}
-      if params[:wikidata_search] =~ /\AQ\d+\z/ 
-        @wikidata_data[:label] = params[:wikidata_search]
-      elsif params[:wikidata_search] =~ /\Ahttp/
-        qid = params[:wikidata_search].split("/").last
-        @wikidata_data[:label] = convert_id_to_name(qid)
-      else
-        @wikidata_data[:label] = params[:wikidata_search] 
-      end
-      @wikidata_data[:type] = params[:type] if params[:type]
-    end
+
   end
 
   private
@@ -174,6 +173,15 @@ class MintController < ApplicationController
     solutions.first.label.to_s if solutions.first&.bound?(:label)
   end
 
+  def map_wikidata_type_to_schema(wikidata_type)
+    if wikidata_type == @wikidata_place_type
+      "schema:Place"
+    elsif wikidata_type == @wikidata_person_type
+      "schema:Person"
+    elsif wikidata_type == @wikidata_organization_type
+      "schema:Organization"
+    end
+  end
 
   def set_authority
     return unless params[:externalUri]

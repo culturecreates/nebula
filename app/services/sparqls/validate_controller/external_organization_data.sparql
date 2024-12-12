@@ -4,6 +4,7 @@
         schema:sameAs ?aduri ;
         schema:description ?desc ;
         schema:url ?url ;
+        schema:location ?country, ?territory;
         schema:sameAs ?isniuri , ?music_brainz .
       } 
       WHERE { 
@@ -13,6 +14,12 @@
         OPTIONAL { 
           <EXTERNAL_URI>  schema:description ?desc . 
           filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
+        }
+         OPTIONAL { 
+          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P17>  ?country . 
+        }
+        OPTIONAL { 
+          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P131>  ?territory . 
         }
           
         OPTIONAL { 
