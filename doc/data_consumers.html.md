@@ -1,7 +1,7 @@
-[fr](data-consumers.fr.md) | en
+
 # Artsdata Data Consumers List
 
-| Orgnaization | Maintained by | Official website | Github repository |
+| Organization | Maintained by | Official website | Github repository |
 | --- | --- | --- | --- |
 | ArtsCultureNB   | Government of New Brunswick | https://artsculturenb.ca/
 | Arts Touring Connector |

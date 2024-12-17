@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     resources :ical
     resources :sparql_manager
     
+    
   end
 
   # Support legacy urls to Zazuko YASGUI SPARQL UI
@@ -45,4 +46,6 @@ Rails.application.routes.draw do
   match "minted/*path", to: "resource#show", via: :get
   match "culture-creates/*path", to: "resource#show", via: :get ## TODO: Move towards a prefix graph/*path
   match "core/*path", to: "resource#show", via: :get ## TODO: Should use graph/core and remove this line? 
+
+  match "doc/*path", to: "application#doc", via: :get
 end

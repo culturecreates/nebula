@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
 
   def test; end
 
+  def doc
+    render template: "#{params[:path]}"
+  end
+
   def user_signed_in?
     session[:handle].present?
   end
