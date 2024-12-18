@@ -3,7 +3,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX ofn:<http://www.ontotext.com/sparql/functions/>
 
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-select ?name ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_days) ((xsd:float(?uploads_last_30_days)/xsd:float("30")) * 7 AS ?average_uploads_per_week)  { 
+select ?name (sample(?groups) as ?group) ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_days) ((xsd:float(?uploads_last_30_days)/xsd:float("30")) * 7 AS ?average_uploads_per_week)  { 
    
 
    { <http://kg.artsdata.ca/resource/dia-logGraphs>  schema:hasPart ?graph . }
@@ -22,8 +22,10 @@ select ?name ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_la
     ?dataid a <http://dataid.dbpedia.org/ns/core#DataId> ;
     <http://xmlns.com/foaf/0.1/primaryTopic> ?dataset .
     ?dataset <http://dataid.dbpedia.org/ns/core#artifact> ?artifact .
+    ?dataset <http://dataid.dbpedia.org/ns/core#group> ?group_uri .
+    ?group_uri schema:name ?groups . 
     ?artifact ^<http://dataid.dbpedia.org/ns/core#artifact> ?all_datasets .
-     ?all_datasets  <http://purl.org/dc/terms/issued> ?date .
+    ?all_datasets  <http://purl.org/dc/terms/issued> ?date .
    
     filter(ofn:asDays(now() - ?date) <= 30)
 
