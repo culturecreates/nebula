@@ -7,7 +7,8 @@ class ApplicationController < ActionController::Base
   def test; end
 
   def doc
-    render template: "#{params[:path]}"
+    template = "#{I18n.locale.to_s}/#{params[:path]}"
+    render template: template
   end
 
   def user_signed_in?

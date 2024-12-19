@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     resources :ical
     resources :sparql_manager
     
+    match "doc/*path", to: "application#doc", via: :get
     
   end
 
@@ -47,5 +48,4 @@ Rails.application.routes.draw do
   match "culture-creates/*path", to: "resource#show", via: :get ## TODO: Move towards a prefix graph/*path
   match "core/*path", to: "resource#show", via: :get ## TODO: Should use graph/core and remove this line? 
 
-  match "doc/*path", to: "application#doc", via: :get
 end
