@@ -1,5 +1,5 @@
 
-# Liste des consommateurs de donnée d'Artsdata
+# Liste des consommateurs de données d'Artsdata
 
 | Application | Gérée par | Site web officiel | Référentiel Github |
 | --- | --- | --- | --- |
