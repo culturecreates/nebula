@@ -2,5 +2,5 @@
 
 English coming...
 
-[French version](https://kg.artsdata.ca/doc/image_policy)
+[French version](https://kg.artsdata.ca/fr/doc/image_policy)
 
