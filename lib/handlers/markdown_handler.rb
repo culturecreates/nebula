@@ -12,8 +12,12 @@ module Handlers
         link_attributes: {rel: 'nofollow', target: "_blank"}
     }
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, @options)
-  
-      "#{markdown.render(source).inspect}.html_safe"
+      rendered_content = markdown.render(source)
+      
+      # Wrap the rendered content with <div class="container">
+      wrapped_content = "<div class=\"container\">#{rendered_content}</div>"
+
+      "#{wrapped_content.inspect}.html_safe"
     end
   end
 end
