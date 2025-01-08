@@ -127,9 +127,11 @@ module EntityHelper
     # end
   end
 
-  def check_if_authoritative
-    if !@entity.entity_uri.starts_with?("http://kg.artsdata.ca")
-      'Non-authoritative'.html_safe
+  def is_authoritative
+    if @entity.entity_uri.starts_with?("http://kg.artsdata.ca")
+      true
+    else
+      false
     end
   end
 end
