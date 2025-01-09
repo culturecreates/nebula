@@ -43,23 +43,19 @@ WHERE {
     ?s ?p ?bns .
     filter(isBLANK(?bns))
     ?bns ?bnp ?bno .
-
-
     # second level blank nodes
     OPTIONAL {
-        ?bns ?bnp ?2bns .
-        filter(isBLANK(?2bns))
-        ?2bns ?2bnp ?2bno .
-    }
-
-    # third level blank nodes
-    OPTIONAL {
-        ?bns ?bnp ?2bns .
-        filter(isBLANK(?2bns))
-        ?2bns ?2bnp ?2bno .
+      ?bns ?bnp ?2bns .
+      filter(isBLANK(?2bns))
+      ?2bns ?2bnp ?2bno .
+      # third level blank nodes
+      OPTIONAL {
         ?2bno ?2bnp ?3bns .
         filter(isBLANK(?3bns))
         ?3bns ?3bnp ?3bno .
+      }
     }
+
+   
   }
 }
