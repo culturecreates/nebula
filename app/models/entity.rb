@@ -135,6 +135,16 @@ class Entity
     @card[:street_address] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/streetAddress"), nil])&.first&.object&.value
     @card[:disambiguating_description] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/disambiguatingDescription"), nil])&.first&.object&.value
     @card[:name_language] = graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])&.first&.object&.language
+
+    # calculate day span when startDate and endDate are present
+    @card[:day_span] =  if  @card[:start_date] && @card[:end_date]
+                          days = 1 + ( (Time.parse(@card[:end_date]) - Time.parse(@card[:start_date])) / (60 * 60 * 24)).to_i 
+                          if days > 1
+                            "spans #{days} days"
+                          else
+                            "single day"
+                          end
+                        end 
   end
 
   # load rdf from external URL

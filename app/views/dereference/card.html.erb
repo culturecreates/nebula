@@ -18,21 +18,12 @@ Test:
 
       <% if type == "http://schema.org/Event" ||   type == "http://schema.org/EventSeries" %>
         -
-        <%= @entity.card[:location_name] %>
+        <%= @entity.card[:location_name] ||= display_warning("MISSING LOCATION") %>
         -
-        <%= @entity.card[:start_date] %>
-        <% if @entity.card[:end_date] %>
+        <%= @entity.card[:start_date] ||= display_warning("MISSING START DATE") %>
+        <% if @entity.card[:day_span] %>
           -
-          <% days =
-            1 +
-              (
-                (
-                  Time.parse(@entity.card[:end_date]) -
-                    Time.parse(@entity.card[:start_date])
-                ) / (60 * 60 * 24)
-              ).to_i %>
-          <%= days > 1 ? "spans #{days} days" : "single day" %>
-
+          <%= @entity.card[:day_span] %>
         <% end %>
       <% else %>
         <% if @entity.card[:disambiguating_description].present? %>
