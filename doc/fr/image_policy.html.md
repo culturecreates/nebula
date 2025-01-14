@@ -12,10 +12,11 @@ Artsdata n’extrait et n’entrepose que les URLs d’image et ne dépose en au
 
 À moins d’une mention de licence indiquant autrement, les utilisateurs doivent présumer que les images dont les URLs sont entreposées dans Artsdata sont protégées par le droit d’auteur.
 
-Artsdata ne cautionne aucune utilisation des URLs d’images, sauf exception des URLs associées à des événements et uniquement pour des fins de promotion d’événement ou des fins d’archives ET lorsque toutes les conditions suivantes sont respectées. 
-* Une URL d’image ne peut être utilisée qu’en lien avec l’événement auquel elle est associée ;
-* L’utilisateur doit s’assurer d’inclure suffisamment de données à propos de l’événement afin que celui-ci soit désambiguïsable (c’est-à-dire qu’il puisse être distingué d’un autre événement similaire) ;
-* Lorsque des données précisant l’URL de la page officielle de l’événement (c.-à-d. la page d’événement sur le site de l’organisateur officiel de l’événement) et/ou l’URL de la billetterie officielle de l’événement sont disponibles, l’utilisateur doit inclure ces informations, en plus des autres données permettant de désambiguïser l’événement.
+AConformément aux ententes types de l’industrie, aux conventions collectives et aux lois en vigueur au Canada, une URL d’image ne devrait être utilisée qu’aux mêmes fins pour lesquelles l’image a été publiée sur le site source et dans les mêmes conditions. Par exemple, dans le cas d’une image promotionnelle pour un événement : 
+* L'URL d’image ne devrait être utilisée qu’en lien avec l’événement auquel elle est associée ;
+* L’utilisateur devrait s’assurer d’inclure suffisamment de données à propos de l’événement afin que celui-ci soit désambiguïsable (c’est-à-dire qu’il puisse être distingué d’un autre événement similaire) ;
+* Lorsque des données précisant l’URL de la page officielle de l’événement (c.-à-d. la page d’événement sur le site de l’organisateur officiel de l’événement) et/ou l’URL de la billetterie officielle de l’événement sont disponibles, l’utilisateur devrait inclure ces informations, en plus des autres données permettant de désambiguïser l’événement ;
+* Si un crédit photo est disponible, celui-ci devrait être réutilisé avec l’URL d’image.
 
 L’objectif des conditions précitées est de faire en sorte que l’URL d’image soit utilisée conformément à l’intention de l’organisateur officiel qui a publié cette image (et des ayants droit qui lui ont accordé le droit de publier l’image pour des fins promotionnelles).
 
