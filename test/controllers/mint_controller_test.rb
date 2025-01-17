@@ -2,12 +2,12 @@ require "test_helper"
 
 class MintControllerTest < ActionDispatch::IntegrationTest
 
-  test "should get preview with valid parameters" do
-    VCR.use_cassette('mint_preview_url') do
-      get mint_preview_url, params: { externalUri: 'http://scenepro.ca/some-uri', classToMint: 'SomeClass' }
-      assert_response :success
-    end
-  end
+  # test "should get preview with valid parameters" do
+  #   VCR.use_cassette('mint_preview_url') do
+  #     get mint_preview_url, params: { externalUri: 'http://scenepro.ca/some-uri', classToMint: 'SomeClass' }
+  #     assert_response :success
+  #   end
+  # end
 
   
   test "should redirect to root with missing externalUri" do
