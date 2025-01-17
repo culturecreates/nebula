@@ -1,0 +1,68 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://db.artsdata.ca/repositories/artsdata
+    body:
+      encoding: UTF-8
+      string: query=%23+load_card+query+is+used+to+load+the+card+data+for+dereferencing+a+given+URI%0A%23+If+there+is+a+nested+location%2C+then+the+location+name+is+flattened.%0A%23+If+there+is+a+nested+address%2C+then+the+postalCode+and+addressLocality+is+flattened.%0A%23+Flatenning+is+done+to+make+the+data+more+readable+and+to+avoid+nested+objects+in+the+card.%0A%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0APREFIX+prov%3A+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23%3E%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0A%0Aconstruct+%7B+%0A++%3Fentity+rdfs%3Alabel+%3Fc+%3B+%0A++++a+%3Ftype+%3B+%0A++schema%3AadditionalType+%3Finferred_type+%3B%0A++schema%3AdisambiguatingDescription+%3FdisambiguatingDescription+%3B%0A++schema%3AstreetAddress+%3Fstreet++%3B++%0A++schema%3AaddressLocality+%3Flocality+%3B++%0A++schema%3ApostalCode+%3FpostalCode+%3B%0A++schema%3AstartDate+%3FstartDate+%3B%0A++schema%3AendDate+%3FendDate+%3B%0A++schema%3Alocation+%3Fplace_name+%3B%0A++prov%3AwasDerivedFrom+%3Fdataid+.%0A%7D+%0Awhere+%7B+%0A++VALUES+%3Fentity+%7B+%3Chttp%3A%2F%2Fscenepro.ca%2Fsome-uri%3E+%7D%0A++OPTIONAL+%7B+%3Fentity+rdfs%3Alabel+%3Fc+.%7D%0A++%23+OPTIONAL+%7B+%3Fg+prov%3AwasDerivedFrom+%3Fdataid+.%7D%0A++MINUS+%7B+%3Fentity+skos%3AhiddenLabel+%3Fc+.+%7D+++%0A++OPTIONAL+%7B+%3Fentity+schema%3AdisambiguatingDescription+%3FdisambiguatingDescription+.%7D%0A++%3Fentity+a+%3Finferred_type+.%0A++graph+%3Fg+%7B+%0A++++OPTIONAL+%7B+%3Fentity+a+%3Ftype+.%7D%0A+++%0A++++%23+When+entity+is+an+Event%0A++++OPTIONAL+%7B+%3Fentity+schema%3AstartDate+%3FstartDate+.%7D+%0A++++OPTIONAL+%7B+%3Fentity+schema%3AendDate+%3FendDate+.%7D++++%0A++++%23+When+entity+is+a+PostalAddress%0A++++OPTIONAL+%7B+%3Fentity+schema%3AstreetAddress+%3Fstreet+.%7D+%0A++++OPTIONAL+%7B+%3Fentity+schema%3AaddressLocality+%3Flocality+.%7D+%0A++++OPTIONAL+%7B+%3Fentity+schema%3ApostalCode+%3FpostalCode+.%7D+%0A++%7D%0A++%0A++%23+When+entity+is+an+Event+then+flatten+nested+location+and+PostalAddress%0A++OPTIONAL+%7B+%3Fentity+schema%3Alocation%2Fschema%3Aname+%3Fplace_name+.%7D%0A++OPTIONAL+%7B+%3Fentity+schema%3Alocation%2Fschema%3Aaddress%2Fschema%3ApostalCode+%3FpostalCode+.%7D%0A++%23+When+entity+is+a+Place+then+flatten+nested+PostalAdress%0A++OPTIONAL+%7B+%3Fentity+schema%3Aaddress%2Fschema%3ApostalCode+%3FpostalCode+.+%7D%0A++OPTIONAL+%7B+%3Fentity++schema%3Aaddress%2Fschema%3AaddressLocality+%3Flocality+.+%7D%0A%0A++%23+For+all+entities%2C+get+the+dataid+for+minting+when+using+load_card%0A++OPTIONAL+%7Bgraph+%3Fg+%7B+%3Chttp%3A%2F%2Fscenepro.ca%2Fsome-uri%3E+a+%3Ftype+.%7D+%3Fg+prov%3AwasDerivedFrom+%3Fdataid+.%7D%0A%7D+
+    headers:
+      User-Agent:
+      - Faraday v2.12.1
+      Accept:
+      - text/x-turtlestar
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Server:
+      - nginx/1.24.0 (Ubuntu)
+      Date:
+      - Fri, 17 Jan 2025 06:15:01 GMT
+      Content-Type:
+      - text/x-turtlestar;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept
+      Cache-Control:
+      - no-store
+      Content-Disposition:
+      - attachment; filename=query-result.ttls
+      X-Xss-Protection:
+      - 1; mode=block
+      - 1; mode=block
+      X-Frame-Options:
+      - DENY
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      - nosniff
+      Content-Language:
+      - en-US
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Referrer-Policy:
+      - origin
+    body:
+      encoding: UTF-8
+      string: |
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix schema: <http://schema.org/> .
+        @prefix prov: <http://www.w3.org/ns/prov#> .
+        @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdf4j: <http://rdf4j.org/schema/rdf4j#> .
+        @prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+        @prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+  recorded_at: Fri, 17 Jan 2025 06:15:01 GMT
+recorded_with: VCR 6.3.1
