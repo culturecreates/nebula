@@ -1,7 +1,7 @@
 
 # Artsdata Data Consumers List
 
-| Application | Maintained by | Official website | Github repository |
+| Application | Maintained by | Official Website | Github Repository |
 | --- | --- | --- | --- |
 | ArtsCultureNB | Government of New Brunswick | https://artsculturenb.ca/ | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Arts Touring Connector | Ontario Presents | https://arts-tc.ca/ | [artsdata-planet-atc](https://github.com/culturecreates/artsdata-planet-atc)
