@@ -102,4 +102,4 @@ WHERE {
      }
 
    
-} order by   ?prop_label ?obj_label ?a 
+} 
