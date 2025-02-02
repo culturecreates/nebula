@@ -27,8 +27,6 @@ CONSTRUCT {
     ?bns ?bnp ?2bns .
     ?2bns ?2bnp ?2bno .
     ?2bnp rdfs:label ?2bnp_label .  
-    ?2bno rdfs:label ?2bno_label .
-
 
     ?shacl_bn sh:focusNode ?s ; 
         ?shacl_pred ?shal_obj .
