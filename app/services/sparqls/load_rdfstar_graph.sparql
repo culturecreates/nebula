@@ -1,4 +1,5 @@
 # load_rdfstar_graph
+# TODO: Add SHACL triples for blank nodes. Currently removed for performance crash when over 10 subevents (ville-de-laval)
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
@@ -17,12 +18,11 @@ CONSTRUCT {
     <<?s ?p ?o>> ?a ?qbns .
     ?qbns ?qbnp ?qbno .
     ?qbnp rdfs:label ?qbnp_label .
-    ?qbno rdfs:label ?qbno_label .
 
     ?s ?p ?bns .
     ?bns ?bnp ?bno .
     ?bnp rdfs:label ?bnp_label .
-    ?bno rdfs:label ?bno_label .
+   
 
     ?bns ?bnp ?2bns .
     ?2bns ?2bnp ?2bno .
@@ -33,8 +33,6 @@ CONSTRUCT {
     ?shacl_bn sh:focusNode ?s ; 
         ?shacl_pred ?shal_obj .
 
-    ?shacl_bn2 sh:focusNode ?bns ; 
-        ?shacl_bn2_pred ?shal_bn2_obj .
     
 }
 FROM onto:explicit 
@@ -49,13 +47,6 @@ WHERE {
         ?shacl_bn sh:focusNode ?s ; 
             ?shacl_pred ?shal_obj .
     }
-
-    # OPTIONAL {
-    #     ?shacl_bn sh:focusNode ?s ; 
-    #      sh:value ?value .
-    # }
-
-    
 
     # main triple labels
     OPTIONAL {
@@ -78,10 +69,7 @@ WHERE {
         <<?s ?p ?o>> ?a ?b .
         ?a rdfs:label ?a_label .
     }
-    OPTIONAL {
-        <<?s ?p ?o>> ?a ?b .
-        ?b rdfs:label ?b_label .
-    }
+   
     # quoted triple blank nodes
     OPTIONAL {
         <<?s ?p ?o>> ?a ?qbns .
@@ -89,9 +77,6 @@ WHERE {
         ?qbns ?qbnp ?qbno .
         OPTIONAL {
             ?qbnp rdfs:label ?qbnp_label .
-        }
-        OPTIONAL {
-            ?qbno rdfs:label ?qbno_label .
         }
 
     }
@@ -101,19 +86,11 @@ WHERE {
         ?s ?p ?bns .
         filter(isBLANK(?bns))
 
-        OPTIONAL {
-            ?shacl_bn2 sh:focusNode ?bns ; 
-                ?shacl_bn2_pred ?shal_bn2_obj .
-        }
-
         ?bns ?bnp ?bno .
         OPTIONAL {
             ?bnp rdfs:label ?bnp_label .
         }
-        OPTIONAL {
-            ?bno rdfs:label ?bno_label .
-        }
-
+       
         # second level blank nodes
         OPTIONAL {
             ?bns ?bnp ?2bns .
@@ -123,10 +100,6 @@ WHERE {
             OPTIONAL {
                 ?2bnp rdfs:label ?2bnp_label .
             }
-            OPTIONAL {
-                ?2bno rdfs:label ?2bno_label .
-            }
-
        }
      }
 
