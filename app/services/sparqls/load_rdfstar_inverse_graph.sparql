@@ -32,5 +32,7 @@ WHERE {
         ?p schema:inverseOf/rdfs:label ?inverse_label
     }
     bind(coalesce(?inverse_label,concat(?prop_label_original," (inverse)")) as ?prop_label)
+
+    filter(!contains(str(?p),"shacl"))
    
 } order by   ?prop_label ?sub_label limit 200
