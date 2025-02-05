@@ -14,6 +14,14 @@ fr:
       To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.  
       An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google speadsheet.</p>
   ical:
-    ical_feeds: "iCal Feeds"
+    ical_feeds: "Flux iCal"
     description: |
-      List of iCal feeds created for Artsdata. To create a new iCal feed, add a CONSTRUCT SPARQL to this <a href='https://github.com/artsdata-stewards/artsdata-actions/tree/main/ical'>Github repository</a>. To test an iCal Feed, copy the URL and paste it into this free Wordpress calendar plugin: <a href='https://icscalendar.com/preview/'>ICS Calendar</a>.
+      Liste des flux iCal créés pour Artsdata. 
+    help:
+      title: "Comment créer un flux iCal"
+      description: |
+        Pour créer un nouveau flux iCal, ajoutez un SPARQL CONSTRUCT au <a href='https://github.com/artsdata-stewards/artsdata-actions/tree/main/ical'>repertoire github iCal</a> d'artsdata-stewards. 
+        Il apparaîtra dans la liste des flux iCal en haut de cette page. 
+        Ensuite, copiez l'URL du flux iCal et utilisez-la avec le plugin Calendar iCal/ICS de votre choix. 
+        Pour tester un flux iCal, copiez l'URL du flux iCal et collez-la dans ce plugin de calendrier Wordpress gratuit : <a href='https://icscalendar.com/preview/'>Calendrier ICS</a>.
+        <p>Le CONSTRUCT SPARQL doit avoir les données minimales suivantes :</p>
