@@ -14,6 +14,7 @@ WHERE {
         OPTIONAL {
           FILTER NOT EXISTS { ?series schema:subEvent ?uri . }
           bind(concat("mint") as ?mint_top_level)
+          filter(	?startDate > now())
           #  bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
         }
         OPTIONAL {
