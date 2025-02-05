@@ -18,9 +18,8 @@ class ArtifactController < ApplicationController
   def create
 
     @artifact = Artifact.new(artifact_params, session[:handle])
-    
     if @artifact.save
-      flash.notice = "Created artifact '#{@artifact.name}'. You may now load the artifact as a dataset into Artsdata."
+      flash.notice = "Created artifact '#{@artifact.name}'. You may now create versions of the artifact."
       redirect_to artifact_index_path
     else
       render 'new'
@@ -31,6 +30,6 @@ class ArtifactController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def artifact_params
-    params.permit(:name, :description, :type, :sheet_url)
+    params.permit(:name, :description, :type, :sheet_url, :webpage_url, :link_identifier)
   end
 end

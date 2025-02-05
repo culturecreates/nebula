@@ -45,14 +45,14 @@
 
     <div class="mb-3" id="website-url-field" style="display: none;">
       <hr>
-      <%= form.label :sheet_url, "Index page", class: "form-label" %>
-      <%= form.text_field :sheet_url,
+      <%= form.label :webpage_url, "Index page", class: "form-label" %>
+      <%= form.text_field :webpage_url,
                       class: "form-control",
-                      value: @artifact.sheet_url,
+                      value: @artifact.webpage_url,
                       placeholder: "Enter URL of the index page" %>
       <br>
       <%= form.label :link_identifier, "Link identifier", class: "form-label" %>
-      <%= form.text_field :sheet_url,
+      <%= form.text_field :link_identifier,
                       class: "form-control",
                       placeholder: "Enter CSS to select links to individual entities" %>
       <br>

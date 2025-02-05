@@ -52,3 +52,4 @@ GoDaddy does NOT support HTTPS forwarding for domains, so https://artsdata.ca wi
 
 https://github.com/apps/artsdata-nebula
 
+Ensure your Github repo has [granted access](https://github.com/organizations/culturecreates/settings/installations/52160418) to the Artsdata Nebula Github App.

@@ -1,11 +1,10 @@
 class Artifact
-  attr_accessor :name, :description, :action_name, :action_url, :type, :description, :sheet_url, :group, :user, :errors, :artifact_create_action_uri
+  attr_accessor :name, :description, :action_name, :action_url, :type, :description, :sheet_url,:webpage_url,:link_identifier, :group, :user, :errors, :artifact_create_action_uri
 
   def initialize(hsh = {}, user = nil)
     hsh.each do |key, value|
       self.send(:"#{key}=", value)
     end
-    self.group = "A10s Google sheet"
     self.user = user
   end
 
@@ -23,7 +22,7 @@ class Artifact
  
     if self.type == "spreadsheet-a10s" && self.sheet_url.present?
       group_id = "a10s-google-sheet"
-      action_name = "Load #{artifact_id} A10s Google Sheet"
+      action_name = "Create an artifact version of #{artifact_id} A10s Google Sheet"
       action_url = "https://api.github.com/repos/artsdata-stewards/a10s-google-sheet-importer/actions/workflows/databus-a10-sheet-importer.yml/dispatches"
       httpBody = {
         ref: "main",
@@ -35,8 +34,8 @@ class Artifact
       }
     elsif self.type == "spreadsheet-smart-chip" && self.sheet_url.present?
       group_id = "spreadsheet-smart-chip"
-      action_name = "Load #{artifact_id} Smart Chip Google Sheet"
-      action_url = "https://api.github.com/repos/culture-creates/artsdata-google-workspace-smart-chip/actions/workflows/push-to-artsdata.yml/dispatches"
+      action_name = "Create an artifact version of #{artifact_id} Smart Chip Google Sheet"
+      action_url = "https://api.github.com/repos/culturecreates/artsdata-google-workspace-smart-chip/actions/workflows/push-to-artsdata.yml/dispatches"
       httpBody = {
         ref: "main",
         inputs: {
@@ -46,8 +45,19 @@ class Artifact
         }
       }
     elsif self.type == "website"
-      self.errors = "website artifacts not yet supported."
-      return false
+      group_id = "artsdata-orion"
+      action_name = "Create an artifact version of the #{artifact_id} website"
+      # artsdata-pipeline-action
+      action_url = "https://api.github.com/repos/culturecreates/artsdata-pipeline-action/actions/workflows/custom-crawl-test.yml/dispatches"
+      httpBody = {
+        ref: "main",
+        inputs: {
+          artifact: artifact_id,
+          "page-url" => @webpage_url,
+          "entity-identifier" => @link_identifier,
+          publisher: "{{PublisherWebID}}"
+        }
+      }
     else
       self.errors = "Invalid artifact. Please review your input."
       return false
