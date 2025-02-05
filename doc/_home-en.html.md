@@ -38,7 +38,7 @@ The Artsdata.ca knowledge graph enables the arts sector to:
 
 - [Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
 - [Data Consumers List](/en/doc/data-consumers)
-- [Image Policy](/en/doc/data-consumers)
+- [Image Policy](/en/doc/image-policy)
 
 ---
 # Add your events to Artsdata.ca
