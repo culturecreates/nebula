@@ -14,7 +14,8 @@ WHERE {
         OPTIONAL {
           FILTER NOT EXISTS { ?series schema:subEvent ?uri . }
           bind(concat("mint") as ?mint_top_level)
-          filter(	?startDate > now())
+          BIND(IF(datatype(?startDate) = xsd:date, xsd:dateTime(CONCAT(STR(?startDate), "T00:00:00")), ?startDate) AS ?normalizedStartDate)
+          filter(?normalizedStartDate > now())
           #  bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
         }
         OPTIONAL {
