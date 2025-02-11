@@ -56,7 +56,7 @@ en:
         It will appear in the list of iCal Feeds at the top of this page.
         Then copy the iCal Feed URL and use it with the Calendar iCal/ICS plugin of your choice.
         To test an iCal Feed, copy the iCal Feed URL and paste it into this free Wordpress calendar plugin: <a href='https://icscalendar.com/preview/'>ICS Calendar</a>.</p>
-        <p>The CONSTRUCT SPARQL must have the following minimum data:</p>
+        <p>iCal Feed <a href="https://culturecreates.github.io/artsdata-data-model/architecture/ical.html">Documentation</a></p>
   artifact:
     title: "Databus Artifact"
     description: |

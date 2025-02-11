@@ -24,4 +24,4 @@ fr:
         Il apparaîtra dans la liste des flux iCal en haut de cette page. 
         Ensuite, copiez l'URL du flux iCal et utilisez-la avec le plugin Calendar iCal/ICS de votre choix. 
         Pour tester un flux iCal, copiez l'URL du flux iCal et collez-la dans ce plugin de calendrier Wordpress gratuit : <a href='https://icscalendar.com/preview/'>Calendrier ICS</a>.
-        <p>Le CONSTRUCT SPARQL doit avoir les données minimales suivantes :</p>
+         <p><a href="https://culturecreates.github.io/artsdata-data-model/architecture/ical.html">Documentation</a> sur le flux iCal</p>
