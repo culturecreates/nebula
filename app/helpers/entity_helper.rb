@@ -52,9 +52,7 @@ module EntityHelper
 
   # Display RDF object literal
   def display_literal(obj)
-    if obj.language
-      "<span>#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{obj.language}</span></span>".html_safe  
-    elsif obj.value.starts_with?("http")
+    if obj.value.starts_with?("http")
       "<span>#{obj.value} <a href='#{obj.value}' title='Open external webpage' target='_blank'>&nbsp;#{ render partial: 'shared/icon_link'}</a></span>".html_safe
     elsif obj.datatype?
       "<span>#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{use_prefix(obj.datatype)}</span></span>".html_safe 
@@ -66,7 +64,7 @@ module EntityHelper
         <<-HTML.html_safe
           <div data-controller='read-more' data-read-more-more-text-value='Read more ↓' data-read-more-less-text-value='Read less ↑'>
             <span class='nebula-field' data-read-more-target='content'>
-              #{obj.value}
+              #{literal_with_lang(obj)}
             </span>
             <div class="d-flex justify-content-end">
               <button type='button' class='btn btn-outline' data-action='read-more#toggle'>Read more ↓</button>
@@ -79,6 +77,13 @@ module EntityHelper
     end
   end
 
+  def literal_with_lang(obj)
+    if obj.language
+      "#{obj.value}<span style='color:gray;font-size: small'>&nbsp;#{obj.language}</span>".html_safe  
+    else
+      obj.value
+    end
+  end
 
  # Display RDF::URI as a link
   def display_uri(uri)
