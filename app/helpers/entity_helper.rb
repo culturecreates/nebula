@@ -63,17 +63,20 @@ module EntityHelper
     else
       word_max = 50
       if obj.value.split.length > word_max
-      "<span title='#{obj.value}'>#{truncate_words(obj.value, word_max)}</span>".html_safe
+        <<-HTML.html_safe
+          <div data-controller='read-more' data-read-more-more-text-value='Read more ↓' data-read-more-less-text-value='Read less ↑'>
+            <span class='nebula-field' data-read-more-target='content'>
+              #{obj.value}
+            </span>
+            <div class="d-flex justify-content-end">
+              <button type='button' class='btn btn-outline' data-action='read-more#toggle'>Read more ↓</button>
+            </div>
+          </div>
+        HTML
       else
-      "<span>#{obj.value}</span>".html_safe
+        "<span>#{obj.value}</span>".html_safe
       end
-
     end
-  end
-
-  def truncate_words(text, num_words, omission: '...')
-    words = text.split
-    words.length > num_words ? words[0...num_words].join(' ') + omission : text
   end
 
 

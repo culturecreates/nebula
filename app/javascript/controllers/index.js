@@ -19,6 +19,8 @@ application.register("artsdata", ArtsdataController)
 import SortableTableController from "controllers/sortable_table_controller"
 application.register("sortable-table", SortableTableController)
 
-
 import Clipboard from '@stimulus-components/clipboard'
 application.register('clipboard', Clipboard)
+
+import ReadMore from '@stimulus-components/read-more'
+application.register('read-more', ReadMore)
