@@ -72,7 +72,7 @@ module EntityHelper
           </div>
         HTML
       else
-        "<span>#{obj.value}</span>".html_safe
+        "<span>#{literal_with_lang(obj)}</span>".html_safe
       end
     end
   end
