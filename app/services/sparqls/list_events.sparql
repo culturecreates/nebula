@@ -2,21 +2,21 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDateTime  (sample(?sameas_action) as ?artsdata)  (sample(?resultSeverity) as ?conforms) 
+SELECT ?uri (sample(?name_language) as ?name)  (sample(?location_name) as ?location) (sample(?additionalType) as ?type)  ?startDate ?endDate (sample(?sameas_action) as ?artsdata)  (sample(?resultSeverity) as ?conforms) 
 WHERE {
     ?uri a schema:Event .
     graph <GRAPH_PLACEHOLDER> {
         ?uri schema:name  ?name_language ;
               a ?additionalType ;
              schema:startDate ?startDate . 
-        bind(STRDT(str(?startDate),xsd:dateTime) as ?startDateTime)
-       
+        OPTIONAL {  ?uri schema:endDate ?endDate .  }
+        BIND(IF(datatype(?startDate) = xsd:date, xsd:dateTime(CONCAT(STR(?startDate), "T00:00:00")), ?startDate) AS ?normalizedStartDate)
         OPTIONAL {
           FILTER NOT EXISTS { ?series schema:subEvent ?uri . }
-          bind(concat("mint") as ?mint_top_level)
-          BIND(IF(datatype(?startDate) = xsd:date, xsd:dateTime(CONCAT(STR(?startDate), "T00:00:00")), ?startDate) AS ?normalizedStartDate)
+          
+          #bind(concat("mint") as ?mint_top_level)
+          bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
           filter(?normalizedStartDate > now())
-          #  bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
         }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
@@ -46,5 +46,5 @@ WHERE {
    
     
 
-} GROUP BY ?uri  ?startDateTime   
-ORDER BY DESC(?startDateTime)
+} GROUP BY ?uri  ?normalizedStartDate ?startDate   ?endDate 
+ORDER BY ASC(?normalizedStartDate)
