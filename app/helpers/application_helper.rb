@@ -23,7 +23,7 @@ module ApplicationHelper
     str.html_safe
   end
 
-  def og_meta_properties(og_title,og_image)
+  def og_meta_properties(og_title, og_image)
     og_properties = ''
     if og_title.present?
       og_properties += "<meta property='og:title' content='#{og_title}' />"
@@ -32,6 +32,16 @@ module ApplicationHelper
       og_properties += "<meta property='og:image' content='#{og_image}' />"
     end
     og_properties.html_safe
+  end
+
+  def meta_alternate_links(uri)
+    alternate_links = ''
+    if uri.present?
+      alternate_links += "<link rel='alternate' type='application/ld+json' href='/entity.jsonld?uri=#{uri}' />"
+      alternate_links += "<link rel='alternate' type='text/turtle' href='/entity.ttl?uri=#{uri}' />"
+      # TODO: Add turtle star 
+    end
+    alternate_links.html_safe
   end
 
 

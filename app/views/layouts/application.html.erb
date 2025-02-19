@@ -3,7 +3,8 @@
   <head>
     <title><%= full_title(yield(:title)) %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= og_meta_properties(yield(:title), yield(:image)) %>
+    <%= og_meta_properties(yield(:title), yield(:description), yield(:image)) %>
+    <%= meta_alternate_links(yield(:uri)) %>
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
