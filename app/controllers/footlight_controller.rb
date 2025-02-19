@@ -1,4 +1,5 @@
 class FootlightController < ApplicationController
+  before_action :authenticate_user!
 
   # GET /footlight/export?uri=
   # Export the graph as viewed by Footlight Aggregator for CMS import
@@ -10,6 +11,8 @@ class FootlightController < ApplicationController
     solutions = helpers.artsdata_sparql_client.query(select_query)
     source = solutions.first.graph.value if solutions.first&.bound?(:graph)
 
+    redirect_to home_path, alert: "No source graph found for URI: #{uri}" and return if source.blank?
+    
     # source = "http://kg.artsdata.ca/culture-creates/artsdata-planet-ville-de-laval/calendrier-activites"
     version = params[:version] || "v3"
     case version
