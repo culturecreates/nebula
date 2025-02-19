@@ -28,6 +28,9 @@ CONSTRUCT {
     ?2bns ?2bnp ?2bno .
     ?2bnp rdfs:label ?2bnp_label .  
 
+    ?2bns ?2bnp ?3bns .
+    ?3bns ?3bnp ?3bno .
+
     ?shacl_bn sh:focusNode ?s ; 
         ?shacl_pred ?shal_obj .
 
@@ -98,6 +101,14 @@ WHERE {
             OPTIONAL {
                 ?2bnp rdfs:label ?2bnp_label .
             }
+
+            # third level blank nodes
+            OPTIONAL {
+                ?2bns ?2bnp ?3bns .
+                filter(isBLANK(?3bns))
+
+                ?3bns ?3bnp ?3bno .
+            } 
        }
      }
 

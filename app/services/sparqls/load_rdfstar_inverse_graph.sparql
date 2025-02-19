@@ -7,18 +7,28 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 CONSTRUCT {
     <entity_uri_placeholder> ?p ?s  .
+    << <entity_uri_placeholder> ?x ?z >> ?a ?b .
     ?p rdfs:label ?prop_label .
     ?s rdfs:label ?sub_label .
-    ?s ?p_b ?s_b . 
+    ?s ?p_b ?o_b . 
+    ?o_b ?p2_b ?o2_b  . 
 }
 FROM onto:explicit 
 WHERE {
 
     ?s ?p <entity_uri_placeholder>   .
-
     OPTIONAL {
-        ?s_b ?p_b ?s . 
-        filter(isBlank(?s))
+        << ?z ?x <entity_uri_placeholder> >> ?a ?b .
+    }
+ 
+    OPTIONAL {
+         ?s ?p_b ?o_b  . # get blank node properties
+         filter(isBlank(?s))
+        filter(?p != ?p_b) # remove the property that is also the inverse property
+        OPTIONAL {
+            ?o_b ?p2_b ?o2_b  . 
+            filter(isBlank(?o_b))
+        }
     }
 
     # main triple labels

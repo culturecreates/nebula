@@ -34,17 +34,17 @@ module EntityHelper
     end
   end
 
-  # Display RDF objects which may be URIs, blank nodes or literals.
+  # Display RDF objects which may be URIs, blank nodes, literals or RDF statements.
   def display_object(obj)
     return if obj.nil?
-    if obj.node? # blank node
-      "Node (#{obj.to_s.truncate(20)})"
+    if obj.statement? 
+      display_statement(obj)
     elsif obj.uri?
       display_uri(obj)
     elsif obj.literal?
       display_literal(obj)
-    elsif obj.statement?
-      display_statement(obj)
+    elsif obj.node? # blank node
+      "Node (#{obj.to_s.truncate(20)})"
     else
       raise StandardError.new "Unexpected RDF class: #{obj.class.to_s}"
     end

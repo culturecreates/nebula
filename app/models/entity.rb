@@ -215,15 +215,7 @@ class Entity
                   'locale_placeholder' , language
                 ])
    
-    response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
-
-    @graph = if response[:code] == 200
-      RDF::Graph.new do |graph|
-        RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
-      end
-    else
-      RDF::Graph.new
-    end
+    @graph = construct_turtle(sparql)
   end
 
   def load_graph_without_triple_terms(language = "en")

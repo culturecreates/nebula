@@ -5,12 +5,15 @@ frame id, graph = class RDF::Graph -->
     <% triples.each do |triple| %>
       <% setup_action(triple.object, triple.predicate) %>
       <div class="statement-object">
-        <% if triple.object.node? %>
-          <%= render partial: "statements_table",
-          locals: {
-            triples: graph.query([triple.object, nil, nil]),
-            graph: graph,
-          } %>
+        <% if triple.object.statement? %>
+          <%= display_object(triple.object) %>
+        <% elsif triple.object.node? %>
+          <% trips = graph.query([triple.object, nil, nil]) %>
+          <% if trips.count > 0 %>
+            <%= render partial: "statements_table", locals: { triples: trips, graph: graph } %>
+          <% else %>
+            <%= display_object(triple.object) %>
+          <% end %>
         <% elsif triple.object.uri? %>
           <% if auto_dereference(triple.object.to_s) %>
             <turbo-frame
