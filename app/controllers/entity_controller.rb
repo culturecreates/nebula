@@ -54,6 +54,14 @@ class EntityController < ApplicationController
       format.all { 
         @entity.load_graph
         @show_expand_button = true if user_signed_in?
+        @show_add_sameas_button = true if user_signed_in?
+        @target_types = [
+          RDF::Vocab::SCHEMA.Event, 
+          RDF::Vocab::SCHEMA.Place, 
+          RDF::Vocab::SCHEMA.Person,
+          RDF::Vocab::SCHEMA.Organization,
+          RDF::Vocab::SCHEMA.PerformingGroup
+        ]
         # TODO: add SHACL validation if artsdata entity
         # @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
        }

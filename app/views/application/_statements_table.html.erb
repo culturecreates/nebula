@@ -25,4 +25,11 @@
       } %>
     </div>
   <% end %>
+  <%= if triples.first.subject.node?
+    render partial: "add_sameas_button",
+    locals: {
+      subject: triples.first.subject,
+      graph: graph,
+    }
+  end %>
 </div>

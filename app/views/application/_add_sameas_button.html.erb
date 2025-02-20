@@ -1,0 +1,15 @@
+<!-- Inputs:subject = RDF subject, graph = class RDF::Graph TODO: remove button
+if there is already a sameAs to Artsdata ID-->
+<% if @show_add_sameas_button %>
+
+  <% if  subject.node? %>
+    <% node_types = graph.query([subject, RDF.type, nil]).objects %>
+    <% if (@target_types & node_types).present? %>
+
+      <a
+        class="btn btn-sm btn-secondary"
+        onclick="alert('Adding sameAs to blank nodes coming soon')"
+      >add sameAs</a>
+    <% end %>
+  <% end %>
+<% end %>
