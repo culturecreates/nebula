@@ -25,7 +25,7 @@
       } %>
     </div>
   <% end %>
-  <%= if triples.first.subject.node?
+  <%= if triples.first&.subject&.node?
     render partial: "add_sameas_button",
     locals: {
       subject: triples.first.subject,
