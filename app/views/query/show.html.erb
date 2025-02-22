@@ -1,9 +1,11 @@
 <% provide(:title, title) %>
-<div class="container">
-  <h1>
-    <%= solutions.count %>
-    <%= title %>
-  </h1>
-  <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
+<div data-controller="filter-query-results">
+  <div class="container">
+    <h1>
+      <%= solutions.count %>
+      <%= title %>
+    </h1>
+    <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
+  </div>
+  <%= render partial: "query_table", locals: { solutions: solutions } %>
 </div>
-<%= render partial: "query_table", locals: { solutions: solutions } %>

@@ -1,6 +1,19 @@
-<div class="alternate-name">
-  <%= link_to "Download CSV", query_show_path(params: permitted_params, format: :csv) %>
+<div class="alternate-name d-flex align-items-center mb-2">
+  <%= link_to "Download CSV",
+  query_show_path(params: permitted_params, format: :csv),
+  class: "btn btn-outlined btn-sm " %>
   |
   <%= link_to "SPARQL",
-  "http://artsdata-trifid-production.herokuapp.com/sparql/#query=#{URI.encode_www_form_component(@query)}" %>
+  "http://artsdata-trifid-production.herokuapp.com/sparql/#query=#{URI.encode_www_form_component(@query)}",
+  class: "btn btn-outlined btn-sm " %>
+  |
+  <form class="d-inline">
+    <input
+      type="search"
+      class="form-control form-control-sm"
+      data-filter-query-results-target="filterInput"
+      data-action="input->filter-query-results#filterContents"
+      placeholder="Filter results"
+    >
+  </form>
 </div>

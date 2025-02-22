@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <% solutions.each.with_index do | solution, index| %>
-        <tr>
+        <tr data-filter-query-results-target="content">
           <th scope="row"><%= index + 1 %></th>
           <% solutions.variable_names.each do |key| %>
             <td>

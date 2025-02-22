@@ -19,6 +19,9 @@ application.register("artsdata", ArtsdataController)
 import SortableTableController from "controllers/sortable_table_controller"
 application.register("sortable-table", SortableTableController)
 
+import FilterQueryResultsController from "controllers/filter_query_results_controller"
+application.register("filter-query-results", FilterQueryResultsController)
+
 import Clipboard from '@stimulus-components/clipboard'
 application.register('clipboard', Clipboard)
 
