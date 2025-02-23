@@ -63,7 +63,7 @@ class EntityController < ApplicationController
           RDF::Vocab::SCHEMA.PerformingGroup
         ]
         # TODO: add SHACL validation if artsdata entity
-        # @entity.load_shacl_into_graph("shacl_artsdata.ttl") if @entity.graph.count > 0
+       
        }
     end
   end

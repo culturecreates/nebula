@@ -8,9 +8,14 @@
 @prefix wdt: <http://www.wikidata.org/prop/direct/> .
 
 ################
-# Super Property Shapes
-# used by more than one shape class
+# Artsdata External SHACL Shapes
 ################
+# This file contains SHACL shapes for testing Events dereferenced from external data sources.
+# This file is slightly different from the Artsdata SHACL.
+# These SHACL shapes test pure JSON-LD from external sources and do not include any standard Artsdata transformations
+# such as fixing schema:eventAttendanceMode and setting xsd:dateTime datatypes.
+
+
 ads:SameAsSh
     sh:path schema:sameAs ;
     sh:minCount 0 ;
@@ -56,10 +61,8 @@ ads:subEventPropertySh
     sh:message "EventSeries must have alteast one subEvent property." .
     
 ads:EventShape
-    # TODO: Check that Event ID ends with #Event
     a sh:NodeShape ;
-   #  sh:closed true ;
- #   sh:ignoredProperties ( rdf:type ) ;
+
     # Sub-types of Event
     sh:targetClass  schema:Event, 
                     schema:EventSeries, 
