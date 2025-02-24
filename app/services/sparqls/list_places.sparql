@@ -1,6 +1,6 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT ?uri (sample(?name_language) as ?name) (sample(?addressLocality) as ?locality)  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
+SELECT ?uri (sample(?name_language) as ?name) (sample(?addressLocality) as ?locality) (sample(?addressRegion) as ?region) (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
 WHERE {
     graph <GRAPH_PLACEHOLDER> {
        ?uri a ?type  . 
@@ -32,8 +32,9 @@ WHERE {
       ?uri schema:address/schema:addressLocality  ?addressLocality .
     }
 
-
-    
+    OPTIONAL {
+      ?uri schema:address/schema:addressRegion ?addressRegion  .
+    }
 
 } GROUP BY ?uri  
 ORDER BY ?uri
