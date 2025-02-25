@@ -4,7 +4,9 @@ class EntityController < ApplicationController
   # Show an entity's asserted statements
   # /entity?uri=
   # /entity.ttl?uri=
+  # /entity.ttls?uri=  Turtle Star
   # /entity.jsonld?uri=
+  # /entity.jsonlds?uri=  JSON-LD Star
   # /entity.rdf?uri=
   def show
     uri = params[:uri] 
