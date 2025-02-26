@@ -1,4 +1,4 @@
-# load_rdfstar_graph
+# load_rdfstar_inverse_graph
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
