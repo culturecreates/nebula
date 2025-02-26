@@ -63,7 +63,11 @@ WHERE {
     # quoted triple
     OPTIONAL {
         <<?s ?p ?o>> ?a ?b .
-        filter(!isBLANK(?b))
+       OPTIONAL {
+            filter(isBlank(?b))
+            ?b ?b2 ?b3 .
+        }
+        
     }
     # quoted triple labels
     OPTIONAL {
