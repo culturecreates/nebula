@@ -1,40 +1,43 @@
 # load_rdfstar_inverse_graph
-
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-
 CONSTRUCT {
     <entity_uri_placeholder> ?p ?s  .
     << <entity_uri_placeholder> ?x ?z >> ?a ?b .
+    ?b ?b2 ?b3 .
     ?p rdfs:label ?prop_label .
     ?s rdfs:label ?sub_label .
-    ?s ?p_b ?o_b . 
-    ?o_b ?p2_b ?o2_b  . 
+    ?s ?p_b ?o_b .
+    ?o_b ?p2_b ?o2_b  .
 }
 FROM onto:explicit 
 WHERE {
-
     {
         select * where {
             ?s ?p <entity_uri_placeholder>   .
             OPTIONAL {
-                << ?z ?x <entity_uri_placeholder> >> ?a ?b .
+                ?s ?p_b ?o_b  .
+                # get forward blank node properties
+                filter(isBlank(?s))
+                filter(?p != ?p_b) # remove the property that is also the inverse property
+                OPTIONAL {
+                    ?o_b ?p2_b ?o2_b  .
+                    filter(isBlank(?o_b))
+                }
             }
         } limit 200
     }
- 
-    OPTIONAL {
-         ?s ?p_b ?o_b  . # get blank node properties
-         filter(isBlank(?s))
-        filter(?p != ?p_b) # remove the property that is also the inverse property
-        OPTIONAL {
-            ?o_b ?p2_b ?o2_b  . 
-            filter(isBlank(?o_b))
-        }
+    {
+        select * where {
+            << ?z ?x <entity_uri_placeholder> >> ?a ?b .
+            OPTIONAL {
+                filter(isBlank(?b))
+                ?b ?b2 ?b3 .
+            }
+        } limit 20 # set to reduce load time. Left without any limit, it can take minutes to load
     }
-
     # main triple labels
     OPTIONAL {
         ?s rdfs:label ?sub_label .
@@ -46,7 +49,5 @@ WHERE {
         ?p schema:inverseOf/rdfs:label ?inverse_label
     }
     bind(coalesce(?inverse_label,concat(?prop_label_original," (inverse)")) as ?prop_label)
-
     filter(!contains(str(?p),"shacl")) # hide all SHACL reports
-   
-} order by   ?prop_label ?sub_label limit 200
+} order by ?prop_label ?sub_label limit 300
