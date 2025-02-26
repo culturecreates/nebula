@@ -16,9 +16,13 @@ CONSTRUCT {
 FROM onto:explicit 
 WHERE {
 
-    ?s ?p <entity_uri_placeholder>   .
-    OPTIONAL {
-        << ?z ?x <entity_uri_placeholder> >> ?a ?b .
+    {
+        select * where {
+            ?s ?p <http://kg.artsdata.ca/resource/K16-114>   .
+            OPTIONAL {
+                << ?z ?x <http://kg.artsdata.ca/resource/K16-114> >> ?a ?b .
+            }
+        } limit 200
     }
  
     OPTIONAL {
