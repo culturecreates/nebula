@@ -18,9 +18,9 @@ WHERE {
 
     {
         select * where {
-            ?s ?p <http://kg.artsdata.ca/resource/K16-114>   .
+            ?s ?p <entity_uri_placeholder>   .
             OPTIONAL {
-                << ?z ?x <http://kg.artsdata.ca/resource/K16-114> >> ?a ?b .
+                << ?z ?x <entity_uri_placeholder> >> ?a ?b .
             }
         } limit 200
     }
