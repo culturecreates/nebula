@@ -29,7 +29,7 @@ WHERE {
             }
         } limit 200
     }
-    {
+    OPTIONAL {
         select * where {
             << ?z ?x <entity_uri_placeholder> >> ?a ?b .
             OPTIONAL {
@@ -49,5 +49,7 @@ WHERE {
         ?p schema:inverseOf/rdfs:label ?inverse_label
     }
     bind(coalesce(?inverse_label,concat(?prop_label_original," (inverse)")) as ?prop_label)
+
     filter(!contains(str(?p),"shacl")) # hide all SHACL reports
+    
 } order by ?prop_label ?sub_label limit 300
