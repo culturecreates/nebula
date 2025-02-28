@@ -136,7 +136,8 @@ module EntityHelper
         return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_org_person_footlight&sparql=ranked_org_person_footlight"
        
       elsif entity.type == "http://schema.org/Place"
-        return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=ranked_place_footlight"
+        # return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=ranked_place_footlight"
+        return "http://api.artsdata.ca/query?uri=http://kg.artsdata.ca/resource/#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=https://raw.githubusercontent.com/culturecreates/footlight-aggregator/main/sparql/query-place-v2.sparql"
       end
   
   end
