@@ -20,6 +20,20 @@
       rel: "nofollow" %>
       |
     <% end %>
+    <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' || session[:handle] == 'dev-aravind' %>
+      <% if cms_ranked_link(@entity) %>
+        <%= link_to "CMS view",
+        dereference_external_path(uri: cms_ranked_link(@entity)),
+        rel: "nofollow" %>
+        |
+      <% end %>
+      <% if capacoa_ranked_link(@entity) %>
+        <%= link_to "CAPACOA view",
+        dereference_external_path(uri: capacoa_ranked_link(@entity)),
+        rel: "nofollow" %>
+        |
+      <% end %>
+    <% end %>
   <% end %>
   <a
     href="#"

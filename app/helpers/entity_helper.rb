@@ -126,13 +126,29 @@ module EntityHelper
   end
 
   def ranked_link(entity)
-    return "http://api.artsdata.ca/ranked/#{entity.k_number}?format=jsonld"
-    # if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization"
-    #    return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_org_person_footlight&sparql=ranked_org_person_footlight"
-    #  # return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=capacoa/member2&sparql=capacoa/member_detail2"
-    # elsif entity.type == "http://schema.org/Place"
-    #   return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=ranked_place_footlight"
-    # end
+    if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization" 
+      return "http://api.artsdata.ca/ranked/#{entity.k_number}?format=jsonld"
+    end
+  end
+
+  def cms_ranked_link(entity)
+      if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization"
+        return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_org_person_footlight&sparql=ranked_org_person_footlight"
+       
+      elsif entity.type == "http://schema.org/Place"
+        return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=ranked_place_footlight"
+      end
+  
+  end
+
+  def capacoa_ranked_link(entity)
+    if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization"
+      return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=capacoa/member2&sparql=capacoa/member_detail2"
+    end
+  end
+
+  def cms_link(entity) # for non-artsdata URIs
+    return "http://api.artsdata.ca/resource?uri=#{CGI.escape(entity.entity_uri)}"
   end
 
   def is_authoritative
