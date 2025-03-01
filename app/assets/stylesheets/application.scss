@@ -105,12 +105,26 @@ a:hover {
   }
 }
 
+.sort-none::after {
+  content: "\f0dc"; /* Font Awesome icons for sort */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-left: 0.4em;
+  color: lightgray;
+}
+
 .sort-asc::after {
-  content: "▲";
+  content: "\f0de"; /* Font Awesome icon for sort up */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-left: 0.4em;
 }
 
 .sort-desc::after {
-  content: "▼";
+  content: "\f0dd"; /* Font Awesome icon for sort down */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-left: 0.4em;
 }
 
 .sticky-top {

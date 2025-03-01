@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["filterInput", "content"]
+  static targets = ["filterInput", "content", "table"]
 
   // Is this needed?
   connect() {
@@ -14,15 +14,18 @@ export default class extends Controller {
 
   filterContents() {
     const query = this.filterInputTarget.value.toLowerCase();
-    console.log(this.contentTargets);
     this.contentTargets.forEach(content => {
       const text = content.textContent.toLowerCase();
       content.style.display = text.includes(query) ? "" : "none";
     });
-    this.updateHeader();
+    this.redrawTable();
   }
 
-  updateHeader() {
-    this.headerTarget.textContent = `#`; // redraw to new columns widths
+  redrawTable() {
+    // Trigger a redraw of the table
+    const table = this.tableTarget;
+    table.style.display = 'none';
+    table.offsetHeight; // Trigger reflow
+    table.style.display = '';
   }
 }

@@ -11,12 +11,16 @@ export default class extends Controller {
     const direction = th.dataset.sortDirection == "asc" ? "desc" : "asc"
     const rows = Array.from(tbody.rows)
 
+   
+
      // Remove sort classes from all headers
-    for (const header of th.parentNode.children) {
+    for (const header of Array.from(th.parentNode.children).slice(1)) {
       header.classList.remove("sort-asc", "sort-desc")
+      header.classList.add("sort-none")
     }
 
     // Add sort class to clicked header
+    th.classList.remove("sort-none")
     th.classList.add(`sort-${direction}`)
 
     rows.sort((rowA, rowB) => {

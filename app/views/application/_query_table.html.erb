@@ -1,17 +1,19 @@
 <div class="table-responsive-sm">
   <table
     data-controller="sortable-table"
+    data-filter-query-results-target="table"
     data-sortable-table-target="table"
     class="table table-hover table-striped"
   >
     <thead class="sticky-top">
       <tr>
-        <th scope="col" data-filter-query-results-target="header">#</th>
+        <th scope="col">#</th>
         <% solutions.variable_names.each do |head| %>
           <th
             scope="col"
             data-action="click->sortable-table#sort"
             data-sort-direction="asc"
+            class="sort-none"
           ><%= head.to_s %></th>
         <% end %>
       </tr>
