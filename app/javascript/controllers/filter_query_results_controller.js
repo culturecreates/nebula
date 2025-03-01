@@ -19,6 +19,10 @@ export default class extends Controller {
       const text = content.textContent.toLowerCase();
       content.style.display = text.includes(query) ? "" : "none";
     });
-    console.log(query);
+    this.updateHeader();
+  }
+
+  updateHeader() {
+    this.headerTarget.textContent = `#`; // redraw to new columns widths
   }
 }
