@@ -5,9 +5,9 @@
 | --- | --- | --- | --- |
 | ArtsCultureNB | Gouvernement du Nouveau-Brunswick | https://artsculturenb.ca/ | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Arts Touring Connector | Ontario Presents | https://arts-tc.ca/ | [artsdata-planet-atc](https://github.com/culturecreates/artsdata-planet-atc)
-| Calendar of performances featuring Indigenous artists | CAPACOA and IPAA | [https://capacoa.ca/fr/secteur-sain/ressources-autochtones/](https://capacoa.ca/fr/secteur-sain/ressources-autochtones/) | [artsdata-ical](https://github.com/culturecreates/artsdata-ical) |
+| Calendrier de représentations d'artistes autochtones | IPAA et CAPACOA | https://ipaa.ca/indigenous-performance-calendar/ | [artsdata-ical](https://github.com/culturecreates/artsdata-ical) |
 | DICI | Culture Mauricie | https://dici.ca/ | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
-| IPAA Member Directory | Indigenous Performing Arts Alliance | https://ipaa.ca/indigenous-artists/| [artsdata-planet-ipaa](https://github.com/culturecreates/artsdata-planet-ipaa) |
+| IPAA Member Directory | Indigenous Performing Arts Alliance (IPAA) | https://ipaa.ca/indigenous-artists/| [artsdata-planet-ipaa](https://github.com/culturecreates/artsdata-planet-ipaa) |
 | I Want To Showcase | Organization of Saskatchewan Arts Councils | https://iwanttoshowcase.ca/ | [artsdata-planet-iwts](https://github.com/culturecreates/artsdata-planet-iwts) |
 | La Vitrine | La Vitrine | https://www.lavitrine.com/ | [artsdata-planet-lavitrine](https://github.com/culturecreates/artsdata-planet-lavitrine) |
 | Répertoire VIVANT du spectacle | CAPACOA | https://capacoa.ca/fr/membre/repertoire/ | [artsdata-shortcode](https://github.com/culturecreates/artsdata-shortcode) |
