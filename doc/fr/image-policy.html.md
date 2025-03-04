@@ -1,5 +1,7 @@
 # Politique d’Artsdata relative aux images – Version 0.1
 
+[English version](https://kg.artsdata.ca/en/doc/image-policy)
+
 _Ébauche_
 
 ## Comment Artsdata gère les informations relatives aux images
