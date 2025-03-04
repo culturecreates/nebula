@@ -33,5 +33,5 @@ By using data from Artsdata, the user consents to this policy.
 Users who violate this policy may be denied access to Artsdata.
 
 
-[French version](https://kg.artsdata.ca/fr/doc/image_policy)
+[French version](https://kg.artsdata.ca/fr/doc/image-policy)
 
