@@ -40,12 +40,19 @@ export default class extends Controller {
       })
     }
     const res = await fetch(url, options);
+    
     const json = await res.json();
-    console.log(json);
+
+    if (res.status == 500) {
+      this.uriTarget.innerHTML = "Error: " + JSON.stringify(json.data.message, null, 2);
+      this.buttonTarget.disabled = false
+      return
+    } 
+   
     if (json.data.status == "success") {
       this.uriTarget.innerHTML = "Successfully minted <a href='" + json.new_uri + "'>" + json.new_uri + "</a>";
     } else {
-      this.uriTarget.innerHTML = "Error: " + JSON.stringify(json.data.message, null, 2);
+      this.uriTarget.innerHTML = "Failed: " + JSON.stringify(json.data.message, null, 2);
     }
 
 
