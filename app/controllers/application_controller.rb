@@ -23,6 +23,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def temporarily_disable
+    flash.alert = "This feature is temporarily disabled for maintenance. Try again in a few minutes."
+    redirect_back(fallback_location: root_path)
+  end
+  
+
   def authenticate_user!
     return true if  Rails.env.test?
     
