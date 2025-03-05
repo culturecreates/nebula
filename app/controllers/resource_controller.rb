@@ -16,6 +16,6 @@ class ResourceController < ApplicationController
               else
                 :html
               end
-    redirect_to entity_path(uri: uri, format: format), status: 303
+    redirect_to entity_url(uri: uri, format: format, protocol: 'https'), status: 303
   end
 end
