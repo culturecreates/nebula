@@ -2,7 +2,7 @@
 
 # ARTSDATA.CA
 
-<br>A pan-Canadian knowledge graph for the arts.</br>
+A pan-Canadian knowledge graph for the arts.
 
 Welcome to the Artsdata knowledge graph. To discover the advantages of linked open data, stay up-to-date with current projects and upcoming events, and learn more about the Artsdata Community Group, please visit https://www.artsdata.ca/en/
 
