@@ -6,7 +6,7 @@ Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des
 
 ---
 
-### Liens utiles
+## Liens utiles
 
 - [Documentation sur le modèle de données](https://culturecreates.github.io/artsdata-data-model/index.fr.html)
 - [Architecture des flux de données](https://culturecreates.github.io/artsdata-data-model/architecture/overview.fr.html)
