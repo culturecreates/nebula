@@ -2,7 +2,7 @@
 
 Un graphe de connaissances pan-canadien pour les arts.
 
-Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des données ouvertes liées, rester au courant des projets en cours et des événements à venir et en savoir plus sur la Communauté d'intérêt Artsdata, veuillez consulter le site [https://www.artsdata.ca](https://www.artsdata.ca)
+Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des données ouvertes liées, rester au courant des projets en cours et des événements à venir et en savoir plus sur la Communauté d'intérêt Artsdata, veuillez consulter le site [www.artsdata.ca](https://www.artsdata.ca/fr/)
 
 ---
 
