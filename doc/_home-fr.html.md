@@ -2,7 +2,7 @@
 
 Un graphe de connaissances pan-canadien pour les arts.
 
-Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des données ouvertes liées, rester au courant des projets en cours et des événements à venir, et en savoir plus sur le groupe communautaire Artsdata, veuillez consulter le site [https://www.artsdata.ca](https://www.artsdata.ca)
+Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des données ouvertes liées, rester au courant des projets en cours et des événements à venir et en savoir plus sur la Communauté d'intérêt Artsdata, veuillez consulter le site [https://www.artsdata.ca](https://www.artsdata.ca)
 
 ---
 
@@ -26,8 +26,8 @@ Vous pouvez utiliser l’interface du graphe de connaissances dans plusieurs fa�
 - Détecter les erreurs dans un flux de données.
 
 <br>Si vous avez un compte utilisateur GitHub, vous pouvez utiliser également ces fonctionnalités additionnelles :</br>
-- Utiliser la fonction « Minter » afin de lier ou créer un nouveau identifiant Artsdata ;
-- Utiliser la fonction « Mint using Wikidata » afin de charger un élément Wikidata et créer un nouveau identifiant Artsdata ;
+- Utiliser la fonction « Minter » afin de lier ou créer un nouvel identifiant Artsdata ;
+- Utiliser la fonction « Mint using Wikidata » afin de charger un élément Wikidata et créer un nouvel identifiant Artsdata ;
 - Accéder aux différents rapports personnalisés.
 
 ---
@@ -46,4 +46,4 @@ Vous pouvez utiliser l’interface du graphe de connaissances dans plusieurs fa�
 
 <br>![Canada Council for the Arts](https://canadacouncil.ca/-/media/Images/CCA/Design_Elements/Logos/CCFA-logo-full-en.svg?la=en&hash=F297C9D9740B613B144255DF6A5FDE48869615EC)</br>
 
-<br>![Financé par le gouvernement du Canada.](/images/2li_FrEn_Wordmark_C_small.png)</br>
+<br>![Gouvernement du Canada](/public/images/Canada_Wordmark_small.png)</br>
