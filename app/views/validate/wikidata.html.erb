@@ -8,5 +8,10 @@
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
       graph: @entity.graph,
     } %>
+    <div
+      data-controller="validation"
+      data-validation-facts-value="<%= @entity.graph.dump(:jsonld).squish  %>"
+    >
+    </div>
   </turbo-frame>
 </div>

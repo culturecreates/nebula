@@ -1,15 +1,22 @@
 class ValidateController < ApplicationController
 
   def show
-    uri = params[:uri] 
-    @entity = Entity.new(entity_uri: uri)
+    uri = params[:uri]
+    class_to_mint = params[:classToMint]
     # Call Artsdata API to get the RDF graph for the entity
     mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
-    url = "#{mint_endpoint}/test_event?uri=#{CGI.escape(uri)}"
+    url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
     response = HTTParty.get(url)
+
     @report = JSON.parse(response.body)['message']
+    @entity = Entity.new(entity_uri: "http://new.uri")
     @entity.graph = RDF::Graph.new
-    @entity.graph.from_jsonld(JSON.parse(response.body)['data'].to_json)
+    jsonld_data = JSON.parse(response.body)['data']
+    @entity.graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:jsonld).new(jsonld_data.to_json, rdfstar: true)  {|reader| graph << reader}
+    end
+
+    
   end
 
   def wikidata
@@ -22,6 +29,8 @@ class ValidateController < ApplicationController
 
     response = wikidata_sparql.query(sparql_by_class_to_mint(@class_to_mint, uri))
     @entity.graph = RDF::Graph.new << response 
+
+    ## TODO: Call Artsdata API Preview endpoint to get the SHACL report
    
     begin
       shacl = SHACL.open(shacl_by_class_to_mint(@class_to_mint))

@@ -14,11 +14,11 @@
         loading...
       </turbo-frame>
     </p>
-    <p>Based on</p>
+    <p>Preview</p>
     <p>
       <turbo-frame
         id='card-validation'
-        src="<%= validate_path(uri: @externalUri)%>"
+        src="<%= validate_path(uri: @externalUri,  classToMint: @classToMint)%>"
         loading="lazy"
         target="_top"
       >

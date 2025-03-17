@@ -3,15 +3,15 @@ class MintController < ApplicationController
   before_action :set_authority, only: [:preview, :link] # known as publisher in Artsdata API
   include DereferenceHelper 
 
-  # show data before minting a new Artsdata URI
+  # Preview data and SHACL report before minting a new Artsdata URI
   # GET /mint/preview
-  #   externalUri (required)
-  #   classToMint
-  #   label
-  #   language
-  #   reference = the prov#wasDerivedFrom URI of the entity
-  #   postalCode
-  #   startDate
+  #   - externalUri (required)
+  #   - classToMint
+  #   - label
+  #   - language
+  #   - reference: the prov#wasDerivedFrom URI of the entity
+  #   - postalCode
+  #   - startDate
   def preview
     required = [:externalUri]
     if required.all? { |k| params.key? k } && @authority
@@ -84,7 +84,6 @@ class MintController < ApplicationController
       request = Net::HTTP::Post.new(uri)
       request["Content-Type"] = "application/json"
       request.body = JSON.dump({
-          "publisher" => @authority,
           "externalUri" => @externalUri,
           "classToLink" => @classToMint,
           "adUri" => @adUri
@@ -118,7 +117,7 @@ class MintController < ApplicationController
     @wikidata_place_type = "Q17350442"
     @wikidata_person_type = "Q5"
     @wikidata_organization_type = "Q43229"
-
+    
     # Search wikidata
     #  - reconile name and type against wikidata(even when the user entered a QID) 
     #    and show other close matches incase there are duplicates in Wikidata
