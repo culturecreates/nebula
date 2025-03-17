@@ -10,12 +10,13 @@
   </turbo-frame>
   <% if @externalUri %>
     <% button_class = result["name"] == @query ? "btn-danger" : "btn-secondary" %>
-    <%= link_to "link",
+    <%= button_to "link",
     mint_link_path(
       externalUri: @externalUri,
       classToMint: result["type"].first["id"],
       adUri: "http://kg.artsdata.ca/resource/" + result["id"],
     ),
+    method: :post,
     class: "btn #{button_class} btn-sm position-absolute bottom-0 end-0 mb-2 me-2",
     style: "z-index: 1;" %>
   <% end %>

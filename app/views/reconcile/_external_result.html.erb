@@ -25,12 +25,13 @@
     </p>
   </a>
   <% if @externalUri %>
-    <%= link_to "link",
+    <%= button_to "link",
     mint_link_path(
       externalUri: @externalUri,
       classToMint: result["type"].first["id"],
       adUri: "http://kg.artsdata.ca/resource/" + result["id"],
     ),
+    method: :post,
     class: "btn btn-danger btn-sm position-absolute bottom-0 end-0 mb-1",
     style: "z-index: 1;" %>
   <% end %>
