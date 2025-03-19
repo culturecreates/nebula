@@ -11,12 +11,13 @@ class ValidateController < ApplicationController
     @report = JSON.parse(response.body)['message']
     @entity = Entity.new(entity_uri: "http://new.uri")
     @entity.graph = RDF::Graph.new
-    jsonld_data = JSON.parse(response.body)['data']
-    @entity.graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:jsonld).new(jsonld_data.to_json, rdfstar: true)  {|reader| graph << reader}
+    body = JSON.parse(response.body)
+    if body['status'] == "success"
+      jsonld_data = body['data']
+      @entity.graph = RDF::Graph.new do |graph|
+        RDF::Reader.for(:jsonld).new(jsonld_data.to_json, rdfstar: true)  {|reader| graph << reader}
+      end
     end
-
-    
   end
 
   def wikidata
