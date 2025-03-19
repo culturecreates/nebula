@@ -9,14 +9,15 @@ WHERE {
         ?uri schema:name  ?name_language ;
               a ?additionalType ;
              schema:startDate ?startDate . 
-        OPTIONAL {  ?uri schema:endDate ?endDate .  }
+        OPTIONAL {  ?uri schema:endDate ?endDate . 
+          BIND(IF(datatype(?endDate) = xsd:date, xsd:dateTime(CONCAT(STR(?endDate), "T00:00:00")), ?endDate) AS ?normalizedEndDate)
+        }
         BIND(IF(datatype(?startDate) = xsd:date, xsd:dateTime(CONCAT(STR(?startDate), "T00:00:00")), ?startDate) AS ?normalizedStartDate)
         OPTIONAL {
           FILTER NOT EXISTS { ?series schema:subEvent ?uri . }
-          
-          #bind(concat("mint") as ?mint_top_level)
           bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
-          filter(?normalizedStartDate > now())
+          bind(COALESCE(?normalizedEndDate,?normalizedStartDate) as ?earliest_end)
+          filter(?earliest_end > now())
           filter(NOT EXISTS {  ?shacl sh:focusNode ?uri })
         }
         OPTIONAL {
