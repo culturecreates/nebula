@@ -10,7 +10,7 @@ Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des
 
 - [Documentation sur le modèle de données](https://culturecreates.github.io/artsdata-data-model/index.fr.html)
 - [Architecture des flux de données](https://culturecreates.github.io/artsdata-data-model/architecture/overview.fr.html)
-- [Lignes directrices sur les identifiants pérennes](https://github.com/culturecreates/artsdata-data-model/blob/master/id-and-uri-guidelines.fr.md)
+- [Lignes directrices sur les identifiants pérennes](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.fr)
 - [Liste des sources de données](https://kg.artsdata.ca/fr/query/show?sparql=feeds_all&title=Data+Feeds)
 - [Liste des consommateurs de données](https://kg.artsdata.ca/en/doc/data-consumers)
 - [Politique d’images](https://kg.artsdata.ca/fr/doc/image-policy)
@@ -31,7 +31,7 @@ Vous pouvez utiliser l’interface du graphe de connaissances dans plusieurs fa�
 - Accéder aux différents rapports personnalisés.
 
 ---
-# Ajoutez vos événements à Artsdata.ca
+## Ajoutez vos événements à Artsdata.ca
 
 - [Données structurées et découvrabilité des événements](https://www.artsdata.ca/fr/ressources/donnees-structurees)
 - [Gabarits Artsdata de données structurées](https://culturecreates.github.io/artsdata-data-model/gabarits-jsonld/README.fr.html)
