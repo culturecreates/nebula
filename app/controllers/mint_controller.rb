@@ -59,6 +59,9 @@ class MintController < ApplicationController
       end
 
       @postalCode = @entity.card[:postal_code]
+      if @postalCode &&  @postalCode.chars.length == 6
+        @postalCode = @postalCode.dup.insert(3, " ")
+      end
       @startDate =  @entity.card[:start_date]
     else 
       flash.now.alert = "Missing a required param. Required list: #{required}"
