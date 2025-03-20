@@ -12,7 +12,7 @@ Welcome to the Artsdata knowledge graph. To discover the advantages of linked op
 
 - [Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
 - [Data flow architecture](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
-- [Persistent identifiers guidelines](https://github.com/culturecreates/artsdata-data-model/blob/master/id-and-uri-guidelines.md)
+- [Persistent identifiers guidelines](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.html)
 - [List of data sources](https://kg.artsdata.ca/query/show?sparql=feeds_all&title=Data+Feeds)
 - [List of data consumers](/en/doc/data-consumers)
 - [Image policy](/en/doc/image-policy)
