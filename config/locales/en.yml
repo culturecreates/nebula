@@ -64,8 +64,11 @@ en:
       Each versioned artifact has a download URL that must not change. The Artsdata knowledge graph may subscribe to your dataset and load artifacts in the background as new versions become available.</p> 
       <p>Please manage Artifacts with the <a href='https://culturecreates.github.io/artsdata-data-model/architecture/graph-store-api.html'>Artsdata Databus API</a>. 
       To create a new version use the <a href='https://documenter.getpostman.com/view/3157443/TVep7mv3#f12d3dc0-5c37-496b-985f-95388660b984'>POST /databus</a> endpoint with <code>publisher=</code> set to your Databus Account URI. 
-      To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.  
-      An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google speadsheet.</p>
+      To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.</p>  
+      <p>An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google speadsheet. 
+      Once an artifact is create you may manually create an artifact version within the Artsdata interface: 
+      click on the URL of the databus artifact you just created, then, under <code>Potential actions</code>, select <code>Create an artifact version of [artifactname]</code>. 
+      This will create an artifact version, upload the data to the knowledge graph and add the dataset to the list of data sources.</p>
     new:
       a10s: |
         <h4>Google Sheet To Artsdata Instructions</h4> <p>Enter the URL of the Google Sheet that contains the data for this artifact. Be careful to select the URL of the JSON-LD tab (called "LD+JSON" in the spreadsheet). The name of the column with the JSON-LD MUST be called <code>jsonld</code>. </p> 
