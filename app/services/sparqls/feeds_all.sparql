@@ -5,65 +5,62 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX shacl: <http://www.w3.org/ns/shacl#>
 PREFIX dataid: <http://dataid.dbpedia.org/ns/core#>
-
 select  
-  ?group
-  ?dataset 
-  ?triples
-  (sample(?event) as ?events)  
-  (sample(?organization) as ?orgs) 
-  (sample(?person) as ?people) 
-  (sample(?place) as ?places) 
-  ?graph  
-  ?generatedAtTime  
-
-  ?errors
+(sample(?groups) as ?group)
+(sample(?datasets) as ?dataset) 
+(sample(?triples) as ?triple)
+(sample(?event) as ?events)  
+(sample(?organization) as ?orgs) 
+(sample(?person) as ?people) 
+(sample(?place) as ?places) 
+(sample(?graphs) as ?graph)  
+(sample(?generatedAtTimes) as ?generatedAtTime)
+(sample(?errors) as ?error)
 where 
 {
-    ?graph a schema:Dataset .
+    ?graphs a schema:Dataset .
+    ?graphs rdfs:label ?datasets;
+            prov:generatedAtTime ?generatedAtTimes ;
+            prov:wasDerivedFrom/foaf:primaryTopic ?dataset_id .
+    ?dataset_id void:classPortion  ?classPortion ;
+                dataid:artifact ?artifact .
     
-    ?graph rdfs:label ?dataset;
-           prov:generatedAtTime ?generatedAtTime ;
-           prov:wasDerivedFrom/foaf:primaryTopic ?dataset_id .
-           ?dataset_id void:classPortion  ?classPortion .
     OPTIONAL {
-            ?classPortion void:class ?type ;
-             void:entities ?event_count .
-             filter(?type = schema:Event)
-           }
-            OPTIONAL {
-            ?classPortion void:class ?type ;
-             void:entities ?place_count .
-             filter(?type = schema:Place)
-           }
-            OPTIONAL {
-            ?classPortion void:class ?type ;
-             void:entities ?organization_count .
-             filter(?type = schema:Organization)
-           }
-            OPTIONAL {
-            ?classPortion void:class ?type ;
-             void:entities ?person_count .
-             filter(?type = schema:Person)
-           }
-          OPTIONAL {
-            ?dataset_id void:triples ?triples .
-           }
-          OPTIONAL {
-            ?dataset_id shacl:results ?errors .
-           }
-          OPTIONAL{
-            ?dataset_id dataid:group ?group_id .
-              OPTIONAL{
+        ?classPortion void:class ?type ;
+                      void:entities ?event_count .
+        filter(?type = schema:Event)
+    }
+    OPTIONAL {
+        ?classPortion void:class ?type ;
+                      void:entities ?place_count .
+        filter(?type = schema:Place)
+    }
+    OPTIONAL {
+        ?classPortion void:class ?type ;
+                      void:entities ?organization_count .
+        filter(?type = schema:Organization)
+    }
+    OPTIONAL {
+        ?classPortion void:class ?type ;
+                      void:entities ?person_count .
+        filter(?type = schema:Person)
+    }
+    OPTIONAL {
+        ?dataset_id void:triples ?triples .
+    }
+    OPTIONAL {
+        ?dataset_id shacl:results ?errors .
+    }
+    OPTIONAL{
+        ?dataset_id dataid:group ?group_id .
+        OPTIONAL{
             ?group_id rdfs:label ?group_label .
-              }
-            bind(COALESCE(?group_label, ?group_id) as ?group)
-           }
-
-    bind(ENCODE_FOR_URI(str(?dataset)) as ?dataset_escaped)
-    bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graph),"'>",str(?event_count),"</a>") as ?event)
-    bind(CONCAT("<a href='/query/show?title=Place entities in ",str(?dataset_escaped),"&sparql=list_places&graph=",str(?graph),"'>",str(?place_count),"</a>") as ?place)
-    bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graph),"'>",str(?person_count),"</a>") as ?person)
-   bind(CONCAT("<a href='/query/show?title=Organization entities in ",str(?dataset_escaped),"&sparql=list_organizations&graph=",str(?graph),"'>",str(?organization_count),"</a>") as ?organization)
-
-} GROUP BY ?dataset ?graph ?generatedAtTime  ?triples  ?errors ?group  order by DESC(?generatedAtTime)
+        }
+        bind(COALESCE(?group_label, ?group_id) as ?groups)
+    }
+    bind(ENCODE_FOR_URI(str(?datasets)) as ?dataset_escaped)
+    bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graphs),"'>",str(?event_count),"</a>") as ?event)
+    bind(CONCAT("<a href='/query/show?title=Place entities in ",str(?dataset_escaped),"&sparql=list_places&graph=",str(?graphs),"'>",str(?place_count),"</a>") as ?place)
+    bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graphs),"'>",str(?person_count),"</a>") as ?person)
+    bind(CONCAT("<a href='/query/show?title=Organization entities in ",str(?dataset_escaped),"&sparql=list_organizations&graph=",str(?graphs),"'>",str(?organization_count),"</a>") as ?organization)
+} GROUP BY ?artifact     order by DESC(?generatedAtTime)
