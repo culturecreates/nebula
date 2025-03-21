@@ -4,8 +4,10 @@ select ?event (sample(?name_lang) as ?name) ?mintDate  ?dataFeed where {
     ?event a schema:Event ;
        schema:name ?name_lang ;
        prov:generatedAtTime ?mintDate .
-    << ?event schema:name ?name_lang >> prov:wasDerivedFrom ?dataFeed .
-} 
+       OPTIONAL {
+            << ?event schema:name ?name_lang >> prov:hadPrimarySource ?dataFeed .
+       }
+   } 
 group by ?event ?mintDate ?dataFeed 
 order by desc(?mintDate)  
 limit 500
