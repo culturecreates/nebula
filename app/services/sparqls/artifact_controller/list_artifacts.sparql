@@ -6,7 +6,7 @@ SELECT
 ?group 
 ?artifact 
 ?artifact_uri
-?artsdata_graph
+
 (max(?version) as ?latest_version) 
 (count(?dataset) as ?versions) 
 ?auto_load
@@ -35,5 +35,5 @@ WHERE {
     bind(STRBEFORE(str(?last_part),"/") as ?group)
     bind(concat("<div class='d-flex'><a class='btn btn-primary btn-sm disabled me-1' href='#'>create</a> <a class='btn btn-danger btn-sm disabled' href='#'>delete</a></div>") as ?action)
     bind("true" as ?auto_load)
-} group by  ?artifact_uri  ?artsdata_graph ?account  ?group ?auto_load 
+} group by  ?artifact_uri  ?account  ?group ?auto_load 
 ?artifact ?action limit 100
