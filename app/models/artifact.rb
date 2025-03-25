@@ -22,7 +22,7 @@ class Artifact
  
     if self.type == "spreadsheet-a10s" && self.sheet_url.present?
       group_id = "a10s-google-sheet"
-      action_name = "Create an artifact version of #{artifact_id} A10s Google Sheet"
+      action_name = "Create an artifact version of #{artifact_id} for #{t("artifact.new.a10s_name")}"
       action_url = "https://api.github.com/repos/artsdata-stewards/a10s-google-sheet-importer/actions/workflows/databus-a10-sheet-importer.yml/dispatches"
       httpBody = {
         ref: "main",
@@ -34,7 +34,7 @@ class Artifact
       }
     elsif self.type == "spreadsheet-smart-chip" && self.sheet_url.present?
       group_id = "spreadsheet-smart-chip"
-      action_name = "Create an artifact version of #{artifact_id} Smart Chip Google Sheet"
+      action_name = "Create an artifact version of #{artifact_id} for #{t("artifact.new.smart_chip_name")}"
       action_url = "https://api.github.com/repos/culturecreates/artsdata-google-workspace-smart-chip/actions/workflows/push-to-artsdata.yml/dispatches"
       httpBody = {
         ref: "main",

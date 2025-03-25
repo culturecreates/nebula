@@ -32,9 +32,9 @@
       <%= form.select :type,
                   options_for_select(
                     [
-                      ["Orion JSON-LD Website", "website"],
-                      ["Smart-Chip Spreadsheet", "spreadsheet-smart-chip"],
-                      ["Google Sheet to Artsdata (A10s version)", "spreadsheet-a10s"],
+                      [t("artifact.new.orion_name"), "website"],
+                      [t("artifact.new.smart_chip_name"), "spreadsheet-smart-chip"],
+                      [t("artifact.new.a10s_name"), "spreadsheet-a10s"],
                     ],
                     @artifact.type,
                   ),
@@ -74,7 +74,7 @@
                       placeholder: "Enter Google sheet URL" %>
 
       <br>
-      <%= t("artifact.new.smart_chip").html_safe %>
+      <%= t("artifact.new.smart_chip_instructions").html_safe %>
       <%= t("artifact.new.format_url").html_safe %>
     </div>
 
@@ -86,7 +86,7 @@
                       value: @artifact.sheet_url,
                       placeholder: "Enter Google sheet URL for JSON-LD tab" %>
       <br>
-      <%= t("artifact.new.a10s").html_safe %>
+      <%= t("artifact.new.a10s_instructions").html_safe %>
       <%= t("artifact.new.format_url").html_safe %>
     </div>
 
