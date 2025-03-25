@@ -53,4 +53,4 @@ You may use the knowledge graph’s interface in many ways:
 
 </br>![Canada Council for the Arts](https://canadacouncil.ca/-/media/Images/CCA/Design_Elements/Logos/CCFA-logo-full-en.svg?la=en&hash=F297C9D9740B613B144255DF6A5FDE48869615EC)</br>
 
-</br>![Government of Canada](/public/images/Canada_Wordmark_small.png)</br>
+</br>![Government of Canada](/images/Canada_Wordmark_small.png)</br>
