@@ -1,0 +1,34 @@
+PREFIX schema: <http://schema.org/>
+
+construct {
+ ?e schema:keys ?keyword_1, ?keyword_2, ?keyword_2_end, ?keyword_3, ?keyword_3_end, ?keyword_4, ?keyword_4_end
+}
+where { 
+    
+    graph <http://kg.artsdata.ca/culture-creates/artsdata-planet-nac/nac-events> {
+          ?e a schema:Event .
+          ?e  schema:workPerformed/schema:keywords ?keywords .
+          bind(REPLACE(strbefore(?keywords,","), " $", "-") as ?keyword_1 )
+       
+        bind(REPLACE(strbefore(strafter(?keywords,","),","), " $", "") as ?keyword_2)
+       
+        OPTIONAL {
+              bind(REPLACE(strafter(?keywords,","), " $", "") as ?keyword_2_end)
+             filter(!contains(?keyword_2_end,","))
+        }
+         OPTIONAL {
+              bind(REPLACE(strafter(strafter(?keywords,","),","), " $", "") as ?keyword_3_end)
+             filter(!contains(?keyword_3_end,","))
+        }
+ 
+         bind(REPLACE(strbefore(strafter(strafter(?keywords,","),","),","), " $", "") as ?keyword_3)
+     
+         bind(REPLACE(strbefore(strafter(strafter(strafter(?keywords,","),","),","),","), " $", "") as ?keyword_4)
+        
+        bind(REPLACE(strafter(strafter(strafter(?keywords,","),","),","), " $", "") as ?keyword_4_end)
+    }
+
+    
+  
+   
+} 

@@ -4,7 +4,7 @@ class QueryController < ApplicationController
   
   # GET /query
   # Pass 'constructs=' param with a list of comma separated construct sparqls.
-  # If contructs are passed, then the 'sparql=' param will use the local graph created by the contrucuts.
+  # If contructs are passed, then the 'sparql=' param will use the local graph created by the constructs.
   # Otherwise, the 'sparql=' param will execute on the remote sparql endpoint.
   # Example: GET /query
   #   ?constructs=custom/scenepro-construct,custom/scenepro-construct-artsdata,custom/scenepro-construct-wikidata

@@ -1,0 +1,9 @@
+
+PREFIX schema: <http://schema.org/>
+# CALL using /query/show?title=NAC+Keywords&constructs=custom/construct-nac-keywords&sparql=custom/nac_keywords
+select  ?keywords (count(?e) as ?count){
+  ?e schema:keys ?keywords
+  filter (?keywords !=  "")
+} 
+GROUP BY ?keywords
+ORDER BY ?keywords
