@@ -14,7 +14,6 @@
   } %>
 
   <% if @wikidata_data %>
-
     <h4>
       Select the Wikidata entity to mint
     </h4>
@@ -31,9 +30,11 @@
   <% if @external_uri %>
 
     <h3>Step 1</h3>
-    <p>Check that the data from Wikidata conforms. There should be no errors in
-      the following table. If there are errors then they should be fixed in
-      Wikidata before proceeding to mint in Artsdata.</p>
+    <p>Preview the transformed data from Wikidata that will be added to
+      Artsdata. There should be no errors in the following table. If there are
+      errors then they should be fixed in Wikidata before proceeding to mint in
+      Artsdata.
+    </p>
 
     <div>
       <p>
@@ -44,6 +45,7 @@
           loading="lazy"
           validating...
         >
+        </turbo-frame>
       </p>
     </div>
     <hr class="my-4">
@@ -124,7 +126,7 @@
         <button
           data-artsdata-target="button"
           class="btn btn-danger"
-          data-action="artsdata#mintEntity"
+          data-action="artsdata#mintEntityUsingFacts"
         >
           mint
         </button>

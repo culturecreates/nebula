@@ -6,12 +6,16 @@ class ValidateController < ApplicationController
     # Call Artsdata API to get the RDF graph for the entity
     mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
     url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
-    response = HTTParty.get(url)
-
-    @report = JSON.parse(response.body)['message']
-    @entity = Entity.new(entity_uri: "http://new.uri")
-    @entity.graph = RDF::Graph.new
+    begin
+      response = HTTParty.get(url)
+      raise "Mint API #{response.code}: #{response.message}" if response.code != 200
+    rescue => e
+      flash.now.alert = "Error: #{e.message}"
+      return
+    end
     body = JSON.parse(response.body)
+    @report = body['message']
+    @entity = Entity.new(entity_uri: "http://new.uri")
     if body['status'] == "success"
       jsonld_data = body['data']
       @entity.graph = RDF::Graph.new do |graph|
@@ -24,23 +28,33 @@ class ValidateController < ApplicationController
     uri = params[:uri] 
     @entity = Entity.new(entity_uri: uri)
     @class_to_mint = params[:class_to_mint] # i.e. schema:Person
-
-    wikidata_sparql_endpoint= "https://query.wikidata.org/sparql"
-    wikidata_sparql = SPARQL::Client.new(wikidata_sparql_endpoint)
-
-    response = wikidata_sparql.query(sparql_by_class_to_mint(@class_to_mint, uri))
-    @entity.graph = RDF::Graph.new << response 
-
-    ## TODO: Call Artsdata API Preview endpoint to get the SHACL report
-   
     begin
-      shacl = SHACL.open(shacl_by_class_to_mint(@class_to_mint))
-      @report = shacl.execute(@entity.graph)
-      @entity.load_graph_into_graph(@report)
-    rescue => exception
-      @entity =  "Error: #{exception}"
+      ## Build graph from Wikidata
+      wikidata_sparql_endpoint= "https://query.wikidata.org/sparql"
+      wikidata_sparql = SPARQL::Client.new(wikidata_sparql_endpoint)
+      response = wikidata_sparql.query(sparql_by_class_to_mint(@class_to_mint, uri))
+      @entity.graph = RDF::Graph.new << response 
+
+      ## Call Artsdata Preview with facts (JSON-LD) from Wikidata
+      mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
+      facts = CGI.escape(@entity.graph.dump(:jsonld).squish)
+      
+      url = "#{mint_endpoint}/preview?classToMint=#{@class_to_mint}&facts=#{facts}"
+      response = HTTParty.get(url)
+      raise "Mint API Error: #{response.code} - #{response.message}" if response.code != 200
+      body = JSON.parse(response.body)
+      @report = body['message']
+      @entity = Entity.new(entity_uri: "http://new.uri")
+      if body['status'] == "success"
+        jsonld_data = body['data']
+        @entity.graph = RDF::Graph.new do |graph|
+          RDF::Reader.for(:jsonld).new(jsonld_data.to_json, rdfstar: true)  {|reader| graph << reader}
+        end
+      end
+    rescue => e
+      flash.now.alert = "Error: #{e.message}"
     end
-   
+    render :show
   end
 
   def sparql_by_class_to_mint(class_to_mint, uri)

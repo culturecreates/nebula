@@ -33,6 +33,41 @@ export default class extends Controller {
     this.buttonTarget.disabled = false
   }
   
+  async mintEntityUsingFacts() {
+    this.buttonTarget.disabled = true
+    const url = this.mintendpointValue + "/facts";
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "uri": this.externaluriValue,
+        "classToMint": this.classtomintValue,
+        "publisher": this.authorityValue,
+        "name": this.labelValue,
+        "language": this.languageValue,
+        "reference": this.referenceValue,
+        "facts": this.facts
+      })
+    }
+    const res = await fetch(url, options);
+    
+    const json = await res.json();
+    console.log("json", json)
+
+    if (res.status == 500) {
+      this.uriTarget.innerHTML = this.createCard("Error", json.message);
+      this.buttonTarget.disabled = false
+      return
+    } 
+   
+    if (json.status == "success") {
+      this.uriTarget.innerHTML = "Successfully minted <a href='" + json.new_uri + "'>" + json.new_uri + "</a> using external facts.";
+    } else {
+      this.uriTarget.innerHTML = this.createCard("Failed", json.message);
+    }
+  }
 
   async mintEntity() {
     this.buttonTarget.disabled = true

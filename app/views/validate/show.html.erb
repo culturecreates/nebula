@@ -2,6 +2,7 @@
   <h1>SHACL Validation</h1>
 
   <turbo-frame id="card-validation">
+    <%= render partial: "flash_danger" %>
     <%= render partial: "shacl_secondary_report", locals: { entity: @entity } %>
     <%= @report %>
     <%= render partial: "statements_table",
