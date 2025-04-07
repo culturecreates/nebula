@@ -19,12 +19,11 @@ construct {
   schema:startDate ?startDate ;
   schema:endDate ?endDate ;
   schema:location ?place_name ;
-  prov:wasDerivedFrom ?dataid .
+  prov:wasDerivedFrom ?g .
 } 
 where { 
   VALUES ?entity { <URI_PLACEHOLDER> }
   OPTIONAL { ?entity rdfs:label ?c .}
-  # OPTIONAL { ?g prov:wasDerivedFrom ?dataid .}
   MINUS { ?entity skos:hiddenLabel ?c . }   
   OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription .}
   ?entity a ?inferred_type .
@@ -46,7 +45,4 @@ where {
   # When entity is a Place then flatten nested PostalAdress
   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode . }
   OPTIONAL { ?entity  schema:address/schema:addressLocality ?locality . }
-
-  # For all entities, get the dataid for minting when using load_card
-  OPTIONAL {graph ?g { <URI_PLACEHOLDER> a ?type .} ?g prov:wasDerivedFrom ?dataid .}
 } 
