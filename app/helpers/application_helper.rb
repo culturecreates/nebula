@@ -136,6 +136,35 @@ module ApplicationHelper
       HTML
     end
   end
+
+  def dump_jsonld(subject, graph)
+    # Construct the SPARQL query
+    sparql_string = <<~SPARQL
+      CONSTRUCT {
+       ?s ?p ?o .
+       ?o2 ?p2 ?o3 .
+      }
+      WHERE {
+        #{subject.to_s} a <http://schema.org/Place> ; ?p ?o .
+        BIND(URI("http://subgraph.com") as ?s)
+        OPTIONAL {
+           #{subject.to_s} ?p ?o2 .
+          filter(isBLANK(?o2))
+          ?o2 ?p2 ?o3 .
+        }
+      }
+    SPARQL
+
+    # Execute the query
+    sparql = SPARQL.parse(sparql_string)
+    sub_graph = sparql.execute(graph)
+    puts "subject: #{subject.to_s}"
+    puts "sub_graph: #{sub_graph.dump(:jsonld, standard_prefixes: true)}"
+ 
+     # Serialize the graph into JSON-LD
+    sub_graph.dump(:jsonld, standard_prefixes: true)
+ 
+  end
         
     
 end

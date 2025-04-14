@@ -1,6 +1,6 @@
 class MintController < ApplicationController
   before_action :authenticate_user! # ensure user has permissions
-  before_action :set_authority, only: [:preview, :link] # known as publisher in Artsdata API
+  before_action :set_authority, only: [:preview, :link, :link_facts] # known as publisher in Artsdata API
   # before_action :temporarily_disable, only: [:wikidata] # disable feature for maintenance
   include DereferenceHelper 
 
@@ -111,6 +111,58 @@ class MintController < ApplicationController
     else
       flash.alert = "Missing a required param. Required list: #{required}"
       redirect_back(fallback_location: root_path)
+    end
+  end
+
+  # Link a blank node to an existing Artsdata URI
+  # POST /mint/link_facts 
+  def link_facts
+    required = [:facts, :adUri]
+    if required.all? { |k| params.key? k }
+      facts = params[:facts]
+      externalReference = "http://kg.artsdata.ca/capacoa/artsdata-orion/co-motion-ca" # params[:externalReference]
+      adUri = params[:adUri]
+      classToLink = "http://schema.org/Place" # if params[:classToMint].starts_with?("http") 
+      #                   params[:classToMint]
+      #                 else
+      #                   "http://schema.org/" + params[:classToMint]
+      #                 end
+      user = session[:handle]  #TODO: use github URI + #this
+
+      # call link in mint service
+      artsdata_link_endpoint = Rails.application.credentials.artsdata_link_endpoint
+      uri = URI.parse("#{artsdata_link_endpoint}/facts") 
+
+      request = Net::HTTP::Post.new(uri)
+      request["Content-Type"] = "application/json"
+      request.body = JSON.dump({
+          "facts" => facts,
+          "externalReference" => externalReference,
+          "classToLink" => classToLink,
+          "adUri" => adUri,
+          "user" => user
+      })
+      
+      req_options = {
+        use_ssl: uri.scheme == "https",
+      }
+
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+
+      result = JSON.parse(response.body)
+      if result["status"] == "success"
+        flash.alert = "Successfully linked blank node to #{adUri}"
+        redirect_to entity_path(uri: @entity.entity_uri)
+      else
+        flash.now.alert = "Failed to link blank node to #{adUri}. #{result}"
+        redirect_back(fallback_location: root_path)
+      end
+
+    else
+      flash.alert = "Missing a required param. Required list: #{required}"
+      redirect_to entity_path(uri: @entity.entity_uri)
     end
   end
 

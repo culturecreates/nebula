@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     get "query/show", to: "query#show"
     get "mint/preview", to: "mint#preview"
     post "mint/link", to: "mint#link"
+    post "mint/link_facts", to: "mint#link_facts"
     get "mint/wikidata", to: "mint#wikidata"
     get "reconcile/query", to: "reconcile#query"
     get "validate/wikidata", to: "validate#wikidata"

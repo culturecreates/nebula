@@ -5,11 +5,20 @@ if there is already a sameAs to Artsdata ID-->
   <% if  subject.node? %>
     <% node_types = graph.query([subject, RDF.type, nil]).objects %>
     <% if (@target_types & node_types).present? %>
-
-      <a
-        class="btn btn-sm btn-secondary"
-        onclick="alert('Adding sameAs to blank nodes coming soon')"
-      >add sameAs</a>
+      <% sameas = graph.query([subject, RDF::Vocab::SCHEMA.sameAs, nil]).objects %>
+      <% if !sameas.to_s.include?("kg.artsdata.ca") %>
+        <div class="input-group mb-3">
+          <!-- Form to submit the input field value and facts -->
+          <%= form_with url: mint_link_facts_path, method: :post, local: true  do |form| %>
+            <%= form.text_field :adUri,
+                            class: "form-control",
+                            placeholder: "URI to link to this entity",
+                            required: true %>
+            <%= form.hidden_field :facts, value: dump_jsonld(subject, graph) %>
+            <%= form.submit "Add sameAs", class: "btn btn-sm btn-secondary" %>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
