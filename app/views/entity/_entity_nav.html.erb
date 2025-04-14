@@ -22,7 +22,7 @@
     <% end %>
     <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' || session[:handle] == 'dev-aravind' %>
       <% if cms_ranked_link(@entity) %>
-        <%= link_to "CMS view",
+        <%= link_to "CMS ranked",
         dereference_external_path(uri: cms_ranked_link(@entity)),
         rel: "nofollow" %>
         |
