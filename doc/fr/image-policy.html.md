@@ -1,19 +1,13 @@
-# Politique d’Artsdata relative aux images
-
-## Résumé de la politique (ne fait pas partie de la politique officielle)
-
-* Artsdata n’entrepose pas d’images, seulement des URLs d’images (et les métadonnées qui peuvent y être associées).
-* Lorsque la licence d’une image n’est pas précisée, l’utilisateur de données doit présumer qu’une image est protégée par le droit d’auteur.
-* Un utilisateur ne devrait réutiliser une URL d’image que conformément aux fins pour lesquelles l’image a été publiée sur le site source.
-* La responsabilité d’Artsdata se limite à la publication d’URL d’image sous forme de données ouvertes.
-
-# Politique d’Artsdata relative aux images – Version 1.0 (version officielle)
+# Politique d’Artsdata relative aux images 
+Version 1.0 
 
 ## Comment Artsdata gère les informations relatives aux images
 
 Artsdata met à disposition des données ouvertes de différentes natures. Parmi ces données, on retrouve des URLs d’images : par exemple, des URLs d’images promotionnelles d’événements ou d’images de profils d’artistes.
 
 Artsdata n’extrait et n’entrepose que les URLs d’image et ne dépose en aucun cas de copies d’images sur ses serveurs. Artsdata n’extrait par ailleurs les URLs d’image que lorsque ces URLs constituent une métadonnée en lien avec une entité précise pour laquelle Artsdata a obtenu l’autorisation d’extraire les données, par exemple un événement ou un artiste. Lorsque des crédits photos et des mentions de licence sont disponible à la source, Artsdata s’assure d’extraire ces métadonnées et des les intégrer à l’intérieur d’un objet image (“schema:ImageObject”). Ainsi, les métadonnées d’image sont rendues accessibles au même titre que l’URL d’image et que les autres métadonnées décrivant l’entité dépeinte par l’image.
+
+### Exemple de schema:ImageObject
 
 ```
 "image": {
@@ -33,10 +27,10 @@ Note : Ce gabarit JSON-LD n’est fourni qu’à titre illustratif. La modélisa
 
 Conformément aux ententes types de l’industrie, aux conventions collectives et aux lois en vigueur au Canada, une URL d’image ne devrait être utilisée qu’aux mêmes fins pour lesquelles l’image a été publiée sur le site source et dans les mêmes conditions. Par exemple, dans le cas d’une image promotionnelle pour un événement :  
 
-* L’URL d’image ne devrait être utilisée qu’en lien avec l’événement auquel elle est associée;
-* L’utilisateur devrait s’assurer d’inclure suffisamment de données à propos de l’événement afin que celui-ci soit désambiguïsable (c’est-à-dire qu’il puisse être distingué d’un autre événement similaire) ;
-* Lorsque les données précisant l’URL de la page officielle de l’événement (c.-à-d. la page d’événement sur le site de l’organisateur officiel de l’événement) et/ou l’URL de la billetterie officielle de l’événement sont disponibles, l’utilisateur devrait inclure ces informations, en plus des autres données permettant de désambiguïser l’événement ;
-* Si un crédit photo est disponible, celui-ci devrait être réutilisé avec l’URL d’image
+- L’URL d’image ne devrait être utilisée qu’en lien avec l’événement auquel elle est associée;
+- L’utilisateur devrait s’assurer d’inclure suffisamment de données à propos de l’événement afin que celui-ci soit désambiguïsable (c’est-à-dire qu’il puisse être distingué d’un autre événement similaire) ;
+- Lorsque les données précisant l’URL de la page officielle de l’événement (c.-à-d. la page d’événement sur le site de l’organisateur officiel de l’événement) et/ou l’URL de la billetterie officielle de l’événement sont disponibles, l’utilisateur devrait inclure ces informations, en plus des autres données permettant de désambiguïser l’événement ;
+- Si un crédit photo est disponible, celui-ci devrait être réutilisé avec l’URL d’image
 
 L’objectif des conditions précitées est de faire en sorte que l’URL d’image soit utilisée conformément à l’intention de l’organisateur officiel qui a publié cette image (et des ayants droit qui lui ont accordé le droit de publier l’image).
 
@@ -54,9 +48,9 @@ Toute utilisation contrevenant avec cette politique, avec les conditions d’uti
 
 À la suite d’un rapport de violation, Artsdata pourrait prendre les mesures suivantes : 
 
-* Retirer l’URL de l’image et les métadonnées associées du graphe de connaissances ;
-* Remplacer provisoirement l’URL d’image par une autre URL de façon à retracer une utilisation fautive ;
-* Retirer au contrevenant l’accès au graphe de connaissances.
+- Retirer l’URL de l’image et les métadonnées associées du graphe de connaissances ;
+- Remplacer provisoirement l’URL d’image par une autre URL de façon à retracer une utilisation fautive ;
+- Retirer au contrevenant l’accès au graphe de connaissances.
 
 ## Consentement
 
