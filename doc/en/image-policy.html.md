@@ -1,19 +1,13 @@
-# Artsdata Image Reuse Policy
-
-## Summary of the policy
-
-* Artsdata does not store images. It only stores the URLs of images (and any associated metadata).
-* When the license of the image isn’t specified, the data user must assume that the image is protected by copyright.
-* A user should only reuse an image URL within the scope of the image’s intended purpose, as outlined in the source website.
-* Artsdata’s responsibility is limited to the publication of the image URL as open data. 
-
-## Artsdata Image Policy – Version 1.0
+# Artsdata Image Policy 
+Version 1.0
 
 ## How Artsdata manages image information
 
 Artsdata makes various kinds of open data available. These include image URLs: for example, URLs associated with promotional images of events, or images of artist profiles.
 
 Artsdata only collects and stores image URLs; it never stores copies of images on its servers. Artsdata only stores image URLs if those URLs constitute metadata connected to a specific entity, such as an event or artist, for which Artsdata has already obtained permission to extract the data. When a photo credit and a license notice are available at the source, Artsdata extracts this metadata and integrates it inside an image object (“schema:ImageObject”). This process ensures that image metadata can be accessed along with the image URL and the rest of the descriptive metadata about the entity depicted by the image.
+
+### Sample schema:ImageObject
 
 ```
 "image": {
@@ -34,16 +28,16 @@ Unless a licence notice indicates otherwise, users must assume that the images w
 
 In accordance with standard contractual practice in the industry, with collective agreements, with individual agreements between Artsdata and data providers, as well as with laws applicable in Canada, an image URL should only be used:
 
-* For the same purposes it was originally published or reproduced on the source site; 
-* In the same conditions it was originally published or reproduced on the source site; and,
-* In accordance with the license notice and/or the terms and conditions of the source site (if applicable).
+- For the same purposes it was originally published or reproduced on the source site; 
+- In the same conditions it was originally published or reproduced on the source site; and,
+- In accordance with the license notice and/or the terms and conditions of the source site (if applicable).
 
 For example, for a promotional image of a live performance:
 
-* An image URL should only be used in connection with its associated event.
-* The user should include enough data about the event to disambiguate it (i.e. make it distinguishable) from similar events.
-* When there is available data specifying the event’s official webpage URL (i.e. the event page on the official event organizer’s website) and/or official ticketing platform, the user should include this information, in addition to other data that enables disambiguation from other events.
-* If a photo credit and/or other form of attribution information is available (for example, a caption providing the title of the show or the names of performers), it should be used along with the image URL. 
+- An image URL should only be used in connection with its associated event.
+- The user should include enough data about the event to disambiguate it (i.e. make it distinguishable) from similar events.
+- When there is available data specifying the event’s official webpage URL (i.e. the event page on the official event organizer’s website) and/or official ticketing platform, the user should include this information, in addition to other data that enables disambiguation from other events.
+- If a photo credit and/or other form of attribution information is available (for example, a caption providing the title of the show or the names of performers), it should be used along with the image URL. 
 
 The purpose of this set of conditions is to ensure that the image URL is used in accordance with the intentions of the official organizer who published or reproduced this image (and the right holders who authorized the reproduction of the image).
 
@@ -61,27 +55,15 @@ Any use infringing with this policy, with terms and conditions on the source sit
 
 Further to an infringement report, Arstdata may take the following actions:
 
-* Remove the image URL and the associated metadata from the Artsdata knowledge graph;
-* Replace the image URL with another URL so as to detect and trace an infringing use;
-* Deny the offender further access to the knowledge graph.
+- Remove the image URL and the associated metadata from the Artsdata knowledge graph;
+- Replace the image URL with another URL so as to detect and trace an infringing use;
+- Deny the offender further access to the knowledge graph.
 
 ## Consent
 
 By using data from Artsdata, the user consents to this policy.
 
 Users who contravene this policy may be denied access to Artsdata.
-
-
-
-
-
-
-
-
-
-
-
-
 
 [French version](https://kg.artsdata.ca/fr/doc/image-policy)
 
