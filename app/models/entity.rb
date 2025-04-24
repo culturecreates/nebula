@@ -1,6 +1,6 @@
 
 class Entity
-  attr_accessor :entity_uri, :graph, :start_date, :card
+  attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri
   @@artsdata_client = ArtsdataApi::V2::Client.new(
         graph_repository: Rails.application.credentials.graph_repository, 
         api_endpoint: Rails.application.credentials.graph_api_endpoint)
@@ -214,8 +214,14 @@ class Entity
                   'entity_uri_placeholder', self.entity_uri,
                   'locale_placeholder' , language
                 ])
-   
     @graph = construct_turtle(sparql)
+  end
+
+  def graph_uri
+    @graph_uri ||= @graph.query([RDF::URI(self.entity_uri), RDF::Vocab::SCHEMA.isPartOf, nil])
+      .objects
+      &.first
+      &.to_s
   end
 
   def load_graph_without_triple_terms(language = "en")

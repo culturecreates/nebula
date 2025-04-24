@@ -112,10 +112,13 @@ module ApplicationHelper
     @url = o.to_s if p.to_s == "http://schema.org/urlTemplate"
   end
 
+  def user_uri
+    "https://github.com/#{session[:handle]}#this"
+  end
+
   def generate_action_div
     if @url
-      user_id = "https://github.com/#{session[:handle]}#this"
-      escaped_http_body = CGI.escapeHTML(@httpBody&.gsub('{{PublisherWebID}}', user_id))
+      escaped_http_body = CGI.escapeHTML(@httpBody&.gsub('{{PublisherWebID}}', user_uri))
       <<-HTML.html_safe
         <div
           data-controller="githubapi"

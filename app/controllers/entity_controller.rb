@@ -63,7 +63,7 @@ class EntityController < ApplicationController
      #     RDF::Vocab::SCHEMA.Organization,
      #     RDF::Vocab::SCHEMA.PerformingGroup,
           RDF::Vocab::SCHEMA.Place
-        ]  
+      ]
   
         # TODO: add SHACL validation if artsdata entity
        

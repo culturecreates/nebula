@@ -117,17 +117,17 @@ class MintController < ApplicationController
   # Link a blank node to an existing Artsdata URI
   # POST /mint/link_facts 
   def link_facts
-    required = [:facts, :adUri]
+    required = [:facts, :adUri, :externalReference]
     if required.all? { |k| params.key? k }
       facts = params[:facts]
-      externalReference = "http://kg.artsdata.ca/capacoa/artsdata-orion/co-motion-ca" # params[:externalReference]
+      externalReference = params[:externalReference]
       adUri = params[:adUri]
       classToLink = "http://schema.org/Place" # if params[:classToMint].starts_with?("http") 
       #                   params[:classToMint]
       #                 else
       #                   "http://schema.org/" + params[:classToMint]
       #                 end
-      user = session[:handle]  #TODO: use github URI + #this
+     
 
       # call link in mint service
       artsdata_link_endpoint = Rails.application.credentials.artsdata_link_endpoint
@@ -140,23 +140,32 @@ class MintController < ApplicationController
           "externalReference" => externalReference,
           "classToLink" => classToLink,
           "adUri" => adUri,
-          "user" => user
+          "user" => helpers.user_uri
       })
-      
       req_options = {
         use_ssl: uri.scheme == "https",
       }
-
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-        http.request(request)
+      # make the HTTP request
+      begin
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
+        if response.code.to_i >= 400
+          raise "HTTP Error #{response.code}: #{response.message} - #{response.body}"
+        end
+        result = JSON.parse(response.body)
+      rescue StandardError => e
+        Rails.logger.error("Error in MintController#link_facts: #{e.class} - #{e.message}")
+        Rails.logger.error(e.backtrace.join("\n"))
+        flash.alert = "An error occurred while making the HTTP request: #{e.message}"
+        redirect_back(fallback_location: root_path) and return
       end
-
-      result = JSON.parse(response.body)
+      
       if result["status"] == "success"
-        flash.alert = "Successfully linked blank node to #{adUri}"
-        redirect_to entity_path(uri: @entity.entity_uri)
+        flash.notice = "Successfully linked blank node to #{adUri}"
+        redirect_back(fallback_location: root_path)
       else
-        flash.now.alert = "Failed to link blank node to #{adUri}. #{result}"
+        flash.alert = "Failed to link blank node to #{adUri}. #{result}"
         redirect_back(fallback_location: root_path)
       end
 
