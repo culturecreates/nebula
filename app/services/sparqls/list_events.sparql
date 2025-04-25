@@ -26,7 +26,7 @@ WHERE {
           bind(concat("<a class='btn btn-primary btn-sm' href='/mint/preview?externalUri=",ENCODE_FOR_URI(str(?uri)),"'>mint</a>") as ?mint_top_level)
           bind(COALESCE(?normalizedEndDate,?normalizedStartDate) as ?earliest_end)
           filter(?earliest_end > now())
-          filter(NOT EXISTS {  ?shacl sh:focusNode ?uri })
+          filter(NOT EXISTS {  ?shacl sh:focusNode ?uri ; sh:resultSeverity  sh:Violation . })
         }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
