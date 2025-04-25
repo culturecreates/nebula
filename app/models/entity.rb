@@ -218,10 +218,21 @@ class Entity
   end
 
   def graph_uri
-    @graph_uri ||= @graph.query([RDF::URI(self.entity_uri), RDF::Vocab::SCHEMA.isPartOf, nil])
-      .objects
-      &.first
-      &.to_s
+    return @graph_uri if @graph_uri.present?
+    
+    # check if in graph already
+    @graph_uri = @graph.query([RDF::URI(self.entity_uri), RDF::Vocab::SCHEMA.isPartOf, nil]).objects&.first&.to_s
+    return @graph_uri if @graph_uri.present?
+
+    # query artsdata for the graph uri
+    sparql = "select ?g where { graph ?g { <#{self.entity_uri}> a ?o } }"
+    response = @@artsdata_client.execute_sparql(sparql)
+    @graph_uri =  if response[:code] == 200
+                    response[:message].first["g"]["value"]
+                  else
+                    nil
+                  end
+    @graph_uri
   end
 
   def load_graph_without_triple_terms(language = "en")

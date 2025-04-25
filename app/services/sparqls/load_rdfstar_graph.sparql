@@ -9,8 +9,6 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 CONSTRUCT {
     ?s ?p ?o  .
 
-    ?s schema:isPartOf ?g .
-
     <<?s ?p ?o>> ?a ?b .
     ?p rdfs:label ?prop_label .
     ?o rdfs:label ?obj_label .
@@ -46,9 +44,6 @@ WHERE {
 
     ?s ?p ?o  .
 
-    graph ?g {
-        ?s a ?type .
-    }
 
     OPTIONAL {
         ?shacl_bn sh:focusNode ?s ; 

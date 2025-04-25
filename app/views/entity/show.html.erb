@@ -27,9 +27,7 @@
   <% if @entity.graph.count == 0 %>
     <%= render partial: "external_resource", locals: { entity: @entity } %>
   <% else %>
-    <%= unless is_authoritative
-      "<a href='https://kg.artsdata.ca/entity?uri=#{@entity.graph_uri}'>Non-authoritative</a>".html_safe
-    end %>
+    <%= "Non-authoritative".html_safe unless is_authoritative %>
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),

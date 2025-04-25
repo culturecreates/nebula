@@ -131,8 +131,7 @@ class MintController < ApplicationController
 
       # call link in mint service
       artsdata_link_endpoint = Rails.application.credentials.artsdata_link_endpoint
-      uri = URI.parse("#{artsdata_link_endpoint}/facts") 
-
+      uri = URI.parse("#{artsdata_link_endpoint}/facts")
       request = Net::HTTP::Post.new(uri)
       request["Content-Type"] = "application/json"
       request.body = JSON.dump({
