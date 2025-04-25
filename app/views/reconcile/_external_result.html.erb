@@ -24,7 +24,7 @@
 
     </p>
   </a>
-  <% if @externalUri %>
+  <% if @externalUri && result["id"][0] == "K" %>
     <%= button_to "link",
     mint_link_path(
       externalUri: @externalUri,
