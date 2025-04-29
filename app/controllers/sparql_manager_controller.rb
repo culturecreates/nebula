@@ -1,5 +1,5 @@
 class SparqlManagerController < ApplicationController
-  before_action :authenticate_user! # ensure user has permissions
+  before_action :check_sparql_manager_access # ensure user has permissions
 
   def index
   
@@ -30,4 +30,9 @@ class SparqlManagerController < ApplicationController
   def artifact_params
     params.permit(:name, :description, :type)
   end
+
+  def check_sparql_manager_access
+    ensure_access("sparql_manager")
+  end
+
 end

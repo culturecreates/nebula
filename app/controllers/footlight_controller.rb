@@ -1,5 +1,5 @@
 class FootlightController < ApplicationController
-  before_action :authenticate_user!
+  before_action :user_signed_in?
 
   # GET /footlight/export?uri=
   # Export the graph as viewed by Footlight Aggregator for CMS import

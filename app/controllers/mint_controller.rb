@@ -230,10 +230,7 @@ class MintController < ApplicationController
   private
 
   def check_minting_access
-    unless user_has_access?("minting")
-      flash.alert = "#{session[:name]} does not have sufficient permissions to mint Artsdata URIs."
-      redirect_back(fallback_location: root_path)
-    end
+    ensure_access("minting")
   end
 
   def convert_id_to_name(wikidata_id)
