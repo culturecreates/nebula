@@ -6,7 +6,7 @@
     |
     <a href="<%= @entity.entity_uri %>" rel="nofollow">
       Visit</a>
-    <% if has_access_level("cms_links") %>
+    <% if user_has_access?("cms_links") %>
       |
       <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
       |
