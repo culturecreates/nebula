@@ -6,7 +6,7 @@
     |
     <a href="<%= @entity.entity_uri %>" rel="nofollow">
       Visit</a>
-    <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' || session[:handle] == 'dev-aravind' %>
+    <% if has_access_level("cms_links") %>
       |
       <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
       |
@@ -14,15 +14,15 @@
     <% end %>
     |
   <% else %>
-    <% if ranked_link(@entity) %>
-      <%= link_to "Ranked",
-      dereference_external_path(uri: ranked_link(@entity)),
-      rel: "nofollow" %>
-      |
-    <% end %>
-    <% if session[:handle] == 'saumier' || session[:handle] == 'sahalali' || session[:handle] == 'dev-aravind' %>
+    <% if user_has_access?("ranked_links") %>
+      <% if ranked_link(@entity) %>
+        <%= link_to "Ranked",
+        dereference_external_path(uri: ranked_link(@entity)),
+        rel: "nofollow" %>
+        |
+      <% end %>
       <% if cms_ranked_link(@entity) %>
-        <%= link_to "CMS ranked",
+        <%= link_to "Ranked",
         dereference_external_path(uri: cms_ranked_link(@entity)),
         rel: "nofollow" %>
         |

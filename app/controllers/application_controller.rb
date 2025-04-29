@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  helper_method :user_has_access?
   before_action :set_locale
   append_view_path "doc"
 
@@ -72,6 +73,17 @@ class ApplicationController < ActionController::Base
     end
    
   end
+
+  # Role-Based Access Control (RBAC) pattern
+  def user_has_access?(feature)
+    case feature
+    when "ranked_links" # Level 2 or Level 1
+      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") } 
+    when "cms_links" # Level 2
+      return session[:teams].any? { |team| team.key?("10808270") }
+    end
+  end
+    
 
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
