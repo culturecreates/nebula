@@ -81,6 +81,8 @@ class ApplicationController < ActionController::Base
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") } 
     when "cms_links" # Level 2
       return session[:teams].any? { |team| team.key?("10808270") }
+    when "minting" 
+      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") } 
     end
   end
     

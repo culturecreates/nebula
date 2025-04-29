@@ -1,5 +1,5 @@
 class MintController < ApplicationController
-  before_action :authenticate_user! # ensure user has permissions
+  before_action :check_minting_access # ensure user has permissions
   before_action :set_authority, only: [:preview, :link, :link_facts] # known as publisher in Artsdata API
   # before_action :temporarily_disable, only: [:wikidata] # disable feature for maintenance
   include DereferenceHelper 
@@ -228,6 +228,13 @@ class MintController < ApplicationController
   end
 
   private
+
+  def check_minting_access
+    unless user_has_access?("minting")
+      flash.alert = "#{session[:name]} does not have sufficient permissions to mint Artsdata URIs."
+      redirect_back(fallback_location: root_path)
+    end
+  end
 
   def convert_id_to_name(wikidata_id)
     sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
