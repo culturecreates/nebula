@@ -6,8 +6,21 @@ class ArtifactController < ApplicationController
     sparql_file =  "artifact_controller/list_artifacts"
 
     # Placeholders in SPARQL query
-    query =  SparqlLoader.load(sparql_file, [ "DATABUS_ACCOUNT", @databus_account.downcase])
-    @artifacts = helpers.artsdata_sparql_client.query(query).limit(1000) # TODO: fix limit
+    @query =  SparqlLoader.load(sparql_file, [ "DATABUS_ACCOUNT", @databus_account.downcase])
+    @artifacts = helpers.artsdata_sparql_client.query(@query).limit(1000) # TODO: fix limit
+  end
+
+  # GET /artifact/push_lastest
+  def push_latest
+    @artifact_uri = params[:artifactUri]
+    databus_service = DatabusService.new(@artifact_uri, helpers.user_uri)
+
+    if databus_service.push_lastest_artifact(@artifact_uri) 
+      flash.notice = "Pushed latest artifact '#{databus_service.latest_version}' to Artsdata."
+    else
+      flash.alert = "Error pushing '#{databus_service.latest_version}' : #{databus_service.errors}."
+    end
+    redirect_to artifact_index_path
   end
 
   def new

@@ -1,26 +1,27 @@
 <% title = "#{pluralize(@artifacts.count, t("artifact.title"))}" %>
 <% provide(:title, title) %>
-<div class="container">
+<div data-controller="filter-query-results">
+  <div class="container">
 
-  <div class="d-flex justify-content-between">
-    <div>
-      <h1>
-        <%= title %>
-      </h1>
-    </div>
-    <div class="p-2">
-      <%= link_to "Create artifact",
-      new_artifact_path,
-      class: "btn btn-primary",
-      data: {
-        turbo: false,
-      } %>
+    <div class="d-flex justify-content-between">
+      <div>
+        <h1>
+          <%= title %>
+        </h1>
+      </div>
+      <div class="p-2">
+        <%= link_to "Create artifact",
+        new_artifact_path,
+        class: "btn btn-primary",
+        data: {
+          turbo: false,
+        } %>
 
+      </div>
     </div>
+
+    <%= t("artifact.description").html_safe %>
+    <%= render partial: "query_nav", locals: { permitted_params: nil } %>
   </div>
-
-  <%= t("artifact.description").html_safe %>
-
+  <%= render partial: "query_table", locals: { solutions: @artifacts } %>
 </div>
-
-<%= render partial: "query_table", locals: { solutions: @artifacts } %>

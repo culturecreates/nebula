@@ -1,8 +1,10 @@
 <div class="alternate-name d-flex align-items-center mb-2">
-  <%= link_to "Download CSV",
-  query_show_path(params: permitted_params, format: :csv),
-  class: "btn btn-outlined btn-sm " %>
-  |
+  <%= if permitted_params
+    link_to "Download CSV |",
+    query_show_path(params: permitted_params, format: :csv),
+    class: "btn btn-outlined btn-sm "
+  end %>
+
   <%= link_to "SPARQL",
   "http://artsdata-trifid-production.herokuapp.com/sparql/#query=#{URI.encode_www_form_component(@query)}",
   class: "btn btn-outlined btn-sm " %>

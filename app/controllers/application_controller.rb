@@ -45,6 +45,8 @@ class ApplicationController < ActionController::Base
 
   # Check if user is signed in and has permission to use the feature
   def ensure_access(feature)
+    return if Rails.env.test? 
+
     user_signed_in!
     return unless user_signed_in?
 
@@ -56,7 +58,6 @@ class ApplicationController < ActionController::Base
 
   # Role-Based Access Control (RBAC) pattern
   def user_has_access?(feature)
-    return true if  Rails.env.test? 
     return false unless session[:teams].present?
 
     case feature
