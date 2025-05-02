@@ -6,24 +6,26 @@
   <%= render partial: "shared/clipboard", locals: { uri: @artifact.uri } %>
   <hr>
   <div class="mb-3">
-    <p><strong>Group:</strong>
+    <p><strong>artifact:</strong>
+      <%= @artifact.artifact_id %></p>
+    <p><strong>group:</strong>
       <%= @artifact.group %></p>
-    <p><strong>Account:</strong>
+    <p><strong>account:</strong>
       <%= @artifact.account %></p>
   </div>
   <div class="d-flex gap-2">
     <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Are you sure you want to push the latest artifact to Artsdata?" } } do |form| %>
       <%= form.hidden_field :artifactUri, value: @artifact.uri %>
-      <%= form.submit "Push latest",
+      <%= form.submit "push latest",
                   class: "btn btn-primary",
                   data: {
                     disable_with: "Pushing...",
                   } %>
     <% end %>
 
-    <%= link_to "Edit", artifact_path(@artifact), class: "btn btn-primary disabled" %>
+    <%= link_to "edit", artifact_path(@artifact), class: "btn btn-primary disabled" %>
 
-    <%= link_to "Delete",
+    <%= link_to "delete",
     artifact_path(artifactUri: @artifact.uri),
     local: true,
     data: {
@@ -32,6 +34,7 @@
       confirm: "Delete all versions?",
     },
     class: "btn btn-danger disabled" %>
+    <%= link_to "index", artifact_index_path, class: "btn btn-secondary" %>
   </div>
 
   <hr>
