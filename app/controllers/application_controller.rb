@@ -5,8 +5,6 @@ class ApplicationController < ActionController::Base
 
   def home; end
 
-  def test; end
-
   def doc
     template = "#{I18n.locale.to_s}/#{params[:path]}"
     render template: template
