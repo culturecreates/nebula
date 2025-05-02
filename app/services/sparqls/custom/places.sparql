@@ -1,6 +1,15 @@
 PREFIX schema: <http://schema.org/>
 PREFIX adm: <http://kg.artsdata.ca/minted/>
-select ?artsdata (sample(?names) as ?name) (sample(?wikidatas) as ?wikidata)  (sample(?streetAddresses) as ?streetAddress)  (sample(?localities) as ?locality) (sample(?regions) as ?region) (sample(?postalCodes) as ?postalCode)   where {
+PREFIX dbo: <http://dbpedia.org/ontology/>
+select ?artsdata 
+(sample(?names) as ?name) 
+(sample(?wikidatas) as ?wikidata)  
+(sample(?streetAddresses) as ?streetAddress)  
+(sample(?localities) as ?locality) 
+(sample(?regions) as ?region) 
+(sample(?postalCodes) as ?postalCode)   
+(sample(?timezones) as ?timezone)   
+where {
    
     graph <http://kg.artsdata.ca/core> {
         ?artsdata a schema:Place ;
@@ -15,6 +24,8 @@ select ?artsdata (sample(?names) as ?name) (sample(?wikidatas) as ?wikidata)  (s
                 ?artsdata schema:address/schema:postalCode  ?postalCodes .}
         optional {
                 ?artsdata schema:address/schema:addressCountry ?country .}
+        optional {
+                ?artsdata  dbo:timeZone  ?timezones .}    
 
         filter(str(?country) = "CA")
     }
