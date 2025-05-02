@@ -1,0 +1,51 @@
+<div class="container">
+
+  <h1 class="text-truncate">
+    <%= @artifact.name ||= @artifact.artifact_id %>
+  </h1>
+  <%= render partial: "shared/clipboard", locals: { uri: @artifact.uri } %>
+  <hr>
+  <div class="mb-3">
+    <p><strong>Group:</strong>
+      <%= @artifact.group %></p>
+    <p><strong>Account:</strong>
+      <%= @artifact.account %></p>
+  </div>
+  <div class="d-flex gap-2">
+    <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Are you sure you want to push the latest artifact to Artsdata?" } } do |form| %>
+      <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+      <%= form.submit "Push latest",
+                  class: "btn btn-primary",
+                  data: {
+                    disable_with: "Pushing...",
+                  } %>
+    <% end %>
+
+    <%= link_to "Edit", artifact_path(@artifact), class: "btn btn-primary disabled" %>
+
+    <%= link_to "Delete",
+    artifact_path(artifactUri: @artifact.uri),
+    local: true,
+    data: {
+      controller: "confirm",
+      action: "submit->confirm#confirm",
+      confirm: "Delete all versions?",
+    },
+    class: "btn btn-danger disabled" %>
+  </div>
+
+  <hr>
+
+  <h2>Artifact Versions</h2>
+  <% if false %>
+    <ul class="list-group">
+      <% @artifact_versions.each do |version| %>
+        <li class="list-group-item">
+          <%= link_to version.version, artifact_version_path(version) %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>Coming soon.</p>
+  <% end %>
+</div>

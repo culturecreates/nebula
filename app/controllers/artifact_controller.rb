@@ -10,17 +10,22 @@ class ArtifactController < ApplicationController
     @artifacts = helpers.artsdata_sparql_client.query(@query).limit(1000) # TODO: fix limit
   end
 
-  # GET /artifact/push_lastest
+  def show
+    artifact_uri = params[:artifactUri]
+    @artifact = Artifact.new
+    @artifact.uri = artifact_uri
+  end
+
+  # POST /artifact/push_latest
   def push_latest
     @artifact_uri = params[:artifactUri]
     databus_service = DatabusService.new(@artifact_uri, helpers.user_uri)
-
     if databus_service.push_lastest_artifact(@artifact_uri) 
       flash.notice = "Pushed latest artifact '#{databus_service.latest_version}' to Artsdata."
     else
       flash.alert = "Error pushing '#{databus_service.latest_version}' : #{databus_service.errors}."
     end
-    redirect_to artifact_index_path
+    redirect_back(fallback_location: root_path)
   end
 
   def new

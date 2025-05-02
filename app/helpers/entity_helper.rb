@@ -152,8 +152,8 @@ module EntityHelper
     return "http://api.artsdata.ca/resource?uri=#{CGI.escape(entity.entity_uri)}"
   end
 
-  def is_authoritative
-    if @entity.entity_uri.starts_with?("http://kg.artsdata.ca")
+  def is_authoritative(uri)
+    if uri.starts_with?("http://kg.artsdata.ca")
       true
     else
       false

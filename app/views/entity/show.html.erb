@@ -8,26 +8,13 @@
     <%= @entity.label&.value&.html_safe %>
   </h1>
 
-  <div
-    data-controller="clipboard"
-    data-clipboard-success-content-value="URI copied"
-  >
-    <%= "<span class='badge bg-primary'>URI</span>".html_safe if is_authoritative %>
-    <span data-clipboard-target="source"><%= @entity.entity_uri %></span>
-    <a
-      class="cursor-pointer"
-      data-action="clipboard#copy"
-      data-clipboard-target="button"
-      title="Copy URI"
-    ><%= render partial: "shared/icon_copy" %></a>
-  </div>
-
+  <%= render partial: "shared/clipboard", locals: { uri: @entity.entity_uri } %>
   <%= render partial: "entity_nav" %>
 
   <% if @entity.graph.count == 0 %>
     <%= render partial: "external_resource", locals: { entity: @entity } %>
   <% else %>
-    <%= "Non-authoritative".html_safe unless is_authoritative %>
+    <%= "Non-authoritative".html_safe unless is_authoritative(@entity.entity_uri) %>
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),

@@ -21,9 +21,10 @@ Rails.application.routes.draw do
     get "validate/wikidata", to: "validate#wikidata"
     get "validate", to: "validate#show"
 
-    resources :artifact do
+
+    resources :artifact do 
       collection do
-        get "push_latest"
+        post :push_latest
       end
     end
 
