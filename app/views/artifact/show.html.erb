@@ -25,15 +25,14 @@
 
     <%= link_to "edit", artifact_path(@artifact), class: "btn btn-primary disabled" %>
 
-    <%= link_to "delete",
-    artifact_path(artifactUri: @artifact.uri),
-    local: true,
-    data: {
-      controller: "confirm",
-      action: "submit->confirm#confirm",
-      confirm: "Delete all versions?",
-    },
-    class: "btn btn-danger disabled" %>
+    <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete all versions of #{@artifact.artifact_id}?" } } do |form| %>
+      <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+      <%= form.submit "delete",
+                  class: "btn btn-danger",
+                  data: {
+                    disable_with: "Deleting...",
+                  } %>
+    <% end %>
     <%= link_to "index", artifact_index_path, class: "btn btn-secondary" %>
   </div>
 

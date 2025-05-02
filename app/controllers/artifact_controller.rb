@@ -28,6 +28,21 @@ class ArtifactController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
 
+  # DELETE /artifact?artifactUri=
+  def destroy
+    @artifact_uri = params[:artifactUri]
+    databus_service = DatabusService.new(@artifact_uri, helpers.user_uri)
+    if databus_service.delete_artifact
+      flash.notice = "Deleted all versions of artifact '#{@artifact_uri}' in Databus."
+      redirect_to artifact_index_path
+    else
+      flash.alert = "Could not delete '#{@artifact_uri}' : #{databus_service.errors}."
+      redirect_back(fallback_location: root_path)
+    end
+    
+  end
+
+  
   def new
     @artifact = Artifact.new
   end
