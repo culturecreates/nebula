@@ -14,9 +14,7 @@ Test:
         <%= @entity.card[:locality] ||= display_warning("LOCALITY") %>
         -
         <%= @entity.card[:postal_code] ||= display_warning("POSTAL CODE") %>
-      <% end %>
-
-      <% if type == "http://schema.org/Event" ||   type == "http://schema.org/EventSeries" %>
+      <% elsif type == "http://schema.org/Event" ||   type == "http://schema.org/EventSeries" %>
         -
         <%= @entity.card[:location_name] ||= display_warning("MISSING LOCATION") %>
         -
@@ -25,6 +23,12 @@ Test:
           -
           <%= @entity.card[:day_span] %>
         <% end %>
+      <% elsif @entity.entity_uri.ends_with?(".jpg",".png") %>
+        <img
+          src="<%= @entity.entity_uri %>"
+          class="img-fluid"
+          style="max-height: 100px;"
+        >
       <% else %>
         <% if @entity.card[:disambiguating_description].present? %>
           -

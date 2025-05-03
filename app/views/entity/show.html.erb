@@ -3,13 +3,24 @@
 <% provide(:uri, @entity.entity_uri) %>
 
 <div class="container">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h1 class="me-3">
+        <%= @entity.label&.value&.html_safe %>
+      </h1>
+      <%= render partial: "shared/clipboard", locals: { uri: @entity.entity_uri } %>
+      <%= render partial: "entity_nav" %>
+    </div>
+    <% if @entity.image.present? %>
+      <a href="<%= @entity.image %>"><img
+          src="<%= @entity.image %>"
+          alt="<%= @entity.label&.value %>"
+          class="img-fluid"
+          style="max-height: 100px;"
+        ></a>
+    <% end %>
 
-  <h1>
-    <%= @entity.label&.value&.html_safe %>
-  </h1>
-
-  <%= render partial: "shared/clipboard", locals: { uri: @entity.entity_uri } %>
-  <%= render partial: "entity_nav" %>
+  </div>
 
   <% if @entity.graph.count == 0 %>
     <%= render partial: "external_resource", locals: { entity: @entity } %>
