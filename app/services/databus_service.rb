@@ -66,6 +66,28 @@ class DatabusService
     end
   end
 
+  def get_artifact_uri(artifact_uri)
+    # Check if the artifact_uri is valid
+    if artifact_uri.nil? || artifact_uri.empty?
+      @errors << "Invalid artifact URI."
+      return nil
+    end
+
+    # Parse the artifact_uri to ensure it's a valid URI
+    begin
+      parsed_uri = URI.parse(artifact_uri)
+      if parsed_uri.scheme.nil? || parsed_uri.host.nil?
+        @errors << "Invalid artifact URI format."
+        return nil
+      end
+    rescue URI::InvalidURIError => e
+      @errors << "Invalid artifact URI: #{e.message}"
+      return nil
+    end
+
+    
+  end
+
   def get_latest_version(artifact_uri)
     # Define the API endpoint
     api_endpoint = "#{Rails.application.credentials.artsdata_databus_endpoint}/artifact/latest?artifact=#{CGI.escape(artifact_uri)}"

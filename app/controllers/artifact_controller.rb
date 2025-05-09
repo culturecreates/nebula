@@ -11,9 +11,47 @@ class ArtifactController < ApplicationController
   end
 
   def show
-    artifact_uri = params[:artifactUri]
-    @artifact = Artifact.new
-    @artifact.uri = artifact_uri
+    @artifact = Artifact.find(params[:artifactUri])
+    @automint_status = get_automint_status( @artifact.graph)
+  end
+
+  def get_automint_status(graph)
+    subject = RDF::URI(graph)
+    automint = RDF::URI("http://kg.artsdata.ca/ontology/automint")
+    response = helpers.artsdata_sparql_client.select.where([subject, automint, :o]).execute
+
+    return response.first&.o&.value == "true"
+  end
+  
+  def toggle_auto_minting
+    graph = params[:graph]
+    new_boolean = params[:new_boolean]
+
+ 
+    # Construct the SPARQL query to update the triple
+    query = <<-SPARQL
+      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+      WITH <http://kg.artsdata.ca/Graph_Ranking>
+      DELETE {
+        <#{graph}> <http://kg.artsdata.ca/ontology/automint> ?boolean .
+      }
+      INSERT {
+        <#{graph}> <http://kg.artsdata.ca/ontology/automint> "#{new_boolean.to_s}"^^xsd:boolean  .
+      }
+      WHERE {
+      OPTIONAL {
+          <#{graph}> <http://kg.artsdata.ca/ontology/automint> ?boolean .
+        } 
+      }
+    SPARQL
+
+    begin
+      helpers.artsdata_sparql_update_client.update(query)
+      flash.notice = "Auto-Minting has been #{new_boolean == "true" ? 'enabled' : 'disabled'}."
+    rescue StandardError => e
+      flash.alert = "Failed to toggle Auto-Minting: #{e.message}"
+    end
+    redirect_back(fallback_location: root_path)
   end
 
   # POST /artifact/push_latest

@@ -155,7 +155,11 @@ class Entity
       options = { rdfstar: true, headers: {"User-Agent" => "artsdata-crawler" } }
       @graph = RDF::Graph.load(self.entity_uri, **options)
     rescue StandardError => e
-      raise StandardError, "Could not detect structured data. #{e}"
+      msg = "Could not detect structured data. #{e}"
+      if msg.end_with?("Connection reset by peer")
+        msg += ". The destination may be blocking user-agent: 'artsdata-crawler'"
+      end
+      raise StandardError, msg
     end
   end
 

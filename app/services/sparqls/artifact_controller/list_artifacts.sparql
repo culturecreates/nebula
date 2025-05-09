@@ -24,9 +24,11 @@ WHERE {
                  <http://dataid.dbpedia.org/ns/core#artifact> ?artifact_uri ;
                  <http://purl.org/dc/terms/publisher> ?publisher ;
                  <http://purl.org/dc/terms/hasVersion> ?version .
-        OPTIONAL {
-            ?artifact_uri ado:automint ?auto_mints .
+        BIND(URI(CONCAT("http://kg.artsdata.ca/",STRAFTER(str(?artifact_uri),"/databus/"))) as ?graph_uri)
+        OPTIONAL{
+            ?graph_uri ado:automint ?auto_mints .   
         }
+    
     }
     
     bind(STRAFTER(str(?artifact_uri),CONCAT(?account,"/")) as ?last_part)
@@ -34,4 +36,6 @@ WHERE {
     bind(STRBEFORE(str(?last_part),"/") as ?group)
     bind(concat("<a class='btn btn-primary btn-sm' href='/artifact/show?artifactUri=",ENCODE_FOR_URI(str(?artifact_uri)),"' data-turbo='false'>view</a>") as ?action)
     bind("true" as ?auto_load)
-} group by    ?account  ?group ?auto_load  ?artifact ?action limit 100
+} group by    ?account  ?group ?auto_load  ?artifact ?action 
+order by DESC(?group)
+limit 200

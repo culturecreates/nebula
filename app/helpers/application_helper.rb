@@ -85,8 +85,17 @@ module ApplicationHelper
     "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
   end
 
+  # Use the standard Ruby SPARQL client
+  # TODO: Can the ArtsdataApi::V2::Client be replaced with this?
   def artsdata_sparql_client
     SPARQL::Client.new(sparql_endpoint)
+  end
+
+  def artsdata_sparql_update_client
+    SPARQL::Client.new("#{sparql_endpoint}/statements", headers: {
+        "Authorization" => "Basic #{Rails.application.credentials.graph_db_basic_auth}"
+      }
+    )
   end
 
   # sets a limit on the number of dereferences per table.

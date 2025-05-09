@@ -229,6 +229,7 @@ class MintController < ApplicationController
 
   private
 
+  # Check if the user has access the the minting feature
   def check_minting_access
     ensure_access("minting")
   end

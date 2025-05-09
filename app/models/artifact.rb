@@ -14,7 +14,8 @@ class Artifact
     :link_identifier, 
     :user, 
     :errors, 
-    :artifact_create_action_uri
+    :artifact_create_action_uri,
+    :graph
 
   def initialize(hsh = {}, user = nil)
     hsh.each do |key, value|
@@ -23,9 +24,35 @@ class Artifact
     self.user = user
   end
 
+  def graph 
+     "http://kg.artsdata.ca/#{@account}/#{@group}/#{@artifact_id}"
+  end
+
+  def self.find(artifactUri)
+    @uri = artifactUri
+    artifact = Artifact.new({uri: artifactUri})
+    #artifact.load
+    artifact
+  end
+
+
   def uri=(uri)
     @uri = uri
     @account, @group, @artifact_id = uri.split("/")[4..6]
+  end
+
+  def load
+    # Load the artifact from the databus
+    artifact = RDF::URI(@uri)
+    @graph = RDF::Graph.new
+    response = artsdata_sparql_client.construct([artifact, :p, :o]).where([[artifact, :p, :o]])
+    response.each_statement do |statement|
+      @graph << statement
+    end
+    response = helpers.artsdata_sparql_client.construct([:s, :p, artifact]).where([:s, :p, artifact])
+    response.each_statement do |statement|
+      @graph << statement
+    end
   end
 
   # Save the artifact to the databus using the Artsdata API
