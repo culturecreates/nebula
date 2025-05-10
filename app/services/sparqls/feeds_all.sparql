@@ -5,6 +5,8 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX shacl: <http://www.w3.org/ns/shacl#>
 PREFIX dataid: <http://dataid.dbpedia.org/ns/core#>
+PREFIX ado: <http://kg.artsdata.ca/ontology/>
+
 select  
 (sample(?groups) as ?group)
 (sample(?datasets) as ?dataset) 
@@ -14,6 +16,7 @@ select
 (sample(?person) as ?people) 
 (sample(?place) as ?places) 
 (sample(?graphs) as ?graph)  
+(sample(?automints) as ?automint)
 (sample(?generatedAtTimes) as ?generatedAtTime)
 (sample(?errors) as ?error)
 where 
@@ -50,6 +53,9 @@ where
     }
     OPTIONAL {
         ?dataset_id shacl:results ?errors .
+    }
+    OPTIONAL {
+        ?graphs ado:automint ?automints .
     }
     OPTIONAL{
         ?dataset_id dataid:group ?group_id .
