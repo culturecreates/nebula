@@ -2,6 +2,8 @@
 
 _Version 0.1 (ébauche)_
 
+Le chargement de données dans le graphe de connaissances Artsdata implique un grand nombre de processus de transformation, d’enrichissement et de mise en valeur des données.
+
 Le Contributeur qui accepte de fournir des données au graphe de connaissance Artsdata autorise le personnel d’Artsdata<sup>1</sup> à procéder aux activités d’extraction-transformation-chargement (ETC) des données suivantes :
 
 - Extraire les données avec l’option technologique la plus appropriée selon les circonstances du Contributeur (voir la liste des [techniques d’extraction](https://culturecreates.github.io/artsdata-data-model/architecture/overview.fr.html#fournisseurs-de-donn%C3%A9es)).
