@@ -7,11 +7,11 @@ class ResourceController < ApplicationController
   # TODO: Try to replace this with rack/content_netgotiation
   def show
     uri = "http://kg.artsdata.ca" + request.path # allow testing on domains like localhost
-    format =  if request.headers['Accept'].include?('application/rdf+xml')
+    format =  if request.headers['Accept']&.include?('application/rdf+xml')
                 :rdf
-              elsif request.headers['Accept'].include?('application/ld+json')
+              elsif request.headers['Accept']&.include?('application/ld+json')
                 :jsonld 
-              elsif request.headers['Accept'].include?('text/turtle')
+              elsif request.headers['Accept']&.include?('text/turtle')
                 :ttl
               else
                 :html
