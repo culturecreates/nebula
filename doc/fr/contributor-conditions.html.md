@@ -19,6 +19,11 @@ Le Contributeur qui accepte de fournir des données au graphe de connaissance Ar
   - Lier les entités secondaires identifiables (par exemple, des personnes, des organismes ou de lieux) à des [identifiants pérennes](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.fr.html) existants (identifiant Artsdata, identifiant Wikidata, ISNI) ;
   - Intégrer des points de données additionnels récupérés par le biais des identifiants pérennes. 
 
+Les données chargées dans Artsdata sont mises en valeur par les [consommateurs de données d’Artsdata](https://kg.artsdata.ca/fr/doc/data-consumers). Elles peuvent aussi être indexées, lues ou extraites par les moteurs de recherche et d’autres tiers. 
+
+Artsdata ne fournit aucune garantie et n’assume aucune responsabilité en regard de l’utilisation des données chargées dans Artsdata.
+
+
 Pour toutes questions à propos de ces conditions, veuillez contacter l’équipe d’Artsdata à artsdata@capacoa.ca. 
 
 <sup>1</sup> Par _personnel d’Artsdata_, on entend le personnel de CAPACOA, de La culture crée et/ou tout autre tiers autorisé à contribuer à l’intendance graphe de connaissances Artsdata.
