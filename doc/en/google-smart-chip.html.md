@@ -34,8 +34,6 @@ If you have any questions or concerns about this privacy policy, please contact 
 
 How users can get help
 -----------------
-How users can get help
------------------
 If you need assistance with the Artsdata Google Smart-Chip add-on, the Artsdata Stewards are here to help. You can reach out to them for support, feedback, or any questions related to the add-on.
 
 For support, please contact us via email at **support@artsdata.ca**. We aim to respond to all inquiries within 2-3 business days.
