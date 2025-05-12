@@ -25,6 +25,9 @@
                     disable_with: "Pushing...",
                   } %>
     <% end %>
+    <%= link_to "create new version",
+    artifact_path(@artifact),
+    class: "btn btn-secondary disabled" %>
 
     <%= link_to "edit", artifact_path(@artifact), class: "btn btn-secondary disabled" %>
 
