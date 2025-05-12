@@ -94,8 +94,8 @@ class Artifact
     elsif self.type == "website"
       @group = "artsdata-orion"
       action_name = "Create an artifact version of the #{@artifact_id} website."
-      # artsdata-pipeline-action
-      action_url = "https://api.github.com/repos/culturecreates/artsdata-pipeline-action/actions/workflows/custom-crawl-test.yml/dispatches"
+      # artsdata-stewards/artsdata-orion
+      action_url = "https://api.github.com/repos/artsdata-stewards/artsdata-orion/actions/workflows/orion-json-ld-website.yml/dispatches"
       httpBody = {
         ref: "main",
         inputs: {
@@ -121,7 +121,7 @@ class Artifact
       action_name: action_name,
       action_url: action_url,
       action_body: httpBody.to_json,
-      publisher: publisher
+      publisher: @publisher
     }
     response = HTTParty.post("#{databus_endpoint}/artifact", 
       body: body.to_json,
