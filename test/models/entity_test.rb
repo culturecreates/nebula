@@ -9,4 +9,11 @@ class EntityTest < ActiveSupport::TestCase
    
   end
 
+  test "graph_api_endpoint is correctly set"  do
+    expected_endpoint = "http://db.artsdata.ca"
+    actual_endpoint = Rails.application.credentials.graph_api_endpoint
+    assert_equal expected_endpoint, actual_endpoint, "The graph_api_endpoint is not correctly set in credentials"
+  end
+ 
+
 end
