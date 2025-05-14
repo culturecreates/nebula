@@ -10,7 +10,7 @@ SELECT
   ?startDate 
   ?endDate 
   (sample(?sameas_action) as ?artsdata)  
-  (sample(?resultSeverity) as ?conforms) 
+  (max(?resultSeverity) as ?conforms) 
 WHERE {
     ?uri a schema:Event .
     graph <GRAPH_PLACEHOLDER> {
@@ -57,4 +57,4 @@ WHERE {
     
 
 } GROUP BY ?uri  ?normalizedStartDate ?startDate   ?endDate 
-ORDER BY DESC(?normalizedStartDate) DESC(?resultSeverity)
+ORDER BY DESC(?normalizedStartDate) 
