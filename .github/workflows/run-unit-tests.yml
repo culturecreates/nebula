@@ -18,6 +18,7 @@ jobs:
           bundler-cache: true
 
       - name: Run tests
-        run: bundle exec rails test
         env:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+        run: bundle exec rails test
+        
