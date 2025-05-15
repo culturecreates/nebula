@@ -1,7 +1,7 @@
 class MintController < ApplicationController
   before_action :check_minting_access # ensure user has permissions
   before_action :set_authority, only: [:preview, :link, :link_facts] # known as publisher in Artsdata API
-  before_action :temporarily_disable, only: [:wikidata] # disable feature for maintenance
+  # before_action :temporarily_disable, only: [:wikidata] # disable feature for maintenance
   include DereferenceHelper 
 
   # Preview data and SHACL report before minting a new Artsdata URI
