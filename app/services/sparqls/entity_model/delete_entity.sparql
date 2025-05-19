@@ -1,0 +1,46 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX adr: <http://kg.artsdata.ca/resource/>
+
+# DANGER: ONLY USE THIS SPARQL IF YOU KNOW WHAT YOU ARE DOING
+# This SPARQL deletes all the entities relationships forwards, blank nodes, annotations, and blank node annotations.
+# It also deletes inverse sameAs relationships, annotations, and blank node annotations.
+delete {
+    graph ?g {
+        ?id ?p ?o .
+        ?o ?bn_p ?bn_o .
+        <<  ?id ?p ?o >> ?a ?b .
+        ?b ?bn_pb ?bn_ob .
+        ?x schema:sameAs ?id .
+        << ?x schema:sameAs ?id >> ?xa ?xb .
+        ?xb ?bn_px ?bn_ox .
+    }
+}
+where {
+    values ?id {
+        <URI_PLACEHOLDER>
+    }
+    graph ?g {
+        ?id ?p ?o .
+        OPTIONAL {
+            <<  ?id ?p ?o >> ?a ?b .
+            OPTIONAL {
+                ?b ?bn_pb ?bn_ob .
+                filter(isBlank(?b))
+            }
+        }
+        OPTIONAL {
+            ?o ?bn_p ?bn_o .
+            filter(isBlank(?o))
+        }
+        ?x schema:sameAs ?id .
+        OPTIONAL {
+            << ?x schema:sameAs ?id >> ?xa ?xb .
+            OPTIONAL {
+                ?xb ?bn_px ?bn_ox .
+                filter(isBlank(?xb))
+            }
+        }
+    }
+}
