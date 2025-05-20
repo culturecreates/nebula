@@ -45,6 +45,7 @@ Save the updated robots.txt file and upload it to the root directory of your web
 Use tools like Google Search Console’s Robots Testing Tool or other online robots.txt validators to ensure your configuration is correct. 
 
 You can also do a test by:
+
 1. copy a url with an event on your website
 2. go https://kg.artsdata.ca
 3. paste your event url into the search box (top right) and click the Search button
