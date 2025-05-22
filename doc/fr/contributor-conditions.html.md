@@ -23,7 +23,7 @@ Le Contributeur qui accepte de fournir des données au graphe de connaissance Ar
   - Lier les entités secondaires identifiables (par exemple, des personnes, des organismes ou de lieux) à des [identifiants pérennes](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.fr.html) existants (identifiant Artsdata, identifiant Wikidata, ISNI) ;
   - Intégrer des points de données additionnels récupérés par le biais des identifiants pérennes. 
 
-Les données chargées dans Artsdata sont mises en valeur par les [consommateurs de données d’Artsdata](https://kg.artsdata.ca/fr/doc/data-consumers). Elles peuvent aussi être indexées, lues, copiées et/ou entreposées par les moteurs de recherche et d’autres tiers, tel qu’autorisé par la license CC0 1.0 Universal.
+Les données chargées dans Artsdata sont mises en valeur par les [consommateurs de données d’Artsdata](https://kg.artsdata.ca/fr/doc/data-consumers). Elles peuvent aussi être indexées, lues, copiées et/ou entreposées par les moteurs de recherche et d’autres tiers, tel qu’autorisé par la license [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.fr).
 
 Artsdata ne fournit aucune garantie et n’assume aucune responsabilité en regard de l’utilisation des données chargées dans Artsdata.
 
