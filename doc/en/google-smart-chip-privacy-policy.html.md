@@ -10,4 +10,4 @@ The Artsdata Google Smart-Chip add-on respects your privacy and is designed to h
 6. **Security**: The add-on is designed to operate within the secure environment of Google Workspace, adhering to its security and privacy standards.
 7. **Changes to Privacy Policy**: Artsdata reserves the right to update this privacy policy at any time. Continued use of the add-on constitutes acceptance of any changes.
 
-If you have any questions or concerns about this privacy policy, please contact support (see the "How users can get help" section below).
+If you have any questions or concerns about this privacy policy, please contact support (see the section "How users can get help" in the [Overview](google-smart-chip.html)).

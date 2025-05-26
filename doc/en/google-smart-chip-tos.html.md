@@ -10,3 +10,8 @@ By using the Artsdata Google Smart-Chip add-on, you agree to the following terms
 6. **Termination**: Artsdata reserves the right to terminate access to the add-on at any time for any reason.
 
 By using this add-on, you acknowledge that you have read and understood these terms.
+
+Related
+--------
+- [Privacy Policy](google-smart-chip-privacy-policy.html)
+- [Overview](google-smart-chip.html)
