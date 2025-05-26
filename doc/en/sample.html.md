@@ -5,7 +5,7 @@ Some text lorem ipsum.
 ## Sub-heading 1
 
 Some text lorem ipsum.
-[Link](https://kg.artsdata.ca/doc/data_consumers) to another page works for both languages.
+[Link](https://kg.artsdata.ca/doc/data-consumers) to another page works for both languages.
 
 ### Sub-heading 2
 Some text loerm ipsum.
