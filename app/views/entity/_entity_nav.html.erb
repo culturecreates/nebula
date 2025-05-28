@@ -27,6 +27,12 @@
         rel: "nofollow" %>
         |
       <% end %>
+      <% if aggregator_place_v2_link(@entity) %>
+        <%= link_to "Aggregator Place V2",
+        dereference_external_path(uri: aggregator_place_v2_link(@entity)),
+        rel: "nofollow" %>
+        |
+      <% end %>
       <% if capacoa_ranked_link(@entity) %>
         <%= link_to "CAPACOA view",
         dereference_external_path(uri: capacoa_ranked_link(@entity)),
