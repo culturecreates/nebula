@@ -17,6 +17,24 @@ class GithubService
     parse_response(result)
   end
 
+  # Class service to fetch information from GitHub API about the workflow schedule
+  # TODO: call this from show artifact controller
+  def self.schedule(workflow_url = nil)
+    workflow_url ||= "https://api.github.com/repos/culturecreates/artsdata-orion/contents/.github/workflows/agoradanse-events.yml"
+    uri = URI(workflow_url)
+    json = info(nil, uri)
+    return "No workflow found." if !json["content"]
+
+    content = Base64.decode64(json["content"])
+    yaml = YAML.load(content)
+    schedule = yaml.dig(true, "schedule") || []
+    return  "No cron schedule found in workflow." if schedule.empty?
+     
+    crons = []
+    schedule.each { |s|  crons << s["cron"] }
+    "Cron schedule: #{crons.join(', ')}"
+  end
+
   def self.parse_response(response)
     case response
     when Net::HTTPOK
