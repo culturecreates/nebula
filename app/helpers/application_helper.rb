@@ -150,29 +150,22 @@ module ApplicationHelper
   end
 
   def dump_jsonld(subject, graph)
-    # Construct the SPARQL query
-    sparql_string = <<~SPARQL
-      CONSTRUCT {
-       ?s ?p ?o .
-       ?o2 ?p2 ?o3 .
-      }
-      WHERE {
-        #{subject.to_s} a <http://schema.org/Place> ; ?p ?o .
-        BIND(URI("http://subgraph.com") as ?s)
-        OPTIONAL {
-           #{subject.to_s} ?p ?o2 .
-          filter(isBLANK(?o2))
-          ?o2 ?p2 ?o3 .
-        }
-      }
-    SPARQL
-
-    # Execute the query
-    sparql = SPARQL.parse(sparql_string)
-    sub_graph = sparql.execute(graph)
-    puts "subject: #{subject.to_s}"
-    puts "sub_graph: #{sub_graph.dump(:jsonld, standard_prefixes: true)}"
- 
+    solutions = graph.query([subject, nil, nil])
+    sub_graph = RDF::Graph.new
+    solutions.each do |solution|
+      # For each solution, we need to check if the object is a blank node
+      if solution.object.is_a?(RDF::Node)
+        # If it is a blank node, we need to find all triples where this blank node is the subject
+        sub_solutions = graph.query([solution.object, nil, nil])
+        sub_solutions.each do |sub_solution|
+          # Add these triples to the main graph
+          sub_graph << sub_solution
+        end
+      else
+        # If it's not a blank node, just add the original triple to the sub_graph
+        sub_graph << solution
+      end
+    end
      # Serialize the graph into JSON-LD
     sub_graph.dump(:jsonld, standard_prefixes: true)
  

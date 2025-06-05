@@ -60,7 +60,7 @@ class EntityController < ApplicationController
         @target_types = [
      #     RDF::Vocab::SCHEMA.Event, 
      #     RDF::Vocab::SCHEMA.Person,
-     #     RDF::Vocab::SCHEMA.Organization,
+         RDF::Vocab::SCHEMA.Organization,
      #     RDF::Vocab::SCHEMA.PerformingGroup,
           RDF::Vocab::SCHEMA.Place
       ]

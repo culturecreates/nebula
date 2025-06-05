@@ -17,6 +17,7 @@ if there is already a sameAs to Artsdata ID-->
                             required: true %>
             <%= form.hidden_field :externalReference, value: @entity.graph_uri %>
             <%= form.hidden_field :facts, value: dump_jsonld(subject, graph) %>
+            <%= form.hidden_field :classToMint, value: (@target_types & node_types).first %>
             <%= form.submit "Add sameAs", class: "btn btn-sm btn-secondary" %>
           <% end %>
         </div>

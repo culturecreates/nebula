@@ -117,12 +117,12 @@ class MintController < ApplicationController
   # Link a blank node to an existing Artsdata URI
   # POST /mint/link_facts 
   def link_facts
-    required = [:facts, :adUri, :externalReference]
+    required = [:facts, :adUri, :externalReference, :classToMint]
     if required.all? { |k| params.key? k }
       facts = params[:facts]
       externalReference = params[:externalReference]
       adUri = params[:adUri]
-      classToLink = "http://schema.org/Place" # if params[:classToMint].starts_with?("http") 
+      classToLink = params[:classToMint] # if params[:classToMint].starts_with?("http") 
       #                   params[:classToMint]
       #                 else
       #                   "http://schema.org/" + params[:classToMint]
