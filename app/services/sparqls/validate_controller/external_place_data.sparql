@@ -1,79 +1,76 @@
- CONSTRUCT { 
-        <EXTERNAL_URI> a schema:Place ; 
-        schema:additionalType ?additionalType ;
-        schema:name ?name ; 
-        schema:sameAs ?aduri ;
-        schema:url ?url ;
-        schema:sameAs ?isniuri , ?music_brainz ;
-        schema:description ?desc ;
-        schema:address ?bn .
-        ?bn a schema:PostalAddress ;
-          schema:streetAddress ?address ;
-          schema:addressLocality ?territoryLabel ;
-          schema:addressCountry ?countryLabel ;
-          schema:addressRegion ?prov_code ;
-          schema:postalCode ?postalCode .
-      } 
-      WHERE { 
-        bind(BNODE() as ?bn)
+CONSTRUCT { 
+      <EXTERNAL_URI> a schema:Place ; 
+      schema:additionalType ?additionalType ;
+      schema:name ?name ; 
+      schema:url ?url ;
+      schema:sameAs ?aduri, ?isni, ?music_brainz ;
+      schema:description ?desc ;
+      schema:address ?bn .
+      ?bn a schema:PostalAddress ;
+        schema:streetAddress ?address ;
+        schema:addressLocality ?territoryLabel ;
+        schema:addressCountry ?countryLabel ;
+        schema:addressRegion ?prov_code ;
+        schema:postalCode ?postalCode .
+} 
+WHERE { 
+  bind(BNODE() as ?bn)
+
+  <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P31> ?additionalType . 
+
+  OPTIONAL {
+    <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
+    filter (lang(?name) = 'en' || lang(?name) = 'fr' )
+  }
+
+  OPTIONAL {
+    <EXTERNAL_URI> schema:description ?desc . 
+    filter (lang(?desc) = 'en' || lang(?desc) = 'fr')
+  }
     
-        <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P31> ?additionalType . 
+  OPTIONAL { 
+    <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P6375> ?address . 
+    filter (lang(?address) = 'en' || lang(?address) = 'fr'  || lang(?address) = '')
+  }
 
-        OPTIONAL {
-          <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
-          filter (lang(?name) = 'en' || lang(?name) = 'fr' )
-        }
-      
-        OPTIONAL {
-          <EXTERNAL_URI> schema:description ?desc . 
-          filter (lang(?desc) = 'en' || lang(?desc) = 'fr')
-        }
-          
-        OPTIONAL { 
-          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P6375> ?address . 
-          filter (lang(?address) = 'en' || lang(?address) = 'fr'  || lang(?address) = '')
-        }
+  # Country
+  OPTIONAL { 
+    <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P17> ?country . 
+    ?country <http://www.w3.org/2000/01/rdf-schema#label> ?countryLabel .
+    filter (lang(?countryLabel) = 'en' || lang(?countryLabel) = 'fr' )
+  }
+  
+  # located in the administrative territorial entity (P131)
+  OPTIONAL { 
+    <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P131> ?territory . 
+    ?territory <http://www.w3.org/2000/01/rdf-schema#label> ?territoryLabel .
+    filter (lang(?territoryLabel) = 'en' || lang(?territoryLabel) = 'fr' )
+    OPTIONAL { # Province
+      ?territory wdt:P131* ?prov .
+      ?prov wdt:P31 wd:Q11828004 .
+      ?prov wdt:P300 ?code .
+      bind(strafter(?code,"-") as ?prov_code )
+    }
+  }
+  
+  # postalCode (P281)
+  OPTIONAL { 
+    <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P281> ?postalCode . 
+  }
+  OPTIONAL { 
+    <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P856> ?url .
+  }
 
-        # Country
-        OPTIONAL { 
-          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P17> ?country . 
-          ?country <http://www.w3.org/2000/01/rdf-schema#label> ?countryLabel .
-          filter (lang(?countryLabel) = 'en' || lang(?countryLabel) = 'fr' )
-        }
-        
-        # located in the administrative territorial entity (P131)
-        OPTIONAL { 
-          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P131> ?territory . 
-          ?territory <http://www.w3.org/2000/01/rdf-schema#label> ?territoryLabel .
-          filter (lang(?territoryLabel) = 'en' || lang(?territoryLabel) = 'fr' )
-          OPTIONAL { # Province
-            ?territory wdt:P131* ?prov .
-            ?prov wdt:P31 wd:Q11828004 .
-            ?prov wdt:P300 ?code .
-            bind(strafter(?code,"-") as ?prov_code )
-          }
-        }
-        
-        # postalCode (P281)
-        OPTIONAL { 
-          <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P281> ?postalCode . 
-        }
-
-        OPTIONAL { 
-          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P7627> ?adid  .
-          BIND (URI(CONCAT("http://kg.artsdata.ca/resource/",?adid)) as ?aduri) 
-        }
-       
-        OPTIONAL { 
-          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P856> ?url .
-        }
-
-        OPTIONAL { 
-          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P213> ?isni .
-          BIND (URI(CONCAT("https://isni.org/isni/",?isni)) as ?isniuri)
-        }
-
-        OPTIONAL { 
-          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct-normalized/P1004> ?music_brainz .
-        }
-      }
+  # Identifiers
+  OPTIONAL { 
+    <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P7627> ?adid  .
+    BIND (URI(CONCAT("http://kg.artsdata.ca/resource/",?adid)) as ?aduri) 
+  }
+  OPTIONAL { 
+    <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P213> ?isni_id .
+    BIND (URI(CONCAT("https://isni.org/isni/",?isni_id)) as ?isni)
+  }
+  OPTIONAL { 
+    <EXTERNAL_URI> <http://www.wikidata.org/prop/direct-normalized/P1004> ?music_brainz .
+  }
+}
