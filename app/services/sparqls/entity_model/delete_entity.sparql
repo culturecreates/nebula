@@ -34,12 +34,14 @@ where {
             ?o ?bn_p ?bn_o .
             filter(isBlank(?o))
         }
-        ?x schema:sameAs ?id .
         OPTIONAL {
-            << ?x schema:sameAs ?id >> ?xa ?xb .
+            ?x schema:sameAs ?id .
             OPTIONAL {
-                ?xb ?bn_px ?bn_ox .
-                filter(isBlank(?xb))
+                << ?x schema:sameAs ?id >> ?xa ?xb .
+                OPTIONAL {
+                    ?xb ?bn_px ?bn_ox .
+                    filter(isBlank(?xb))
+                }
             }
         }
     }
