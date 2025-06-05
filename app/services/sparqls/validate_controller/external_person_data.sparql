@@ -4,11 +4,11 @@
         schema:sameAs ?aduri ;
         schema:description ?desc ;
         schema:gender ?gender ;
-        schema:occupation ?occupation ;
+        schema:hasOccupation ?occupation ;
         schema:birthDate ?birth_date ;
         schema:birthPlace ?birth_place ;
         schema:url ?url ;
-        schema:sameAs ?isniuri , ?music_brainz .
+        schema:sameAs ?isni , ?music_brainz, ?spotify_artist .
       } 
       WHERE { 
         <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
@@ -19,18 +19,25 @@
           filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
         }
           
-        OPTIONAL { 
-          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P7627> ?adid  .
-          BIND (URI(CONCAT("http://kg.artsdata.ca/resource/",?adid)) as ?aduri) 
-        }
+        
         OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P21> ?gender .}
         OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P106> ?occupation .}
         OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P19> ?birth_place .}
         OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P569> ?birth_date .}
         OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P856> ?url .}
+        
+        # Identifiers
         OPTIONAL { 
-          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P213> ?isni .
-          BIND (URI(CONCAT("https://isni.org/isni/",?isni)) as ?isniuri)
+          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P7627> ?adid  .
+          BIND (URI(CONCAT("http://kg.artsdata.ca/resource/",?adid)) as ?aduri) 
+        }
+        OPTIONAL { 
+          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P213> ?isni_id .
+          BIND (URI(CONCAT("https://isni.org/isni/",?isni)) as ?isni)
+        }
+        OPTIONAL { 
+          <EXTERNAL_URI> <http://www.wikidata.org/prop/direct/P1902> ?spotify_artist_id .
+          BIND (URI(CONCAT("https://open.spotify.com/artist/",?spotify_artist_id)) as ?spotify_artist)
         }
         OPTIONAL { <EXTERNAL_URI> <http://www.wikidata.org/prop/direct-normalized/P434> ?music_brainz .}
       }
