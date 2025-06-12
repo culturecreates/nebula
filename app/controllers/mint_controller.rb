@@ -24,7 +24,7 @@ class MintController < ApplicationController
 
       # get extra data about the entity when only externalUri is provided
       # Need: 
-      # - reference (i.e. artifact)
+      # - reference (i.e. graph URI that contains external URI)
       # - label (i.e. name)
       # - language (of name)
       # - classToMint (i.e. type)
@@ -220,7 +220,7 @@ class MintController < ApplicationController
       @label = solutions.map { |s| s.label.to_s if s.bound?(:label) }.first 
       @description = solutions.map { |s| s.desc.to_s if s.bound?(:desc) }.first 
       @language = "en"
-      @reference = "http://www.wikidata.org/entity/#{params[:uri]}"
+      @reference = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
     end
 
