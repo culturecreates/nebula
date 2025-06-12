@@ -1,7 +1,12 @@
 module MintHelper
 
+  # 
   def classToReconcile(classToMint)
-    if classToMint.value == "http://schema.org/Person" || classToMint.value == "http://schema.org/Organization"
+    if classToMint.class == RDF::URI
+      classToMint = classToMint.value
+    end
+
+    if classToMint == "http://schema.org/Person" || classToMint == "http://schema.org/Organization"
       "dbo:Agent"
     else
       classToMint
