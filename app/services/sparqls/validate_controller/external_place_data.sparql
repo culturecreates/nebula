@@ -3,7 +3,7 @@ CONSTRUCT {
       schema:additionalType ?additionalType ;
       schema:name ?name ; 
       schema:url ?url ;
-      schema:sameAs ?aduri, ?isni, ?music_brainz ;
+      schema:sameAs ?aduri, ?isni, ?music_brainz, <EXTERNAL_URI>;
       schema:description ?desc ;
       schema:address ?bn .
       ?bn a schema:PostalAddress ;

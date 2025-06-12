@@ -1,11 +1,10 @@
  CONSTRUCT { 
         <EXTERNAL_URI> a schema:Organization ; 
         schema:name ?name ; 
-        schema:sameAs ?aduri ;
+        schema:sameAs ?aduri, ?isni, ?spotify_artist, ?music_brainz , <EXTERNAL_URI> ;
         schema:description ?desc ;
         schema:url ?url ;
-        schema:location ?country, ?territory;
-        schema:sameAs ?isni, ?spotify_artist, ?music_brainz .
+        schema:location ?country, ?territory  .
       } 
       WHERE { 
         <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
