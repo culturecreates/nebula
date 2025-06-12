@@ -59,21 +59,51 @@
 
     </div>
   </div>
-  <div class="col-md">
+  <div class="col-md" style="height: 1000px; overflow-y: auto;">
     <!-- Second column content goes here -->
     <p>Reconciliation check:</p>
-    <ul>
-      <li><%= @label %></li>
-      <li><%= @classToMint %></li>
-      <%= "<li> #{@postalCode}</li>".html_safe if @postalCode %>
-      <%= "<li> #{@startDate}</li>".html_safe if @startDate %>
-    </ul>
+    <%= form_with url: reconcile_query_path, method: :get, local: false, class: "form-inline", data: { turbo_frame: "recon_results" } do |form| %>
+      <div class="mb-1 row">
+        <%= form.label :query, "Name", class: "col-sm-1 col-form-label" %>
+        <div class="col-sm-11">
+          <%= form.text_field :query, value: @label, class: "form-control" %>
+        </div>
+      </div>
+      <div class="mb-1 row">
+        <%= form.label :type, "Type", class: "col-sm-1 col-form-label" %>
+        <div class="col-sm-11">
+          <%= form.text_field :type,
+                          value: classToReconcile(@classToMint),
+                          class: "form-control" %>
+        </div>
+      </div>
+      <% if @postalCode %>
+        <div class="mb-1 row">
+          <%= form.label :postalCode, "Postal", class: "col-sm-1 col-form-label" %>
+          <div class="col-sm-11">
+            <%= form.text_field :postalCode, value: @postalCode, class: "form-control" %>
+          </div>
+        </div>
+      <% end %>
+      <% if false %>
+        <div class="mb-1 row">
+          <%= form.label :startDate, "Start", class: "col-sm-1 col-form-label" %>
+          <div class="col-sm-11">
+            <%= form.text_field :startDate, value: @startDate, class: "form-control me-3" %>
+          </div>
+        </div>
+      <% end %>
+      <%= form.hidden_field :externalUri, value: @externalUri %>
+      <div class="text-center">
+        <%= form.submit "Reconcile", class: "btn btn-sm btn-outline-dark mb-3" %>
+      </div>
+    <% end %>
     <!-- HACK: Remove commas from @label (@label.gsub(","," ")) to avoid
     triggering Application Firewalls (WAF) like Securi even with percent
     encoding. This may be removed if there is no WAF problem. -->
     <turbo-frame
       id='recon_results'
-      src="<%= reconcile_query_path(query: @label&.gsub(","," "), type: @classToMint, externalUri: @externalUri, postalCode: @postalCode)%>"
+      src="<%= reconcile_query_path(query: @label&.gsub(","," "), type: classToReconcile(@classToMint), externalUri: @externalUri, postalCode: @postalCode)%>"
       loading="lazy"
       target="_top"
     >
