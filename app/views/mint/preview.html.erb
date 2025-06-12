@@ -66,7 +66,11 @@
       <div class="mb-1 row">
         <%= form.label :query, "Name", class: "col-sm-1 col-form-label" %>
         <div class="col-sm-11">
-          <%= form.text_field :query, value: @label, class: "form-control" %>
+          <%= form.text_field :query,
+                          value: @label,
+                          class: "form-control",
+                          autocomplete: "off",
+                          spellcheck: "false" %>
         </div>
       </div>
       <div class="mb-1 row">
@@ -74,14 +78,20 @@
         <div class="col-sm-11">
           <%= form.text_field :type,
                           value: classToReconcile(@classToMint),
-                          class: "form-control" %>
+                          class: "form-control",
+                          autocomplete: "off",
+                          spellcheck: "false" %>
         </div>
       </div>
       <% if @postalCode %>
         <div class="mb-1 row">
           <%= form.label :postalCode, "Postal", class: "col-sm-1 col-form-label" %>
           <div class="col-sm-11">
-            <%= form.text_field :postalCode, value: @postalCode, class: "form-control" %>
+            <%= form.text_field :postalCode,
+                            value: @postalCode,
+                            class: "form-control",
+                            autocomplete: "off",
+                            spellcheck: "false" %>
           </div>
         </div>
       <% end %>
