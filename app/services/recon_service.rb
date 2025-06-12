@@ -12,10 +12,10 @@ class ReconService
         }
       }
    
-    if params[:type]
+    if params[:type].presence
       query["q0"]["type"] = params[:type]
     end
-    if params[:postalCode] 
+    if params[:postalCode].presence 
       if params[:type].downcase.include?("event")
         query["q0"]["properties"] = [{pid: "schema:location/schema:address/schema:postalCode", v: params[:postalCode]}]
       else
