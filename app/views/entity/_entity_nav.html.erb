@@ -1,11 +1,17 @@
-<div class="alternate-name">
+<div class="alternate-name d-flex align-items-center mt-1">
   <% if !@entity.entity_uri.starts_with?("http://kg.artsdata.ca/") %>
     <%= link_to "Dereference",
     dereference_external_path(uri: @entity.entity_uri),
+    class: "text-decoration-none me-2",
     rel: "nofollow" %>
     |
-    <a href="<%= @entity.entity_uri %>" rel="nofollow">
-      Visit</a>
+    <a
+      href="<%= @entity.entity_uri %>"
+      class="text-decoration-none ms-2 me-2"
+      rel="nofollow"
+    >
+      Visit
+    </a>
     <% if user_has_access?("cms_links") %>
       |
       <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
@@ -14,28 +20,34 @@
     <% end %>
     |
   <% else %>
+    <%= render partial: "entity/download_dropdown", locals: { entity: @entity } %>
+    |
     <% if user_has_access?("ranked_links") %>
       <% if ranked_link(@entity) %>
         <%= link_to "Ranked",
         dereference_external_path(uri: ranked_link(@entity)),
+        class: "text-decoration-none ms-2 me-2",
         rel: "nofollow" %>
         |
       <% end %>
       <% if cms_ranked_link(@entity) %>
         <%= link_to "CMS view",
         dereference_external_path(uri: cms_ranked_link(@entity)),
+        class: "text-decoration-none ms-2 me-2",
         rel: "nofollow" %>
         |
       <% end %>
       <% if aggregator_place_v2_link(@entity) %>
         <%= link_to "Aggregator Place V2",
         dereference_external_path(uri: aggregator_place_v2_link(@entity)),
+        class: "text-decoration-none ms-2 me-2",
         rel: "nofollow" %>
         |
       <% end %>
       <% if capacoa_ranked_link(@entity) %>
         <%= link_to "CAPACOA view",
         dereference_external_path(uri: capacoa_ranked_link(@entity)),
+        class: "text-decoration-none ms-2 me-2",
         rel: "nofollow" %>
         |
       <% end %>
@@ -45,19 +57,21 @@
     href="#"
     onclick="alert('Wikidata style discussion coming soon.');"
     id="aduriapi"
+    class="text-decoration-none ms-2 me-2"
+    rel="nofollow"
   >Discussion</a>
   |
-  <%= link_to "JSON",
-  entity_path(uri: @entity.entity_uri, format: :jsonld),
-  data: {
-    turbo_prefetch: false,
-  } %>
-  |
-  <a href="<%= graphdb_link(@entity.entity_uri) %>" rel="nofollow" id="graphdb">GraphDB</a>
+  <a
+    href="<%= graphdb_link(@entity.entity_uri) %>"
+    class="text-decoration-none ms-2 me-2"
+    rel="nofollow"
+    id="graphdb"
+  >GraphDB</a>
   <% if session[:name] %>
     |
     <%= link_to "minter",
     mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
+    class: "text-decoration-none ms-2 me-2",
     rel: "nofollow" %>
   <% end %>
 </div>

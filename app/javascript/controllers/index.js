@@ -22,8 +22,10 @@ application.register("sortable-table", SortableTableController)
 import FilterQueryResultsController from "controllers/filter_query_results_controller"
 application.register("filter-query-results", FilterQueryResultsController)
 
-import Clipboard from '@stimulus-components/clipboard'
-application.register('clipboard', Clipboard)
+// import Clipboard from '@stimulus-components/clipboard'
+// application.register('clipboard', Clipboard)
+import CustomClipboardController from "controllers/custom_clipboard_controller"
+application.register('clipboard', CustomClipboardController)
 
 import ReadMore from '@stimulus-components/read-more'
 application.register('read-more', ReadMore)
