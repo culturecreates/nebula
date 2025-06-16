@@ -1,0 +1,50 @@
+{
+  "@context": "http://schema.org",
+  "@type": [
+    "Place",
+    "VirtualLocation"
+  ],
+  "@explicit": true,
+  "name": {
+    "@value": {}
+  },
+  "address": {
+    "@type": [
+      "PostalAddress"
+    ],
+    "@explicit": true,
+    "addressCountry": {
+      "@value": {}
+    },
+    "addressRegion": {
+      "@value": {}
+    },
+    "addressLocality": {
+      "@value": {}
+    },
+    "postalCode": {
+      "@value": {}
+    },
+    "streetAddress": {
+      "@value": {}
+    }
+  },
+  "sameAs": {},
+  "url": {},
+  "longitude": {
+    "@value": {}
+  },
+  "latitude": {
+    "@value": {}
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "@explicit": true,
+    "latitude": {
+      "@value": {}
+    },
+    "longitude": {
+      "@value": {}
+    }
+  }
+}

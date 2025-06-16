@@ -1,0 +1,142 @@
+{
+  "@context": "http://schema.org",
+  "@type": [
+    "Event",
+    "EventSeries"
+  ],
+  "@explicit": true,
+  "@omitDefault": true,
+  "additionalType": {
+    "@type": "skos:Concept",
+    "@explicit": true,
+    "@omitDefault": true,
+    "skos:prefLabel": {
+      "@value": {}
+    },
+    "skos:hiddenLabel": {
+      "@value": {}
+    }
+  },
+  "name": {
+    "@value": {}
+  },
+  "sameAs": {},
+  "startDate": {},
+  "location": {
+    "@type": [
+      "Place",
+      "VirtualLocation"
+    ],
+    "@explicit": true,
+    "name": {
+      "@value": {}
+    },
+    "address": {
+      "@type": [
+        "PostalAddress"
+      ],
+      "@explicit": true,
+      "addressCountry": {
+        "@value": {}
+      },
+      "addressRegion": {
+        "@value": {}
+      },
+      "addressLocality": {
+        "@value": {}
+      },
+      "postalCode": {
+        "@value": {}
+      },
+      "streetAddress": {
+        "@value": {}
+      }
+    },
+    "sameAs": {},
+    "url": {}
+  },
+  "endDate": {},
+  "eventStatus": {},
+  "eventAttendanceMode": {},
+  "description": {
+    "@value": {}
+  },
+  "url": {},
+  "image": {
+    "@type": "ImageObject",
+    "@explicit": true,
+    "url": {},
+    "height": {},
+    "width": {},
+    "description": {
+      "@value": {}
+    },
+    "disambiguatingDescription": {
+      "@value": {}
+    },
+    "creditText": {
+      "@value": {}
+    },
+    "caption": {
+      "@value": {}
+    },
+    "author": {},
+    "copyrightNotice": {
+      "@value": {}
+    },
+    "usageInfo": {
+      "@value": {}
+    }
+  },
+  "keywords": [
+    {
+      "@value": {}
+    }
+  ],
+  "performer": [
+    {
+      "@type": [
+        "Organization",
+        "Person"
+      ],
+      "@explicit": true,
+      "@omitDefault": true,
+      "name": {
+        "@value": {}
+      },
+      "sameAs": [
+        {}
+      ],
+      "url": {}
+    }
+  ],
+  "organizer": [
+    {
+      "@type": [
+        "Organization",
+        "Person"
+      ],
+      "@explicit": true,
+      "@omitDefault": true,
+      "name": {
+        "@value": {}
+      },
+      "sameAs": {},
+      "url": {}
+    }
+  ],
+  "mainEntityOfPage": [
+    {
+      "@type": "WebPage",
+      "@explicit": true,
+      "inLanguage": {
+        "@value": {}
+      },
+      "url": {},
+      "lastReviewed": {}
+    }
+  ],
+  "subEvent": {
+    "@embed": "@never"
+  }
+}

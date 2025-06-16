@@ -1,0 +1,55 @@
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "@explicit": true,
+  "@omitDefault": true,
+  "name": {
+    "@value": {}
+  },
+  "alternateName": {
+    "@value": {}
+  },
+  "additionalType": {
+    "@type": "skos:Concept",
+    "@explicit": true,
+    "@omitDefault": true,
+    "skos:prefLabel": {
+      "@value": {}
+    },
+    "skos:hiddenLabel": {
+      "@value": {}
+    }
+  },
+  "description": {
+    "@value": {}
+  },
+  "url": {},
+  "logo": {},
+  "location": {
+    "@type": "Place",
+    "@explicit": true,
+    "address": {
+      "@type": "PostalAddress",
+      "@explicit": true,
+      "addressCountry": {
+        "@value": {}
+      },
+      "addressRegion": {
+        "@value": {}
+      },
+      "addressLocality": {
+        "@value": {}
+      },
+      "postalCode": {
+        "@value": {}
+      },
+      "streetAddress": {
+        "@value": {}
+      }
+    }
+  },
+  "naics": {
+    "@value": {}
+  },
+  "sameAs": {}
+}

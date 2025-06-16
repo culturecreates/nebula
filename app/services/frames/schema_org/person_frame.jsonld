@@ -1,0 +1,40 @@
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "@explicit": true,
+  "@omitDefault": true,
+  "name": {"@value": {}},
+  "image": {},
+  "sameAs": {},
+  "url": {},
+  "mainEntityOfPage": [
+    {
+      "@type": "WebPage",
+      "@explicit": true,
+      "inLanguage": {},
+      "url": {},
+      "lastReviewed": {}
+    }
+  ],
+  "workLocation": {
+    "@type": "AdministrativeArea",
+    "@explicit": true,
+    "address": {
+      "@type": "PostalAddress",
+      "@explicit": true,
+      "addressCountry": {"@value": {}},
+      "addressRegion": {"@value": {}},
+      "addressLocality": {"@value": {}}
+    },
+    "hasOccupation": [
+      {"@value": {}}
+    ],
+    "sameAs": {},
+    "memberOf": {
+      "@type": "Organization",
+      "name": {"@value": {}},
+      "url": {},
+      "sameAs": {}
+    }
+  }
+}
