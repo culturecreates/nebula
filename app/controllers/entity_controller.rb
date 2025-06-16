@@ -2,12 +2,17 @@ class EntityController < ApplicationController
   before_action :user_signed_in?, only: [:expand] 
 
   # Show an entity's asserted statements
-  # /entity?uri=
-  # /entity.ttl?uri=
-  # /entity.ttls?uri=  Turtle Star
-  # /entity.jsonld?uri=
-  # /entity.jsonlds?uri=  JSON-LD Star
-  # /entity.rdf?uri=
+  # /entity?uri=  --> HTML
+  # /entity.ttl?uri=  --> Turtle
+  # /entity.ttls?uri=  --> Turtle Star
+  # /entity.jsonld?uri=&frameTemplate= --> JSON-LD (special template for schema_org)
+  # /entity.jsonld?uri=  --> JSON-LD (default frame)
+  # /entity.rdf?uri=  --> RDF/XML
+  # /entity.jsonlds?uri=  --> JSON-LD Star
+  # /entity.ttl?uri=  --> Turtle
+  # /entity.ttls?uri=  --> Turtle Star
+  # /entity.jsonlds?uri=  --> JSON-LD Star
+  # /entity.rdf?uri=  --> RDF/XML
   def show
     uri = params[:uri] 
     uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
@@ -17,20 +22,22 @@ class EntityController < ApplicationController
     respond_to do |format|
       format.jsonld {
         # see https://json-ld.github.io/json-ld.org/spec/latest/json-ld-api-best-practices/
-        nebula_context_url = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
         @entity.load_graph_without_triple_terms
-        jsonld = JSON::LD::API::fromRdf(@entity.graph)
-        if @entity.type && @entity.type != "http://schema.org/Thing"
-          frame = JSON.parse %({"@type": "#{@entity.type.value}",  "@embed": "@once"}) # Default is @once
-          jsonld = JSON::LD::API.frame(jsonld, frame)
-        end
-        compacted_jsonld = JSON::LD::API.compact(jsonld, JSON::LD::Context.new().parse(nebula_context_url))
-        if compacted_jsonld['@graph'].is_a? Hash
-          compacted_jsonld = {'@context' => nebula_context_url}.merge(compacted_jsonld['@graph'])
+        frame_template = params[:frameTemplate]
+        frame, context, jsonld = shape(@entity, frame_template)
+        if frame.present?
+          framed_jsonld = JSON::LD::API.frame(jsonld, frame)
+          @compacted_jsonld = JSON::LD::API.compact(framed_jsonld, context, expanded: false) # Or expand: JSON::LD::Context.new().parse(nebula_context_url)
+       
+          if frame_template == "schema_org" 
+            render template: "entity/show_schema", formats: [:html], content_type: 'text/html'
+          else
+            render json: @compacted_jsonld, content_type: 'application/ld+json'
+          end
         else
-          compacted_jsonld['@context']= nebula_context_url
+          flash.alert = "This JSON-LD could not be generated. [template #{frame_template}]."
+          redirect_back(fallback_location: root_path) 
         end
-        render json: compacted_jsonld, content_type: 'application/ld+json'
       }
       format.jsonlds {
         puts "rendering expanded jsonld-star..."
@@ -96,6 +103,195 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.load_derived_statements
+  end
+
+
+  private
+
+  # determine the shape for JSON-LD output
+  # Frame_template can be "schema_org" or nil
+  def shape(entity, frame_template)
+    puts "Determining shape for entity: #{entity.entity_uri} with frame template: #{frame_template}"
+    if frame_template
+      if frame_template == "schema_org"
+        entity_class = entity.type.value.split('/').last.downcase
+        entity_class = "event" if entity_class == "eventseries" # Use 'event' for schema.org EventSeries
+
+         
+        file_path = Rails.root.join("app","services", "frames", "schema_org", "#{entity_class}_frame.jsonld")
+        begin
+          raise StandardError, "no frame file for class type" unless ["event","person","place","organization"].include? entity_class 
+          frame = JSON.parse(File.read(file_path)) 
+        rescue StandardError => e
+          puts "Error parsing frame: #{e.message}"
+          return
+        end
+        context = "http://schema.org"
+        
+        # Transform graph to work with schema.org @context
+        # Add location, performers and organizers
+        if entity_class == "event"
+          entity.load_event_nested_entities
+        end
+        graph = entity.graph.dup
+        graph = convert_dates(graph)
+        graph = pick_language(graph, I18n.locale)
+        graph = convert_eventStatus(graph)
+        graph = convert_eventAttendanceMode(graph)
+        graph = transform_image(graph)
+        jsonld = JSON::LD::API::fromRdf(graph)
+      else
+        puts "No matching frame template: #{e.message}"
+        frame = nil
+      end
+    else
+      frame = nil
+    end
+    if !frame || !frame.is_a?(Hash)
+      # use default frame if no valid frame is provided
+      frame = {
+        '@type' => entity.type.value,
+        '@id' => entity.entity_uri.to_s,
+        '@embed'=> '@once' # Default is @once
+      }
+      # use artsdata @context if no valid frame is provided
+      context = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
+      # use graph without any transforms if no valid frame is provided
+      jsonld = JSON::LD::API::fromRdf(@entity.graph)
+    end
+
+    return [frame, context, jsonld]
+  end
+
+  def transform_image(graph)
+    update_string = <<-SPARQL
+      PREFIX schema: <http://schema.org/>
+      DELETE {
+        ?s schema:image ?image .
+      }
+      INSERT {
+        ?s schema:image [
+          a schema:ImageObject ;
+          schema:url ?image_uri ;
+        ]  .
+      }
+      WHERE {
+        ?s schema:image ?image .
+        FILTER NOT EXISTS { ?image a schema:ImageObject }
+        BIND(URI(str(?image)) AS ?image_uri)
+      }
+    SPARQL
+    update = SPARQL.parse(update_string, update: true)
+    graph.query(update)
+    return graph
+  end
+
+
+  def convert_eventStatus(graph)
+    update_string = <<-SPARQL
+      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+      PREFIX schema: <http://schema.org/>
+      DELETE {
+        ?s schema:eventStatus ?eventStatus .
+      }
+      INSERT {
+        ?s schema:eventStatus ?eventStatus_str .
+      }
+      WHERE {
+        ?s schema:eventStatus ?eventStatus .
+        BIND(str(?eventStatus) AS ?eventStatus_str)
+      }
+    SPARQL
+    update = SPARQL.parse(update_string, update: true)
+    graph.query(update)
+    return graph
+  end
+
+  def convert_eventAttendanceMode(graph)
+    update_string = <<-SPARQL
+      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+      PREFIX schema: <http://schema.org/>
+      DELETE {
+        ?s schema:eventAttendanceMode ?attendanceMode .
+      }
+      INSERT {
+        ?s schema:eventAttendanceMode ?attendanceMode_str .
+      }
+      WHERE {
+        ?s schema:eventAttendanceMode ?attendanceMode .
+        BIND(str(?attendanceMode) AS ?attendanceMode_str)
+      }
+    SPARQL
+    update = SPARQL.parse(update_string, update: true)
+    graph.query(update)
+    return graph
+  end
+
+  # Convert xsd:dateTime and xsd:date to schema:Date
+  def convert_dates(graph)
+    update_string = <<-SPARQL
+      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+      PREFIX schema: <http://schema.org/>
+      DELETE {
+        ?s ?p ?o .
+      }
+      INSERT {
+        ?s ?p ?o_new .
+      }
+      WHERE {
+        ?s ?p ?o .
+        FILTER(isLiteral(?o))
+        FILTER (DATATYPE(?o) IN (xsd:dateTime, xsd:date))
+        BIND(str(?o) AS ?o_str)
+        BIND(STRDT(?o_str, schema:Date) AS ?o_new)
+      }
+    SPARQL
+    update = SPARQL.parse(update_string, update: true)
+    graph.query(update)
+    return graph
+  end
+
+
+  # Add non-language tagged literal
+  # TODO: use lang to set first choice language
+  def pick_language(graph, lang)
+    update_string = <<-SPARQL
+      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+      # This SPARQL ensures that all language-tagged strings have a preferred non-language tagged literal 
+      # using English and then French as a fallback
+      # If a language-tagged string does not have an English fallback, it will be added
+
+      INSERT {
+      ?s ?p ?o_pref 
+      }
+      WHERE {
+        ?s ?p ?o .
+        # Find all language-tagged strings
+        FILTER (DATATYPE(?o) = rdf:langString)
+
+        # Check if there is already a preferred value without a language tag
+        OPTIONAL {
+          ?s ?p ?o_none .
+          FILTER (LANG(?o_none) = "")
+        }
+        # If there is no preferred value, add one using english or french as fallback
+        FILTER (!BOUND(?o_none))
+        OPTIONAL {
+          ?s ?p ?o_en .
+          FILTER (LANG(?o_en) = "en")
+        }
+        OPTIONAL {
+          ?s ?p ?o_fr .
+          FILTER (LANG(?o_fr) = "fr")
+        }
+        BIND(STR(COALESCE(?o_en,?o_fr)) AS ?o_pref)
+
+      }
+    SPARQL
+    update = SPARQL.parse(update_string, update: true)
+    graph.query(update)
+    return graph
   end
  
 end

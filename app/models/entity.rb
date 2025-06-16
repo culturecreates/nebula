@@ -262,6 +262,47 @@ class Entity
 
 
 
+ def load_event_nested_entities
+    location = @graph.query([RDF::URI(self.entity_uri), RDF::URI("http://schema.org/location"), nil])&.first&.object
+    if location && location.uri?
+      # load location graph
+      place = Entity.new(entity_uri: location.value)
+      graph <<  place.load_graph_without_triple_terms
+    end
+    # load performers
+    performers = @graph.query([RDF::URI(self.entity_uri), RDF::URI("http://schema.org/location"), nil])
+    performers.each do |p|
+      if p.object.uri?
+        performer = Entity.new(entity_uri: p.object.value)
+        graph << performer.load_graph_without_triple_terms
+      end
+    end
+    # load organizers
+    organizers = @graph.query([RDF::URI(self.entity_uri), RDF::URI("http://schema.org/organizer"), nil])
+    organizers.each do |o|
+      if o.object.uri?
+        organizer = Entity.new(entity_uri: o.object.value)
+        graph << organizer.load_graph_without_triple_terms
+      end
+    end
+    # load offers
+    offers = @graph.query([RDF::URI(self.entity_uri), RDF::URI("http://schema.org/offers"), nil])
+    offers.each do |o|
+      if o.object.uri?
+        offer = Entity.new(entity_uri: o.object.value)
+        graph << offer.load_graph_without_triple_terms
+      end
+    end
+    # load EventSeries
+    event_series = @graph.query([RDF::URI(self.entity_uri), RDF::URI("http://schema.org/eventSeries"), nil])
+    event_series.each do |es|
+      if es.object.uri?
+        series = Entity.new(entity_uri: es.object.value)
+        graph << series.load_graph_without_triple_terms
+      end
+    end
+ end
+
   def entity_jsonld
     if @graph.count > 0
       JSON.parse(@graph.dump(:jsonld)).first

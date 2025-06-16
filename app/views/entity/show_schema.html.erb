@@ -1,0 +1,33 @@
+<div class="container">
+  <div>
+    <div>
+      <h1 class="me-3">
+        JSON-LD Schema.org
+      </h1>
+      <p>
+        JSON-LD using Schema.org @context. It can be copy/pasted into HTML Web
+        pages.
+      </p>
+      <div
+        data-controller="clipboard"
+        data-clipboard-success-content-value="JSON-LD copied"
+      >
+
+        <button
+          class="cursor-pointer btn btn-outline-primary mb-1"
+          data-action="clipboard#copy"
+          data-clipboard-target="button"
+          title="Copy URI"
+        >
+          <%= render partial: "shared/icon_copy" %>
+          Copy
+        </button>
+
+        <div class="card mb-3">
+          <div class="card-body bg-light border rounded">
+            <pre><code><span data-clipboard-target="source">&lt;script type="application/ld+json"&gt;<%= JSON.pretty_generate(@compacted_jsonld) %>&lt;/script&gt;</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
