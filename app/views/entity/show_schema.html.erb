@@ -5,12 +5,12 @@
         JSON-LD Schema.org
       </h1>
       <p>
-        JSON-LD using Schema.org @context. It can be copy/pasted into HTML Web
-        pages.
+        <%= t("entity.download.jsonld_for_schema_org") %>
+
       </p>
       <div
         data-controller="clipboard"
-        data-clipboard-success-content-value="JSON-LD copied"
+        data-clipboard-success-content-value="<%= t("entity.download.copy_completed") %>"
       >
 
         <button
@@ -20,7 +20,7 @@
           title="Copy URI"
         >
           <%= render partial: "shared/icon_copy" %>
-          Copy
+          <%= t("entity.download.copy_button") %>
         </button>
 
         <div class="card mb-3">

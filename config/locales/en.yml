@@ -79,3 +79,8 @@ en:
       smart_chip_name: "Smart-Chip Spreadsheet"
       smart_chip_instructions: |
         <h4>Smart-Chip Instructions</h4><p> Enter the URL of the Google Sheet that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>
+  entity:
+    download:
+      jsonld_for_schema_org: "JSON-LD using Schema.org @context. It can be copy/pasted into HTML Webpages."
+      copy_button: "Copy"
+      copy_completed: "JSON-LD copied"

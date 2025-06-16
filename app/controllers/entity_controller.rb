@@ -116,11 +116,9 @@ class EntityController < ApplicationController
       if frame_template == "schema_org"
         entity_class = entity.type.value.split('/').last.downcase
         entity_class = "event" if entity_class == "eventseries" # Use 'event' for schema.org EventSeries
-
-         
         file_path = Rails.root.join("app","services", "frames", "schema_org", "#{entity_class}_frame.jsonld")
         begin
-          raise StandardError, "no frame file for class type" unless ["event","person","place","organization"].include? entity_class 
+          raise StandardError, "no frame file for entity class #{entity_class}" unless ["event","person","place","organization"].include? entity_class 
           frame = JSON.parse(File.read(file_path)) 
         rescue StandardError => e
           puts "Error parsing frame: #{e.message}"
@@ -135,10 +133,10 @@ class EntityController < ApplicationController
         end
         graph = entity.graph.dup
         graph = convert_dates(graph)
-        graph = pick_language(graph, I18n.locale)
         graph = convert_eventStatus(graph)
         graph = convert_eventAttendanceMode(graph)
         graph = transform_image(graph)
+        graph = pick_language(graph, I18n.locale)
         jsonld = JSON::LD::API::fromRdf(graph)
       else
         puts "No matching frame template: #{e.message}"
@@ -278,14 +276,14 @@ class EntityController < ApplicationController
         # If there is no preferred value, add one using english or french as fallback
         FILTER (!BOUND(?o_none))
         OPTIONAL {
-          ?s ?p ?o_en .
-          FILTER (LANG(?o_en) = "en")
+          ?s ?p ?o_primary .
+          FILTER (LANG(?o_primary) = "#{lang}")
         }
         OPTIONAL {
-          ?s ?p ?o_fr .
-          FILTER (LANG(?o_fr) = "fr")
+          ?s ?p ?o_secondary .
+          FILTER (LANG(?o_secondary) != "#{lang}")
         }
-        BIND(STR(COALESCE(?o_en,?o_fr)) AS ?o_pref)
+        BIND(STR(COALESCE(?o_primary,?o_secondary)) AS ?o_pref)
 
       }
     SPARQL
