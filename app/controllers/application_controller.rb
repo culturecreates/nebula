@@ -10,22 +10,42 @@ class ApplicationController < ActionController::Base
     render template: template
   end
 
-  def user_signed_in?
-    session[:handle].present?
-  end
-
-  def user_signed_in!
-    unless user_signed_in?
-      flash.alert = "You must be logged in to access this section"
-      redirect_back(fallback_location: root_path) and return
-    end
-  end
-
   def temporarily_disable
     flash.alert = "This feature is temporarily disabled for maintenance. Try again in a few minutes."
     redirect_back(fallback_location: root_path)
   end
   
+  # Check if user is signed in and has a valid session
+  def user_signed_in?
+    return false unless session[:handle].present?
+      
+    return false unless session[:github_authenticated_time].present? && session[:github_expires_in].present?
+
+    return false if Time.now.utc - Time.parse(session[:github_authenticated_time]) > session[:github_expires_in]
+
+    true
+  end
+
+  # Ensure user is signed in, otherwise notify and redirect
+  def user_signed_in!
+    unless user_signed_in?
+      logout
+      flash.alert = "You must be logged in to access this section"
+      redirect_back(fallback_location: root_path) and return
+    end
+  end
+
+  # Log out user by clearing session data
+  def logout
+    session[:github_authenticated] = false
+    session[:github_expires_in] = nil
+    session[:github_authenticated_time] = nil
+    session[:handle] = nil
+    session[:name] = nil
+    session[:token] = nil
+    session[:teams] = nil
+    session[:accounts] = nil
+  end
 
   def authenticate_databus_user!
     return true if  Rails.env.test?

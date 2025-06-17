@@ -30,6 +30,8 @@ Rails.application.routes.draw do
 
     resources :ical
     resources :sparql_manager
+
+    get "logout", to: "github#logout!"
     
     match "doc/*path", to: "application#doc", via: :get
     

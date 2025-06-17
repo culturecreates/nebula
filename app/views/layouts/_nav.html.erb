@@ -171,7 +171,7 @@
 
         <li class="nav-item">
           <% if session[:handle] %>
-            <a class="nav-link disabled" aria-disabled="true">Logout</a>
+            <a class="nav-link" href="<%= logout_url %>">Logout</a>
           <% else %>
             <a class="nav-link" href="<%= github_url %>">Login</a>
           <% end %>
