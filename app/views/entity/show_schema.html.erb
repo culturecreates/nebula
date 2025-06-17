@@ -25,9 +25,11 @@
 
         <div class="card mb-3">
           <div class="card-body bg-light border rounded">
-            <pre><code><span data-clipboard-target="source">&lt;script type="application/ld+json"&gt;<%= JSON.pretty_generate(@compacted_jsonld) %>&lt;/script&gt;</span></code></pre>
+            <pre><code><span data-clipboard-target="source">&lt;script type="application/ld+json"&gt;<%= "\n" %><%= JSON.pretty_generate(@compacted_jsonld) %><%= "\n" %>&lt;/script&gt;</span></code>
+            </pre>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
