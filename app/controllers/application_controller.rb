@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   helper_method :ensure_access, :user_has_access?
-  before_action :set_locale
+  before_action :set_locale, :undergoing_maintenance
   append_view_path "doc"
 
   def home; end
@@ -13,6 +13,10 @@ class ApplicationController < ActionController::Base
   def temporarily_disable
     flash.alert = "This feature is temporarily disabled for maintenance. Try again in a few minutes."
     redirect_back(fallback_location: root_path)
+  end
+
+  def undergoing_maintenance
+    flash.notice = "Artsdata is currently undergoing maintenance. Service is slower than usual."
   end
   
   # Check if user is signed in and has a valid session
