@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   helper_method :ensure_access, :user_has_access?
-  before_action :set_locale, :undergoing_maintenance
+  before_action :set_locale, :maintenance_mode?
   append_view_path "doc"
 
   def home; end
@@ -10,8 +10,10 @@ class ApplicationController < ActionController::Base
     render template: template
   end
 
-  def undergoing_maintenance
-    flash.notice = "Artsdata is currently undergoing maintenance. Service is slower than usual."
+  def maintenance_mode?
+    if Rails.application.config.feature_maintenance_mode_enabled
+      flash.notice = "Artsdata is currently undergoing maintenance. Service is slower than usual."
+    end
   end
   
   # Check if user is signed in and has a valid session

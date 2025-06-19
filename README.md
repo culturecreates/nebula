@@ -22,9 +22,17 @@ This website is paired with the Github App:
 
 The subdomain for this website is kg.artsdata.ca.
 
-The naked domain http://artsdata.ca is redirected to https://kg.artsdata.ca
+## Feature Flags and maintenance mode
 
-GoDaddy does NOT support HTTPS forwarding for domains, so https://artsdata.ca will NOT work until we find a better DNS host that offers ANAME/ALIAS functionality. 
+Features can be turned on/off in the file /config/initializers/feature_flags.rb.
+
+There is a feature flag to turn on 'maintenance mode' which will display a message that Artsdata in undergoing maintenance but still allow user access. This can be used in conjunction with feature flags when working on maintenance.
+
+# Github App
+
+https://github.com/apps/artsdata-nebula
+
+Ensure your Github repo has [granted access](https://github.com/organizations/culturecreates/settings/installations/52160418) to the Artsdata Nebula Github App.
 
 ## Rails 7 Setup
   Steps from scratch:
@@ -48,8 +56,4 @@ GoDaddy does NOT support HTTPS forwarding for domains, so https://artsdata.ca wi
   `EDITOR="code --wait" rails credentials:edit`
 
 
-# Github App
 
-https://github.com/apps/artsdata-nebula
-
-Ensure your Github repo has [granted access](https://github.com/organizations/culturecreates/settings/installations/52160418) to the Artsdata Nebula Github App.
