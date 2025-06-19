@@ -40,7 +40,7 @@ Si vous avez un compte utilisateur GitHub, vous pouvez utiliser également ces f
 
 Avez-vous déjà structuré vos événements ? Faites-nous savoir afin que nous puissions les ajouter à Artsdata.ca.
 
-<a href="mailto:support@culturecreates.com?subject=Participation%20à%20Artsdata.ca&body=Mon%20site%20Web%20contient%20des%20données%20structurées.%20Veuillez%20l'ajouter%20à%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Nous joindre</a></br>
+<a href="mailto:artsdata-support@capacoa.ca?subject=Participation%20à%20Artsdata.ca&body=Mon%20site%20Web%20contient%20des%20données%20structurées.%20Veuillez%20l'ajouter%20à%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Nous joindre</a></br>
 
 ---
 ## Soutenu par

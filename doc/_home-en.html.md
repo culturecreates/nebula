@@ -44,7 +44,7 @@ With a GitHub user account, you may also use these additional features:
 
 Already have structured data for events? Let us know so we can add your events to Artsdata.ca.
 
-<a href="mailto:support@culturecreates.com?subject=Artsdata.ca%20participation&body=My%20website%20has%20structured%20data.%20Please%20add%20it%20to%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Contact us</a></br>
+<a href="mailto:artsdata-support@capacoa.ca?subject=Artsdata.ca%20participation&body=My%20website%20has%20structured%20data.%20Please%20add%20it%20to%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Contact us</a></br>
 
 ---
 
