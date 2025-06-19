@@ -1,0 +1,1 @@
+Rails.application.config.feature_minting_enabled = false

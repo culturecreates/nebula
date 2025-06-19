@@ -10,11 +10,6 @@ class ApplicationController < ActionController::Base
     render template: template
   end
 
-  def temporarily_disable
-    flash.alert = "This feature is temporarily disabled for maintenance. Try again in a few minutes."
-    redirect_back(fallback_location: root_path)
-  end
-
   def undergoing_maintenance
     flash.notice = "Artsdata is currently undergoing maintenance. Service is slower than usual."
   end
@@ -74,6 +69,12 @@ class ApplicationController < ActionController::Base
 
     unless user_has_access?(feature)
       flash.alert = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin."
+      redirect_to root_path and return
+    end
+    
+    # Check feature flag
+    if feature == "minting" && Rails.application.config.feature_minting_enabled == false
+      flash.alert = "This feature is temporarily disabled for maintenance. Try again later."
       redirect_to root_path and return
     end
   end
