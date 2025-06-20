@@ -1,13 +1,13 @@
 require 'test_helper'
 
 class EntityTest < ActiveSupport::TestCase
-  # def setup
-  #   @entity = Entity.new(entity_uri: "http://kg.artsdata.ca/resource/K23-300")
-  #   VCR.use_cassette('EntityTest setup event entity K23-300') do
-  #     @entity.load_graph
-  #   end
+  def setup
+    @entity = Entity.new(entity_uri: "http://kg.artsdata.ca/resource/K23-300")
+    VCR.use_cassette('EntityTest setup event entity K23-300', record: :new_episodes) do
+      @entity.load_graph
+   end
    
-  # end
+  end
 
   test "graph_api_endpoint is correctly set"  do
     expected_endpoint = "http://35.183.197.209:7200"
