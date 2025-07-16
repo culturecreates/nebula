@@ -14,6 +14,12 @@ const API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
  */
 export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20) {
   try {
+    // Check if graphUrl is empty or undefined
+    if (!graphUrl || graphUrl.trim() === '') {
+      console.log('Empty graph URL provided, returning empty array');
+      return [];
+    }
+    
     const encodedGraphUrl = encodeURIComponent(graphUrl);
     const apiUrl = `${API_BASE_URL}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
     
@@ -33,6 +39,13 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20) {
     const data = await response.json();
     console.log('API Response Data:', data);
     console.log('Selected Type:', type);
+    
+    // Handle empty API results
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      console.log('Empty results from API');
+      return [];
+    }
+    
     return transformApiResults(data, page, limit, type);
   } catch (error) {
     console.error('Error fetching dynamic data:', error);

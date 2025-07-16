@@ -1,28 +1,75 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAvailableTypes } from '../services/dataFeedService';
+import { validateGraphUrl, debounce } from '../utils/urlValidation';
 import Pagination from './Pagination';
 
 const FilterControls = ({ 
   dataFeed, setDataFeed, type, setType, minScore, setMinScore, showAll, setShowAll,
   filterText, setFilterText, pageSize, setPageSize, loading, error,
-  onAcceptAll, totalItems, currentPage, setCurrentPage
+  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults
 }) => {
   const availableTypes = getAvailableTypes();
+  const [validation, setValidation] = useState({ isValid: true, message: '' });
+  const [inputValue, setInputValue] = useState(dataFeed || '');
+
+  // Debounced validation function
+  const debouncedValidate = debounce((url) => {
+    const result = validateGraphUrl(url);
+    setValidation(result);
+    
+    // Only set the dataFeed if the URL is valid
+    if (result.isValid && !result.isWarning) {
+      setDataFeed(url);
+    }
+  }, 500);
+
+  // Update input value when dataFeed prop changes
+  useEffect(() => {
+    if (dataFeed !== inputValue) {
+      setInputValue(dataFeed || '');
+    }
+  }, [dataFeed]);
+
+  // Handle input change
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    if (value.trim() === '') {
+      setValidation({ isValid: true, message: '' });
+      setDataFeed('');
+    } else {
+      debouncedValidate(value);
+    }
+  };
 
   return (
   <div className="filter-controls">
     {/* First row: Graph URL, Type, Accept All button */}
     <div className="filter-row-1">
       <div className="form-group">
-        <label className="form-label">Graph URL</label>
+        <label className="form-label">Data Feed</label>
         <input
           type="text"
-          value={dataFeed}
-          onChange={(e) => setDataFeed(e.target.value)}
-          className="form-input"
-          placeholder="Enter graph URL (e.g., http://kg.artsdata.ca/culture-creates/artsdata-planet-iwts/iwts-ca)"
+          value={inputValue}
+          onChange={handleInputChange}
+          className={`form-input ${
+            validation.isValid 
+              ? (validation.isWarning ? 'form-input-warning' : '')
+              : 'form-input-error'
+          }`}
+          placeholder="Enter graph URL"
           disabled={loading}
         />
+        {validation.message && (
+          <div className={`validation-message ${
+            validation.isValid 
+              ? (validation.isWarning ? 'validation-warning' : 'validation-success')
+              : 'validation-error'
+          }`}>
+            {validation.message}
+          </div>
+        )}
       </div>
       <div className="form-group">
         <label className="form-label">Type</label>
@@ -39,15 +86,17 @@ const FilterControls = ({
           ))}
         </select>
       </div>
-      <div className="accept-all-container">
-        <button 
-          onClick={onAcceptAll} 
-          className="btn btn-primary accept-all-btn"
-          disabled={totalItems === 0}
-        >
-          Accept All ({totalItems})
-        </button>
-      </div>
+      {dataFeed && dataFeed.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
+        <div className="accept-all-container">
+          <button 
+            onClick={onAcceptAll} 
+            className="btn btn-primary accept-all-btn"
+            disabled={totalItems === 0}
+          >
+            Accept All ({totalItems})
+          </button>
+        </div>
+      )}
     </div>
     
     {/* Second row: Filter results, Minimum Score, Show All, Page Size, Pagination */}
@@ -101,7 +150,7 @@ const FilterControls = ({
           <option value="50">50</option>
         </select>
       </div>
-      {!loading && !error && (
+      {!loading && !error && dataFeed && dataFeed.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
         <div className="pagination-container">
           <Pagination
             currentPage={currentPage}

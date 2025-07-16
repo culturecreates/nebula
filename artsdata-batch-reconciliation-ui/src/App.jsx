@@ -8,6 +8,7 @@ import TypeSwitchConfirmation from "./components/TypeSwitchConfirmation";
 import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation";
 import { fetchDynamicData, getAvailableTypes } from "./services/dataFeedService";
 import { batchReconcile, getReferenceUri, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
+import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper for filtering rows
 function filterItems(items, filterText) {
@@ -33,7 +34,7 @@ function sortItems(items, sortKey, sortDir) {
 
 // Main App Component
 const App = () => {
-  const [dataFeed, setDataFeed] = useState("http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/tout-culture");
+  const [dataFeed, setDataFeed] = useState();
   const [type, setType] = useState("Event");
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(true);
@@ -82,9 +83,24 @@ const App = () => {
       }
     };
 
-    // Only load if we have both type and dataFeed
-    if (type && dataFeed) {
-      loadData();
+    // Only load if we have both type and dataFeed, and URL is valid
+    if (type && dataFeed && dataFeed.trim() !== '') {
+      const validation = validateGraphUrl(dataFeed);
+      if (validation.isValid && !validation.isWarning) {
+        loadData();
+      } else {
+        // Don't load data if URL is invalid
+        setItems([]);
+        setReconciledItems([]);
+        setLoading(false);
+        setError(validation.isValid ? null : validation.message);
+      }
+    } else if (dataFeed === '' || !dataFeed) {
+      // Clear data when data feed is empty
+      setItems([]);
+      setReconciledItems([]);
+      setLoading(false);
+      setError(null);
     }
   }, [type, dataFeed, currentPage, pageSize]);
 
@@ -660,6 +676,7 @@ const App = () => {
         totalItems={itemsReadyToAccept}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        hasResults={currentPageItems.length > 0}
       />
 
       <div className="table-container">
@@ -681,7 +698,19 @@ const App = () => {
           </div>
         )}
         
-        {!loading && !error && (
+        {!loading && !error && (!dataFeed || dataFeed.trim() === '') && (
+          <div className="empty-state-message">
+            <p>Please enter a data feed URL to load entities for reconciliation.</p>
+          </div>
+        )}
+        
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length === 0 && (
+          <div className="empty-state-message">
+            <p>No entities found for the selected data feed and type.</p>
+          </div>
+        )}
+        
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-wrapper">
             <table className="data-table">
               <thead className="table-header">
@@ -722,7 +751,7 @@ const App = () => {
           </div>
         )}
 
-        {!loading && !error && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
           <div className="bottom-accept-all">
             <button 
               onClick={handleAcceptAll} 
