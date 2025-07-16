@@ -1,6 +1,6 @@
 import React from "react";
 
-const ActionButton = ({ status, onAction }) => {
+const ActionButton = ({ status, onAction, hasMatches, autoMatched }) => {
   if (status === "Select") {
     return (
       <div className="action-buttons">
@@ -13,8 +13,19 @@ const ActionButton = ({ status, onAction }) => {
       </div>
     );
   }
+  
+  if (status === "Auto-matched") {
+    return (
+      <div className="action-buttons">
+        <span className="auto-match-indicator">Auto-matched</span>
+        <button onClick={() => onAction("change")} className="action-link">
+          change
+        </button>
+      </div>
+    );
+  }
 
-  if (["Match", "Mint person", "Skipped"].includes(status)) {
+  if (["Match", "Mint person", "Skipped", "Linked"].includes(status)) {
     return (
       <button onClick={() => onAction("change")} className="action-link">
         change

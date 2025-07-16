@@ -1,31 +1,38 @@
 import React from 'react';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => (
-  <div className="pagination">
-    <button
-      onClick={() => onPageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-      className="pagination-btn pagination-nav"
-    >
-      «
-    </button>
-    {[...Array(totalPages)].map((_, i) => (
+const Pagination = ({ currentPage, onPageChange }) => {
+  // Show current page and next 3 pages (total 4 pages)
+  const pagesToShow = [];
+  for (let i = 0; i < 4; i++) {
+    pagesToShow.push(currentPage + i);
+  }
+
+  return (
+    <div className="pagination">
       <button
-        key={i+1}
-        onClick={() => onPageChange(i+1)}
-        className={`pagination-btn ${currentPage === i+1 ? 'pagination-active' : ''}`}
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="pagination-btn pagination-nav"
       >
-        {i+1}
+        «
       </button>
-    ))}
-    <button
-      onClick={() => onPageChange(currentPage + 1)}
-      disabled={currentPage === totalPages}
-      className="pagination-btn pagination-nav"
-    >
-      »
-    </button>
-  </div>
-);
+      {pagesToShow.map(pageNum => (
+        <button
+          key={pageNum}
+          onClick={() => onPageChange(pageNum)}
+          className={`pagination-btn ${currentPage === pageNum ? 'pagination-active' : ''}`}
+        >
+          {pageNum}
+        </button>
+      ))}
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        className="pagination-btn pagination-nav"
+      >
+        »
+      </button>
+    </div>
+  );
+};
 
 export default Pagination;
