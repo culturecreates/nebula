@@ -1,0 +1,90 @@
+/**
+ * Service for fetching data feed results from Artsdata Reconciliation API
+ */
+
+const API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
+
+/**
+ * Fetch dynamic data based on type, graph URL, page and limit using the recon extension API
+ * @param {string} type - The entity type (Event, Person, Organization, Place)
+ * @param {string} graphUrl - The direct graph URL
+ * @param {number} page - Page number (default: 1)
+ * @param {number} limit - Number of items per page (default: 20)
+ * @returns {Promise<Array>} - Array of transformed data
+ */
+export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20) {
+  try {
+    const encodedGraphUrl = encodeURIComponent(graphUrl);
+    const apiUrl = `${API_BASE_URL}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
+    
+    console.log('Fetching from API:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('API Response Data:', data);
+    console.log('Selected Type:', type);
+    return transformApiResults(data, page, limit, type);
+  } catch (error) {
+    console.error('Error fetching dynamic data:', error);
+    throw error;
+  }
+}
+
+/**
+ * Transform API results into a normalized format for the UI
+ * @param {Array} apiResults - Raw API results (array of items)
+ * @param {number} page - Page number
+ * @param {number} limit - Items per page
+ * @param {string} selectedType - User-selected type from dropdown
+ * @returns {Array} - Normalized data array
+ */
+function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'Event') {
+  if (!Array.isArray(apiResults)) {
+    return [];
+  }
+
+  // Convert user-selected type to schema.org format
+  const schemaType = `http://schema.org/${selectedType}`;
+
+  return apiResults.map((item, index) => {
+    return {
+      id: ((page - 1) * limit) + index + 1,
+      name: item.name || '',
+      uri: item.uri || '',
+      url: item.url || '', // May not be provided
+      externalId: item.uri ? item.uri.split('/').pop() : '',
+      type: item.type || schemaType, // Use selected type if API type is missing
+      description: item.description || '',
+      location: item.location || '', // New field from API
+      startDate: item.startDate || '', // New field from API
+      endDate: item.endDate || '', // New field from API
+      isni: '', // Not provided by API
+      wikidata: '', // Not provided by API
+      status: 'needs-judgment', // Default status
+      matches: [] // Initialize empty matches array
+    };
+  });
+}
+
+/**
+ * Get available entity types (limited to API supported types)
+ * @returns {Array} - Array of available types
+ */
+export function getAvailableTypes() {
+  return [
+    { value: 'Event', label: 'Event' },
+    { value: 'Person', label: 'Person' },
+    { value: 'Organization', label: 'Organization' },
+    { value: 'Place', label: 'Place' }
+  ];
+}
