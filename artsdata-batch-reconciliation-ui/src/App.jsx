@@ -390,6 +390,7 @@ const App = () => {
           status: "reconciled",
           linkedTo: matchCandidate.id,
           linkedToName: matchCandidate.name,
+          linkError: null,
           actionError: null
         };
       } else if (action === "skip") {
@@ -419,6 +420,13 @@ const App = () => {
           selectedMatch: matchCandidate,
           actionError: null
         };
+      } else if (action === "reset_link_error") {
+        // Reset link error state when user clicks Change from link-error
+        updateData = {
+          linkError: null,
+          actionError: null,
+          selectedMatch: null
+        };
       }
 
       const updatedItem = {
@@ -445,11 +453,21 @@ const App = () => {
       );
     } catch (error) {
       console.error('Error performing action:', error);
+      
+      // Determine error type based on action
+      let errorData = { actionError: error.message };
+      if (action === "mint_preview" || action === "mint_final") {
+        errorData.mintError = error.message;
+      } else if (action === "link") {
+        errorData.linkError = error.message;
+        // Keep the item in judgment-ready state so user can change selection
+        errorData.status = item.status || 'judgment-ready';
+      }
+      
       // Update item with error state
       const errorItem = {
         ...item,
-        mintError: error.message,
-        actionError: error.message
+        ...errorData
       };
       
       // Save error state to global storage
@@ -464,8 +482,7 @@ const App = () => {
           reconciledItem.id === itemId
             ? {
                 ...reconciledItem, // Preserve reconciliation data like matches
-                mintError: error.message,
-                actionError: error.message
+                ...errorData
               }
             : reconciledItem
         )

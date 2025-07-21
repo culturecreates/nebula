@@ -38,6 +38,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
       return 'mint-error';
     }
     
+    if (item.linkError) {
+      return 'link-error';
+    }
+    
     if (selectedMatch) {
       return 'judgment-ready';
     }
@@ -110,6 +114,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
     if (currentStatus === 'mint-ready') {
       onAction(item.id, 'reset_mint');
     }
+    // Reset link error state if item failed to link
+    else if (currentStatus === 'link-error') {
+      onAction(item.id, 'reset_link_error');
+    }
     // Reset judgment state if item was in judgment-ready state due to auto-match
     else if (currentStatus === 'judgment-ready' && !selectedMatch) {
       // This means it's an automatic judgment (single true match)
@@ -177,6 +185,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                 hasError={item.hasError || item.reconciliationError} 
                 autoMatched={item.hasAutoMatch}
                 mintError={item.mintError || mintPreviewError}
+                linkError={item.linkError}
                 entityType={item.type?.split('/').pop() || 'Entity'}
               />
             )}
@@ -192,7 +201,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
             )}
             
             {/* Change link - only show for non-reconciled items */}
-            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready') && (
+            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'link-error') && (
               <button 
                 className="action-link"
                 onClick={handleChange}
@@ -216,6 +225,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                 ⚠️
               </div>
             )}
+            
           </div>
         </td>
         <td className="table-cell cell-external-id">

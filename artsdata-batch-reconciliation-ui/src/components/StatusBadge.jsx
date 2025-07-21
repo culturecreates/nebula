@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 
-const StatusBadge = ({ status, hasError, autoMatched, mintError, entityType }) => {
+const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, entityType }) => {
   const getStatusClass = () => {
     switch (status) {
       case 'needs-judgment': return 'status-badge status-needs-judgment';
@@ -9,6 +9,7 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, entityType }) =
       case 'mint-ready': return 'status-badge status-mint-ready';
       case 'reconciled': return 'status-badge status-reconciled';
       case 'mint-error': return 'status-badge status-mint-error';
+      case 'link-error': return 'status-badge status-link-error';
       case 'skipped': return 'status-badge status-skipped';
       // Legacy statuses for backward compatibility
       case 'Match': return 'status-badge status-match';
@@ -26,6 +27,7 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, entityType }) =
       case 'mint-ready': return `Mint ${entityType || 'Entity'}`;
       case 'reconciled': return 'Reconciled';
       case 'mint-error': return `Mint ${entityType || 'Entity'}`;
+      case 'link-error': return 'Link Error';
       case 'skipped': return 'Skipped';
       default: return status;
     }
@@ -36,10 +38,10 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, entityType }) =
       <span className={getStatusClass()}>
         {autoMatched && status === 'Auto-matched' ? '✓ Auto-matched' : getStatusText()}
       </span>
-      {(hasError || mintError) && (
+      {(hasError || mintError || linkError) && (
         <AlertCircle 
           className="error-icon" 
-          title={mintError || "Error occurred"}
+          title={linkError || mintError || "Error occurred"}
         />
       )}
     </div>
