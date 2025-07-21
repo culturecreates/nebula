@@ -1,12 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/artsdata-batch-reconciliation-ui/',
+  base: '/nebula/artsdata-batch-reconciliation-ui/', // Repository name + subdirectory
   build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
+    outDir: 'dist'
   }
 })

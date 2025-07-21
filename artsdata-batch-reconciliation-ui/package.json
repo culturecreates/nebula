@@ -9,8 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist -r https://github.com/culturecreates/nebula.git"
   },
+  "homepage": "https://culturecreates.github.io/nebula/artsdata-batch-reconciliation-ui",
   "dependencies": {
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
