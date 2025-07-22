@@ -385,7 +385,8 @@ const App = () => {
         };
       } else if (action === "link" && matchCandidate) {
         // Link to matched entity
-        const linkResult = await linkEntity(item.uri, `schema:${type}`, matchCandidate.id);
+        const adUri = `http://kg.artsdata.ca/resource/${matchCandidate.id}`;
+        const linkResult = await linkEntity(item.uri, `schema:${type}`, adUri);
         updateData = {
           status: "reconciled",
           linkedTo: matchCandidate.id,
