@@ -34,7 +34,7 @@ function sortItems(items, sortKey, sortDir) {
 
 // Main App Component
 const App = () => {
-  const [dataFeed, setDataFeed] = useState();
+  const [dataFeed, setDataFeed] = useState('');
   const [type, setType] = useState("Event");
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(true);
@@ -99,6 +99,8 @@ const App = () => {
       // Clear data when data feed is empty
       setItems([]);
       setReconciledItems([]);
+      setGlobalJudgments(new Map());
+      setReconciliationStatus('idle');
       setLoading(false);
       setError(null);
     }
@@ -249,6 +251,8 @@ const App = () => {
     setItems([]);
     setReconciledItems([]);
     setGlobalJudgments(new Map());
+    setReconciliationStatus('idle');
+    setError(null);
     
     // Set the new type
     setType(newType);
@@ -304,6 +308,8 @@ const App = () => {
     setItems([]);
     setReconciledItems([]);
     setGlobalJudgments(new Map());
+    setReconciliationStatus('idle');
+    setError(null);
     
     // Set the new data feed
     setDataFeed(newDataFeed);
@@ -669,11 +675,6 @@ const App = () => {
 
   return (
     <div className="app">
-      <div className="header">
-        <div className="header-content">
-          <h1 className="header-title">Artsdata Batch Reconciliation</h1>
-        </div>
-      </div>
       
       <FilterControls
         dataFeed={dataFeed}
@@ -699,39 +700,49 @@ const App = () => {
 
       <div className="table-container">
         {loading && (
-          <div className="loading-message">
-            Loading data from Artsdata...
+          <div className="alert alert-info" role="alert">
+            <div className="d-flex align-items-center">
+              <div className="spinner-border spinner-border-sm me-2" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              Loading data from Artsdata...
+            </div>
           </div>
         )}
         
         {reconciliationStatus === 'loading' && (
-          <div className="loading-message">
-            Running batch reconciliation...
+          <div className="alert alert-info" role="alert">
+            <div className="d-flex align-items-center">
+              <div className="spinner-border spinner-border-sm me-2" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              Running batch reconciliation...
+            </div>
           </div>
         )}
         
         {error && (
-          <div className="error-message">
-            Error loading data: {error}
+          <div className="alert alert-danger" role="alert">
+            <strong>Error loading data:</strong> {error}
           </div>
         )}
         
         {!loading && !error && (!dataFeed || dataFeed.trim() === '') && (
-          <div className="empty-state-message">
-            <p>Please enter a data feed URL to load entities for reconciliation.</p>
+          <div className="alert alert-secondary" role="alert">
+            Please enter a data feed URL to load entities for reconciliation.
           </div>
         )}
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length === 0 && (
-          <div className="empty-state-message">
-            <p>No entities found for the selected data feed and type.</p>
+          <div className="alert alert-warning" role="alert">
+            No entities found for the selected data feed and type.
           </div>
         )}
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
-          <div className="table-wrapper">
-            <table className="data-table">
-              <thead className="table-header">
+          <div className="table-responsive-sm">
+            <table className="table table-hover table-striped">
+              <thead className="sticky-top">
                 <tr>
                   {[
                     { key: 'id', label: '#' },
@@ -746,7 +757,8 @@ const App = () => {
                   ].map((col, idx) => (
                     <th
                       key={col.key || idx}
-                      className="table-header-cell"
+                      scope="col"
+                      className={col.key ? "sort-none" : ""}
                       onClick={col.key ? () => handleSort(col.key) : undefined}
                       style={col.key ? { cursor: 'pointer' } : {}}
                     >
@@ -755,7 +767,7 @@ const App = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="table-body">
+              <tbody>
                 {currentPageItems.map((item) => (
                   <TableRow
                     key={item.id}

@@ -37,7 +37,7 @@ const FilterControls = ({
     
     if (value.trim() === '') {
       setValidation({ isValid: true, message: '' });
-      setDataFeed('');
+      setDataFeed(''); // This will trigger the confirmation modal if there's unsaved work
     } else {
       debouncedValidate(value);
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 const DataFeedSwitchConfirmation = ({ 
   show, 
@@ -12,37 +13,60 @@ const DataFeedSwitchConfirmation = ({
   if (!show) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <svg className="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.684-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-          <h3>Switch Data Feed</h3>
+    <div
+      className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50"
+      style={{ zIndex: 1055 }}
+      role="dialog"
+      tabIndex="-1"
+    >
+      <div
+        className="modal-content shadow-lg border-0 rounded-3 bg-white"
+        style={{ maxWidth: "550px", width: "90%" }}
+      >
+        <div className="modal-header border-bottom-0 pb-2 px-4 pt-4 d-flex justify-content-between align-items-center">
+          <h5 className="modal-title d-flex align-items-center fw-semibold text-dark mb-0">
+            <AlertTriangle className="text-warning me-3" size={24} />
+            Switch Data Feed
+          </h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={onCancel}
+            aria-label="Close"
+          ></button>
         </div>
-        <div className="modal-body">
-          <p>
-            You have <strong>{unsavedCount}</strong> unsaved judgment{unsavedCount !== 1 ? 's' : ''} for the current data feed.
-          </p>
-          <p>
+        <div className="modal-body pt-3 pb-4 px-4">
+          <div className="bg-info bg-opacity-10 border border-info border-opacity-25 rounded-2 p-3 mb-3">
+            <p className="mb-2 text-dark fs-6">
+              <i className="bi bi-info-circle-fill text-info me-2"></i>
+              You have <span className="fw-bold text-primary">{unsavedCount}</span> unsaved
+              judgment{unsavedCount !== 1 ? "s" : ""} for the current data feed.
+            </p>
+          </div>
+          <p className="mb-0 text-muted">
             Switching to a new data feed will clear your current work unless you accept all judgments first.
           </p>
         </div>
-        <div className="modal-footer">
-          <button 
-            className="btn btn-primary" 
+        <div className="modal-footer border-top-0 pt-2 pb-4 px-4 d-flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="btn btn-success px-3"
             onClick={onAcceptAll}
           >
+            <i className="bi bi-check-circle me-2"></i>
             Accept All & Switch
           </button>
-          <button 
-            className="btn btn-secondary" 
+          <button
+            type="button"
+            className="btn btn-outline-warning px-3"
             onClick={onContinue}
           >
+            <i className="bi bi-exclamation-triangle me-2"></i>
             Continue & Lose Work
           </button>
-          <button 
-            className="btn btn-tertiary" 
+          <button
+            type="button"
+            className="btn btn-secondary px-3"
             onClick={onCancel}
           >
             Cancel

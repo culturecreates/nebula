@@ -166,9 +166,9 @@ const TableRow = ({ item, onAction, onRefresh }) => {
 
   return (
     <>
-      <tr className={`table-row${expanded ? ' expanded' : ''}`} onClick={handleRowClick} style={{ cursor: 'pointer' }}>
-        <td className="table-cell cell-id">{item.id}</td>
-        <td className="table-cell">
+      <tr className={expanded ? 'expanded' : ''} onClick={handleRowClick} style={{ cursor: 'pointer' }}>
+        <th scope="row">{item.id}</th>
+        <td>
           <div className="judgement-cell">
             {/* Status badge without button text for ready states */}
             {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready') ? (
@@ -228,7 +228,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
             
           </div>
         </td>
-        <td className="table-cell cell-external-id">
+        <td>
           {canShowEye && (
             <button
               className="icon-button eye-externalid-btn"
@@ -240,27 +240,27 @@ const TableRow = ({ item, onAction, onRefresh }) => {
             </button>
           )}
         </td>
-        <td className="table-cell">
+        <td>
           <div className="name-cell">
             <div className="name-primary">{item.name}</div>
             <div className="name-secondary">{item.description}</div>
           </div>
         </td>
-        <td className="table-cell">
+        <td>
           {item.url && (
             <a href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
               {truncateUrl(item.url)}
             </a>
           )}
         </td>
-        <td className="table-cell">
+        <td>
           {item.isni || ''}
         </td>
-        <td className="table-cell">
+        <td>
           {item.wikidata || ''}
         </td>
-        <td className="table-cell cell-type">{item.type}</td>
-        <td className="table-cell">
+        <td>{item.type}</td>
+        <td>
           {/* Only show refresh button for non-reconciled items */}
           {(currentStatus !== 'reconciled' && !item.linkedTo && !item.mintedAs) && (
             <button
@@ -280,8 +280,8 @@ const TableRow = ({ item, onAction, onRefresh }) => {
         const isSelected = isManuallySelected || isAutoSelected;
         return (
           <tr key={`${item.id}-match-${index}`} className={`table-row match-row ${isSelected ? 'selected-match' : ''}`}>
-            <td className="table-cell"></td>
-            <td className="table-cell">
+            <td></td>
+            <td>
               <div className="match-actions">
                 {currentStatus === 'needs-judgment' && (
                   <button 
@@ -305,25 +305,25 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                 )}
               </div>
             </td>
-            <td className="table-cell cell-external-id">
+            <td>
               <span title={match.id}>{match.id}</span>
             </td>
-            <td className="table-cell">
+            <td>
               <div className="name-cell">
                 <div className="match-name">{match.name}</div>
                 <div className="match-description">{match.description}</div>
               </div>
             </td>
-            <td className="table-cell"></td>
-            <td className="table-cell"></td>
-            <td className="table-cell"></td>
-            <td className="table-cell cell-type">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
               {Array.isArray(match.type) 
                 ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])
                 : (typeof match.type === 'object' ? match.type.id || match.type.name : match.type)
               }
             </td>
-            <td className="table-cell"></td>
+            <td></td>
           </tr>
         );
       })}
