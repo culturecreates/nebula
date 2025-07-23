@@ -13,7 +13,7 @@ class DatabusService
     # Get latest version of the artifact
     @latest_version = get_latest_version(artifact_uri)
     return false if @latest_version.nil?
-    api_endpoint = "#{Rails.application.credentials.artsdata_databus_endpoint}/push_artifact_version"
+    api_endpoint = "#{Rails.application.config.artsdata_databus_endpoint}/push_artifact_version"
     # payload = {
     #   artifact_version_uri: @latest_version,
     #   publisher: @user_uri
@@ -24,7 +24,7 @@ class DatabusService
 
   # Delete all versions of the artifact from Databus
   def delete_artifact
-      api_endpoint = "#{Rails.application.credentials.artsdata_databus_endpoint}"
+      api_endpoint = "#{Rails.application.config.artsdata_databus_endpoint}"
       api_url = "#{api_endpoint}?artifact=#{CGI.escape(@artifact_uri.to_s)}&publisher=#{CGI.escape(@user_uri)}"
       call_databus_api(api_url,"delete")
   end
@@ -90,7 +90,7 @@ class DatabusService
 
   def get_latest_version(artifact_uri)
     # Define the API endpoint
-    api_endpoint = "#{Rails.application.credentials.artsdata_databus_endpoint}/artifact/latest?artifact=#{CGI.escape(artifact_uri)}"
+    api_endpoint = "#{Rails.application.config.artsdata_databus_endpoint}/artifact/latest?artifact=#{CGI.escape(artifact_uri)}"
     begin
       response = Net::HTTP.get_response(URI.parse(api_endpoint))
       if response.code.to_i == 200

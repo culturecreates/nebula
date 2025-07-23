@@ -20,7 +20,7 @@ class ReconcileController < ApplicationController
       redirect_to entity_path(uri: @query) if @query.starts_with?("http") || @query.match?(/^K.*-.*$/)
 
       @query.squish! # remove extra spaces and newlines
-      recon_uri = params[:reconEndpoint] || Rails.application.credentials.artsdata_recon_endpoint
+      recon_uri = params[:reconEndpoint] || Rails.application.config.artsdata_recon_endpoint
       recon_service = ReconService.new(recon_uri)
       response = recon_service.query_party(params)
     

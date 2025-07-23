@@ -115,7 +115,7 @@
       name. -->
       <div
         data-controller="artsdata"
-        data-artsdata-mintendpoint-value="<%= Rails.application.credentials.artsdata_mint_endpoint %>"
+        data-artsdata-mintendpoint-value="<%= Rails.application.config.artsdata_mint_endpoint %>"
         data-artsdata-externaluri-value="<%= @external_uri %>"
         data-artsdata-classtomint-value="<%= @class_to_mint %>"
         data-artsdata-authority-value="<%=  @group %>"

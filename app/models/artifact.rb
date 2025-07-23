@@ -112,7 +112,7 @@ class Artifact
    
     
     # Call the API to save the artifact
-    databus_endpoint = Rails.application.credentials.artsdata_databus_endpoint
+    databus_endpoint = Rails.application.config.artsdata_databus_endpoint
     body = {
       name: name,
       description: @description,

@@ -4,7 +4,7 @@ class ValidateController < ApplicationController
     uri = params[:uri]
     class_to_mint = params[:classToMint]
     # Call Artsdata API to get the RDF graph for the entity
-    mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
+    mint_endpoint = Rails.application.config.artsdata_mint_endpoint
     url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
     begin
       response = HTTParty.get(url)
@@ -36,7 +36,7 @@ class ValidateController < ApplicationController
       @entity.graph = RDF::Graph.new << response 
 
       ## Call Artsdata Preview with facts (JSON-LD) from Wikidata
-      mint_endpoint = Rails.application.credentials.artsdata_mint_endpoint
+      mint_endpoint = Rails.application.config.artsdata_mint_endpoint
       facts = CGI.escape(@entity.graph.dump(:jsonld).squish)
       
       url = "#{mint_endpoint}/preview?classToMint=#{@class_to_mint}&facts=#{facts}"
