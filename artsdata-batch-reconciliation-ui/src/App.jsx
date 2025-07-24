@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import FilterControls from "./components/FilterControls";
 import TableRow from "./components/TableRow";
@@ -22,15 +25,6 @@ function filterItems(items, filterText) {
   );
 }
 
-// Helper for sorting
-function sortItems(items, sortKey, sortDir) {
-  if (!sortKey) return items;
-  return [...items].sort((a, b) => {
-    if (a[sortKey] < b[sortKey]) return sortDir === "asc" ? -1 : 1;
-    if (a[sortKey] > b[sortKey]) return sortDir === "asc" ? 1 : -1;
-    return 0;
-  });
-}
 
 // Main App Component
 const App = () => {
@@ -41,8 +35,6 @@ const App = () => {
   const [filterText, setFilterText] = useState("");
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortKey, setSortKey] = useState(null);
-  const [sortDir, setSortDir] = useState("asc");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -570,15 +562,6 @@ const App = () => {
     }
   };
 
-  const handleSort = (key) => {
-    if (sortKey === key) {
-      setSortDir(sortDir === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-  };
-
   const handleRefreshRow = async (id) => {
     try {
       // Find the original item from the items array (before reconciliation)
@@ -649,7 +632,7 @@ const App = () => {
     );
   }
   
-  const sorted = sortItems(filtered, sortKey, sortDir);
+  const sorted = filtered;
   
   // Since API handles pagination, we display all items from current API call
   const currentPageItems = sorted;
@@ -758,9 +741,7 @@ const App = () => {
                     <th
                       key={col.key || idx}
                       scope="col"
-                      className={col.key ? "sort-none" : ""}
-                      onClick={col.key ? () => handleSort(col.key) : undefined}
-                      style={col.key ? { cursor: 'pointer' } : {}}
+                      className=""
                     >
                       {col.label}
                     </th>

@@ -11,6 +11,8 @@
   },
   "homepage": "https://culturecreates.github.io/nebula/artsdata-batch-reconciliation-ui",
   "dependencies": {
+    "bootstrap": "^5.3.7",
+    "bootstrap-icons": "^1.13.1",
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
