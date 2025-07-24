@@ -3,7 +3,7 @@ class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri
   @@artsdata_client = ArtsdataApi::V2::Client.new(
         graph_repository: Rails.application.credentials.graph_repository, 
-        api_endpoint: Rails.application.credentials.graph_api_endpoint)
+        api_endpoint: Rails.application.config.graph_api_endpoint)
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]

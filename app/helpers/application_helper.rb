@@ -82,7 +82,7 @@ module ApplicationHelper
   end
 
   def sparql_endpoint
-    "#{Rails.application.credentials.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
+    "#{Rails.application.config.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
   end
 
   # Use the standard Ruby SPARQL client
