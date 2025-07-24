@@ -2,7 +2,7 @@
  * Service for fetching data feed results from Artsdata Reconciliation API
  */
 
-const API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
+const DEFAULT_API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
 
 /**
  * Fetch dynamic data based on type, graph URL, page and limit using the recon extension API
@@ -10,9 +10,13 @@ const API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
  * @param {string} graphUrl - The direct graph URL
  * @param {number} page - Page number (default: 1)
  * @param {number} limit - Number of items per page (default: 20)
+ * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Array>} - Array of transformed data
  */
-export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20) {
+export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}) {
+  // Use config endpoint or fall back to default
+  const apiBaseUrl = config.reconciliationEndpoint ? `${config.reconciliationEndpoint}/extend` : DEFAULT_API_BASE_URL;
+  
   try {
     // Check if graphUrl is empty or undefined
     if (!graphUrl || graphUrl.trim() === '') {
@@ -21,7 +25,7 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20) {
     }
     
     const encodedGraphUrl = encodeURIComponent(graphUrl);
-    const apiUrl = `${API_BASE_URL}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
+    const apiUrl = `${apiBaseUrl}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
     
     console.log('Fetching from API:', apiUrl);
     

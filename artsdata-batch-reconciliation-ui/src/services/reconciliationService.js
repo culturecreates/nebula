@@ -3,21 +3,24 @@
  * Handles batch reconciliation, minting, and linking operations
  */
 
-// API endpoints
-const STAGING_API_BASE = 'https://staging.api.artsdata.ca';
-const RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
-const RECONCILIATION_ENDPOINT = '/match'; // Based on reconciliation API spec
+// Default endpoints for development (when no config is passed)
+const DEFAULT_STAGING_API_BASE = 'https://staging.api.artsdata.ca';
+const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
+const DEFAULT_PUBLISHER_URI = 'http://kg.artsdata.ca/resource/K1-1';
 
-// Publisher URI for development (as specified in requirements)
-const PUBLISHER_URI = 'http://kg.artsdata.ca/resource/K1-1';
+const RECONCILIATION_ENDPOINT = '/match'; // Based on reconciliation API spec
 
 /**
  * Call the reconciliation API to get match candidates
  * @param {Array} entities - Array of entities to reconcile
  * @param {string} entityType - schema:Person, schema:Organization, etc.
+ * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Object>} - Reconciliation results
  */
-export async function getMatchCandidates(entities, entityType) {
+export async function getMatchCandidates(entities, entityType, config = {}) {
+  // Use config endpoints or fall back to defaults
+  const reconciliationBaseUrl = config.reconciliationEndpoint || DEFAULT_RECONCILIATION_BASE_URL;
+  
   try {
     // Build queries for batch reconciliation
     const queries = entities.map(entity => ({
@@ -37,7 +40,7 @@ export async function getMatchCandidates(entities, entityType) {
     console.log('Reconciliation Query:', { queries });
     console.log('Reconciliation EntityType:', entityType);
 
-    const response = await fetch(`${RECONCILIATION_BASE_URL}${RECONCILIATION_ENDPOINT}`, {
+    const response = await fetch(`${reconciliationBaseUrl}${RECONCILIATION_ENDPOINT}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,10 +66,14 @@ export async function getMatchCandidates(entities, entityType) {
  * Preview minting process for an entity
  * @param {string} uri - URI of the entity to mint
  * @param {string} classToMint - schema:Person, schema:Organization, etc.
+ * @param {Object} config - Configuration object with endpoints
  * @param {string} facts - Optional graph of facts
  * @returns {Promise<Object>} - Preview results
  */
-export async function previewMint(uri, classToMint, facts = null) {
+export async function previewMint(uri, classToMint, config = {}, facts = null) {
+  // Use config endpoints or fall back to defaults
+  const mintEndpoint = config.mintEndpoint || DEFAULT_STAGING_API_BASE;
+  
   try {
     const params = new URLSearchParams({
       uri,
@@ -77,7 +84,7 @@ export async function previewMint(uri, classToMint, facts = null) {
       params.append('facts', facts);
     }
 
-    const response = await fetch(`${STAGING_API_BASE}/mint/preview?${params}`, {
+    const response = await fetch(`${mintEndpoint}/mint/preview?${params}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
@@ -101,11 +108,16 @@ export async function previewMint(uri, classToMint, facts = null) {
  * @param {string} uri - URI of the entity to mint
  * @param {string} classToMint - schema:Person, schema:Organization, etc.
  * @param {string} reference - URI of the graph/data feed
+ * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Object>} - Mint results
  */
-export async function mintEntity(uri, classToMint, reference) {
+export async function mintEntity(uri, classToMint, reference, config = {}) {
+  // Use config endpoints or fall back to defaults
+  const mintEndpoint = config.mintEndpoint || DEFAULT_STAGING_API_BASE;
+  const publisherUri = config.userUri || DEFAULT_PUBLISHER_URI;
+  
   try {
-    const response = await fetch(`${STAGING_API_BASE}/mint`, {
+    const response = await fetch(`${mintEndpoint}/mint`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +127,7 @@ export async function mintEntity(uri, classToMint, reference) {
         uri,
         classToMint,
         reference,
-        publisher: PUBLISHER_URI
+        publisher: publisherUri
       })
     });
 
@@ -136,9 +148,13 @@ export async function mintEntity(uri, classToMint, reference) {
  * @param {string} externalUri - URI of the entity to link
  * @param {string} classToLink - schema:Person, schema:Organization, etc.
  * @param {string} adUri - Artsdata URI of the entity to link to
+ * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Object>} - Link results
  */
-export async function linkEntity(externalUri, classToLink, adUri) {
+export async function linkEntity(externalUri, classToLink, adUri, config = {}) {
+  // Use config endpoints or fall back to defaults
+  const linkEndpoint = config.linkEndpoint || DEFAULT_STAGING_API_BASE;
+  
   try {
     const params = new URLSearchParams({
       externalUri,
@@ -146,7 +162,7 @@ export async function linkEntity(externalUri, classToLink, adUri) {
       adUri
     });
     
-    const response = await fetch(`${STAGING_API_BASE}/link?${params}`, {
+    const response = await fetch(`${linkEndpoint}/link?${params}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json'
@@ -265,14 +281,14 @@ export function getReferenceUri(feed) {
  * @param {number} batchSize - Number of entities per batch
  * @returns {Promise<Array>} - Reconciled entities
  */
-export async function batchReconcile(entities, entityType, batchSize = 20) {
+export async function batchReconcile(entities, entityType, batchSize = 20, config = {}) {
   const results = [];
   
   for (let i = 0; i < entities.length; i += batchSize) {
     const batch = entities.slice(i, i + batchSize);
     
     try {
-      const reconciliationResults = await getMatchCandidates(batch, entityType);
+      const reconciliationResults = await getMatchCandidates(batch, entityType, config);
       const processedBatch = processReconciliationResults(reconciliationResults, batch);
       results.push(...processedBatch);
     } catch (error) {

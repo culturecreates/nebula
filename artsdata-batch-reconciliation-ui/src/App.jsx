@@ -27,7 +27,7 @@ function filterItems(items, filterText) {
 
 
 // Main App Component
-const App = () => {
+const App = ({ config }) => {
   const [dataFeed, setDataFeed] = useState('');
   const [type, setType] = useState("Event");
   const [minScore, setMinScore] = useState(50);
@@ -64,7 +64,7 @@ const App = () => {
       setReconciliationStatus('idle');
       
       try {
-        const data = await fetchDynamicData(type, dataFeed, currentPage, pageSize);
+        const data = await fetchDynamicData(type, dataFeed, currentPage, pageSize, config);
         setItems(data);
         setReconciledItems(data); // Initialize with original data
       } catch (err) {
@@ -152,7 +152,7 @@ const App = () => {
         if (itemsToReconcile.length > 0) {
           console.log(`Reconciling ${itemsToReconcile.length} items of type ${schemaType}`);
           // Batch reconcile new items
-          const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length);
+          const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length, config);
           
           // Update reconciledItems with the new reconciled data
           // Don't merge with previous state - replace the current items
@@ -362,7 +362,7 @@ const App = () => {
       if (action === "mint_preview") {
         // Preview mint first
         const schemaType = `schema:${type}`; // Add schema: prefix for mint API
-        const previewResult = await previewMint(item.uri, schemaType);
+        const previewResult = await previewMint(item.uri, schemaType, config);
         
         if (previewResult.status === 'success') {
           updateData = {
@@ -375,7 +375,7 @@ const App = () => {
       } else if (action === "mint_final") {
         // Perform actual mint
         const schemaType = `schema:${type}`; // Add schema: prefix for mint API
-        const mintResult = await mintEntity(item.uri, schemaType, dataFeed);
+        const mintResult = await mintEntity(item.uri, schemaType, dataFeed, config);
         updateData = {
           status: "reconciled",
           mintedAs: `${type.toLowerCase()}`,
@@ -384,7 +384,7 @@ const App = () => {
       } else if (action === "link" && matchCandidate) {
         // Link to matched entity
         const adUri = `http://kg.artsdata.ca/resource/${matchCandidate.id}`;
-        const linkResult = await linkEntity(item.uri, `schema:${type}`, adUri);
+        const linkResult = await linkEntity(item.uri, `schema:${type}`, adUri, config);
         updateData = {
           status: "reconciled",
           linkedTo: matchCandidate.id,
@@ -593,7 +593,7 @@ const App = () => {
       
       // Perform fresh reconciliation for this single item
       const schemaType = `schema:${type}`; // Add schema: prefix for reconciliation API
-      const reconciled = await batchReconcile([resetItem], schemaType, 1);
+      const reconciled = await batchReconcile([resetItem], schemaType, 1, config);
       
       if (reconciled.length > 0) {
         // Update with fresh reconciled data
