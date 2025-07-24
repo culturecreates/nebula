@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     post "mint/link_facts", to: "mint#link_facts"
     get "mint/wikidata", to: "mint#wikidata"
     get "reconcile/query", to: "reconcile#query"
+    get "reconcile/batch", to: "reconcile#batch"
     get "validate/wikidata", to: "validate#wikidata"
     get "validate", to: "validate#show"
 

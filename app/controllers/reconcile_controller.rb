@@ -3,6 +3,8 @@ require 'uri'
 
 class ReconcileController < ApplicationController
 
+  def batch; end
+
   # Reconcile - returns only Artsdata URIs
   # GET /reconcile/query?query=&type=&postalCode=
   # https://wikidata.reconci.link/en/api
