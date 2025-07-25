@@ -169,10 +169,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
               />
             )}
             
-            {/* Mint option button for needs-judgment state */}
+            {/* Mint option link for needs-judgment state */}
             {currentStatus === 'needs-judgment' && (
               <button 
-                className="btn btn-sm btn-secondary"
+                className="action-link"
                 onClick={handleMintClick}
               >
                 Mint New

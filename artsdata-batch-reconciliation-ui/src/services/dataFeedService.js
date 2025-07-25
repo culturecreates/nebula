@@ -73,11 +73,18 @@ function extractWikidataId(item) {
   if (item.wikidata) return item.wikidata;
   if (item.wikidataId) return item.wikidataId;
   
-  // Check sameAs array for Wikidata links
-  if (item.sameAs && Array.isArray(item.sameAs)) {
-    const wikidataLink = item.sameAs.find(link => 
-      typeof link === 'string' && link.includes('wikidata.org')
-    );
+  // Check sameAs for Wikidata links (handle both string and array)
+  if (item.sameAs) {
+    let wikidataLink = null;
+    
+    if (Array.isArray(item.sameAs)) {
+      wikidataLink = item.sameAs.find(link => 
+        typeof link === 'string' && link.includes('wikidata.org')
+      );
+    } else if (typeof item.sameAs === 'string' && item.sameAs.includes('wikidata.org')) {
+      wikidataLink = item.sameAs;
+    }
+    
     if (wikidataLink) {
       // Extract just the Q-ID from the full URL
       const match = wikidataLink.match(/Q\d+/);
@@ -105,16 +112,27 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
   const schemaType = `http://schema.org/${selectedType}`;
 
   return apiResults.map((item, index) => {
-    // Check if entity already has sameAs link to Artsdata
-    const hasSameAs = item.sameAs && Array.isArray(item.sameAs) && 
-                     item.sameAs.some(link => link.includes('kg.artsdata.ca'));
+    // Check if entity already has sameAs link to Artsdata (handle both string and array)
+    let hasSameAs = false;
+    let artsdataLink = null;
+    
+    if (item.sameAs) {
+      if (Array.isArray(item.sameAs)) {
+        // Handle array format
+        hasSameAs = item.sameAs.some(link => link.includes('kg.artsdata.ca'));
+        artsdataLink = item.sameAs.find(link => link.includes('kg.artsdata.ca'));
+      } else if (typeof item.sameAs === 'string') {
+        // Handle string format
+        hasSameAs = item.sameAs.includes('kg.artsdata.ca');
+        artsdataLink = hasSameAs ? item.sameAs : null;
+      }
+    }
     
     // Extract Artsdata ID if sameAs exists
     let artsdataId = null;
     let artsdataName = null;
-    if (hasSameAs) {
-      const artsdataLink = item.sameAs.find(link => link.includes('kg.artsdata.ca'));
-      artsdataId = artsdataLink ? artsdataLink.split('/').pop() : null;
+    if (hasSameAs && artsdataLink) {
+      artsdataId = artsdataLink.split('/').pop();
       artsdataName = item.name || ''; // Use the entity's own name
     }
 
