@@ -218,23 +218,40 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     const result = results[index] || {};
     const candidates = result.candidates || [];
     
-    // Find true matches (where match property is true)
-    const trueMatches = candidates.filter(candidate => candidate.match === true);
+    // Check if entity is pre-reconciled and find matching candidate
+    let hasAutoMatch = false;
+    let autoMatchCandidate = null;
     
-    // Auto-judgment logic: only if there's exactly one true match
-    const hasAutoMatch = trueMatches.length === 1;
-    const autoMatchCandidate = hasAutoMatch ? trueMatches[0] : null;
+    if (entity.isPreReconciled && entity.linkedTo) {
+      // Find candidate that matches the entity's artsdata_uri
+      const matchingCandidate = candidates.find(candidate => candidate.id === entity.linkedTo);
+      if (matchingCandidate) {
+        hasAutoMatch = true;
+        autoMatchCandidate = matchingCandidate;
+      }
+    } else {
+      // Find true matches (where match property is true) for non-pre-reconciled entities
+      const trueMatches = candidates.filter(candidate => candidate.match === true);
+      // Auto-judgment logic: only if there's exactly one true match
+      hasAutoMatch = trueMatches.length === 1;
+      autoMatchCandidate = hasAutoMatch ? trueMatches[0] : null;
+    }
     
     // Transform candidates for UI display
-    const matches = candidates.map(candidate => ({
-      id: candidate.id,
-      name: candidate.name,
-      description: candidate.description || candidate.disambiguatingDescription || '',
-      type: candidate.type || [],
-      score: normalizeScore(candidate.score),
-      match: candidate.match || false,
-      externalId: candidate.id || ''
-    }));
+    const matches = candidates.map(candidate => {
+      // For pre-reconciled entities, mark the matching candidate as a true match
+      const isMatchingCandidate = entity.isPreReconciled && entity.linkedTo && candidate.id === entity.linkedTo;
+      
+      return {
+        id: candidate.id,
+        name: candidate.name,
+        description: candidate.description || candidate.disambiguatingDescription || '',
+        type: candidate.type || [],
+        score: normalizeScore(candidate.score),
+        match: isMatchingCandidate ? true : (candidate.match || false), // Override match for pre-reconciled
+        externalId: candidate.id || ''
+      };
+    });
 
     const processedEntity = {
       ...entity,
