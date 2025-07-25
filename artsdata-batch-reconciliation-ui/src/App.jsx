@@ -410,7 +410,7 @@ const App = ({ config }) => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [reconciledItems]);
 
-  const handleAction = async (itemId, action, matchCandidate = null) => {
+  const handleAction = async (itemId, action, matchCandidate = null, selectedType = null) => {
     const item = reconciledItems.find(item => item.id === itemId);
     if (!item) return;
 
@@ -418,25 +418,28 @@ const App = ({ config }) => {
       let updateData = {};
       
       if (action === "mint_preview") {
-        // Preview mint first
-        const schemaType = `schema:${type}`; // Add schema: prefix for mint API
+        // Preview mint first - use selectedType if provided, otherwise fall back to current type
+        const entityType = selectedType || type;
+        const schemaType = `schema:${entityType}`; // Add schema: prefix for mint API
         const previewResult = await previewMint(item.uri, schemaType, config);
         
         if (previewResult.status === 'success') {
           updateData = {
             mintReady: true,
-            mintError: null
+            mintError: null,
+            selectedMintType: entityType // Save the selected type for mint_final
           };
         } else {
           throw new Error(previewResult.message || 'Mint preview failed');
         }
       } else if (action === "mint_final") {
-        // Perform actual mint
-        const schemaType = `schema:${type}`; // Add schema: prefix for mint API
+        // Perform actual mint - use saved selectedMintType if available, otherwise fall back to current type
+        const entityType = item.selectedMintType || type;
+        const schemaType = `schema:${entityType}`; // Add schema: prefix for mint API
         const mintResult = await mintEntity(item.uri, schemaType, dataFeed, config);
         updateData = {
           status: "reconciled",
-          mintedAs: `${type.toLowerCase()}`,
+          mintedAs: `${entityType.toLowerCase()}`,
           actionError: null
         };
       } else if (action === "link" && matchCandidate) {
@@ -461,6 +464,7 @@ const App = ({ config }) => {
           mintReady: false,
           mintError: null,
           selectedMatch: null,
+          selectedMintType: null,
           actionError: null
         };
       } else if (action === "reset_judgment") {
@@ -751,7 +755,7 @@ const App = ({ config }) => {
         hasResults={currentPageItems.length > 0}
       />
 
-      <div className="table-container">
+      <div className={`table-container ${currentPageItems.length === 0 ? 'empty-state' : ''}`}>
         {loading && (
           <div className="alert alert-info" role="alert">
             <div className="d-flex align-items-center">
@@ -837,7 +841,7 @@ const App = ({ config }) => {
             <button 
               onClick={handleAcceptAll} 
               className="btn btn-primary accept-all-btn"
-              disabled={itemsReadyToAccept === 0}
+              disabled={true}
             >
               Accept All ({itemsReadyToAccept})
             </button>

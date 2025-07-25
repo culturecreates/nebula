@@ -139,7 +139,7 @@ const FilterControls = ({
           <button 
             onClick={onAcceptAll} 
             className="btn btn-primary accept-all-btn"
-            disabled={totalItems === 0}
+            disabled={true}
           >
             Accept All ({totalItems})
           </button>
@@ -160,28 +160,13 @@ const FilterControls = ({
         />
       </div>
       <div className="form-group">
-        <label className="form-label">Minimum Score</label>
-        <div className="slider-container">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={minScore}
-            onChange={(e) => setMinScore(parseInt(e.target.value, 10))}
-            className="slider"
-            disabled={loading}
-          />
-          <div className="slider-tooltip">{minScore}</div>
-        </div>
-      </div>
-      <div className="form-group">
         <label className="checkbox-container">
           <input
             type="checkbox"
             checked={showAll}
             onChange={(e) => setShowAll(e.target.checked)}
             className="checkbox"
-            disabled={loading}
+            disabled={true}
           />
           <span className="checkbox-label">Show all</span>
         </label>

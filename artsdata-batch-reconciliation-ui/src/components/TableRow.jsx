@@ -14,7 +14,6 @@ function truncateUrl(url, maxLength = 24) {
 }
 
 const TableRow = ({ item, onAction, onRefresh }) => {
-  const [expanded, setExpanded] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(item.selectedMatch || null);
   const [showMintConfirm, setShowMintConfirm] = useState(false);
   const [mintPreviewLoading, setMintPreviewLoading] = useState(false);
@@ -66,19 +65,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
 
   const currentStatus = getItemStatus();
   
-  // Auto-expand if there are multiple matches to show
-  const shouldAutoExpand = item.matches && item.matches.length > 1 && currentStatus === 'needs-judgment';
-  
-  React.useEffect(() => {
-    if (shouldAutoExpand) {
-      setExpanded(true);
-    }
-  }, [shouldAutoExpand]);
 
   // Handle match selection
   const handleMatchSelect = (match) => {
     setSelectedMatch(match);
-    setExpanded(false); // Collapse after selection
     // Save match selection to global state
     onAction(item.id, 'select_match', match);
   };
@@ -89,13 +79,13 @@ const TableRow = ({ item, onAction, onRefresh }) => {
   };
 
   // Handle mint confirmation
-  const handleMintConfirm = async () => {
+  const handleMintConfirm = async (selectedType) => {
     setMintPreviewLoading(true);
     setMintPreviewError(null);
     
     try {
-      // Call mint preview API
-      await onAction(item.id, 'mint_preview');
+      // Call mint preview API with selected type
+      await onAction(item.id, 'mint_preview', null, selectedType);
       setShowMintConfirm(false);
     } catch (error) {
       setMintPreviewError(error.message);
@@ -108,7 +98,6 @@ const TableRow = ({ item, onAction, onRefresh }) => {
   const handleChange = (e) => {
     e.stopPropagation(); // Prevent row click handler
     setSelectedMatch(null);
-    setExpanded(true);
     
     // Reset mint state if item was in mint-ready state
     if (currentStatus === 'mint-ready') {
@@ -150,23 +139,13 @@ const TableRow = ({ item, onAction, onRefresh }) => {
     }
   };
 
-  const handleRowClick = (e) => {
-    if (
-      e.target.closest('.icon-button') ||
-      e.target.closest('.action-link') ||
-      e.target.closest('.btn')
-    ) {
-      return;
-    }
-    setExpanded((prev) => !prev);
-  };
 
   // Only show eye icon if item.externalId exists
   const canShowEye = !!item.externalId;
 
   return (
     <>
-      <tr className={expanded ? 'expanded' : ''} onClick={handleRowClick} style={{ cursor: 'pointer' }}>
+      <tr>
         <th scope="row">{item.id}</th>
         <td>
           <div className="judgement-cell">
@@ -177,7 +156,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                 onClick={handleFinalAction}
                 disabled={currentStatus === 'mint-error'}
               >
-                {currentStatus === 'judgment-ready' ? 'Match' : `Mint ${item.type?.split('/').pop() || 'Entity'}`}
+                {currentStatus === 'judgment-ready' ? 'Match' : `Mint ${item.selectedMintType || item.type?.split('/').pop() || 'Entity'}`}
               </button>
             ) : (
               <StatusBadge 
@@ -186,7 +165,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                 autoMatched={item.hasAutoMatch}
                 mintError={item.mintError || mintPreviewError}
                 linkError={item.linkError}
-                entityType={item.type?.split('/').pop() || 'Entity'}
+                entityType={item.selectedMintType || item.type?.split('/').pop() || 'Entity'}
               />
             )}
             
@@ -201,7 +180,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
             )}
             
             {/* Change link - only show for non-reconciled items */}
-            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'link-error') && (
+            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'link-error' || currentStatus === 'skipped') && (
               <button 
                 className="action-link"
                 onClick={handleChange}
@@ -233,7 +212,11 @@ const TableRow = ({ item, onAction, onRefresh }) => {
             <button
               className="icon-button eye-externalid-btn"
               title={item.externalId}
-              onClick={e => { e.stopPropagation(); }}
+              onClick={e => { 
+                e.stopPropagation(); 
+                const encodedUri = encodeURIComponent(item.uri);
+                window.open(`https://staging.kg.artsdata.ca/entity?uri=${encodedUri}`, '_blank');
+              }}
               style={{ marginRight: '0.5rem' }}
             >
               <Eye className="table-icon" />
@@ -273,11 +256,27 @@ const TableRow = ({ item, onAction, onRefresh }) => {
           )}
         </td>
       </tr>
-      {expanded && item.matches && item.matches.map((match, index) => {
-        // Check if this match is selected either manually or automatically
-        const isManuallySelected = selectedMatch && selectedMatch.id === match.id;
-        const isAutoSelected = !selectedMatch && match.match === true && item.hasAutoMatch !== false;
-        const isSelected = isManuallySelected || isAutoSelected;
+      {item.matches && item.matches
+        .filter((match) => {
+          // If a match is selected, only show the selected match
+          if (selectedMatch) {
+            return selectedMatch.id === match.id;
+          }
+          // If no manual selection but there's an auto-match, only show the auto-matched one
+          if (!selectedMatch && item.hasAutoMatch && match.match === true) {
+            return true;
+          }
+          // If no selection at all, show all matches (needs-judgment state)
+          if (!selectedMatch && (currentStatus === 'needs-judgment' || !item.hasAutoMatch)) {
+            return true;
+          }
+          return false;
+        })
+        .map((match, index) => {
+          // Check if this match is selected either manually or automatically
+          const isManuallySelected = selectedMatch && selectedMatch.id === match.id;
+          const isAutoSelected = !selectedMatch && match.match === true && item.hasAutoMatch !== false;
+          const isSelected = isManuallySelected || isAutoSelected;
         return (
           <tr key={`${item.id}-match-${index}`} className={`table-row match-row ${isSelected ? 'selected-match' : ''}`}>
             <td></td>
@@ -306,7 +305,14 @@ const TableRow = ({ item, onAction, onRefresh }) => {
               </div>
             </td>
             <td>
-              <span title={match.id}>{match.id}</span>
+              <a 
+                href={`https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(`http://kg.artsdata.ca/resource/${match.id}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={match.id}
+              >
+                {match.id}
+              </a>
             </td>
             <td>
               <div className="name-cell">
