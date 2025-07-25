@@ -1,52 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { validateGraphUrl, debounce } from '../utils/urlValidation';
+import React, { useState, useEffect } from 'react';
+import { validateGraphUrl } from '../utils/urlValidation';
 
 const FilterControls = ({ 
   dataFeed, setDataFeed, type, setType, minScore, setMinScore, showAll, setShowAll,
   filterText, setFilterText, pageSize, setPageSize, loading, error,
-  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults
+  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch
 }) => {
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
   const [typeInputValue, setTypeInputValue] = useState(type || '');
-
-  // Create stable debounced functions using useRef to avoid recreation
-  const debouncedSetDataFeedRef = useRef(
-    debounce((url) => {
-      const result = validateGraphUrl(url);
-      setValidation(result);
-      
-      // Only set the dataFeed if the URL is valid
-      if (result.isValid && !result.isWarning) {
-        setDataFeed(url);
-      }
-    }, 2000)
-  );
-
-  const debouncedSetTypeRef = useRef(
-    debounce((typeValue) => {
-      // Use the latest setType function
-      setType(typeValue);
-    }, 2000)
-  );
-
-  // Update the refs when the setter functions change
-  useEffect(() => {
-    debouncedSetDataFeedRef.current = debounce((url) => {
-      const result = validateGraphUrl(url);
-      setValidation(result);
-      
-      if (result.isValid && !result.isWarning) {
-        setDataFeed(url);
-      }
-    }, 2000);
-  }, [setDataFeed]);
-
-  useEffect(() => {
-    debouncedSetTypeRef.current = debounce((typeValue) => {
-      setType(typeValue);
-    }, 2000);
-  }, [setType]);
 
   // Update input value when dataFeed prop changes
   useEffect(() => {
@@ -67,32 +29,36 @@ const FilterControls = ({
     const value = e.target.value;
     setInputValue(value);
     
-    if (value.trim() === '') {
-      setValidation({ isValid: true, message: '' });
-      setDataFeed(''); // This will trigger the confirmation modal if there's unsaved work
-    } else {
-      // Update validation immediately for UI feedback
-      const result = validateGraphUrl(value);
-      setValidation(result);
-      
-      // Debounce the actual parent state update
-      debouncedSetDataFeedRef.current(value);
-    }
+    // Update validation immediately for UI feedback
+    const result = validateGraphUrl(value);
+    setValidation(result);
   };
 
   // Handle type input change
   const handleTypeInputChange = (e) => {
     const value = e.target.value;
     setTypeInputValue(value);
+  };
+
+  // Handle search button click
+  const handleSearchClick = () => {
+    // Validate inputs before searching
+    const urlValidation = validateGraphUrl(inputValue);
+    setValidation(urlValidation);
     
-    // Debounce the parent state update
-    if (value.trim() === '') {
-      // If empty, update immediately without confirmation
-      setType('');
-    } else {
-      // For non-empty values, use debounced update
-      debouncedSetTypeRef.current(value);
+    if (urlValidation.isValid && !urlValidation.isWarning && typeInputValue.trim() !== '') {
+      // Call the parent's search handler with current input values
+      onSearch(inputValue.trim(), typeInputValue.trim());
     }
+  };
+
+  // Check if search can be performed
+  const canSearch = () => {
+    return inputValue.trim() !== '' && 
+           typeInputValue.trim() !== '' && 
+           validation.isValid && 
+           !validation.isWarning && 
+           !loading;
   };
 
   return (
@@ -133,6 +99,24 @@ const FilterControls = ({
           placeholder="e.g., Event, Person, Organization"
           disabled={loading}
         />
+      </div>
+      <div className="search-button-container">
+        <button 
+          onClick={handleSearchClick}
+          className="btn btn-primary"
+          disabled={!canSearch()}
+        >
+          {loading ? (
+            <>
+              <div className="spinner-border spinner-border-sm me-2" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              Searching...
+            </>
+          ) : (
+            'Search'
+          )}
+        </button>
       </div>
       {dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
         <div className="accept-all-container">

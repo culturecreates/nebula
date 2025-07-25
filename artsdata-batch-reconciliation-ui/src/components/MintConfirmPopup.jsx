@@ -10,11 +10,20 @@ const MintConfirmPopup = ({
   isLoading,
   error,
 }) => {
-  const [selectedType, setSelectedType] = React.useState(entityType || 'Event');
+  // Smart type matching function
+  const getMatchingType = (entityType) => {
+    const availableTypes = ['Event', 'Person', 'Organization', 'Place'];
+    const normalizedEntityType = entityType?.split('/').pop(); // Handle schema.org URLs
+    return availableTypes.includes(normalizedEntityType) ? normalizedEntityType : null;
+  };
+
+  const [selectedType, setSelectedType] = React.useState(() => {
+    return getMatchingType(entityType) || '';
+  });
   
   // Update selected type when entityType prop changes
   React.useEffect(() => {
-    setSelectedType(entityType || 'Event');
+    setSelectedType(getMatchingType(entityType) || '');
   }, [entityType]);
   
   const handleConfirm = () => {
@@ -61,6 +70,9 @@ const MintConfirmPopup = ({
               onChange={(e) => setSelectedType(e.target.value)}
               disabled={isLoading}
             >
+              {!getMatchingType(entityType) && (
+                <option value="">Select a type...</option>
+              )}
               <option value="Event">Event</option>
               <option value="Person">Person</option>
               <option value="Organization">Organization</option>
@@ -87,7 +99,7 @@ const MintConfirmPopup = ({
             type="button"
             className="btn btn-success px-4"
             onClick={handleConfirm}
-            disabled={isLoading || error}
+            disabled={isLoading || error || !selectedType}
           >
             {isLoading && (
               <span
@@ -97,7 +109,7 @@ const MintConfirmPopup = ({
                 <span className="visually-hidden">Loading...</span>
               </span>
             )}
-            {isLoading ? "Checking..." : `Mint ${selectedType}`}
+            {isLoading ? "Checking..." : selectedType ? `Mint ${selectedType}` : "Select Type"}
           </button>
         </div>
       </div>
