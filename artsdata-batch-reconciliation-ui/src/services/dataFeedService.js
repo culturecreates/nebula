@@ -13,7 +13,7 @@ const DEFAULT_API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
  * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Array>} - Array of transformed data
  */
-export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}) {
+export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}, signal = null) {
   // Use config endpoint or fall back to default
   const apiBaseUrl = config.reconciliationEndpoint ? `${config.reconciliationEndpoint}/extend` : DEFAULT_API_BASE_URL;
   
@@ -33,7 +33,8 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
       method: 'GET',
       headers: {
         'Accept': 'application/json'
-      }
+      },
+      signal: signal // Add abort signal support
     });
 
     if (!response.ok) {
@@ -52,6 +53,11 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
     
     return transformApiResults(data, page, limit, type);
   } catch (error) {
+    // Don't log aborted requests as errors
+    if (error.name === 'AbortError') {
+      console.log('Request aborted:', error);
+      throw error;
+    }
     console.error('Error fetching dynamic data:', error);
     throw error;
   }

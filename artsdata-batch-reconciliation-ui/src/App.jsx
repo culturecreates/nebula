@@ -5,12 +5,11 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import FilterControls from "./components/FilterControls";
 import TableRow from "./components/TableRow";
-import Pagination from "./components/Pagination";
 import NavigationConfirmation from "./components/NavigationConfirmation";
 import TypeSwitchConfirmation from "./components/TypeSwitchConfirmation";
 import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation";
-import { fetchDynamicData, getAvailableTypes } from "./services/dataFeedService";
-import { batchReconcile, getReferenceUri, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
+import { fetchDynamicData } from "./services/dataFeedService";
+import { batchReconcile, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper for filtering rows
@@ -33,7 +32,7 @@ const App = ({ config }) => {
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(true);
   const [filterText, setFilterText] = useState("");
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -56,31 +55,75 @@ const App = ({ config }) => {
   // Global judgment storage across all pages
   const [globalJudgments, setGlobalJudgments] = useState(new Map());
 
+  // Add request sequence tracking to prevent race conditions
+  const [requestSequence, setRequestSequence] = useState(0);
+  const [abortController, setAbortController] = useState(null);
+
+
+  // Internal load function that does the actual API call
+  const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize) => {
+    // Cancel previous request if it exists
+    if (abortController) {
+      abortController.abort();
+    }
+
+    // Create new abort controller for this request
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    // Increment sequence number for this request
+    const currentSequence = requestSequence + 1;
+    setRequestSequence(currentSequence);
+
+    setLoading(true);
+    setError(null);
+    setReconciliationStatus('idle');
+    
+    try {
+      const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, currentPageSize, config, controller.signal);
+      
+      // Only update state if this is still the latest request
+      setRequestSequence(prev => {
+        if (currentSequence >= prev) {
+          setItems(data);
+          setReconciledItems(data); // Initialize with original data
+        }
+        return prev;
+      });
+    } catch (err) {
+      // Only update error state if this is still the latest request and not aborted
+      if (err.name !== 'AbortError') {
+        setRequestSequence(prev => {
+          if (currentSequence >= prev) {
+            setError(err.message);
+            console.error('Error loading data:', err);
+          }
+          return prev;
+        });
+      }
+    } finally {
+      // Only update loading state if this is still the latest request
+      setRequestSequence(prev => {
+        if (currentSequence >= prev) {
+          setLoading(false);
+        }
+        return prev;
+      });
+    }
+  };
+
   // Load data when type, feed, or page changes
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      setError(null);
-      setReconciliationStatus('idle');
-      
-      try {
-        const data = await fetchDynamicData(type, dataFeed, currentPage, pageSize, config);
-        setItems(data);
-        setReconciledItems(data); // Initialize with original data
-      } catch (err) {
-        setError(err.message);
-        console.error('Error loading data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     // Only load if we have both type and dataFeed filled, and URL is valid
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
-        loadData();
+        loadDataInternal(type, dataFeed, currentPage, pageSize);
       } else {
+        // Cancel any pending request
+        if (abortController) {
+          abortController.abort();
+        }
         // Don't load data if URL is invalid
         setItems([]);
         setReconciledItems([]);
@@ -88,6 +131,10 @@ const App = ({ config }) => {
         setError(validation.isValid ? null : validation.message);
       }
     } else {
+      // Cancel any pending request
+      if (abortController) {
+        abortController.abort();
+      }
       // Clear data when either field is empty
       setItems([]);
       setReconciledItems([]);
@@ -96,6 +143,13 @@ const App = ({ config }) => {
       setLoading(false);
       setError(null);
     }
+
+    // Cleanup function to cancel any pending requests when component unmounts
+    return () => {
+      if (abortController) {
+        abortController.abort();
+      }
+    };
   }, [type, dataFeed, currentPage, pageSize]);
 
   // Separate effect to apply saved judgments when items change

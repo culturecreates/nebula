@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { validateGraphUrl, debounce } from '../utils/urlValidation';
-import Pagination from './Pagination';
 
 const FilterControls = ({ 
   dataFeed, setDataFeed, type, setType, minScore, setMinScore, showAll, setShowAll,
@@ -11,24 +10,43 @@ const FilterControls = ({
   const [inputValue, setInputValue] = useState(dataFeed || '');
   const [typeInputValue, setTypeInputValue] = useState(type || '');
 
-  // Debounced validation function
-  const debouncedValidate = debounce((url) => {
-    const result = validateGraphUrl(url);
-    setValidation(result);
-    
-    // Only set the dataFeed if the URL is valid
-    if (result.isValid && !result.isWarning) {
-      setDataFeed(url);
-    }
-  }, 500);
+  // Create stable debounced functions using useRef to avoid recreation
+  const debouncedSetDataFeedRef = useRef(
+    debounce((url) => {
+      const result = validateGraphUrl(url);
+      setValidation(result);
+      
+      // Only set the dataFeed if the URL is valid
+      if (result.isValid && !result.isWarning) {
+        setDataFeed(url);
+      }
+    }, 2000)
+  );
 
-  // Debounced type update function with longer delay to prevent premature warnings
-  const debouncedTypeUpdate = debounce((typeValue) => {
-    // Only call setType if the value has actually changed
-    if (typeValue !== type) {
+  const debouncedSetTypeRef = useRef(
+    debounce((typeValue) => {
+      // Use the latest setType function
       setType(typeValue);
-    }
-  }, 2000);
+    }, 2000)
+  );
+
+  // Update the refs when the setter functions change
+  useEffect(() => {
+    debouncedSetDataFeedRef.current = debounce((url) => {
+      const result = validateGraphUrl(url);
+      setValidation(result);
+      
+      if (result.isValid && !result.isWarning) {
+        setDataFeed(url);
+      }
+    }, 2000);
+  }, [setDataFeed]);
+
+  useEffect(() => {
+    debouncedSetTypeRef.current = debounce((typeValue) => {
+      setType(typeValue);
+    }, 2000);
+  }, [setType]);
 
   // Update input value when dataFeed prop changes
   useEffect(() => {
@@ -53,7 +71,12 @@ const FilterControls = ({
       setValidation({ isValid: true, message: '' });
       setDataFeed(''); // This will trigger the confirmation modal if there's unsaved work
     } else {
-      debouncedValidate(value);
+      // Update validation immediately for UI feedback
+      const result = validateGraphUrl(value);
+      setValidation(result);
+      
+      // Debounce the actual parent state update
+      debouncedSetDataFeedRef.current(value);
     }
   };
 
@@ -62,13 +85,13 @@ const FilterControls = ({
     const value = e.target.value;
     setTypeInputValue(value);
     
-    // Only call the actual setType (which might show confirmation) after debounce
+    // Debounce the parent state update
     if (value.trim() === '') {
       // If empty, update immediately without confirmation
       setType('');
     } else {
       // For non-empty values, use debounced update
-      debouncedTypeUpdate(value);
+      debouncedSetTypeRef.current(value);
     }
   };
 
@@ -163,26 +186,6 @@ const FilterControls = ({
           <span className="checkbox-label">Show all</span>
         </label>
       </div>
-      <div className="form-group">
-        <label className="form-label">Page Size</label>
-        <select
-          value={pageSize}
-          onChange={(e) => setPageSize(parseInt(e.target.value, 10))}
-          className="form-select page-size-select"
-        >
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-        </select>
-      </div>
-      {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
-        <div className="pagination-container">
-          <Pagination
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-          />
-        </div>
-      )}
     </div>
     
     {loading && (
