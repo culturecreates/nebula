@@ -260,7 +260,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
           )}
         </td>
       </tr>
-      {item.matches && currentStatus !== 'skipped' && item.matches
+      {item.matches && currentStatus !== 'skipped' && currentStatus !== 'mint-ready' && item.matches
         .filter((match) => {
           // If a match is selected, only show the selected match
           if (selectedMatch) {
