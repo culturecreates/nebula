@@ -64,6 +64,31 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
 }
 
 /**
+ * Extract Wikidata ID from various possible locations in the item data
+ * @param {Object} item - Item data from API
+ * @returns {string} - Wikidata ID or empty string
+ */
+function extractWikidataId(item) {
+  // Check direct wikidata fields first
+  if (item.wikidata) return item.wikidata;
+  if (item.wikidataId) return item.wikidataId;
+  
+  // Check sameAs array for Wikidata links
+  if (item.sameAs && Array.isArray(item.sameAs)) {
+    const wikidataLink = item.sameAs.find(link => 
+      typeof link === 'string' && link.includes('wikidata.org')
+    );
+    if (wikidataLink) {
+      // Extract just the Q-ID from the full URL
+      const match = wikidataLink.match(/Q\d+/);
+      return match ? match[0] : wikidataLink;
+    }
+  }
+  
+  return '';
+}
+
+/**
  * Transform API results into a normalized format for the UI
  * @param {Array} apiResults - Raw API results (array of items)
  * @param {number} page - Page number
@@ -104,8 +129,8 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       location: item.location || '', // New field from API
       startDate: item.startDate || '', // New field from API
       endDate: item.endDate || '', // New field from API
-      isni: '', // Not provided by API
-      wikidata: '', // Not provided by API
+      isni: item.isni || item.ISNI || '', // Extract ISNI if available
+      wikidata: extractWikidataId(item), // Extract Wikidata if available
       // Mark as reconciled if already has sameAs link
       status: hasSameAs ? 'reconciled' : 'needs-judgment',
       linkedTo: artsdataId,
