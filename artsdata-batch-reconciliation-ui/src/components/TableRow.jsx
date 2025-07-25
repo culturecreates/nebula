@@ -301,9 +301,9 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                 <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
                   {match.match ? 'TRUE' : ''} ({match.score})
                 </span>
-                {isSelected && (
+                {isAutoSelected && (
                   <span className="selected-indicator">
-                    ✓ {isAutoSelected ? 'Auto-Selected' : 'Selected'}
+                    ✓ Auto-Selected
                   </span>
                 )}
               </div>
