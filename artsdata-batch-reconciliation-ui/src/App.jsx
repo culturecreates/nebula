@@ -846,7 +846,7 @@ const App = ({ config }) => {
           <div className="bottom-accept-all">
             <button 
               onClick={handleAcceptAll} 
-              className="btn btn-primary accept-all-btn"
+              className="btn btn-primary"
               disabled={true}
             >
               Accept All ({itemsReadyToAccept})

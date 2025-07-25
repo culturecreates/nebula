@@ -138,7 +138,7 @@ const FilterControls = ({
         <div className="accept-all-container">
           <button 
             onClick={onAcceptAll} 
-            className="btn btn-primary accept-all-btn"
+            className="btn btn-primary"
             disabled={true}
           >
             Accept All ({totalItems})

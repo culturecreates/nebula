@@ -435,10 +435,6 @@ body {
   padding-right: 1rem; /* Match bottom button alignment */
 }
 
-.accept-all-btn {
-  white-space: nowrap;
-}
-
 .filter-row-2 {
   display: flex;
   gap: 1rem;

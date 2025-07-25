@@ -64,35 +64,46 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
 }
 
 /**
- * Extract Wikidata ID from various possible locations in the item data
- * @param {Object} item - Item data from API
+ * Extract ISNI ID from ISNI URI
+ * @param {string} isni_uri - ISNI URI from API
+ * @returns {string} - ISNI ID or empty string
+ */
+function extractIsniId(isni_uri) {
+  if (!isni_uri || typeof isni_uri !== 'string') return '';
+  
+  // Extract ISNI ID from URI (typically the last part after /)
+  // Example: "https://isni.org/isni/0000000123456789" -> "0000000123456789"
+  const isniMatch = isni_uri.match(/(\d{16})$/);
+  return isniMatch ? isniMatch[1] : isni_uri;
+}
+
+/**
+ * Extract Wikidata ID from Wikidata URI or various other locations
+ * @param {string} wikidata_uri - Wikidata URI from API
  * @returns {string} - Wikidata ID or empty string
  */
-function extractWikidataId(item) {
-  // Check direct wikidata fields first
-  if (item.wikidata) return item.wikidata;
-  if (item.wikidataId) return item.wikidataId;
-  
-  // Check sameAs for Wikidata links (handle both string and array)
-  if (item.sameAs) {
-    let wikidataLink = null;
-    
-    if (Array.isArray(item.sameAs)) {
-      wikidataLink = item.sameAs.find(link => 
-        typeof link === 'string' && link.includes('wikidata.org')
-      );
-    } else if (typeof item.sameAs === 'string' && item.sameAs.includes('wikidata.org')) {
-      wikidataLink = item.sameAs;
-    }
-    
-    if (wikidataLink) {
-      // Extract just the Q-ID from the full URL
-      const match = wikidataLink.match(/Q\d+/);
-      return match ? match[0] : wikidataLink;
-    }
+function extractWikidataId(wikidata_uri) {
+  // Check direct wikidata_uri field first (new format)
+  if (wikidata_uri && typeof wikidata_uri === 'string') {
+    // Extract just the Q-ID from the full URL
+    const match = wikidata_uri.match(/Q\d+/);
+    return match ? match[0] : wikidata_uri;
   }
   
   return '';
+}
+
+/**
+ * Extract first type from comma-separated types string
+ * @param {string} typeString - Type string from API (may be comma-separated)
+ * @returns {string} - First type or empty string
+ */
+function extractFirstType(typeString) {
+  if (!typeString || typeof typeString !== 'string') return '';
+  
+  // Split by comma and get the first type, trim whitespace
+  const types = typeString.split(',');
+  return types[0].trim();
 }
 
 /**
@@ -108,31 +119,18 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
     return [];
   }
 
-  // Convert user-selected type to schema.org format
+  // Convert user-selected type to schema.org format (fallback only)
   const schemaType = `http://schema.org/${selectedType}`;
 
   return apiResults.map((item, index) => {
-    // Check if entity already has sameAs link to Artsdata (handle both string and array)
-    let hasSameAs = false;
-    let artsdataLink = null;
+    // Check if entity already has artsdata_uri (new format)
+    const hasArtsdataUri = item.artsdata_uri && item.artsdata_uri.trim() !== '';
     
-    if (item.sameAs) {
-      if (Array.isArray(item.sameAs)) {
-        // Handle array format
-        hasSameAs = item.sameAs.some(link => link.includes('kg.artsdata.ca'));
-        artsdataLink = item.sameAs.find(link => link.includes('kg.artsdata.ca'));
-      } else if (typeof item.sameAs === 'string') {
-        // Handle string format
-        hasSameAs = item.sameAs.includes('kg.artsdata.ca');
-        artsdataLink = hasSameAs ? item.sameAs : null;
-      }
-    }
-    
-    // Extract Artsdata ID if sameAs exists
+    // Extract Artsdata ID if artsdata_uri exists
     let artsdataId = null;
     let artsdataName = null;
-    if (hasSameAs && artsdataLink) {
-      artsdataId = artsdataLink.split('/').pop();
+    if (hasArtsdataUri) {
+      artsdataId = item.artsdata_uri.split('/').pop();
       artsdataName = item.name || ''; // Use the entity's own name
     }
 
@@ -140,21 +138,21 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       id: ((page - 1) * limit) + index + 1,
       name: item.name || '',
       uri: item.uri || '',
-      url: item.url || '', // May not be provided
+      url: item.url || '', // Direct from API
       externalId: item.uri ? item.uri.split('/').pop() : '',
-      type: item.type || schemaType, // Use selected type if API type is missing
+      type: extractFirstType(item.type) || schemaType, // Use first API-provided type, fallback to generated schema type
       description: item.description || '',
       location: item.location || '', // New field from API
       startDate: item.startDate || '', // New field from API
       endDate: item.endDate || '', // New field from API
-      isni: item.isni || item.ISNI || '', // Extract ISNI if available
-      wikidata: extractWikidataId(item), // Extract Wikidata if available
-      // Mark as reconciled if already has sameAs link
-      status: hasSameAs ? 'reconciled' : 'needs-judgment',
+      isni: extractIsniId(item.isni_uri), // Extract ISNI from new isni_uri field
+      wikidata: extractWikidataId(item.wikidata_uri), // Extract Wikidata from new wikidata_uri field
+      // Mark as reconciled if already has artsdata_uri
+      status: hasArtsdataUri ? 'reconciled' : 'needs-judgment',
       linkedTo: artsdataId,
       linkedToName: artsdataName,
       matches: [], // Initialize empty matches array
-      isPreReconciled: hasSameAs // Flag to identify pre-reconciled entities
+      isPreReconciled: hasArtsdataUri // Flag to identify pre-reconciled entities
     };
   });
 }
