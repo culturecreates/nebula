@@ -316,10 +316,18 @@ body {
   cursor: pointer;
 }
 
+.checkbox-container:has(.checkbox:disabled) {
+  cursor: not-allowed;
+}
+
 .checkbox {
   border-radius: 0.25rem;
   border: 1px solid var(--border-medium);
   accent-color: var(--btn-primary);
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
 }
 
 .checkbox-label {
@@ -332,6 +340,12 @@ body {
   background-color: var(--bg-white);
   border-radius: 0.5rem;
   box-shadow: var(--shadow-sm);
+}
+
+/* Remove background and shadow for empty states */
+.table-container.empty-state {
+  background-color: transparent;
+  box-shadow: none;
 }
 
 /* Add padding to non-table content */
@@ -396,7 +410,7 @@ body {
   display: flex;
   gap: 1rem;
   align-items: start;
-  margin-bottom: 1rem;
+  margin-bottom: 2.5rem; /* Increased spacing to prevent overlap with validation messages */
   min-height: 4rem; /* Reserve space for validation messages */
 }
 
@@ -421,39 +435,20 @@ body {
   padding-right: 1rem; /* Match bottom button alignment */
 }
 
-.accept-all-btn {
-  white-space: nowrap;
-}
-
 .filter-row-2 {
   display: flex;
   gap: 1rem;
-  align-items: end;
+  align-items: center;
   margin-bottom: 1rem;
 }
 
-.filter-row-2 .form-group {
-  flex: 1;
+.filter-row-2 .form-group:first-child {
+  flex: none; /* Keep original width instead of expanding */
+  width: 400px; /* Same width as Data Feed field above */
 }
 
-.filter-row-2 .form-group:nth-child(2) {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.filter-row-2 .form-group:nth-child(2) .form-label {
-  margin-bottom: 0;
-  font-size: 0.875rem;
-  order: 1;
-  width: 60px;
-  line-height: 1.2;
-  text-align: right;
-}
-
-.filter-row-2 .form-group:nth-child(2) .slider-container {
-  order: 2;
+.filter-row-2 .form-group:last-child {
+  flex: none; /* Show all checkbox keeps its size */
 }
 
 .pagination-container {

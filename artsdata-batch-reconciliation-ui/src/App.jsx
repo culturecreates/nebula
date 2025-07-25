@@ -5,12 +5,11 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import FilterControls from "./components/FilterControls";
 import TableRow from "./components/TableRow";
-import Pagination from "./components/Pagination";
 import NavigationConfirmation from "./components/NavigationConfirmation";
 import TypeSwitchConfirmation from "./components/TypeSwitchConfirmation";
 import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation";
-import { fetchDynamicData, getAvailableTypes } from "./services/dataFeedService";
-import { batchReconcile, getReferenceUri, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
+import { fetchDynamicData } from "./services/dataFeedService";
+import { batchReconcile, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper for filtering rows
@@ -27,13 +26,13 @@ function filterItems(items, filterText) {
 
 
 // Main App Component
-const App = () => {
+const App = ({ config }) => {
   const [dataFeed, setDataFeed] = useState('');
-  const [type, setType] = useState("Event");
+  const [type, setType] = useState("");
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(true);
   const [filterText, setFilterText] = useState("");
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -56,39 +55,87 @@ const App = () => {
   // Global judgment storage across all pages
   const [globalJudgments, setGlobalJudgments] = useState(new Map());
 
+  // Add request sequence tracking to prevent race conditions
+  const [requestSequence, setRequestSequence] = useState(0);
+  const [abortController, setAbortController] = useState(null);
+
+
+  // Internal load function that does the actual API call
+  const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize) => {
+    // Cancel previous request if it exists
+    if (abortController) {
+      abortController.abort();
+    }
+
+    // Create new abort controller for this request
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    // Increment sequence number for this request
+    const currentSequence = requestSequence + 1;
+    setRequestSequence(currentSequence);
+
+    setLoading(true);
+    setError(null);
+    setReconciliationStatus('idle');
+    
+    try {
+      const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, currentPageSize, config, controller.signal);
+      
+      // Only update state if this is still the latest request
+      setRequestSequence(prev => {
+        if (currentSequence >= prev) {
+          setItems(data);
+          setReconciledItems(data); // Initialize with original data
+        }
+        return prev;
+      });
+    } catch (err) {
+      // Only update error state if this is still the latest request and not aborted
+      if (err.name !== 'AbortError') {
+        setRequestSequence(prev => {
+          if (currentSequence >= prev) {
+            setError(err.message);
+            console.error('Error loading data:', err);
+          }
+          return prev;
+        });
+      }
+    } finally {
+      // Only update loading state if this is still the latest request
+      setRequestSequence(prev => {
+        if (currentSequence >= prev) {
+          setLoading(false);
+        }
+        return prev;
+      });
+    }
+  };
+
   // Load data when type, feed, or page changes
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      setError(null);
-      setReconciliationStatus('idle');
-      
-      try {
-        const data = await fetchDynamicData(type, dataFeed, currentPage, pageSize);
-        setItems(data);
-        setReconciledItems(data); // Initialize with original data
-      } catch (err) {
-        setError(err.message);
-        console.error('Error loading data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Only load if we have both type and dataFeed, and URL is valid
-    if (type && dataFeed && dataFeed.trim() !== '') {
+    // Only load if we have both type and dataFeed filled, and URL is valid
+    if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
-        loadData();
+        loadDataInternal(type, dataFeed, currentPage, pageSize);
       } else {
+        // Cancel any pending request
+        if (abortController) {
+          abortController.abort();
+        }
         // Don't load data if URL is invalid
         setItems([]);
         setReconciledItems([]);
         setLoading(false);
         setError(validation.isValid ? null : validation.message);
       }
-    } else if (dataFeed === '' || !dataFeed) {
-      // Clear data when data feed is empty
+    } else {
+      // Cancel any pending request
+      if (abortController) {
+        abortController.abort();
+      }
+      // Clear data when either field is empty
       setItems([]);
       setReconciledItems([]);
       setGlobalJudgments(new Map());
@@ -96,6 +143,13 @@ const App = () => {
       setLoading(false);
       setError(null);
     }
+
+    // Cleanup function to cancel any pending requests when component unmounts
+    return () => {
+      if (abortController) {
+        abortController.abort();
+      }
+    };
   }, [type, dataFeed, currentPage, pageSize]);
 
   // Separate effect to apply saved judgments when items change
@@ -152,7 +206,7 @@ const App = () => {
         if (itemsToReconcile.length > 0) {
           console.log(`Reconciling ${itemsToReconcile.length} items of type ${schemaType}`);
           // Batch reconcile new items
-          const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length);
+          const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length, config);
           
           // Update reconciledItems with the new reconciled data
           // Don't merge with previous state - replace the current items
@@ -212,12 +266,16 @@ const App = () => {
   // Check if there are unsaved judgments ready to accept
   const getUnsavedJudgmentCount = () => {
     const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
-      item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)
+      // Exclude pre-reconciled entities from unsaved work count
+      !item.isPreReconciled &&
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
     );
     
     const currentPageReadyItems = reconciledItems.filter(item => {
       if (globalJudgments.has(item.id)) return false;
+      // Exclude pre-reconciled entities from unsaved work count
+      if (item.isPreReconciled) return false;
       return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
              (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     });
@@ -352,7 +410,7 @@ const App = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [reconciledItems]);
 
-  const handleAction = async (itemId, action, matchCandidate = null) => {
+  const handleAction = async (itemId, action, matchCandidate = null, selectedType = null) => {
     const item = reconciledItems.find(item => item.id === itemId);
     if (!item) return;
 
@@ -360,31 +418,34 @@ const App = () => {
       let updateData = {};
       
       if (action === "mint_preview") {
-        // Preview mint first
-        const schemaType = `schema:${type}`; // Add schema: prefix for mint API
-        const previewResult = await previewMint(item.uri, schemaType);
+        // Preview mint first - use selectedType if provided, otherwise fall back to current type
+        const entityType = selectedType || type;
+        const schemaType = `schema:${entityType}`; // Add schema: prefix for mint API
+        const previewResult = await previewMint(item.uri, schemaType, config);
         
         if (previewResult.status === 'success') {
           updateData = {
             mintReady: true,
-            mintError: null
+            mintError: null,
+            selectedMintType: entityType // Save the selected type for mint_final
           };
         } else {
           throw new Error(previewResult.message || 'Mint preview failed');
         }
       } else if (action === "mint_final") {
-        // Perform actual mint
-        const schemaType = `schema:${type}`; // Add schema: prefix for mint API
-        const mintResult = await mintEntity(item.uri, schemaType, dataFeed);
+        // Perform actual mint - use saved selectedMintType if available, otherwise fall back to current type
+        const entityType = item.selectedMintType || type;
+        const schemaType = `schema:${entityType}`; // Add schema: prefix for mint API
+        const mintResult = await mintEntity(item.uri, schemaType, dataFeed, config);
         updateData = {
           status: "reconciled",
-          mintedAs: `${type.toLowerCase()}`,
+          mintedAs: `${entityType.toLowerCase()}`,
           actionError: null
         };
       } else if (action === "link" && matchCandidate) {
         // Link to matched entity
         const adUri = `http://kg.artsdata.ca/resource/${matchCandidate.id}`;
-        const linkResult = await linkEntity(item.uri, `schema:${type}`, adUri);
+        const linkResult = await linkEntity(item.uri, `schema:${type}`, adUri, config);
         updateData = {
           status: "reconciled",
           linkedTo: matchCandidate.id,
@@ -403,6 +464,7 @@ const App = () => {
           mintReady: false,
           mintError: null,
           selectedMatch: null,
+          selectedMintType: null,
           actionError: null
         };
       } else if (action === "reset_judgment") {
@@ -425,6 +487,12 @@ const App = () => {
           linkError: null,
           actionError: null,
           selectedMatch: null
+        };
+      } else if (action === "reset_skip") {
+        // Reset skip state when user clicks Change from skipped
+        updateData = {
+          status: 'needs-judgment',
+          actionError: null
         };
       }
 
@@ -498,13 +566,17 @@ const App = () => {
   const handleAcceptAll = () => {
     // Count items from ALL pages that have judgments ready to be accepted
     const allGlobalItemsToAccept = Array.from(globalJudgments.values()).filter(item => 
-      item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)
+      // Exclude pre-reconciled entities from accept all
+      !item.isPreReconciled &&
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
     );
     
     // Also count current page items that are ready but not in global storage
     const currentPageReadyItems = reconciledItems.filter(item => {
       if (globalJudgments.has(item.id)) return false;
+      // Exclude pre-reconciled entities from accept all
+      if (item.isPreReconciled) return false;
       return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
              (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     });
@@ -522,8 +594,10 @@ const App = () => {
     setGlobalJudgments(prev => {
       const newMap = new Map(prev);
       for (const [itemId, item] of prev) {
-        if (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)) {
+        // Only mark non-pre-reconciled items as reconciled through accept all
+        if (!item.isPreReconciled &&
+            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
           newMap.set(itemId, {
             ...item,
             status: 'reconciled'
@@ -545,8 +619,10 @@ const App = () => {
     // Update current page items
     setReconciledItems(prev => 
       prev.map(item => {
-        if (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)) {
+        // Only mark non-pre-reconciled items as reconciled through accept all
+        if (!item.isPreReconciled &&
+            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
           return {
             ...item,
             status: 'reconciled'
@@ -593,7 +669,7 @@ const App = () => {
       
       // Perform fresh reconciliation for this single item
       const schemaType = `schema:${type}`; // Add schema: prefix for reconciliation API
-      const reconciled = await batchReconcile([resetItem], schemaType, 1);
+      const reconciled = await batchReconcile([resetItem], schemaType, 1, config);
       
       if (reconciled.length > 0) {
         // Update with fresh reconciled data
@@ -639,14 +715,18 @@ const App = () => {
 
   // Count items ready to accept across ALL visited pages from global storage
   const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
-    item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-    (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)
+    // Exclude pre-reconciled entities from accept all count
+    !item.isPreReconciled &&
+    (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+    (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
   );
   
   // Count current page items that are ready but not yet in global storage
   const currentPageReadyItems = reconciledItems.filter(item => {
     // Skip if already in global storage
     if (globalJudgments.has(item.id)) return false;
+    // Exclude pre-reconciled entities from accept all count
+    if (item.isPreReconciled) return false;
     
     // Check if item is ready to accept
     const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || 
@@ -681,7 +761,7 @@ const App = () => {
         hasResults={currentPageItems.length > 0}
       />
 
-      <div className="table-container">
+      <div className={`table-container ${currentPageItems.length === 0 ? 'empty-state' : ''}`}>
         {loading && (
           <div className="alert alert-info" role="alert">
             <div className="d-flex align-items-center">
@@ -710,19 +790,19 @@ const App = () => {
           </div>
         )}
         
-        {!loading && !error && (!dataFeed || dataFeed.trim() === '') && (
+        {!loading && !error && ((!dataFeed || dataFeed.trim() === '') || (!type || type.trim() === '')) && (
           <div className="alert alert-secondary" role="alert">
-            Please enter a data feed URL to load entities for reconciliation.
+            Please enter both a data feed URL and entity type to load entities for reconciliation.
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length === 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
           <div className="alert alert-warning" role="alert">
             No entities found for the selected data feed and type.
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-responsive-sm">
             <table className="table table-hover table-striped">
               <thead className="sticky-top">
@@ -762,12 +842,12 @@ const App = () => {
           </div>
         )}
 
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="bottom-accept-all">
             <button 
               onClick={handleAcceptAll} 
-              className="btn btn-primary accept-all-btn"
-              disabled={itemsReadyToAccept === 0}
+              className="btn btn-primary"
+              disabled={true}
             >
               Accept All ({itemsReadyToAccept})
             </button>
