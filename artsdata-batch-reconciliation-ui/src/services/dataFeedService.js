@@ -80,6 +80,19 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
   const schemaType = `http://schema.org/${selectedType}`;
 
   return apiResults.map((item, index) => {
+    // Check if entity already has sameAs link to Artsdata
+    const hasSameAs = item.sameAs && Array.isArray(item.sameAs) && 
+                     item.sameAs.some(link => link.includes('kg.artsdata.ca'));
+    
+    // Extract Artsdata ID if sameAs exists
+    let artsdataId = null;
+    let artsdataName = null;
+    if (hasSameAs) {
+      const artsdataLink = item.sameAs.find(link => link.includes('kg.artsdata.ca'));
+      artsdataId = artsdataLink ? artsdataLink.split('/').pop() : null;
+      artsdataName = item.name || ''; // Use the entity's own name
+    }
+
     return {
       id: ((page - 1) * limit) + index + 1,
       name: item.name || '',
@@ -93,8 +106,12 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       endDate: item.endDate || '', // New field from API
       isni: '', // Not provided by API
       wikidata: '', // Not provided by API
-      status: 'needs-judgment', // Default status
-      matches: [] // Initialize empty matches array
+      // Mark as reconciled if already has sameAs link
+      status: hasSameAs ? 'reconciled' : 'needs-judgment',
+      linkedTo: artsdataId,
+      linkedToName: artsdataName,
+      matches: [], // Initialize empty matches array
+      isPreReconciled: hasSameAs // Flag to identify pre-reconciled entities
     };
   });
 }

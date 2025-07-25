@@ -266,12 +266,16 @@ const App = ({ config }) => {
   // Check if there are unsaved judgments ready to accept
   const getUnsavedJudgmentCount = () => {
     const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
-      item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)
+      // Exclude pre-reconciled entities from unsaved work count
+      !item.isPreReconciled &&
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
     );
     
     const currentPageReadyItems = reconciledItems.filter(item => {
       if (globalJudgments.has(item.id)) return false;
+      // Exclude pre-reconciled entities from unsaved work count
+      if (item.isPreReconciled) return false;
       return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
              (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     });
@@ -552,13 +556,17 @@ const App = ({ config }) => {
   const handleAcceptAll = () => {
     // Count items from ALL pages that have judgments ready to be accepted
     const allGlobalItemsToAccept = Array.from(globalJudgments.values()).filter(item => 
-      item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)
+      // Exclude pre-reconciled entities from accept all
+      !item.isPreReconciled &&
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
     );
     
     // Also count current page items that are ready but not in global storage
     const currentPageReadyItems = reconciledItems.filter(item => {
       if (globalJudgments.has(item.id)) return false;
+      // Exclude pre-reconciled entities from accept all
+      if (item.isPreReconciled) return false;
       return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
              (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     });
@@ -576,8 +584,10 @@ const App = ({ config }) => {
     setGlobalJudgments(prev => {
       const newMap = new Map(prev);
       for (const [itemId, item] of prev) {
-        if (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)) {
+        // Only mark non-pre-reconciled items as reconciled through accept all
+        if (!item.isPreReconciled &&
+            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
           newMap.set(itemId, {
             ...item,
             status: 'reconciled'
@@ -599,8 +609,10 @@ const App = ({ config }) => {
     // Update current page items
     setReconciledItems(prev => 
       prev.map(item => {
-        if (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)) {
+        // Only mark non-pre-reconciled items as reconciled through accept all
+        if (!item.isPreReconciled &&
+            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
           return {
             ...item,
             status: 'reconciled'
@@ -693,14 +705,18 @@ const App = ({ config }) => {
 
   // Count items ready to accept across ALL visited pages from global storage
   const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
-    item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-    (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo)
+    // Exclude pre-reconciled entities from accept all count
+    !item.isPreReconciled &&
+    (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+    (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
   );
   
   // Count current page items that are ready but not yet in global storage
   const currentPageReadyItems = reconciledItems.filter(item => {
     // Skip if already in global storage
     if (globalJudgments.has(item.id)) return false;
+    // Exclude pre-reconciled entities from accept all count
+    if (item.isPreReconciled) return false;
     
     // Check if item is ready to accept
     const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || 
