@@ -122,7 +122,7 @@ module EntityHelper
   end
 
   def graphdb_link(uri)
-    return "https://db.artsdata.ca/resource?uri=#{CGI.escape(uri)}"
+    return "#{Rails.application.config.graph_api_endpoint}/resource?uri=#{CGI.escape(uri)}"
   end
 
   def ranked_link(entity)
