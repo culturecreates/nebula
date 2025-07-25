@@ -488,6 +488,12 @@ const App = ({ config }) => {
           actionError: null,
           selectedMatch: null
         };
+      } else if (action === "reset_skip") {
+        // Reset skip state when user clicks Change from skipped
+        updateData = {
+          status: 'needs-judgment',
+          actionError: null
+        };
       }
 
       const updatedItem = {

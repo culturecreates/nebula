@@ -119,6 +119,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
     else if (currentStatus === 'judgment-ready' && selectedMatch) {
       onAction(item.id, 'select_match', null);
     }
+    // Reset skipped state back to needs-judgment
+    else if (currentStatus === 'skipped') {
+      onAction(item.id, 'reset_skip');
+    }
   };
 
   // Handle final action (Match or Mint button click)
