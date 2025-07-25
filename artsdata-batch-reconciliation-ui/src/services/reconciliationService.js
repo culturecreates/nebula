@@ -241,8 +241,8 @@ export function processReconciliationResults(reconciliationResults, originalEnti
       matches,
       hasAutoMatch,
       autoMatchCandidate,
-      // Update status based on auto-match
-      status: hasAutoMatch ? 'Auto-matched' : entity.status
+      // Preserve reconciled status for pre-reconciled entities, otherwise update based on auto-match
+      status: entity.isPreReconciled ? 'reconciled' : (hasAutoMatch ? 'Auto-matched' : entity.status)
     };
     
     return processedEntity;
