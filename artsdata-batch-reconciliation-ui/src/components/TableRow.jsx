@@ -266,6 +266,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
           if (selectedMatch) {
             return selectedMatch.id === match.id;
           }
+          // For pre-reconciled entities, only show the matching entity (auto-selected)
+          if (item.isPreReconciled && item.linkedTo) {
+            return match.id === item.linkedTo;
+          }
           // If no manual selection but there's an auto-match, only show the auto-matched one
           if (!selectedMatch && item.hasAutoMatch && match.match === true) {
             return true;
@@ -298,10 +302,12 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                     Match
                   </button>
                 )}
-                <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
-                  {match.match ? 'TRUE' : ''} ({match.score})
-                </span>
-                {isAutoSelected && (
+                {!item.isPreReconciled && (
+                  <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
+                    {match.match ? 'TRUE' : ''} ({match.score})
+                  </span>
+                )}
+                {isAutoSelected && !item.isPreReconciled && (
                   <span className="selected-indicator">
                     ✓ Auto-Selected
                   </span>
