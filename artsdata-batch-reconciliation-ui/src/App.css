@@ -427,6 +427,13 @@ body {
   width: 150px; /* Fixed width for Type field */
 }
 
+.search-button-container {
+  display: flex;
+  align-items: start;
+  padding-top: 1.5rem; /* Align with input labels */
+  margin-left: 1rem;
+}
+
 .accept-all-container {
   margin-left: auto;
   display: flex;

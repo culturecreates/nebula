@@ -8,6 +8,7 @@ import TableRow from "./components/TableRow";
 import NavigationConfirmation from "./components/NavigationConfirmation";
 import TypeSwitchConfirmation from "./components/TypeSwitchConfirmation";
 import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation";
+import SearchConfirmation from "./components/SearchConfirmation";
 import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
@@ -51,6 +52,10 @@ const App = ({ config }) => {
   // Data feed switch confirmation state
   const [showDataFeedSwitchConfirm, setShowDataFeedSwitchConfirm] = useState(false);
   const [pendingDataFeedSwitch, setPendingDataFeedSwitch] = useState(null);
+  
+  // Search confirmation state
+  const [showSearchConfirm, setShowSearchConfirm] = useState(false);
+  const [pendingSearch, setPendingSearch] = useState(null);
   
   // Global judgment storage across all pages
   const [globalJudgments, setGlobalJudgments] = useState(new Map());
@@ -112,36 +117,14 @@ const App = ({ config }) => {
     }
   };
 
-  // Load data when type, feed, or page changes
+  // Load data when page changes (but not on type/dataFeed changes anymore)
   useEffect(() => {
     // Only load if we have both type and dataFeed filled, and URL is valid
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
         loadDataInternal(type, dataFeed, currentPage, pageSize);
-      } else {
-        // Cancel any pending request
-        if (abortController) {
-          abortController.abort();
-        }
-        // Don't load data if URL is invalid
-        setItems([]);
-        setReconciledItems([]);
-        setLoading(false);
-        setError(validation.isValid ? null : validation.message);
       }
-    } else {
-      // Cancel any pending request
-      if (abortController) {
-        abortController.abort();
-      }
-      // Clear data when either field is empty
-      setItems([]);
-      setReconciledItems([]);
-      setGlobalJudgments(new Map());
-      setReconciliationStatus('idle');
-      setLoading(false);
-      setError(null);
     }
 
     // Cleanup function to cancel any pending requests when component unmounts
@@ -150,7 +133,7 @@ const App = ({ config }) => {
         abortController.abort();
       }
     };
-  }, [type, dataFeed, currentPage, pageSize]);
+  }, [currentPage, pageSize]); // Only reload on page/pageSize changes
 
   // Separate effect to apply saved judgments when items change
   useEffect(() => {
@@ -395,6 +378,70 @@ const App = ({ config }) => {
     // Cancel the data feed switch
     setShowDataFeedSwitchConfirm(false);
     setPendingDataFeedSwitch(null);
+  };
+
+  // Handle search request
+  const handleSearch = (newDataFeed, newType) => {
+    const unsavedCount = getUnsavedJudgmentCount();
+    
+    if (unsavedCount > 0) {
+      setPendingSearch({ dataFeed: newDataFeed, type: newType });
+      setShowSearchConfirm(true);
+    } else {
+      // No unsaved work, search directly
+      performSearch(newDataFeed, newType);
+    }
+  };
+
+  const performSearch = (newDataFeed, newType) => {
+    // Clear previous results when performing new search
+    setItems([]);
+    setReconciledItems([]);
+    setGlobalJudgments(new Map());
+    setReconciliationStatus('idle');
+    setError(null);
+    
+    // Update the state variables
+    setDataFeed(newDataFeed);
+    setType(newType);
+    setCurrentPage(1); // Reset to first page
+    
+    // Perform the search
+    const validation = validateGraphUrl(newDataFeed);
+    if (validation.isValid && !validation.isWarning) {
+      loadDataInternal(newType, newDataFeed, 1, pageSize);
+    }
+  };
+
+  const handleSearchAcceptAll = () => {
+    // Accept all current judgments first
+    handleAcceptAll();
+    
+    // Then perform search
+    if (pendingSearch) {
+      performSearch(pendingSearch.dataFeed, pendingSearch.type);
+    }
+    
+    // Close confirmation
+    setShowSearchConfirm(false);
+    setPendingSearch(null);
+  };
+
+  const handleSearchContinue = () => {
+    // Search and lose work
+    if (pendingSearch) {
+      performSearch(pendingSearch.dataFeed, pendingSearch.type);
+    }
+    
+    // Close confirmation
+    setShowSearchConfirm(false);
+    setPendingSearch(null);
+  };
+
+  const handleSearchCancel = () => {
+    // Cancel the search
+    setShowSearchConfirm(false);
+    setPendingSearch(null);
   };
 
   // Override browser back/forward navigation
@@ -759,6 +806,7 @@ const App = ({ config }) => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         hasResults={currentPageItems.length > 0}
+        onSearch={handleSearch}
       />
 
       <div className={`table-container ${currentPageItems.length === 0 ? 'empty-state' : ''}`}>
@@ -879,6 +927,18 @@ const App = ({ config }) => {
         onCancel={handleDataFeedSwitchCancel}
         currentFeed={dataFeed}
         newFeed={pendingDataFeedSwitch}
+        unsavedCount={getUnsavedJudgmentCount()}
+      />
+      
+      <SearchConfirmation
+        show={showSearchConfirm}
+        onAcceptAll={handleSearchAcceptAll}
+        onContinue={handleSearchContinue}
+        onCancel={handleSearchCancel}
+        currentDataFeed={dataFeed}
+        currentType={type}
+        newDataFeed={pendingSearch?.dataFeed}
+        newType={pendingSearch?.type}
         unsavedCount={getUnsavedJudgmentCount()}
       />
     </div>
