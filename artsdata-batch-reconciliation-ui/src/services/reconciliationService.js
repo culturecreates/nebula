@@ -22,6 +22,17 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
   const reconciliationBaseUrl = config.reconciliationEndpoint || DEFAULT_RECONCILIATION_BASE_URL;
   
   try {
+    // Determine reconciliation type - use dbo:Agent as default except for Place/Event
+    const getReconciliationType = (type) => {
+      const normalizedType = type.toLowerCase().replace('schema:', '');
+      if (normalizedType === 'place' || normalizedType === 'event') {
+        return type; // Use original type for Place and Event
+      }
+      return 'dbo:Agent'; // Use dbo:Agent for Person, Organization, and others
+    };
+    
+    const reconciliationType = getReconciliationType(entityType);
+    
     // Build queries for batch reconciliation
     const queries = entities.map(entity => ({
       conditions: [
@@ -33,12 +44,12 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
           matchQuantifier: "any"
         }
       ],
-      type: entityType,
+      type: reconciliationType,
       limit: 10 // Limit candidates per entity
     }));
 
     console.log('Reconciliation Query:', { queries });
-    console.log('Reconciliation EntityType:', entityType);
+    console.log('Reconciliation EntityType:', entityType, '-> Reconciliation Type:', reconciliationType);
 
     const response = await fetch(`${reconciliationBaseUrl}${RECONCILIATION_ENDPOINT}`, {
       method: 'POST',

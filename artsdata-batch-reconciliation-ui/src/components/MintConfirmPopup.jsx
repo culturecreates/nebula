@@ -10,6 +10,16 @@ const MintConfirmPopup = ({
   isLoading,
   error,
 }) => {
+  const [selectedType, setSelectedType] = React.useState(entityType || 'Event');
+  
+  // Update selected type when entityType prop changes
+  React.useEffect(() => {
+    setSelectedType(entityType || 'Event');
+  }, [entityType]);
+  
+  const handleConfirm = () => {
+    onConfirm(selectedType);
+  };
   if (!isOpen) return null;
 
   return (
@@ -26,7 +36,7 @@ const MintConfirmPopup = ({
         <div className="modal-header border-bottom-0 pb-2 px-4 pt-4 d-flex justify-content-between align-items-center">
           <h5 className="modal-title d-flex align-items-center fw-semibold text-dark mb-0">
             <AlertTriangle className="text-warning me-3" size={24} />
-            Confirm Mint {entityType}
+            Mint New Entity
           </h5>
           <button
             type="button"
@@ -38,10 +48,24 @@ const MintConfirmPopup = ({
         </div>
         <div className="modal-body pt-3 pb-4 px-4">
           <p className="mb-3 text-muted fs-6">
-            Are you sure you want to mint a new {entityType.toLowerCase()} for:
+            Select the entity type and confirm minting for:
           </p>
           <div className="bg-light border rounded-2 p-3 mb-3">
             <p className="fw-bold mb-0 text-dark">{entityName}</p>
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold text-dark">Entity Type</label>
+            <select 
+              className="form-select"
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              disabled={isLoading}
+            >
+              <option value="Event">Event</option>
+              <option value="Person">Person</option>
+              <option value="Organization">Organization</option>
+              <option value="Place">Place</option>
+            </select>
           </div>
           {error && (
             <div className="alert alert-danger border-0 rounded-2 mb-0" role="alert">
@@ -62,7 +86,7 @@ const MintConfirmPopup = ({
           <button
             type="button"
             className="btn btn-success px-4"
-            onClick={onConfirm}
+            onClick={handleConfirm}
             disabled={isLoading || error}
           >
             {isLoading && (
@@ -73,7 +97,7 @@ const MintConfirmPopup = ({
                 <span className="visually-hidden">Loading...</span>
               </span>
             )}
-            {isLoading ? "Checking..." : `Mint ${entityType}`}
+            {isLoading ? "Checking..." : `Mint ${selectedType}`}
           </button>
         </div>
       </div>
