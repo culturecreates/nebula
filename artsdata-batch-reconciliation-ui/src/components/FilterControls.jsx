@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getAvailableTypes } from '../services/dataFeedService';
 import { validateGraphUrl, debounce } from '../utils/urlValidation';
 import Pagination from './Pagination';
 
@@ -8,9 +7,9 @@ const FilterControls = ({
   filterText, setFilterText, pageSize, setPageSize, loading, error,
   onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults
 }) => {
-  const availableTypes = getAvailableTypes();
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
+  const [typeInputValue, setTypeInputValue] = useState(type || '');
 
   // Debounced validation function
   const debouncedValidate = debounce((url) => {
@@ -23,12 +22,27 @@ const FilterControls = ({
     }
   }, 500);
 
+  // Debounced type update function with longer delay to prevent premature warnings
+  const debouncedTypeUpdate = debounce((typeValue) => {
+    // Only call setType if the value has actually changed
+    if (typeValue !== type) {
+      setType(typeValue);
+    }
+  }, 2000);
+
   // Update input value when dataFeed prop changes
   useEffect(() => {
     if (dataFeed !== inputValue) {
       setInputValue(dataFeed || '');
     }
   }, [dataFeed]);
+
+  // Update type input value when type prop changes
+  useEffect(() => {
+    if (type !== typeInputValue) {
+      setTypeInputValue(type || '');
+    }
+  }, [type]);
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -40,6 +54,21 @@ const FilterControls = ({
       setDataFeed(''); // This will trigger the confirmation modal if there's unsaved work
     } else {
       debouncedValidate(value);
+    }
+  };
+
+  // Handle type input change
+  const handleTypeInputChange = (e) => {
+    const value = e.target.value;
+    setTypeInputValue(value);
+    
+    // Only call the actual setType (which might show confirmation) after debounce
+    if (value.trim() === '') {
+      // If empty, update immediately without confirmation
+      setType('');
+    } else {
+      // For non-empty values, use debounced update
+      debouncedTypeUpdate(value);
     }
   };
 
@@ -73,20 +102,16 @@ const FilterControls = ({
       </div>
       <div className="form-group">
         <label className="form-label">Type</label>
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          className="form-select"
+        <input
+          type="text"
+          value={typeInputValue}
+          onChange={handleTypeInputChange}
+          className="form-input"
+          placeholder="e.g., Event, Person, Organization"
           disabled={loading}
-        >
-          {availableTypes.map(typeOption => (
-            <option key={typeOption.value} value={typeOption.value}>
-              {typeOption.label}
-            </option>
-          ))}
-        </select>
+        />
       </div>
-      {dataFeed && dataFeed.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
+      {dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
         <div className="accept-all-container">
           <button 
             onClick={onAcceptAll} 
@@ -150,7 +175,7 @@ const FilterControls = ({
           <option value="50">50</option>
         </select>
       </div>
-      {!loading && !error && dataFeed && dataFeed.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
+      {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning && hasResults && (
         <div className="pagination-container">
           <Pagination
             currentPage={currentPage}

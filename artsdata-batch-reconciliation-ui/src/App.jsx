@@ -29,7 +29,7 @@ function filterItems(items, filterText) {
 // Main App Component
 const App = ({ config }) => {
   const [dataFeed, setDataFeed] = useState('');
-  const [type, setType] = useState("Event");
+  const [type, setType] = useState("");
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(true);
   const [filterText, setFilterText] = useState("");
@@ -75,8 +75,8 @@ const App = ({ config }) => {
       }
     };
 
-    // Only load if we have both type and dataFeed, and URL is valid
-    if (type && dataFeed && dataFeed.trim() !== '') {
+    // Only load if we have both type and dataFeed filled, and URL is valid
+    if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
         loadData();
@@ -87,8 +87,8 @@ const App = ({ config }) => {
         setLoading(false);
         setError(validation.isValid ? null : validation.message);
       }
-    } else if (dataFeed === '' || !dataFeed) {
-      // Clear data when data feed is empty
+    } else {
+      // Clear data when either field is empty
       setItems([]);
       setReconciledItems([]);
       setGlobalJudgments(new Map());
@@ -710,19 +710,19 @@ const App = ({ config }) => {
           </div>
         )}
         
-        {!loading && !error && (!dataFeed || dataFeed.trim() === '') && (
+        {!loading && !error && ((!dataFeed || dataFeed.trim() === '') || (!type || type.trim() === '')) && (
           <div className="alert alert-secondary" role="alert">
-            Please enter a data feed URL to load entities for reconciliation.
+            Please enter both a data feed URL and entity type to load entities for reconciliation.
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length === 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
           <div className="alert alert-warning" role="alert">
             No entities found for the selected data feed and type.
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-responsive-sm">
             <table className="table table-hover table-striped">
               <thead className="sticky-top">
@@ -762,7 +762,7 @@ const App = ({ config }) => {
           </div>
         )}
 
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && currentPageItems.length > 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="bottom-accept-all">
             <button 
               onClick={handleAcceptAll} 
