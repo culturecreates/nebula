@@ -88,7 +88,7 @@ class ArtifactController < ApplicationController
   # POST /artifact
   def create
 
-    @artifact = Artifact.new(artifact_params, session[:handle])
+    @artifact = Artifact.new(artifact_params, helpers.user_uri)
     if @artifact.save
       flash.notice = "Created artifact '#{@artifact.name}'. You may now create versions of the artifact."
       redirect_to artifact_index_path

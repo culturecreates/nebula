@@ -63,10 +63,8 @@ class Artifact
       return false
     end
     @artifact_id = self.name.downcase.gsub(" ", "-")
-
     @description = self.description
-    @publisher = "https://github.com/#{self.user}#this"
- 
+   
     if self.type == "spreadsheet-a10s" && self.sheet_url.present?
       @group = "a10s-google-sheet"
       action_name = "Create an artifact version of #{@artifact_id}"
@@ -121,7 +119,7 @@ class Artifact
       action_name: action_name,
       action_url: action_url,
       action_body: httpBody.to_json,
-      publisher: @publisher
+      publisher: @user
     }
     response = HTTParty.post("#{databus_endpoint}/artifact", 
       body: body.to_json,
