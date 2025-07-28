@@ -24,17 +24,13 @@
       </turbo-frame>
     </p>
 
-    <p><%= session[:name] %>
-      acting on behalf of the authority</p>
     <p>
-      <turbo-frame
-        id='card-3'
-        src="<%= dereference_card_path(uri: @authority, frame_id: "3")%>"
-        loading="lazy"
-        target="_top"
-      >
-        loading...
-      </turbo-frame>
+      Proceed to mint if you are sure there are no duplicates and warnings can
+      be ignored.
+    </p>
+    <p>
+      <%= session[:name] %>
+      will be recorded as the publisher.
     </p>
 
     <div

@@ -90,6 +90,7 @@
         </div>
         <%= @external_uri %>
       </div>
+
       <!-- Then call Wikidata to get: A label in a language . The annotations
       can be generated locally using the group and the date. Specific to the
       type: places need complete address people recommended occupation
@@ -99,6 +100,11 @@
       editable. Show reconcile with Artsdata (and link button to avoid
       minting): place uses postal code, person uses name, organization uses
       name. -->
+      <p>
+        <%= session[:name] %>
+        will be recorded as the publisher.
+      </p>
+
       <div
         data-controller="artsdata"
         data-artsdata-mintendpoint-value="<%= Rails.application.config.artsdata_mint_endpoint %>"
