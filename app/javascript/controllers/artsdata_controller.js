@@ -6,7 +6,7 @@ export default class extends Controller {
     externaluri: String, 
     classtomint: String, 
     label: String,
-    authority: String, 
+    publisher: String, 
     mintendpoint: String,
     language: String,
     reference: String
@@ -16,7 +16,7 @@ export default class extends Controller {
     console.log("externaluri", this.externaluriValue)
     console.log("classtomint", this.classtomintValue)
     console.log("label", this.labelValue)
-    console.log("authority", this.authorityValue)
+    console.log("publisher", this.publisherValue)
     console.log("mintendpoint",  this.mintendpointValue)
     console.log("language", this.languageValue)
     console.log("reference", this.referenceValue)
@@ -44,7 +44,7 @@ export default class extends Controller {
       body: JSON.stringify({
         "uri": this.externaluriValue,
         "classToMint": this.classtomintValue,
-        "publisher": this.authorityValue,
+        "publisher": this.publisherValue,
         "name": this.labelValue,
         "language": this.languageValue,
         "reference": this.referenceValue,
@@ -80,7 +80,7 @@ export default class extends Controller {
       body: JSON.stringify({
         "uri": this.externaluriValue,
         "classToMint": this.classtomintValue,
-        "publisher": this.authorityValue,
+        "publisher": this.publisherValue,
         "name": this.labelValue,
         "language": this.languageValue,
         "reference": this.referenceValue,

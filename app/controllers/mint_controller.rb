@@ -1,6 +1,5 @@
 class MintController < ApplicationController
   before_action :check_minting_access # ensure user has permissions
-  before_action :set_authority, only: [:preview, :link, :link_facts] # known as publisher in Artsdata API
   include DereferenceHelper 
 
   # Preview data and SHACL report before minting a new Artsdata URI
@@ -14,7 +13,7 @@ class MintController < ApplicationController
   #   - startDate
   def preview
     required = [:externalUri]
-    if required.all? { |k| params.key? k } && @authority
+    if required.all? { |k| params.key? k } 
       @externalUri = params[:externalUri]
       @classToMint = params[:classToMint]
 
@@ -71,7 +70,7 @@ class MintController < ApplicationController
   # GET /mint/link?externalUri=&classToMint=&adUri=&
   def link 
     required = [:externalUri, :classToMint, :adUri]
-    if required.all? { |k| params.key? k } && @authority
+    if required.all? { |k| params.key? k } 
       @externalUri = params[:externalUri]
       @classToMint =  if params[:classToMint].starts_with?("http") 
                         params[:classToMint]
@@ -250,25 +249,5 @@ class MintController < ApplicationController
     end
   end
 
-  def set_authority
-    return unless params[:externalUri]
-
-    externalUri = params[:externalUri]
-    if externalUri.starts_with?("http://scenepro.ca")
-      @authority = "http://kg.artsdata.ca/resource/K14-90"
-    elsif externalUri.starts_with?("http://kg.footlight.io") || externalUri.starts_with?("http://lod.footlight.io")
-      @authority = "https://graph.culturecreates.com/id/footlight"
-    elsif externalUri.starts_with?("http://capacoa.ca")
-      @authority = "https://graph.culturecreates.com/id/capacoa-admin"
-    elsif externalUri.starts_with?("https://capacoa.ca/member/")
-      @authority = "https://graph.culturecreates.com/id/capacoa-admin"
-    elsif externalUri.starts_with?("http://wikidata.org")
-      @authority = "http://wikidata.org" 
-    elsif externalUri.starts_with?("https://ipaa.ca")
-      @authority = "http://kg.artsdata.ca/resource/K14-165"
-    else 
-      @authority = "http://kg.artsdata.ca/resource/K1-1"
-    end
-  end
 
 end

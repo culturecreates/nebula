@@ -90,20 +90,6 @@
         </div>
         <%= @external_uri %>
       </div>
-
-      <p><%= session[:name] %>
-        acting on behalf of the authority
-      </p>
-      <p>
-        <turbo-frame
-          id='card-3'
-          src="<%= dereference_card_path(uri: @group, frame_id: "3")%>"
-          loading="lazy"
-          target="_top"
-        >
-          loading...
-        </turbo-frame>
-      </p>
       <!-- Then call Wikidata to get: A label in a language . The annotations
       can be generated locally using the group and the date. Specific to the
       type: places need complete address people recommended occupation
@@ -118,7 +104,7 @@
         data-artsdata-mintendpoint-value="<%= Rails.application.config.artsdata_mint_endpoint %>"
         data-artsdata-externaluri-value="<%= @external_uri %>"
         data-artsdata-classtomint-value="<%= @class_to_mint %>"
-        data-artsdata-authority-value="<%=  @group %>"
+        data-artsdata-publisher-value="<%=  @publisher %>"
         data-artsdata-label-value="<%= @label %>"
         data-artsdata-language-value="<%= @language %>"
         data-artsdata-reference-value="<%= @reference %>"
