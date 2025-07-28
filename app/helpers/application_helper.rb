@@ -122,7 +122,9 @@ module ApplicationHelper
   end
 
   def user_uri
-    "https://github.com/#{session[:handle]}#this"
+    if session[:handle].present?
+      "https://github.com/#{session[:handle]}#this"
+    end
   end
 
   def generate_action_div
