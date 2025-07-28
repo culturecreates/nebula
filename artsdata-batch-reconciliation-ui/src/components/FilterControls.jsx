@@ -61,6 +61,16 @@ const FilterControls = ({
            !loading;
   };
 
+  // Handle Enter key press in input fields
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (canSearch()) {
+        handleSearchClick();
+      }
+    }
+  };
+
   return (
   <div className="filter-controls">
     {/* First row: Graph URL, Type, Accept All button */}
@@ -71,6 +81,7 @@ const FilterControls = ({
           type="text"
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           className={`form-input ${
             validation.isValid 
               ? (validation.isWarning ? 'form-input-warning' : '')
@@ -95,6 +106,7 @@ const FilterControls = ({
           type="text"
           value={typeInputValue}
           onChange={handleTypeInputChange}
+          onKeyDown={handleKeyDown}
           className="form-input"
           placeholder="e.g., Event, Person, Organization"
           disabled={loading}
