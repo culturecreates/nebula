@@ -153,54 +153,89 @@ const TableRow = ({ item, onAction, onRefresh }) => {
         <th scope="row">{item.id}</th>
         <td>
           <div className="judgement-cell">
-            {/* Status badge without button text for ready states */}
-            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready') ? (
-              <button 
-                className="btn btn-sm btn-primary"
-                onClick={handleFinalAction}
-                disabled={currentStatus === 'mint-error'}
-              >
-                {currentStatus === 'judgment-ready' ? 'Match' : `Mint ${item.selectedMintType || item.type?.split('/').pop() || 'Entity'}`}
-              </button>
+            {/* Primary action button or text for finalized states */}
+            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'skipped' || currentStatus === 'reconciled') ? (
+              <>
+                {currentStatus === 'reconciled' ? (
+                  <div className="reconciled-text primary-action-full-width">
+                    Reconciled
+                  </div>
+                ) : (
+                  <button 
+                    className={`btn btn-sm ${currentStatus === 'skipped' ? 'btn-secondary' : 'btn-primary'} primary-action-full-width`}
+                    onClick={currentStatus === 'skipped' ? undefined : handleFinalAction}
+                    disabled={currentStatus === 'mint-error' || currentStatus === 'skipped'}
+                  >
+                    {currentStatus === 'judgment-ready' ? 'Match' : 
+                     currentStatus === 'mint-ready' ? `Mint ${item.selectedMintType || item.type?.split('/').pop() || 'Entity'}` : 
+                     'Skipped'}
+                  </button>
+                )}
+                {/* Two-column layout for Change link below (only for skipped, not reconciled) */}
+                {currentStatus !== 'reconciled' && (
+                  <div className="judgement-two-columns">
+                    <div className="status-text-column">
+                      {/* Empty left column */}
+                    </div>
+                    <div className="interactive-elements-column">
+                      <button 
+                        className="action-link"
+                        onClick={handleChange}
+                      >
+                        Change
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
-              <StatusBadge 
-                status={currentStatus} 
-                hasError={item.hasError || item.reconciliationError} 
-                autoMatched={item.hasAutoMatch}
-                mintError={item.mintError || mintPreviewError}
-                linkError={item.linkError}
-                entityType={item.selectedMintType || item.type?.split('/').pop() || 'Entity'}
-              />
-            )}
-            
-            {/* Mint option link for needs-judgment state */}
-            {currentStatus === 'needs-judgment' && (
-              <button 
-                className="action-link"
-                onClick={handleMintClick}
-              >
-                Mint New
-              </button>
-            )}
-            
-            {/* Change link - only show for non-reconciled items */}
-            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'link-error' || currentStatus === 'skipped') && (
-              <button 
-                className="action-link"
-                onClick={handleChange}
-              >
-                Change
-              </button>
-            )}
-            
-            {/* Skip option */}
-            {currentStatus === 'needs-judgment' && (
-              <button 
-                className="action-link"
-                onClick={() => onAction(item.id, 'skip')}
-              >
-                Skip
-              </button>
+              /* Two-column layout for other states */
+              <div className="judgement-two-columns">
+                {/* Left column: Status badges */}
+                <div className="status-text-column">
+                  <StatusBadge 
+                    status={currentStatus} 
+                    hasError={item.hasError || item.reconciliationError} 
+                    autoMatched={item.hasAutoMatch}
+                    mintError={item.mintError || mintPreviewError}
+                    linkError={item.linkError}
+                    entityType={item.selectedMintType || item.type?.split('/').pop() || 'Entity'}
+                  />
+                </div>
+                
+                {/* Right column: Action links */}
+                <div className="interactive-elements-column">
+                  {/* Mint option link for needs-judgment state */}
+                  {currentStatus === 'needs-judgment' && (
+                    <button 
+                      className="action-link"
+                      onClick={handleMintClick}
+                    >
+                      Mint New
+                    </button>
+                  )}
+                  
+                  {/* Skip option */}
+                  {currentStatus === 'needs-judgment' && (
+                    <button 
+                      className="action-link"
+                      onClick={() => onAction(item.id, 'skip')}
+                    >
+                      Skip
+                    </button>
+                  )}
+                  
+                  {/* Change link for other states */}
+                  {currentStatus === 'link-error' && (
+                    <button 
+                      className="action-link"
+                      onClick={handleChange}
+                    >
+                      Change
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
             
             {item.reconciliationError && (
@@ -289,29 +324,42 @@ const TableRow = ({ item, onAction, onRefresh }) => {
           <tr key={`${item.id}-match-${index}`} className={`table-row match-row ${isSelected ? 'selected-match' : ''}`}>
             <td></td>
             <td>
-              <div className="match-actions">
-                {currentStatus === 'needs-judgment' && (
-                  <button 
-                    className="action-link match-link"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMatchSelect(match);
-                    }}
-                    title="Choose this match"
-                  >
-                    Match
-                  </button>
-                )}
-                {!item.isPreReconciled && (
-                  <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
-                    {match.match ? 'TRUE' : ''} ({match.score})
-                  </span>
-                )}
-                {isAutoSelected && !item.isPreReconciled && (
-                  <span className="selected-indicator">
-                    ✓ Auto-Selected
-                  </span>
-                )}
+              <div className="match-judgement-cell">
+                {/* Two-column split: Empty left, Match button with score on right */}
+                <div className="match-two-columns">
+                  {/* Left column: Empty to align with main entity status badges */}
+                  <div className="match-status-column">
+                    {/* Empty column for alignment */}
+                  </div>
+                  
+                  {/* Right column: Match button with score horizontally */}
+                  <div className="match-interactive-column">
+                    <div className="match-button-row">
+                      {currentStatus === 'needs-judgment' && (
+                        <button 
+                          className="action-link match-link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMatchSelect(match);
+                          }}
+                          title="Choose this match"
+                        >
+                          Match
+                        </button>
+                      )}
+                      {!item.isPreReconciled && currentStatus === 'needs-judgment' && (
+                        <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
+                          {match.match ? 'TRUE' : ''} ({match.score})
+                        </span>
+                      )}
+                    </div>
+                    {isAutoSelected && !item.isPreReconciled && (
+                      <span className="selected-indicator">
+                        ✓ Auto-Selected
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </td>
             <td>

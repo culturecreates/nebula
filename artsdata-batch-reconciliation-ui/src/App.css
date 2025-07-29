@@ -890,6 +890,96 @@ body {
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
+  min-width: 140px;
+}
+
+/* Two-column layout within judgement cell */
+.judgement-two-columns {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0rem;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.status-text-column {
+  display: flex;
+  align-items: center;
+  width: auto;
+  flex: 0 0 auto;
+  min-width: 60px;
+}
+
+.interactive-elements-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* Primary action button - aligned with link buttons */
+.primary-action-full-width {
+  width: 70%; /* Full width minus left column width */
+  margin-bottom: 0.25rem;
+}
+
+/* Reconciled text styling */
+.reconciled-text {
+  color: #000;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Change link container - full width */
+.change-link-container {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+/* Match row two-column layout */
+.match-judgement-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.match-two-columns {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0rem;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.match-status-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  align-items: flex-start;
+  width: 60px;
+  flex: 0 0 60px;
+}
+
+.match-interactive-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.match-button-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.change-link-below {
+  margin-top: 0.25rem;
 }
 
 .btn-sm {
@@ -899,7 +989,7 @@ body {
 }
 
 .action-link {
-  color: #2563eb;
+  color: #53585F;
   font-size: 0.75rem;
   text-decoration: underline;
   background: none;
@@ -910,7 +1000,7 @@ body {
 }
 
 .action-link:hover {
-  color: var(--btn-primary-focus);
+  color: #2563eb;
 }
 
 /* Responsive Styles */
