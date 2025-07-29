@@ -305,6 +305,10 @@ const TableRow = ({ item, onAction, onRefresh }) => {
           if (item.isPreReconciled && item.linkedTo) {
             return match.id === item.linkedTo;
           }
+          // For reconciled entities with linkedTo (including newly minted), only show the linked entity
+          if (currentStatus === 'reconciled' && item.linkedTo) {
+            return match.id === item.linkedTo;
+          }
           // If no manual selection but there's an auto-match, only show the auto-matched one
           if (!selectedMatch && item.hasAutoMatch && match.match === true) {
             return true;
@@ -353,7 +357,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
                         </span>
                       )}
                     </div>
-                    {isAutoSelected && !item.isPreReconciled && (
+                    {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
                       <span className="selected-indicator">
                         ✓ Auto-Selected
                       </span>

@@ -484,11 +484,41 @@ const App = ({ config }) => {
         const entityType = item.selectedMintType || type;
         const schemaType = `schema:${entityType}`; // Add schema: prefix for mint API
         const mintResult = await mintEntity(item.uri, schemaType, dataFeed, config);
+        
         updateData = {
           status: "reconciled",
           mintedAs: `${entityType.toLowerCase()}`,
           actionError: null
         };
+        
+        // Auto-refresh match results to find the newly minted entity
+        // Extract the Artsdata ID from the mint response
+        let mintedEntityId = null;
+        if (mintResult.new_uri) {
+          const uriParts = mintResult.new_uri.split('/');
+          mintedEntityId = uriParts[uriParts.length - 1];
+        }
+        
+        // Create a temporary item with reconciled status for re-reconciliation
+        const itemForRefresh = { ...item, ...updateData };
+        const reconciled = await batchReconcile([itemForRefresh], schemaType, 1, config);
+        
+        if (reconciled.length > 0) {
+          // Merge the reconciliation results with our update data, but preserve the reconciled status
+          updateData = { 
+            ...reconciled[0], // Get fresh matches and reconciliation data
+            ...updateData     // Preserve our reconciled status and mint info
+          };
+          
+          // Find the newly minted entity in the matches using the exact ID
+          const matches = reconciled[0].matches || [];
+          const mintedMatch = matches.find(match => match.id === mintedEntityId);
+          
+          if (mintedMatch) {
+            updateData.linkedTo = mintedEntityId;
+            updateData.linkedToName = mintedMatch.name;
+          }
+        }
       } else if (action === "link" && matchCandidate) {
         // Link to matched entity
         const adUri = `http://kg.artsdata.ca/resource/${matchCandidate.id}`;
