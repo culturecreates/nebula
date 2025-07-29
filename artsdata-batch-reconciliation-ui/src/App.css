@@ -921,7 +921,7 @@ body {
 
 /* Primary action button - aligned with link buttons */
 .primary-action-full-width {
-  width: calc(100% - 100px); /* Full width minus left column width */
+  width: 70%; /* Full width minus left column width */
   margin-bottom: 0.25rem;
 }
 
