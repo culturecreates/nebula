@@ -4,11 +4,12 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # External API endpoints for Artsdata services
-  config.graph_api_endpoint = "http://staging.db.artsdata.ca" # "http://localhost:7200" #  "http://35.183.197.209:7200" #
-  config.artsdata_recon_endpoint = "https://staging.api.artsdata.ca/recon" #   "http://localhost:3005/recon" # 
-  config.artsdata_mint_endpoint = "https://staging.api.artsdata.ca/mint" #     "http://localhost:3005/mint" # 
-  config.artsdata_link_endpoint = "https://staging.api.artsdata.ca/link" #   "http://localhost:3005/link" #
-  config.artsdata_databus_endpoint = "https://staging.api.artsdata.ca/databus" # "http://localhost:3005/databus" #
+  prefix = "staging." # Set to ".staging" for staging or "" for production
+  config.graph_api_endpoint = "http://#{prefix}db.artsdata.ca" #  "http://35.183.197.209:7200" #
+  config.artsdata_recon_endpoint = "https://#{prefix}api.artsdata.ca/recon" #  "http://localhost:3005/recon" # 
+  config.artsdata_mint_endpoint = "https://#{prefix}api.artsdata.ca/mint" #      "http://localhost:3005/mint" # 
+  config.artsdata_link_endpoint = "https://#{prefix}api.artsdata.ca/link" #    "http://localhost:3005/link" #
+  config.artsdata_databus_endpoint = "https://#{prefix}api.artsdata.ca/databus" # "http://localhost:3005/databus" #
 
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
