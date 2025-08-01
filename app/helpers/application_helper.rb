@@ -73,6 +73,7 @@ module ApplicationHelper
       .gsub("http://www.w3.org/ns/dcat#","dcat:")
       .gsub("http://ogp.me/ns#", "og:")
       .gsub("http://purl.org/vocab/vann/", "vann:")
+      .gsub("http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#","ebucore:")
 
     if uri_compact.present?
       return uri_compact
