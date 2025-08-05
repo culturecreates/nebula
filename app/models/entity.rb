@@ -208,8 +208,6 @@ class Entity
         RDF::Graph.new
       end
     end
-   
-    
   end
 
 
@@ -310,6 +308,5 @@ class Entity
       [] # return empty array
     end
   end
-
 
 end
