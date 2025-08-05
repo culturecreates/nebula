@@ -31,7 +31,7 @@ class Entity
         image = @graph.query([s, RDF::URI("http://schema.org/url"), nil])
         image.first.object.value if image.count > 0
       else
-        s.value if !s.value.end_with?("#ImageObject")
+        s.value if s.value.end_with?("jpg") || s.value.end_with?("png") || s.value.end_with?("jpeg")
       end
     end
   end
