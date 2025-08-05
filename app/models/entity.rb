@@ -1,9 +1,6 @@
 
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri
-  @@artsdata_client = ArtsdataApi::V2::Client.new(
-        graph_repository: Rails.application.credentials.graph_repository, 
-        api_endpoint: Rails.application.config.graph_api_endpoint)
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
@@ -189,6 +186,22 @@ class Entity
     @graph = construct_turtle(sparql)
   end
 
+  def delete
+    return false if @entity_uri.blank?
+    sparql = SparqlLoader.load('delete_entity', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    response = artsdata_update_client.update(sparql)
+    if response
+      true
+    else
+      false
+    end
+  rescue => e
+    puts "Error deleting entity: #{e.message}"
+    false
+  end
+
   def construct_turtle(sparql, sparql_endpoint = nil)
     if sparql_endpoint == "wikidata"
       @@wikidata_client ||= SPARQL::Client.new("https://query.wikidata.org/sparql")
@@ -199,7 +212,7 @@ class Entity
       end
       graph
     else
-      response = @@artsdata_client.execute_construct_turtle_star_sparql(sparql)
+      response = artsdata_client.execute_construct_turtle_star_sparql(sparql)
       if response[:code] == 200
         RDF::Graph.new do |graph|
           RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
@@ -228,7 +241,7 @@ class Entity
 
     # query artsdata for the graph uri
     sparql = "select ?g where { graph ?g { <#{self.entity_uri}> a ?o } }"
-    response = @@artsdata_client.execute_sparql(sparql)
+    response = artsdata_client.execute_sparql(sparql)
     @graph_uri =  if response[:code] == 200
                     response[:message].first["g"]["value"]
                   else
@@ -243,7 +256,7 @@ class Entity
                   'locale_placeholder' , language
                 ])
    
-    response = @@artsdata_client.execute_construct_turtle_sparql(sparql)
+    response = artsdata_client.execute_construct_turtle_sparql(sparql)
 
     @graph =  if response[:code] == 200
                 graph = RDF::Graph.new
@@ -309,4 +322,15 @@ class Entity
     end
   end
 
+  private
+
+  def artsdata_client
+    @@artsdata_client ||= ArtsdataApi::V2::Client.new(
+        graph_repository: Rails.application.credentials.graph_repository, 
+        api_endpoint: Rails.application.config.graph_api_endpoint)
+  end
+
+  def artsdata_update_client
+    @@artsdata_update_client ||= ArtsdataApi::SparqlService.update_client
+  end
 end

@@ -24,7 +24,7 @@ class ApplicationHelperTest < ActiveSupport::TestCase
     graph << [bn_address, RDF::Vocab::SCHEMA.streetAddress, "123 Main St"]
     graph << [bn_address, RDF::Vocab::SCHEMA.addressLocality, "City"]
     # puts graph.dump(:jsonld, standard_prefixes: true)
-    expected = {"@context"=>{"schema"=>"http://schema.org/"}, "@graph"=>[{"@id"=>"_:place", "schema:name"=>"Place Name"}, {"@id"=>"_:address", "schema:streetAddress"=>"123 Main St", "schema:addressLocality"=>"City"}]}
+    expected = {"@context"=>{"schema"=>"http://schema.org/"}, "@graph"=>[{"@id"=>"_:place", "schema:name"=>"Place Name", "schema:address"=>{"@id"=>"_:address"}}, {"@id"=>"_:address", "schema:streetAddress"=>"123 Main St", "schema:addressLocality"=>"City"}]}
     output = dump_jsonld(bn_place, graph)
     assert_equal expected, JSON.parse(output)
   end

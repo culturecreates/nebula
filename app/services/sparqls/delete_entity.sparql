@@ -1,0 +1,30 @@
+PREFIX onto: <http://www.ontotext.com/>
+delete {
+    ?uri ?p ?o .
+    <<  ?uri ?p ?o >> ?a ?b .
+    ?b ?bp ?bo .
+    ?bo ?bop ?boo .
+    ?inverse_s ?inverse_p ?uri .
+}
+where {
+    GRAPH onto:explicit {
+        values ?uri {
+            <entity_uri_placeholder>
+        }
+        ?uri ?p ?o .
+        OPTIONAL {
+            <<  ?uri ?p ?o >> ?a ?b .
+            OPTIONAL {
+                ?b ?bp ?bo .
+                filter(isBLANK(?b))
+                OPTIONAL {
+                    ?bo ?bop ?boo .
+                    filter(isBLANK(?bo))
+                }
+            }
+        }
+        OPTIONAL {
+            ?inverse_s ?inverse_p ?uri .
+        }
+    }
+}

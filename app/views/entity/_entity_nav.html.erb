@@ -69,9 +69,18 @@
   >GraphDB</a>
   <% if session[:name] %>
     |
-    <%= link_to "minter",
+    <%= link_to "Minter",
     mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
-    class: "text-decoration-none ms-2 me-2",
+    class: "ms-2 me-2",
     rel: "nofollow" %>
+    |
+    <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete all triples in subject and object positions?" } } do |form| %>
+      <%= form.hidden_field :artifactUri, value: @entity.entity_uri %>
+      <%= form.submit "Delete",
+                  class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
+                  data: {
+                    disable_with: "Deleting...",
+                  } %>
+    <% end %>
   <% end %>
 </div>

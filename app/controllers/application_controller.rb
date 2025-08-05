@@ -96,6 +96,8 @@ class ApplicationController < ActionController::Base
       return session[:teams].any? { |team| team.key?("10808270") }
     when "ical"
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
+    when "delete_entity"
+      return session[:teams].any? { |team| team.key?("10808270") }
     else
       false
     end

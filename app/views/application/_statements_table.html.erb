@@ -6,7 +6,9 @@
     graph: graph,
   } %>
   <% properties = triples.map { |s| s.predicate }.uniq %>
+  <% puts "Processing prop: #{properties.inspect}" %>
   <% properties.each do |prop| %>
+
     <div class="statement">
       <div class="statement-predicate">
         <%= display_label(prop) %>

@@ -82,22 +82,7 @@ module ApplicationHelper
     end
   end
 
-  def sparql_endpoint
-    "#{Rails.application.config.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
-  end
-
-  # Use the standard Ruby SPARQL client
-  # TODO: Can the ArtsdataApi::V2::Client be replaced with this?
-  def artsdata_sparql_client
-    SPARQL::Client.new(sparql_endpoint)
-  end
-
-  def artsdata_sparql_update_client
-    SPARQL::Client.new("#{sparql_endpoint}/statements", headers: {
-        "Authorization" => "Basic #{Rails.application.credentials.graph_db_basic_auth}"
-      }
-    )
-  end
+  
 
   # sets a limit on the number of dereferences per table.
   # Note that derived statements are a separate table.
@@ -156,6 +141,7 @@ module ApplicationHelper
     solutions = graph.query([subject, nil, nil])
     sub_graph = RDF::Graph.new
     solutions.each do |solution|
+      sub_graph << solution
       # For each solution, we need to check if the object is a blank node
       if solution.object.is_a?(RDF::Node)
         # If it is a blank node, we need to find all triples where this blank node is the subject
@@ -164,9 +150,6 @@ module ApplicationHelper
           # Add these triples to the main graph
           sub_graph << sub_solution
         end
-      else
-        # If it's not a blank node, just add the original triple to the sub_graph
-        sub_graph << solution
       end
     end
      # Serialize the graph into JSON-LD

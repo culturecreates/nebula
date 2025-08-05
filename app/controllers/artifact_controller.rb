@@ -7,7 +7,7 @@ class ArtifactController < ApplicationController
 
     # Placeholders in SPARQL query
     @query =  SparqlLoader.load(sparql_file, [ "DATABUS_ACCOUNT", @databus_account.downcase])
-    @artifacts = helpers.artsdata_sparql_client.query(@query).limit(1000) # TODO: fix limit
+    @artifacts = ArtsdataApi::SparqlService.client.query(@query).limit(1000) # TODO: fix limit
   end
 
   def show
@@ -18,7 +18,7 @@ class ArtifactController < ApplicationController
   def get_automint_status(graph)
     subject = RDF::URI(graph)
     automint = RDF::URI("http://kg.artsdata.ca/ontology/automint")
-    response = helpers.artsdata_sparql_client.select.where([subject, automint, :o]).execute
+    response = ArtsdataApi::SparqlService.client.select.where([subject, automint, :o]).execute
 
     return response.first&.o&.value == "true"
   end

@@ -6,7 +6,7 @@ class FootlightController < ApplicationController
 
     # get the source graph from URI
     select_query = "select ?graph where { graph ?graph { <#{uri}> a ?type } }"
-    solutions = helpers.artsdata_sparql_client.query(select_query)
+    solutions = ArtsdataApi::SparqlService.client.query(select_query)
     source = solutions.first.graph.value if solutions.first&.bound?(:graph)
 
     redirect_to home_path, alert: "No source graph found for URI: #{uri}" and return if source.blank?

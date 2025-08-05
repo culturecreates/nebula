@@ -1,121 +1,98 @@
 # load_rdfstar_graph
 # TODO: Add SHACL triples for blank nodes. Currently removed for performance crash when over 10 subevents (ville-de-laval)
-
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-
 CONSTRUCT {
     ?s ?p ?o  .
-
     <<?s ?p ?o>> ?a ?b .
     ?p rdfs:label ?prop_label .
     ?o rdfs:label ?obj_label .
     ?a rdfs:label ?a_label .
     ?b rdfs:label ?b_label .
-
     <<?s ?p ?o>> ?a ?qbns .
     ?qbns ?qbnp ?qbno .
     ?qbnp rdfs:label ?qbnp_label .
-
     ?s ?p ?bns .
     ?bns ?bnp ?bno .
     ?bnp rdfs:label ?bnp_label .
-   
-
     ?bns ?bnp ?2bns .
     ?2bns ?2bnp ?2bno .
-    ?2bnp rdfs:label ?2bnp_label .  
-
+    ?2bnp rdfs:label ?2bnp_label .
     ?2bns ?2bnp ?3bns .
     ?3bns ?3bnp ?3bno .
-
-    ?shacl_bn sh:focusNode ?s ; 
-        ?shacl_pred ?shal_obj .
-
-    
+    ?shacl_bn sh:focusNode ?s ;
+              ?shacl_pred ?shal_obj .
 }
 FROM onto:explicit 
 WHERE {
     values ?s {
         <entity_uri_placeholder> 
     }
-
-    ?s ?p ?o  .
-
-
-    OPTIONAL {
-        ?shacl_bn sh:focusNode ?s ; 
-            ?shacl_pred ?shal_obj .
-    }
-
-    # main triple labels
-    OPTIONAL {
-        ?o rdfs:label ?obj_label .
-    }
-    OPTIONAL {
-        ?p rdfs:label ?prop_label .
-    }
-    OPTIONAL {
-        ?o schema:name ?obj_name .
-    }
-
-    # quoted triple
-    OPTIONAL {
-        <<?s ?p ?o>> ?a ?b .
-       OPTIONAL {
-            filter(isBlank(?b))
-            ?b ?b2 ?b3 .
-        }
-        
-    }
-    # quoted triple labels
-    OPTIONAL {
-        <<?s ?p ?o>> ?a ?b .
-        ?a rdfs:label ?a_label .
-    }
-   
-    # quoted triple blank nodes
-    OPTIONAL {
-        <<?s ?p ?o>> ?a ?qbns .
-        filter(isBLANK(?qbns))
-        ?qbns ?qbnp ?qbno .
+    {
+        ?s ?p ?o  .
+        # main triple labels
         OPTIONAL {
-            ?qbnp rdfs:label ?qbnp_label .
+            ?o rdfs:label ?obj_label .
         }
-
-    }
-
-    # blank nodes
-     OPTIONAL {
-        ?s ?p ?bns .
-        filter(isBLANK(?bns))
-
-        ?bns ?bnp ?bno .
         OPTIONAL {
-            ?bnp rdfs:label ?bnp_label .
+            ?p rdfs:label ?prop_label .
         }
-       
-        # second level blank nodes
         OPTIONAL {
-            ?bns ?bnp ?2bns .
-            filter(isBLANK(?2bns))
-
-            ?2bns ?2bnp ?2bno .
+            ?o schema:name ?obj_name .
+        }
+        # quoted triple
+        OPTIONAL {
+            <<?s ?p ?o>> ?a ?b .
             OPTIONAL {
-                ?2bnp rdfs:label ?2bnp_label .
+                filter(isBlank(?b))
+                ?b ?b2 ?b3 .
             }
-
-            # third level blank nodes
+        }
+        # quoted triple labels
+        OPTIONAL {
+            <<?s ?p ?o>> ?a ?b .
+            ?a rdfs:label ?a_label .
+        }
+        # quoted triple blank nodes
+        OPTIONAL {
+            <<?s ?p ?o>> ?a ?qbns .
+            filter(isBLANK(?qbns))
+            ?qbns ?qbnp ?qbno .
             OPTIONAL {
-                ?2bns ?2bnp ?3bns .
-                filter(isBLANK(?3bns))
-
-                ?3bns ?3bnp ?3bno .
-            } 
-       }
-     }
-
-   
-} limit 2000
+                ?qbnp rdfs:label ?qbnp_label .
+            }
+        }
+        # blank nodes
+        OPTIONAL {
+            ?s ?p ?bns .
+            filter(isBLANK(?bns))
+            ?bns ?bnp ?bno .
+            OPTIONAL {
+                ?bnp rdfs:label ?bnp_label .
+            }
+            # second level blank nodes
+            OPTIONAL {
+                ?bns ?bnp ?2bns .
+                filter(isBLANK(?2bns))
+                ?2bns ?2bnp ?2bno .
+                OPTIONAL {
+                    ?2bnp rdfs:label ?2bnp_label .
+                }
+                # third level blank nodes
+                OPTIONAL {
+                    ?2bns ?2bnp ?3bns .
+                    filter(isBLANK(?3bns))
+                    ?3bns ?3bnp ?3bno .
+                } 
+            }
+        }
+    }
+    UNION {
+        OPTIONAL {
+            ?shacl_bn sh:focusNode ?s ;
+                      ?shacl_pred ?shal_obj .
+        }
+    }
+} limit 1000

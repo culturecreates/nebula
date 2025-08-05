@@ -24,13 +24,13 @@ class QueryController < ApplicationController
 
     solutions = if !construct_files
                   begin
-                    helpers.artsdata_sparql_client.query(@query).limit(1000)
+                    ArtsdataApi::SparqlService.client.query(@query).limit(1000)
                   rescue SPARQL::Client::ServerError => e
                     flash.alert = e.message[0..100]
                     return redirect_to root_path,  data: { turbo: false }
                   end
                 else
-                  SPARQL.execute(@query,local_graph(construct_files, helpers.artsdata_sparql_client) )
+                  SPARQL.execute(@query,local_graph(construct_files, ArtsdataApi::SparqlService.client) )
                 end
 
     respond_to do |format|

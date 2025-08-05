@@ -1,5 +1,6 @@
 class EntityController < ApplicationController
   before_action :user_signed_in?, only: [:expand] 
+  before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
 
   # Show an entity's asserted statements
   # /entity?uri=  --> HTML
@@ -105,8 +106,28 @@ class EntityController < ApplicationController
     @entity.load_derived_statements
   end
 
+  # DELETE /entity
+  # delete an entity by URI
+  # this will delete all statements about the entity
+  # and all statements that are derived from it
+  # /entity?uri=[canonical URI]
+  def destroy
+    uri = params[:uri]
+    @entity = Entity.new(entity_uri: uri)
+    if @entity.delete
+      flash.notice = "Deleted entity '#{uri}'."
+    else
+      flash.alert = "Could not delete entity '#{uri}' "
+    end
+    redirect_back(fallback_location: root_path)
+  end
+
 
   private
+
+  def check_delete_entity_access
+    ensure_access("delete_entity")
+  end
 
   # determine the shape for JSON-LD output
   # Frame_template can be "schema_org" or nil
