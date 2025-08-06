@@ -119,9 +119,8 @@ class EntityController < ApplicationController
     else
       flash.alert = "Could not delete entity #{uri}."
     end
-    redirect_back(fallback_location: root_path)
+    redirect_to entity_path(uri: uri)
   end
-
 
   private
 
