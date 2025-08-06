@@ -115,9 +115,9 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     if @entity.delete
-      flash.notice = "Deleted entity '#{uri}'."
+      flash.notice = "Deleted entity #{uri}."
     else
-      flash.alert = "Could not delete entity '#{uri}' "
+      flash.alert = "Could not delete entity #{uri}."
     end
     redirect_back(fallback_location: root_path)
   end
