@@ -11,20 +11,23 @@ where {
         values ?uri {
             <entity_uri_placeholder>
         }
-        ?uri ?p ?o .
-        OPTIONAL {
-            <<  ?uri ?p ?o >> ?a ?b .
+        {
+            ?uri ?p ?o .
             OPTIONAL {
-                ?b ?bp ?bo .
-                filter(isBLANK(?b))
+                <<  ?uri ?p ?o >> ?a ?b .
                 OPTIONAL {
-                    ?bo ?bop ?boo .
-                    filter(isBLANK(?bo))
+                    ?b ?bp ?bo .
+                    filter(isBLANK(?b))
+                    OPTIONAL {
+                        ?bo ?bop ?boo .
+                        filter(isBLANK(?bo))
+                    }
                 }
             }
-        }
-        OPTIONAL {
-            ?inverse_s ?inverse_p ?uri .
+        } UNION {
+            OPTIONAL {
+                ?inverse_s ?inverse_p ?uri .
+            }
         }
     }
 }
