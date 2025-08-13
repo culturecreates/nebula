@@ -884,6 +884,42 @@ body {
   margin-left: 0.5rem;
 }
 
+/* Parent Row Alternating Backgrounds */
+.parent-row.parent-grey {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.parent-row.parent-grey td,
+.parent-row.parent-grey th {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.parent-row.parent-white {
+  background-color: #ffffff !important;
+}
+
+.parent-row.parent-white td,
+.parent-row.parent-white th {
+  background-color: #ffffff !important;
+}
+
+/* Match Row Backgrounds - Inherit from Parent */
+.match-row.match-grey {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.match-row.match-grey td {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.match-row.match-white {
+  background-color: #ffffff !important;
+}
+
+.match-row.match-white td {
+  background-color: #ffffff !important;
+}
+
 /* Enhanced Action Buttons */
 .judgement-cell {
   display: flex;

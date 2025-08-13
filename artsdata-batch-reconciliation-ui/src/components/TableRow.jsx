@@ -13,7 +13,7 @@ function truncateUrl(url, maxLength = 24) {
   return `${start}...${end}`;
 }
 
-const TableRow = ({ item, onAction, onRefresh }) => {
+const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
   const [selectedMatch, setSelectedMatch] = useState(item.selectedMatch || null);
   const [showMintConfirm, setShowMintConfirm] = useState(false);
   const [mintPreviewLoading, setMintPreviewLoading] = useState(false);
@@ -147,9 +147,12 @@ const TableRow = ({ item, onAction, onRefresh }) => {
   // Only show eye icon if item.externalId exists
   const canShowEye = !!item.externalId;
 
+  // Determine if this parent row should have grey background (even indices: 0, 2, 4...)
+  const isGreyRow = parentRowIndex % 2 === 0;
+
   return (
     <>
-      <tr>
+      <tr className={`parent-row ${isGreyRow ? 'parent-grey' : 'parent-white'}`}>
         <th scope="row">{item.id}</th>
         <td>
           <div className="judgement-cell">
@@ -325,7 +328,7 @@ const TableRow = ({ item, onAction, onRefresh }) => {
           const isAutoSelected = !selectedMatch && match.match === true && item.hasAutoMatch !== false;
           const isSelected = isManuallySelected || isAutoSelected;
         return (
-          <tr key={`${item.id}-match-${index}`} className={`table-row match-row ${isSelected ? 'selected-match' : ''}`}>
+          <tr key={`${item.id}-match-${index}`} className={`table-row match-row ${isSelected ? 'selected-match' : ''} ${isGreyRow ? 'match-grey' : 'match-white'}`}>
             <td></td>
             <td>
               <div className="match-judgement-cell">

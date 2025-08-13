@@ -882,7 +882,7 @@ const App = ({ config }) => {
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-responsive-sm">
-            <table className="table table-hover table-striped">
+            <table className="table table-hover">
               <thead className="sticky-top">
                 <tr>
                   {[
@@ -907,10 +907,11 @@ const App = ({ config }) => {
                 </tr>
               </thead>
               <tbody>
-                {currentPageItems.map((item) => (
+                {currentPageItems.map((item, index) => (
                   <TableRow
                     key={item.id}
                     item={item}
+                    parentRowIndex={index}
                     onAction={handleAction}
                     onRefresh={handleRefreshRow}
                   />
