@@ -882,7 +882,7 @@ const App = ({ config }) => {
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-responsive-sm">
-            <table className="table table-hover">
+            <table className="table table-hover table-borderless">
               <thead className="sticky-top">
                 <tr>
                   {[
