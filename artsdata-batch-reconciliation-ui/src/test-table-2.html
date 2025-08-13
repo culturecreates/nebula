@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+</head>
+
+<body>
+  <h1>Hello, world!</h1>
+  <table class="table table-responsive">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Judgement</th>
+        <th scope="col">
+        </th>
+        <th scope="col"> Refresh
+        </th>
+      </tr>
+    </thead>
+    <tbody class="table-striped">
+      <tr>
+        <th scope="row" class="sticky-top">1</th>
+        <td>Select</td>
+        <td>
+          <table background=none class="table table-hover table-responsive">
+            <thead class="sticky-top">
+              <tr>
+                <th style="width: 100px;"></th>
+                <th style="width: 60px;">ID</th>
+                <th style="min-width: 300px;">Name</th>
+                <th>URL</th>
+                <th>ISNI</th>
+                <th>Wikidata</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a href="#">mint&nbsp;new</a><br><a href="#">skip</a>
+                </td>
+                <td>eye
+                </td>
+                <td>Source name</td>
+                <td class="text-nowrap">http://the.url.isalolong...?and=query</td>
+                <td>http://isni.org/...0000123456789</td>
+
+                <td>http://www.wikida...Q1234567890</td>
+
+                <td>PerformingGroup</td>
+              </tr>
+
+              <tr class="table-active">
+                <td><a href="#">match</a>&nbsp;(3)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td>http://isni.org/...0000123456789</td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td class="text-nowrap">K12-3</td>
+                <td>Another is a very long name Another is a very long name Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td>http://www.wikida...Q1234567890</td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td><a href="#">match</a> (1)</td>
+                <td>K12-3</td>
+                <td>Another is a very long name</td>
+                <td>http://the.url.isalolong...?and=query</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-secondary" href="#">Refresh</button>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row" class="sticky-top">2</th>
+        <td><button type="button" class="btn btn-primary">Match</button><br>
+          <a href="#">change</a>
+        </td>
+        <td>
+          <table class="table table-responsive">
+            <thead>
+              <tr>
+                <th style="width: 100px;"></th>
+                 <th style="width: 60px;">ID</th>
+                <th style="min-width: 300px;">Name</th>
+                <th>URL</th>
+                <th>ISNI</th>
+                <th>Wikidata</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td>eye</td>
+                <td>Marianna Mazza</td>
+                <td>http://mazza.com</td>
+                <td></td>
+                <td></td>
+                <td>Person</td>
+              </tr>
+              <tr class="table-active">
+                <td></td>
+                <td>K12-3</td>
+                <td>Marianna Mazza</td>
+                <td>http://mairannamazza.com</td>
+                <td></td>
+                <td>https://isni.org/1234</td>
+                <td>Person</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-secondary" href="#">Refresh</button>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row" class="sticky-top">3</th>
+        <td><button type="button" class="btn btn-primary">Mint&nbsp;Person</button><br>
+          <a href="#">change</a>
+        </td>
+        <td>
+          <table class="table table-responsive">
+            <thead>
+              <tr>
+                <th style="width: 100px;"></th>
+               <th style="width: 60px;">ID</th>
+                <th style="min-width: 300px;">Name</th>
+                <th>URL</th>
+                <th>ISNI</th>
+                <th>Wikidata</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td></td>
+                <td>eye</td>
+                <td>Marianna Mazza</td>
+                <td>http://mazza.com</td>
+                <td>https://isni.org/1234</td>
+                <td>https://www.wikidata.org/Q987987</td>
+                <td>Performing Group</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-secondary" href="#">Refresh</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
