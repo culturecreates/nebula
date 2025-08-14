@@ -147,25 +147,54 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
   // Only show eye icon if item.externalId exists
   const canShowEye = !!item.externalId;
 
-  // Determine if this parent row should have grey background (even indices: 0, 2, 4...)
-  const isGreyRow = parentRowIndex % 2 === 0;
+
+  // Determine visible matches based on current status and selections
+  const getVisibleMatches = () => {
+    if (!item.matches) return [];
+    
+    return item.matches.filter((match) => {
+      // If a match is selected, only show the selected match
+      if (selectedMatch) {
+        return selectedMatch.id === match.id;
+      }
+      // For pre-reconciled entities, only show the matching entity (auto-selected)
+      if (item.isPreReconciled && item.linkedTo) {
+        return match.id === item.linkedTo;
+      }
+      // For reconciled entities with linkedTo (including newly minted), only show the linked entity
+      if (currentStatus === 'reconciled' && item.linkedTo) {
+        return match.id === item.linkedTo;
+      }
+      // If no manual selection but there's an auto-match, only show the auto-matched one
+      if (!selectedMatch && item.hasAutoMatch && match.match === true) {
+        return true;
+      }
+      // If no selection at all, show all matches (needs-judgment state)
+      if (!selectedMatch && (currentStatus === 'needs-judgment' || !item.hasAutoMatch)) {
+        return true;
+      }
+      return false;
+    });
+  };
+
+  const visibleMatches = getVisibleMatches();
 
   return (
     <>
-      <tr className={`parent-row ${isGreyRow ? 'parent-grey' : 'parent-white'}`}>
-        <th scope="row">{item.id}</th>
+      <tr className="parent-row">
+        <th scope="row" className="sticky-top row-number">{item.id}</th>
         <td>
+          {/* Judgement cell with action buttons */}
           <div className="judgement-cell">
-            {/* Primary action button or text for finalized states */}
             {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'skipped' || currentStatus === 'reconciled') ? (
               <>
                 {currentStatus === 'reconciled' ? (
-                  <div className="reconciled-text primary-action-full-width">
+                  <div className="reconciled-text">
                     Reconciled
                   </div>
                 ) : (
                   <button 
-                    className={`btn btn-sm ${currentStatus === 'skipped' ? 'btn-secondary' : 'btn-primary'} primary-action-full-width`}
+                    className={`btn btn-sm ${currentStatus === 'skipped' ? 'btn-secondary' : 'btn-primary'}`}
                     onClick={currentStatus === 'skipped' ? undefined : handleFinalAction}
                     disabled={currentStatus === 'mint-error' || currentStatus === 'skipped'}
                   >
@@ -174,70 +203,37 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
                      'Skipped'}
                   </button>
                 )}
-                {/* Two-column layout for Change link below (only for skipped, not reconciled) */}
                 {currentStatus !== 'reconciled' && (
-                  <div className="judgement-two-columns">
-                    <div className="status-text-column">
-                      {/* Empty left column */}
-                    </div>
-                    <div className="interactive-elements-column">
-                      <button 
-                        className="action-link"
-                        onClick={handleChange}
-                      >
-                        Change
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              /* Two-column layout for other states */
-              <div className="judgement-two-columns">
-                {/* Left column: Status badges */}
-                <div className="status-text-column">
-                  <StatusBadge 
-                    status={currentStatus} 
-                    hasError={item.hasError || item.reconciliationError} 
-                    autoMatched={item.hasAutoMatch}
-                    mintError={item.mintError || mintPreviewError}
-                    linkError={item.linkError}
-                    entityType={item.selectedMintType || item.type?.split('/').pop() || 'Entity'}
-                  />
-                </div>
-                
-                {/* Right column: Action links */}
-                <div className="interactive-elements-column">
-                  {/* Mint option link for needs-judgment state */}
-                  {currentStatus === 'needs-judgment' && (
-                    <button 
-                      className="action-link"
-                      onClick={handleMintClick}
-                    >
-                      Mint New
-                    </button>
-                  )}
-                  
-                  {/* Skip option */}
-                  {currentStatus === 'needs-judgment' && (
-                    <button 
-                      className="action-link"
-                      onClick={() => onAction(item.id, 'skip')}
-                    >
-                      Skip
-                    </button>
-                  )}
-                  
-                  {/* Change link for other states */}
-                  {currentStatus === 'link-error' && (
+                  <div>
                     <button 
                       className="action-link"
                       onClick={handleChange}
                     >
                       Change
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div>
+                <StatusBadge 
+                  status={currentStatus} 
+                  hasError={item.hasError || item.reconciliationError} 
+                  autoMatched={item.hasAutoMatch}
+                  mintError={item.mintError || mintPreviewError}
+                  linkError={item.linkError}
+                  entityType={item.selectedMintType || item.type?.split('/').pop() || 'Entity'}
+                />
+                {currentStatus === 'link-error' && (
+                  <div>
+                    <button 
+                      className="action-link"
+                      onClick={handleChange}
+                    >
+                      Change
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             
@@ -246,47 +242,150 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
                 ⚠️
               </div>
             )}
-            
           </div>
         </td>
         <td>
-          {canShowEye && (
-            <button
-              className="icon-button eye-externalid-btn"
-              title={item.externalId}
-              onClick={e => { 
-                e.stopPropagation(); 
-                const encodedUri = encodeURIComponent(item.uri);
-                window.open(`https://staging.kg.artsdata.ca/entity?uri=${encodedUri}`, '_blank');
-              }}
-              style={{ marginRight: '0.5rem' }}
-            >
-              <Eye className="table-icon" />
-            </button>
-          )}
-        </td>
-        <td>
-          <div className="name-cell">
-            <div className="name-primary">{item.name}</div>
-            <div className="name-secondary">{item.description}</div>
+          {/* Nested table containing source entity and all matches */}
+          <div className="nested-table-container">
+            <table className="table table-hover table-responsive table-borderless nested-table">
+              <thead className="sticky-top">
+                <tr>
+                  <th style={{width: '100px'}}></th>
+                  <th style={{width: '60px'}}>ID</th>
+                  <th style={{minWidth: '300px'}}>Name</th>
+                  <th>URL</th>
+                  <th>ISNI</th>
+                  <th>Wikidata</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Source entity row */}
+                <tr className="source-entity-row">
+                  <td>
+                    {/* Action links for source entity */}
+                    {currentStatus === 'needs-judgment' && (
+                      <>
+                        <button 
+                          className="action-link"
+                          onClick={handleMintClick}
+                        >
+                          mint&nbsp;new
+                        </button>
+                        <br />
+                        <button 
+                          className="action-link"
+                          onClick={() => onAction(item.id, 'skip')}
+                        >
+                          skip
+                        </button>
+                      </>
+                    )}
+                  </td>
+                  <td>
+                    {canShowEye ? (
+                      <button
+                        className="eye-externalid-btn"
+                        title={item.externalId}
+                        onClick={e => { 
+                          e.stopPropagation(); 
+                          const encodedUri = encodeURIComponent(item.uri);
+                          window.open(`https://staging.kg.artsdata.ca/entity?uri=${encodedUri}`, '_blank');
+                        }}
+                      >
+                        <Eye className="table-icon" />
+                      </button>
+                    ) : (
+                      'eye'
+                    )}
+                  </td>
+                  <td>
+                    <div className="name-cell">
+                      <div className="name-primary">{item.name}</div>
+                      <div className="name-secondary">{item.description}</div>
+                    </div>
+                  </td>
+                  <td className="text-nowrap">
+                    {item.url && (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
+                        {truncateUrl(item.url)}
+                      </a>
+                    )}
+                  </td>
+                  <td>{item.isni || ''}</td>
+                  <td>{item.wikidata || ''}</td>
+                  <td>{item.type?.split('/').pop() || item.type}</td>
+                </tr>
+                
+                {/* Match rows - only show if not in skipped or mint-ready state */}
+                {currentStatus !== 'skipped' && currentStatus !== 'mint-ready' && visibleMatches.map((match, index) => {
+                  // Check if this match is selected either manually or automatically
+                  const isManuallySelected = selectedMatch && selectedMatch.id === match.id;
+                  const isAutoSelected = !selectedMatch && match.match === true && item.hasAutoMatch !== false;
+                  const isSelected = isManuallySelected || isAutoSelected;
+                  
+                  return (
+                    <tr key={`${item.id}-match-${index}`} className="table-active">
+                      <td>
+                        {currentStatus === 'needs-judgment' && (
+                          <>
+                            <button 
+                              className="action-link match-link"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMatchSelect(match);
+                              }}
+                              title="Choose this match"
+                            >
+                              match
+                            </button>
+                            {!item.isPreReconciled && (
+                              <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
+                                &nbsp;({match.score})
+                              </span>
+                            )}
+                          </>
+                        )}
+                        {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
+                          <div className="selected-indicator">
+                            ✓ Auto-Selected
+                          </div>
+                        )}
+                      </td>
+                      <td className="text-nowrap">
+                        <a 
+                          href={`https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(`http://kg.artsdata.ca/resource/${match.id}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={match.id}
+                        >
+                          {match.id}
+                        </a>
+                      </td>
+                      <td>
+                        <div className="name-cell">
+                          <div className="match-name">{match.name}</div>
+                          <div className="match-description">{match.description}</div>
+                        </div>
+                      </td>
+                      <td>{/* URL column for matches - typically empty */}</td>
+                      <td>{/* ISNI column for matches */}</td>
+                      <td>{/* Wikidata column for matches */}</td>
+                      <td>
+                        {Array.isArray(match.type) 
+                          ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])
+                          : (typeof match.type === 'object' ? match.type.id || match.type.name : match.type)
+                        }
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </td>
         <td>
-          {item.url && (
-            <a href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
-              {truncateUrl(item.url)}
-            </a>
-          )}
-        </td>
-        <td>
-          {item.isni || ''}
-        </td>
-        <td>
-          {item.wikidata || ''}
-        </td>
-        <td>{item.type}</td>
-        <td>
-          {/* Only show refresh button for non-reconciled items */}
+          {/* Refresh button */}
           {(currentStatus !== 'reconciled' && !item.linkedTo && !item.mintedAs) && (
             <button
               onClick={e => { e.stopPropagation(); onRefresh && onRefresh(item.id); }}
@@ -298,106 +397,6 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
           )}
         </td>
       </tr>
-      {item.matches && currentStatus !== 'skipped' && currentStatus !== 'mint-ready' && item.matches
-        .filter((match) => {
-          // If a match is selected, only show the selected match
-          if (selectedMatch) {
-            return selectedMatch.id === match.id;
-          }
-          // For pre-reconciled entities, only show the matching entity (auto-selected)
-          if (item.isPreReconciled && item.linkedTo) {
-            return match.id === item.linkedTo;
-          }
-          // For reconciled entities with linkedTo (including newly minted), only show the linked entity
-          if (currentStatus === 'reconciled' && item.linkedTo) {
-            return match.id === item.linkedTo;
-          }
-          // If no manual selection but there's an auto-match, only show the auto-matched one
-          if (!selectedMatch && item.hasAutoMatch && match.match === true) {
-            return true;
-          }
-          // If no selection at all, show all matches (needs-judgment state)
-          if (!selectedMatch && (currentStatus === 'needs-judgment' || !item.hasAutoMatch)) {
-            return true;
-          }
-          return false;
-        })
-        .map((match, index) => {
-          // Check if this match is selected either manually or automatically
-          const isManuallySelected = selectedMatch && selectedMatch.id === match.id;
-          const isAutoSelected = !selectedMatch && match.match === true && item.hasAutoMatch !== false;
-          const isSelected = isManuallySelected || isAutoSelected;
-        return (
-          <tr key={`${item.id}-match-${index}`} className={`table-row match-row ${isSelected ? 'selected-match' : ''} ${isGreyRow ? 'match-grey' : 'match-white'}`}>
-            <td></td>
-            <td>
-              <div className="match-judgement-cell">
-                {/* Two-column split: Empty left, Match button with score on right */}
-                <div className="match-two-columns">
-                  {/* Left column: Empty to align with main entity status badges */}
-                  <div className="match-status-column">
-                    {/* Empty column for alignment */}
-                  </div>
-                  
-                  {/* Right column: Match button with score horizontally */}
-                  <div className="match-interactive-column">
-                    <div className="match-button-row">
-                      {currentStatus === 'needs-judgment' && (
-                        <button 
-                          className="action-link match-link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMatchSelect(match);
-                          }}
-                          title="Choose this match"
-                        >
-                          Match
-                        </button>
-                      )}
-                      {!item.isPreReconciled && currentStatus === 'needs-judgment' && (
-                        <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
-                          {match.match ? 'TRUE' : ''} ({match.score})
-                        </span>
-                      )}
-                    </div>
-                    {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
-                      <span className="selected-indicator">
-                        ✓ Auto-Selected
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <a 
-                href={`https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(`http://kg.artsdata.ca/resource/${match.id}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={match.id}
-              >
-                {match.id}
-              </a>
-            </td>
-            <td>
-              <div className="name-cell">
-                <div className="match-name">{match.name}</div>
-                <div className="match-description">{match.description}</div>
-              </div>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              {Array.isArray(match.type) 
-                ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])
-                : (typeof match.type === 'object' ? match.type.id || match.type.name : match.type)
-              }
-            </td>
-            <td></td>
-          </tr>
-        );
-      })}
       
       {/* Mint Confirmation Popup */}
       <MintConfirmPopup

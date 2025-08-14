@@ -13,26 +13,26 @@
   --bg-gray-50: #f9fafb;
   --bg-blue-50: #dbeafe;
   --bg-red-50: #fef2f2;
-  
+
   /* Text Colors */
   --text-primary: #374151;
   --text-secondary: #6b7280;
   --text-dark: #1f2937;
   --text-muted: #9ca3af;
   --text-white: #ffffff;
-  
+
   /* Border Colors */
   --border-light: #e5e7eb;
   --border-medium: #d1d5db;
   --border-red: #fecaca;
-  
+
   /* Button Colors */
   --btn-primary: #3b82f6;
   --btn-primary-hover: #2563eb;
   --btn-primary-focus: #1d4ed8;
   --btn-danger: #dc2626;
   --btn-success: #10b981;
-  
+
   /* Status Colors */
   --status-orange: #f59e0b;
   --status-green: #10b981;
@@ -41,13 +41,14 @@
   --status-red: #dc2626;
   --status-light-gray: #d1d5db;
   --status-dark-gray: #e5e7eb;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
@@ -362,9 +363,8 @@ body {
   z-index: 1020 !important; /* Above content but below modals */
   background-color: #f8f9fa !important; /* Ensure solid background */
   border-bottom: 1px solid #dee2e6 !important; /* Bootstrap table border */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; /* Add shadow for better separation */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Add shadow for better separation */
   /* Ensure full coverage to prevent content bleeding through */
-  width: 100% !important;
   left: 0 !important;
 }
 
@@ -617,6 +617,10 @@ body {
 .name-cell {
   display: flex;
   flex-direction: column;
+  max-width: 400px; /* Prevent expansion beyond column width */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .name-primary {
@@ -884,40 +888,80 @@ body {
   margin-left: 0.5rem;
 }
 
-/* Parent Row Alternating Backgrounds */
-.parent-row.parent-grey {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+/* Parent Row - no alternating background */
+.parent-row {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6 !important;
 }
 
-.parent-row.parent-grey td,
-.parent-row.parent-grey th {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+.parent-row td,
+.parent-row th {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6 !important;
 }
 
-.parent-row.parent-white {
-  background-color: #ffffff !important;
+/* Hover for nested table match rows only */
+.nested-table.table-hover tbody tr:hover td,
+.nested-table.table-hover tbody tr:hover th {
+  background-color: rgba(0, 0, 0, 0.075) !important;
 }
 
-.parent-row.parent-white td,
-.parent-row.parent-white th {
-  background-color: #ffffff !important;
+/* Fixed header labels above table */
+.table-header-labels {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: #000000;
 }
 
-/* Match Row Backgrounds - Inherit from Parent */
-.match-row.match-grey {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+.header-label-id {
+  width: 60px;
+  min-width: 60px;
 }
 
-.match-row.match-grey td {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+.header-label-judgement {
+  width: 150px;
+  min-width: 150px;
 }
 
-.match-row.match-white {
-  background-color: #ffffff !important;
+.header-label-content {
+  flex: 1; /* Takes remaining space */
 }
 
-.match-row.match-white td {
-  background-color: #ffffff !important;
+.header-label-refresh {
+  width: 100px;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Main table border handling */
+.table-no-header {
+  border-collapse: collapse !important;
+}
+
+/* Outer table column widths */
+.table-no-header td:nth-child(1) {
+  width: 60px;
+  min-width: 60px;
+}
+
+.table-no-header td:nth-child(2) {
+  width: 150px;
+  min-width: 150px;
+}
+
+.table-no-header td:nth-child(3) {
+  width: auto; /* Takes remaining space for nested table */
+}
+
+.table-no-header td:nth-child(4) {
+  width: 100px;
+  min-width: 100px;
 }
 
 /* Enhanced Action Buttons */
@@ -926,7 +970,8 @@ body {
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
-  min-width: 140px;
+  width: 100%;
+  max-width: 150px; /* Constrain width */
 }
 
 /* Two-column layout within judgement cell */
@@ -1025,7 +1070,7 @@ body {
 }
 
 .action-link {
-  color: #53585F;
+  color: #2563eb;
   font-size: 0.75rem;
   text-decoration: underline;
   background: none;
@@ -1036,7 +1081,147 @@ body {
 }
 
 .action-link:hover {
+  color: #1d4ed8;
+}
+
+/* Nested Table Styles */
+.nested-table-container {
+  width: 100%;
+  background: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nested-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed; /* Enforce fixed column widths */
+}
+
+/* Row number sticky positioning - same as nested table headers */
+.row-number.sticky-top {
+  position: sticky !important;
+  top: 0 !important; /* Stick directly to top of viewport */
+  z-index: 1020 !important; /* Same as nested table headers */
+  background-color: #ffffff !important; /* White background for row numbers */
+  border-bottom: 1px solid #dee2e6 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Row number sticky positioning - same as nested table headers */
+.row-number.sticky-top {
+  position: sticky !important;
+  top: 0 !important; /* Stick directly to top of viewport */
+  z-index: 1020 !important; /* Same as nested table headers */
+  background-color: #ffffff !important; /* White background for row numbers */
+  border-bottom: 1px solid #dee2e6 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+
+/* Inner table headers - sticky to viewport top */
+.nested-table .sticky-top {
+  position: sticky !important;
+  top: 0 !important; /* Stick directly to top of viewport */
+  z-index: 1020 !important; /* Above content */
+  background-color: #f8f9fa !important;
+  box-shadow: none !important; /* Remove box shadow for nested table headers */
+}
+
+/* Only add border to nested table headers that are NOT borderless */
+.nested-table:not(.table-borderless) .sticky-top {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Source entity row styling */
+.source-entity-row {
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Match rows styling - no background color */
+.nested-table .table-active {
+  background-color: transparent !important;
+}
+
+.nested-table .table-active td {
+  background-color: transparent !important;
+}
+
+/* Alignment columns for nested table */
+.nested-table th:first-child,
+.nested-table td:first-child {
+  width: 100px;
+  min-width: 100px;
+}
+
+.nested-table th:nth-child(2),
+.nested-table td:nth-child(2) {
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  padding-right: 12px; /* Add spacing after ID content */
+}
+
+.nested-table th:nth-child(3),
+.nested-table td:nth-child(3) {
+  min-width: 300px;
+  max-width: 400px; /* Prevent names from extending beyond viewport */
+  word-wrap: break-word;
+  white-space: normal; /* Allow text to wrap to next line */
+  padding-left: 12px; /* Add gap between ID and Name columns */
+}
+
+/* Eye icon styling in nested table */
+.nested-table .eye-externalid-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.nested-table .eye-externalid-btn:hover {
+  color: #374151;
+}
+
+/* Action links in nested table */
+.nested-table .action-link {
   color: #2563eb;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nested-table .action-link:hover {
+  color: #1d4ed8;
+}
+
+/* Match score styling in nested table */
+.nested-table .match-score {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.nested-table .true-match {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.nested-table .candidate-match {
+  color: #6b7280;
+}
+
+/* Selected indicator in nested table */
+.nested-table .selected-indicator {
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
 }
 
 /* Responsive Styles */
@@ -1060,5 +1245,31 @@ body {
   .table-cell {
     padding: 0.5rem;
     font-size: 0.75rem;
+  }
+
+  /* Mobile adjustments for nested tables */
+  .nested-table th:first-child,
+  .nested-table td:first-child {
+    width: 80px;
+    min-width: 80px;
+  }
+
+  .nested-table th:nth-child(2),
+  .nested-table td:nth-child(2) {
+    width: 50px;
+    min-width: 50px;
+  }
+
+  .nested-table th:nth-child(3),
+  .nested-table td:nth-child(3) {
+    min-width: 200px;
+  }
+
+  /* Hide less important columns on mobile */
+  .nested-table th:nth-child(5),
+  .nested-table td:nth-child(5),
+  .nested-table th:nth-child(6),
+  .nested-table td:nth-child(6) {
+    display: none;
   }
 }

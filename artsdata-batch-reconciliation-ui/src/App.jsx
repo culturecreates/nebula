@@ -882,30 +882,15 @@ const App = ({ config }) => {
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-responsive-sm">
-            <table className="table table-hover table-borderless">
-              <thead className="sticky-top">
-                <tr>
-                  {[
-                    { key: 'id', label: '#' },
-                    { key: 'status', label: 'Judgement' },
-                    { key: 'externalId', label: 'ID' },
-                    { key: 'name', label: 'Name' },
-                    { key: 'url', label: 'URL' },
-                    { key: 'isni', label: 'ISNI' },
-                    { key: 'wikidata', label: 'Wikidata' },
-                    { key: 'type', label: 'Type' },
-                    { key: '', label: '' }
-                  ].map((col, idx) => (
-                    <th
-                      key={col.key || idx}
-                      scope="col"
-                      className=""
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+            {/* Fixed header labels above table */}
+            <div className="table-header-labels">
+              <div className="header-label-id">#</div>
+              <div className="header-label-judgement">Judgement</div>
+              <div className="header-label-content"></div>
+              <div className="header-label-refresh">Refresh</div>
+            </div>
+            
+            <table className="table table-no-header">
               <tbody>
                 {currentPageItems.map((item, index) => (
                   <TableRow
