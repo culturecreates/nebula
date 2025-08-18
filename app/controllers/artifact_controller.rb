@@ -46,7 +46,7 @@ class ArtifactController < ApplicationController
     SPARQL
 
     begin
-      ArtsdataApi::SparqlService.update_client.update(query)
+      helpers.artsdata_sparql_update_client.update(query)
       flash.notice = "Auto-Minting has been #{new_boolean == "true" ? 'enabled' : 'disabled'}."
     rescue StandardError => e
       flash.alert = "Failed to toggle Auto-Minting: #{e.message}"
