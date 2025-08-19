@@ -881,16 +881,18 @@ const App = ({ config }) => {
         )}
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
-          <div className="table-responsive-sm">
-            {/* Fixed header labels above table */}
-            <div className="table-header-labels">
-              <div className="header-label-id">#</div>
-              <div className="header-label-judgement">Judgement</div>
-              <div className="header-label-content"></div>
-              <div className="header-label-refresh">Refresh</div>
-            </div>
-            
-            <table className="table table-no-header">
+          <div className="table-scroll-container">
+            <table className="table table-responsive">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Judgement</th>
+                  <th scope="col">
+                  </th>
+                  <th scope="col"> Refresh
+                  </th>
+                </tr>
+              </thead>
               <tbody>
                 {currentPageItems.map((item, index) => (
                   <TableRow
