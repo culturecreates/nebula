@@ -256,6 +256,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
                   <th>URL</th>
                   <th>ISNI</th>
                   <th>Wikidata</th>
+                  {/* Show PostalCode column for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
                   <th>Type</th>
                 </tr>
               </thead>
@@ -314,6 +316,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
                   </td>
                   <td>{item.isni || ''}</td>
                   <td>{item.wikidata || ''}</td>
+                  {/* Show PostalCode column for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
                   <td>{item.type?.split('/').pop() || item.type}</td>
                 </tr>
                 
@@ -368,9 +372,23 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
                           <div className="match-description">{match.description}</div>
                         </div>
                       </td>
-                      <td>{/* URL column for matches - typically empty */}</td>
-                      <td>{/* ISNI column for matches */}</td>
-                      <td>{/* Wikidata column for matches */}</td>
+                      <td className="text-nowrap">
+                        {match.url && (
+                          <a href={match.url} target="_blank" rel="noopener noreferrer" title={match.url}>
+                            {truncateUrl(match.url)}
+                          </a>
+                        )}
+                      </td>
+                      <td>{match.isni || ''}</td>
+                      <td>
+                        {match.wikidata && (
+                          <a href={match.wikidata} target="_blank" rel="noopener noreferrer" title={match.wikidata}>
+                            {match.wikidata.split('/').pop()}
+                          </a>
+                        )}
+                      </td>
+                      {/* Show PostalCode column for Place entities */}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
                       <td>
                         {Array.isArray(match.type) 
                           ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])
