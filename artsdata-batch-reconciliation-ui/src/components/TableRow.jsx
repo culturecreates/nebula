@@ -13,7 +13,7 @@ function truncateUrl(url, maxLength = 24) {
   return `${start}...${end}`;
 }
 
-const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
+const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) => {
   const [selectedMatch, setSelectedMatch] = useState(item.selectedMatch || null);
   const [showMintConfirm, setShowMintConfirm] = useState(false);
   const [mintPreviewLoading, setMintPreviewLoading] = useState(false);
@@ -182,7 +182,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex }) => {
   return (
     <>
       <tr className="parent-row">
-        <th scope="row" className="sticky-top row-number">{item.id}</th>
+        <th scope="row" className="sticky-top row-number">{displayIndex}</th>
         <td>
           {/* Judgement cell with action buttons */}
           <div className="judgement-cell">
