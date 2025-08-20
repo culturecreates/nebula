@@ -45,7 +45,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         }
       ];
       
-      // Combine URL and Wikidata into sameAs property with array of values
+      // Combine URL and Wikidata into sameAs property
       const sameAsValues = [];
       
       if (entity.url && entity.url.trim() !== '') {
@@ -60,7 +60,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         conditions.push({
           matchType: "property",
           propertyId: "http://schema.org/sameAs",
-          propertyValue: sameAsValues,
+          propertyValue: sameAsValues.length === 1 ? sameAsValues[0] : sameAsValues,
           required: false,
           matchQuantifier: "any"
         });
