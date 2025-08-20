@@ -34,8 +34,8 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     const reconciliationType = getReconciliationType(entityType);
     
     // Build queries for batch reconciliation
-    const queries = entities.map(entity => ({
-      conditions: [
+    const queries = entities.map(entity => {
+      const conditions = [
         {
           matchType: "name",
           propertyId: "schema:name",
@@ -43,10 +43,46 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
           required: true,
           matchQuantifier: "any"
         }
-      ],
-      type: reconciliationType,
-      limit: 10 // Limit candidates per entity
-    }));
+      ];
+      
+      // Combine URL and Wikidata into sameAs property with array of values
+      const sameAsValues = [];
+      
+      if (entity.url && entity.url.trim() !== '') {
+        sameAsValues.push(entity.url);
+      }
+      
+      if (entity.wikidata && entity.wikidata.trim() !== '') {
+        sameAsValues.push(entity.wikidata);
+      }
+      
+      if (sameAsValues.length > 0) {
+        conditions.push({
+          matchType: "property",
+          propertyId: "http://schema.org/sameAs",
+          propertyValue: sameAsValues,
+          required: false,
+          matchQuantifier: "any"
+        });
+      }
+      
+      // ISNI condition removed for this iteration
+      // if (entity.isni && entity.isni.trim() !== '') {
+      //   conditions.push({
+      //     matchType: "property",
+      //     propertyId: "http://www.wikidata.org/prop/direct/P213",
+      //     propertyValue: entity.isni,
+      //     required: false,
+      //     matchQuantifier: "any"  
+      //   });
+      // }
+      
+      return {
+        conditions,
+        type: reconciliationType,
+        limit: 10 // Limit candidates per entity
+      };
+    });
 
     console.log('Reconciliation Query:', { queries });
     console.log('Reconciliation EntityType:', entityType, '-> Reconciliation Type:', reconciliationType);
@@ -249,7 +285,12 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         type: candidate.type || [],
         score: normalizeScore(candidate.score),
         match: isMatchingCandidate ? true : (candidate.match || false), // Override match for pre-reconciled
-        externalId: candidate.id || ''
+        externalId: candidate.id || '',
+        // Additional fields from Artsdata entities
+        url: candidate.url || candidate['http://schema.org/url'] || '',
+        isni: candidate.isni || candidate['http://www.wikidata.org/prop/direct/P213'] || '',
+        wikidata: candidate.wikidata || candidate['http://www.wikidata.org/entity/'] || '',
+        postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || ''
       };
     });
 
