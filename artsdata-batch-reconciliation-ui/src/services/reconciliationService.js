@@ -45,11 +45,22 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         }
       ];
       
-      // Combine URL and Wikidata into sameAs property
+      // Add URL as separate property
+      if (entity.url && entity.url.trim() !== '') {
+        conditions.push({
+          matchType: "property",
+          propertyId: "http://schema.org/url",
+          propertyValue: entity.url,
+          required: false,
+          matchQuantifier: "any"
+        });
+      }
+      
+      // Combine ISNI and Wikidata into sameAs property
       const sameAsValues = [];
       
-      if (entity.url && entity.url.trim() !== '') {
-        sameAsValues.push(entity.url);
+      if (entity.isni && entity.isni.trim() !== '') {
+        sameAsValues.push(entity.isni);
       }
       
       if (entity.wikidata && entity.wikidata.trim() !== '') {
@@ -65,17 +76,6 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
           matchQuantifier: "any"
         });
       }
-      
-      // ISNI condition removed for this iteration
-      // if (entity.isni && entity.isni.trim() !== '') {
-      //   conditions.push({
-      //     matchType: "property",
-      //     propertyId: "http://www.wikidata.org/prop/direct/P213",
-      //     propertyValue: entity.isni,
-      //     required: false,
-      //     matchQuantifier: "any"  
-      //   });
-      // }
       
       return {
         conditions,
