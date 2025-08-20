@@ -147,6 +147,7 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       endDate: item.endDate || '', // New field from API
       isni: extractIsniId(item.isni_uri), // Extract ISNI from new isni_uri field
       wikidata: extractWikidataId(item.wikidata_uri), // Extract Wikidata from new wikidata_uri field
+      postalCode: item.postal_code || '', // Extract postal code from new postal_code field
       // Mark as reconciled if already has artsdata_uri
       status: hasArtsdataUri ? 'reconciled' : 'needs-judgment',
       linkedTo: artsdataId,
