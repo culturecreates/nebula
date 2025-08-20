@@ -3,7 +3,7 @@ class GraphEditorService
 
   def initialize
     @client = SPARQL::Client.new("http://db.artsdata.ca/repositories/artsdata/statements", headers: {
-      Authorization: "Basic YXJ0c2RhdGEtYXBpOlN5amNpeC16b3Z3ZXMtN3ZvYm1p"})
+      Authorization: "Basic #{Rails.application.credentials.graph_db_basic_auth}"})
   end
 
   # Method to update a triple in the graph
