@@ -69,6 +69,65 @@ const App = ({ config }) => {
   const [requestSequence, setRequestSequence] = useState(0);
   const [abortController, setAbortController] = useState(null);
 
+  // Track if initial URL parameters have been processed
+  const [urlParamsProcessed, setUrlParamsProcessed] = useState(false);
+
+  // URL parameter utilities
+  const getUrlParams = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+      feedUrl: urlParams.get('feedUrl') || '',
+      type: urlParams.get('type') || ''
+    };
+  };
+
+  const updateUrlParams = (feedUrl, type) => {
+    const url = new URL(window.location);
+    if (feedUrl) {
+      url.searchParams.set('feedUrl', feedUrl);
+    } else {
+      url.searchParams.delete('feedUrl');
+    }
+    
+    if (type) {
+      url.searchParams.set('type', type);
+    } else {
+      url.searchParams.delete('type');
+    }
+    
+    // Update the URL without triggering a page reload
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  // Process initial URL parameters on component mount
+  useEffect(() => {
+    if (!urlParamsProcessed) {
+      const urlParams = getUrlParams();
+      console.log('Processing initial URL parameters:', urlParams);
+      
+      if (urlParams.feedUrl || urlParams.type) {
+        // Set the state from URL parameters
+        if (urlParams.feedUrl) {
+          setDataFeed(urlParams.feedUrl);
+        }
+        if (urlParams.type) {
+          setType(urlParams.type);
+        }
+        
+        // If both parameters are present, automatically trigger search directly
+        if (urlParams.feedUrl && urlParams.type) {
+          console.log('Auto-triggering search from URL parameters');
+          // Call loadDataInternal directly to avoid double loading
+          const validation = validateGraphUrl(urlParams.feedUrl);
+          if (validation.isValid && !validation.isWarning) {
+            loadDataInternal(urlParams.type, urlParams.feedUrl, 1, pageSize);
+          }
+        }
+      }
+      
+      setUrlParamsProcessed(true);
+    }
+  }, [urlParamsProcessed]);
 
   // Internal load function that does the actual API call
   const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize) => {
@@ -124,10 +183,16 @@ const App = ({ config }) => {
 
   // Load data when page changes (but not on type/dataFeed changes anymore)
   useEffect(() => {
+    console.log('Page/PageSize useEffect triggered:', { type, dataFeed, currentPage, pageSize, urlParamsProcessed });
+    
+    // Don't load during URL parameter processing to prevent double loading
+    if (!urlParamsProcessed) return;
+    
     // Only load if we have both type and dataFeed filled, and URL is valid
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
+        console.log('Page/PageSize useEffect calling loadDataInternal');
         loadDataInternal(type, dataFeed, currentPage, pageSize);
       }
     }
@@ -406,16 +471,13 @@ const App = ({ config }) => {
     setReconciliationStatus('idle');
     setError(null);
     
-    // Update the state variables
+    // Update URL parameters first
+    updateUrlParams(newDataFeed, newType);
+    
+    // Update the state variables and let useEffect handle the loading
     setDataFeed(newDataFeed);
     setType(newType);
     setCurrentPage(1); // Reset to first page
-    
-    // Perform the search
-    const validation = validateGraphUrl(newDataFeed);
-    if (validation.isValid && !validation.isWarning) {
-      loadDataInternal(newType, newDataFeed, 1, pageSize);
-    }
   };
 
   const handleSearchAcceptAll = () => {
