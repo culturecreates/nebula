@@ -3,6 +3,8 @@
  * Handles batch reconciliation, minting, and linking operations
  */
 
+import { enrichMatchCandidates, getEntityTypeFromUrl } from './dataExtensionService.js';
+
 // Default endpoints for development (when no config is passed)
 const DEFAULT_STAGING_API_BASE = 'https://staging.api.artsdata.ca';
 const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
@@ -102,6 +104,48 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
 
     const data = await response.json();
     console.log('Reconciliation API Response:', data);
+    
+    // Enrich match candidates with extended data if we have candidates
+    if (data && data.results && Array.isArray(data.results)) {
+      try {
+        // Get entity type for data extension (convert from schema: format)
+        const extensionEntityType = getEntityTypeFromUrl(entityType);
+        console.log('Entity type for extension:', extensionEntityType);
+        
+        // Collect all candidates from all results for batch enrichment
+        const allCandidates = [];
+        const candidateToResultMap = new Map(); // Track which candidates belong to which result (by ID)
+        
+        data.results.forEach((result, resultIndex) => {
+          if (result && result.candidates && Array.isArray(result.candidates)) {
+            result.candidates.forEach((candidate, candidateIndex) => {
+              allCandidates.push(candidate);
+              // Use candidate.id as key instead of object reference
+              candidateToResultMap.set(candidate.id, { resultIndex, candidateIndex });
+            });
+          }
+        });
+        
+        if (allCandidates.length > 0) {
+          console.log(`Enriching ${allCandidates.length} candidates in single batch`);
+          const enrichedCandidates = await enrichMatchCandidates(allCandidates, extensionEntityType, config);
+          
+          // Map enriched candidates back to their original results using candidate ID
+          enrichedCandidates.forEach((enrichedCandidate) => {
+            const mapping = candidateToResultMap.get(enrichedCandidate.id);
+            if (mapping) {
+              data.results[mapping.resultIndex].candidates[mapping.candidateIndex] = enrichedCandidate;
+            }
+          });
+          
+          console.log('Reconciliation results enriched with extended data');
+        }
+      } catch (enrichmentError) {
+        console.error('Error enriching match candidates:', enrichmentError);
+        // Continue with original data if enrichment fails
+      }
+    }
+    
     return data;
   } catch (error) {
     console.error('Error getting match candidates:', error);

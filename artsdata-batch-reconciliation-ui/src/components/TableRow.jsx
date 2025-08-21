@@ -379,11 +379,17 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                           </a>
                         )}
                       </td>
-                      <td>{match.isni || ''}</td>
-                      <td>
+                      <td className="text-nowrap">
+                        {match.isni && (
+                          <a href={match.isni} target="_blank" rel="noopener noreferrer" title={match.isni}>
+                            {truncateUrl(match.isni)}
+                          </a>
+                        )}
+                      </td>
+                      <td className="text-nowrap">
                         {match.wikidata && (
                           <a href={match.wikidata} target="_blank" rel="noopener noreferrer" title={match.wikidata}>
-                            {match.wikidata.split('/').pop()}
+                            {truncateUrl(match.wikidata)}
                           </a>
                         )}
                       </td>
