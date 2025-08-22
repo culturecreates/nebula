@@ -1,7 +1,7 @@
 import React from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Flag } from 'lucide-react';
 
-const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, entityType }) => {
+const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, entityType, isFlaggedForReview }) => {
   const getStatusClass = () => {
     switch (status) {
       case 'needs-judgment': return 'status-badge status-needs-judgment';
@@ -10,7 +10,8 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, enti
       case 'reconciled': return 'status-badge status-reconciled';
       case 'mint-error': return 'status-badge status-mint-error';
       case 'link-error': return 'status-badge status-link-error';
-      case 'skipped': return 'status-badge status-skipped';
+      case 'flagged': return 'status-badge status-flagged';
+      case 'flagged-complete': return 'status-badge status-needs-judgment'; // Same styling as needs-judgment
       // Legacy statuses for backward compatibility
       case 'Match': return 'status-badge status-match';
       case 'Mint person': return 'status-badge status-mint';
@@ -28,7 +29,8 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, enti
       case 'reconciled': return 'Reconciled';
       case 'mint-error': return `Mint ${entityType || 'Entity'}`;
       case 'link-error': return 'Link Error';
-      case 'skipped': return 'Skipped';
+      case 'flagged': return 'Needs review';
+      case 'flagged-complete': return 'Select';
       default: return status;
     }
   };

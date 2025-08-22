@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StatusBadge from './StatusBadge';
 import ActionButton from './ActionButton';
 import MintConfirmPopup from './MintConfirmPopup';
-import { Eye, RefreshCw } from 'lucide-react';
+import { Eye, RefreshCw, Flag } from 'lucide-react';
 
 // Helper to truncate URLs in the middle
 function truncateUrl(url, maxLength = 24) {
@@ -29,7 +29,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   
   // Determine the current status based on matches and user selections
   const getItemStatus = () => {
-    if (item.status === 'reconciled' || item.status === 'skipped') {
+    if (item.status === 'reconciled' || item.status === 'flagged' || item.status === 'flagged-complete') {
       return item.status;
     }
     
@@ -119,13 +119,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
     else if (currentStatus === 'judgment-ready' && selectedMatch) {
       onAction(item.id, 'select_match', null);
     }
-    // Reset skipped state back to needs-judgment
-    else if (currentStatus === 'skipped') {
-      onAction(item.id, 'reset_skip');
+    // Reset flagged state back to needs-judgment
+    else if (currentStatus === 'flagged' || currentStatus === 'flagged-complete') {
+      onAction(item.id, 'reset_flag');
     }
   };
 
-  // Handle final action (Match or Mint button click)
+  // Handle final action (Match, Mint, or Flag button click)
   const handleFinalAction = () => {
     if (currentStatus === 'judgment-ready') {
       if (selectedMatch) {
@@ -140,6 +140,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
       }
     } else if (currentStatus === 'mint-ready') {
       onAction(item.id, 'mint_final');
+    } else if (currentStatus === 'flagged') {
+      onAction(item.id, 'flag_final');
     }
   };
 
@@ -169,8 +171,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
       if (!selectedMatch && item.hasAutoMatch && match.match === true) {
         return true;
       }
-      // If no selection at all, show all matches (needs-judgment state)
-      if (!selectedMatch && (currentStatus === 'needs-judgment' || !item.hasAutoMatch)) {
+      // If no selection at all, show all matches (needs-judgment or flagged-complete state)
+      if (!selectedMatch && ((currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') || !item.hasAutoMatch)) {
         return true;
       }
       return false;
@@ -186,7 +188,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         <td>
           {/* Judgement cell with action buttons */}
           <div className="judgement-cell">
-            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'skipped' || currentStatus === 'reconciled') ? (
+            {(currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'reconciled') ? (
               <>
                 {currentStatus === 'reconciled' ? (
                   <div className="reconciled-text">
@@ -194,13 +196,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   </div>
                 ) : (
                   <button 
-                    className={`btn btn-sm ${currentStatus === 'skipped' ? 'btn-secondary' : 'btn-primary'}`}
-                    onClick={currentStatus === 'skipped' ? undefined : handleFinalAction}
-                    disabled={currentStatus === 'mint-error' || currentStatus === 'skipped'}
+                    className={`btn btn-sm btn-primary`}
+                    onClick={handleFinalAction}
+                    disabled={currentStatus === 'mint-error'}
                   >
                     {currentStatus === 'judgment-ready' ? 'Match' : 
                      currentStatus === 'mint-ready' ? `Mint ${item.selectedMintType || item.type?.split('/').pop() || 'Entity'}` : 
-                     'Skipped'}
+                     'Flag'}
                   </button>
                 )}
                 {currentStatus !== 'reconciled' && (
@@ -223,7 +225,14 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   mintError={item.mintError || mintPreviewError}
                   linkError={item.linkError}
                   entityType={item.selectedMintType || item.type?.split('/').pop() || 'Entity'}
+                  isFlaggedForReview={item.isFlaggedForReview}
                 />
+                {currentStatus === 'flagged-complete' && (
+                  <div style={{fontSize: '12px', color: 'var(--flag-color)'}}>
+                    <Flag className="flag-icon me-1" size={12} fill="currentColor" title="Flagged for review" style={{display: 'inline'}} />
+                    <span style={{fontWeight: 'bold'}}>Needs review</span>
+                  </div>
+                )}
                 {currentStatus === 'link-error' && (
                   <div>
                     <button 
@@ -266,7 +275,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                 <tr className="source-entity-row">
                   <td>
                     {/* Action links for source entity */}
-                    {currentStatus === 'needs-judgment' && (
+                    {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
                       <>
                         <button 
                           className="action-link"
@@ -277,9 +286,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                         <br />
                         <button 
                           className="action-link"
-                          onClick={() => onAction(item.id, 'skip')}
+                          onClick={() => onAction(item.id, 'flag')}
                         >
-                          skip
+                          flag
                         </button>
                       </>
                     )}
@@ -321,8 +330,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <td>{item.type?.split('/').pop() || item.type}</td>
                 </tr>
                 
-                {/* Match rows - only show if not in skipped or mint-ready state */}
-                {currentStatus !== 'skipped' && currentStatus !== 'mint-ready' && visibleMatches.map((match, index) => {
+                {/* Match rows - only show if not in flagged or mint-ready state */}
+                {currentStatus !== 'flagged' && currentStatus !== 'mint-ready' && visibleMatches.map((match, index) => {
                   // Check if this match is selected either manually or automatically
                   const isManuallySelected = selectedMatch && selectedMatch.id === match.id;
                   const isAutoSelected = !selectedMatch && match.match === true && item.hasAutoMatch !== false;
@@ -331,7 +340,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   return (
                     <tr key={`${item.id}-match-${index}`} className="table-active">
                       <td>
-                        {currentStatus === 'needs-judgment' && (
+                        {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
                           <>
                             <button 
                               className="action-link match-link"
