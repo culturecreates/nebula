@@ -14,8 +14,78 @@ import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
-// Enhanced helper for filtering rows - searches all visible content and filters matches
-function filterItems(items, filterText) {
+// Helper function to calculate current item status (matches TableRow.jsx logic)
+function getCurrentItemStatus(item, globalJudgments) {
+  if (item.status === 'reconciled' || item.status === 'flagged' || item.status === 'flagged-complete') {
+    return item.status;
+  }
+  
+  if (item.mintError) {
+    return 'mint-error';
+  }
+  
+  if (item.linkError) {
+    return 'link-error';
+  }
+  
+  // Check if there's a selected match in global judgments
+  const judgment = globalJudgments.get(item.id);
+  if (judgment && judgment.selectedMatch) {
+    return 'judgment-ready';
+  }
+  
+  if (item.mintReady) {
+    return 'mint-ready';
+  }
+  
+  // Default to needs-judgment
+  return 'needs-judgment';
+}
+
+// Helper function to get status text for search matching
+function getStatusSearchTerms(item, globalJudgments) {
+  const currentStatus = getCurrentItemStatus(item, globalJudgments);
+  const entityType = item.selectedMintType || item.type?.split('/').pop() || 'Entity';
+  const terms = [];
+  
+  // Add current status terms
+  switch (currentStatus) {
+    case 'needs-judgment':
+      terms.push('select', 'needs judgment');
+      break;
+    case 'judgment-ready':
+      terms.push('match');
+      break;
+    case 'mint-ready':
+      terms.push('mint', `mint ${entityType.toLowerCase()}`);
+      break;
+    case 'reconciled':
+      terms.push('reconciled');
+      break;
+    case 'mint-error':
+      terms.push('mint error', `mint ${entityType.toLowerCase()}`);
+      break;
+    case 'link-error':
+      terms.push('link error');
+      break;
+    case 'flagged':
+      terms.push('flag', 'needs review', 'flagged');
+      break;
+    case 'flagged-complete':
+      terms.push('select', 'flag', 'flagged', 'needs review');
+      break;
+  }
+  
+  // Add flag-related terms if item is flagged
+  if (item.isFlaggedForReview) {
+    terms.push('flag', 'flagged', 'needs review');
+  }
+  
+  return terms;
+}
+
+// Enhanced helper for filtering rows - searches all visible content including status/judgment terms
+function filterItems(items, filterText, globalJudgments) {
   if (!filterText || filterText.trim() === '') return items;
   const lower = filterText.toLowerCase().trim();
   
@@ -44,6 +114,12 @@ function filterItems(items, filterText) {
       field && typeof field === 'string' && field.toLowerCase().includes(lower)
     );
     
+    // Check status/judgment terms
+    const statusTerms = getStatusSearchTerms(item, globalJudgments);
+    const statusMatch = statusTerms.some(term => 
+      term.toLowerCase().includes(lower)
+    );
+    
     // Filter match candidates that match the search term
     let filteredMatches = [];
     if (item.matches && Array.isArray(item.matches)) {
@@ -70,22 +146,11 @@ function filterItems(items, filterText) {
       });
     }
     
-    // Include item if parent matches OR if any match candidates match
-    if (parentMatch || filteredMatches.length > 0) {
-      // Create filtered item
+    // Include item if parent matches OR if any match candidates match OR if status matches
+    if (parentMatch || statusMatch || filteredMatches.length > 0) {
+      // Create filtered item - always show ALL matches for found parent/child rows
       const filteredItem = { ...item };
-      
-      // Always apply match filtering when there's a search term
-      // If parent matches AND there are filtered matches, show only filtered matches
-      // If parent matches but no matches contain search term, show all matches
-      // If parent doesn't match, show only filtered matches
-      if (filteredMatches.length > 0) {
-        filteredItem.matches = filteredMatches;
-        filteredItem.matchesFiltered = true; // Flag to indicate matches have been filtered
-      }
-      // If parent matches but no matches contain the search term, keep all matches
-      // This case: parent has search term but matches don't
-      
+      // Keep all matches visible when parent or child rows match the search
       filteredItems.push(filteredItem);
     }
   });
@@ -979,7 +1044,7 @@ const App = ({ config }) => {
   };
 
   // Filtering and sorting
-  let filtered = filterItems(reconciledItems, filterText);
+  let filtered = filterItems(reconciledItems, filterText, globalJudgments);
   
   // Apply "Show All" filter
   if (!showAll) {

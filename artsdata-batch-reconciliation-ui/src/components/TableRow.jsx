@@ -154,11 +154,6 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   const getVisibleMatches = () => {
     if (!item.matches) return [];
     
-    // If matches have been filtered by search, respect the filtered results
-    if (item.matchesFiltered) {
-      return item.matches; // Already filtered in App.jsx, show all filtered matches
-    }
-    
     return item.matches.filter((match) => {
       // If a match is selected, only show the selected match
       if (selectedMatch) {
