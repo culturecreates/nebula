@@ -7,7 +7,7 @@
   >
     <thead class="sticky-top">
       <tr>
-        <th scope="col">#</th>
+        <th scope="col" class="sticky-col">#</th>
         <% solutions.variable_names.each do |head| %>
           <th
             scope="col"
@@ -21,7 +21,7 @@
     <tbody>
       <% solutions.each.with_index do | solution, index| %>
         <tr data-filter-query-results-target="content">
-          <th scope="row"><%= index + 1 %></th>
+          <th scope="row" class="sticky-col"><%= index + 1 %></th>
           <% solutions.variable_names.each do |key| %>
             <td>
               <%= display_object(solution[key]) if solution[key] %>

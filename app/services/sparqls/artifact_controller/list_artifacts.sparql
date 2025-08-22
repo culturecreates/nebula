@@ -38,4 +38,4 @@ WHERE {
     bind("true" as ?auto_load)
 } group by    ?account  ?group ?auto_load  ?artifact ?action 
 order by DESC(?group)
-limit 250
+limit 300
