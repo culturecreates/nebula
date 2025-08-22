@@ -14,16 +14,65 @@ import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
-// Helper for filtering rows
+// Enhanced helper for filtering rows - searches all visible content including matches
 function filterItems(items, filterText) {
-  if (!filterText) return items;
-  const lower = filterText.toLowerCase();
-  return items.filter((item) =>
-    Object.values(item).some(
-      (val) =>
-        typeof val === "string" && val.toLowerCase().includes(lower)
-    )
-  );
+  if (!filterText || filterText.trim() === '') return items;
+  const lower = filterText.toLowerCase().trim();
+  
+  return items.filter((item) => {
+    // Search in parent entity fields (all visible content)
+    const parentFields = [
+      item.name,
+      item.description,
+      item.uri,
+      item.url,
+      item.isni,
+      item.wikidata,
+      item.postalCode,
+      item.type,
+      item.location,
+      item.startDate,
+      item.endDate,
+      item.externalId,
+      item.id?.toString()
+    ];
+    
+    // Check parent entity fields
+    const parentMatch = parentFields.some(field => 
+      field && typeof field === 'string' && field.toLowerCase().includes(lower)
+    );
+    
+    if (parentMatch) return true;
+    
+    // Search in match candidates (child rows)
+    if (item.matches && Array.isArray(item.matches)) {
+      const matchFound = item.matches.some(match => {
+        const matchFields = [
+          match.name,
+          match.description,
+          match.id,
+          match.url,
+          match.isni,
+          match.wikidata,
+          match.postalCode,
+          match.type,
+          match.score?.toString(),
+          // Handle type arrays and objects
+          Array.isArray(match.type) ? 
+            match.type.map(t => typeof t === 'object' ? (t.id || t.name) : t).join(' ') :
+            (typeof match.type === 'object' ? (match.type.id || match.type.name) : match.type)
+        ];
+        
+        return matchFields.some(field => 
+          field && typeof field === 'string' && field.toLowerCase().includes(lower)
+        );
+      });
+      
+      if (matchFound) return true;
+    }
+    
+    return false;
+  });
 }
 
 
