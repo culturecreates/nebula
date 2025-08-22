@@ -14,16 +14,83 @@ import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
-// Helper for filtering rows
+// Enhanced helper for filtering rows - searches all visible content and filters matches
 function filterItems(items, filterText) {
-  if (!filterText) return items;
-  const lower = filterText.toLowerCase();
-  return items.filter((item) =>
-    Object.values(item).some(
-      (val) =>
-        typeof val === "string" && val.toLowerCase().includes(lower)
-    )
-  );
+  if (!filterText || filterText.trim() === '') return items;
+  const lower = filterText.toLowerCase().trim();
+  
+  const filteredItems = [];
+  
+  items.forEach((item) => {
+    // Search in parent entity fields (all visible content)
+    const parentFields = [
+      item.name,
+      item.description,
+      item.uri,
+      item.url,
+      item.isni,
+      item.wikidata,
+      item.postalCode,
+      item.type,
+      item.location,
+      item.startDate,
+      item.endDate,
+      item.externalId,
+      item.id?.toString()
+    ];
+    
+    // Check parent entity fields
+    const parentMatch = parentFields.some(field => 
+      field && typeof field === 'string' && field.toLowerCase().includes(lower)
+    );
+    
+    // Filter match candidates that match the search term
+    let filteredMatches = [];
+    if (item.matches && Array.isArray(item.matches)) {
+      filteredMatches = item.matches.filter(match => {
+        const matchFields = [
+          match.name,
+          match.description,
+          match.id,
+          match.url,
+          match.isni,
+          match.wikidata,
+          match.postalCode,
+          match.type,
+          match.score?.toString(),
+          // Handle type arrays and objects
+          Array.isArray(match.type) ? 
+            match.type.map(t => typeof t === 'object' ? (t.id || t.name) : t).join(' ') :
+            (typeof match.type === 'object' ? (match.type.id || match.type.name) : match.type)
+        ];
+        
+        return matchFields.some(field => 
+          field && typeof field === 'string' && field.toLowerCase().includes(lower)
+        );
+      });
+    }
+    
+    // Include item if parent matches OR if any match candidates match
+    if (parentMatch || filteredMatches.length > 0) {
+      // Create filtered item
+      const filteredItem = { ...item };
+      
+      // Always apply match filtering when there's a search term
+      // If parent matches AND there are filtered matches, show only filtered matches
+      // If parent matches but no matches contain search term, show all matches
+      // If parent doesn't match, show only filtered matches
+      if (filteredMatches.length > 0) {
+        filteredItem.matches = filteredMatches;
+        filteredItem.matchesFiltered = true; // Flag to indicate matches have been filtered
+      }
+      // If parent matches but no matches contain the search term, keep all matches
+      // This case: parent has search term but matches don't
+      
+      filteredItems.push(filteredItem);
+    }
+  });
+  
+  return filteredItems;
 }
 
 

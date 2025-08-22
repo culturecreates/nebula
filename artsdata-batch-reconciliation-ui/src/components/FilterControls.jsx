@@ -152,7 +152,6 @@ const FilterControls = ({
           onChange={(e) => setFilterText(e.target.value)}
           className="form-input"
           placeholder="Filter results"
-          disabled
         />
       </div>
       <div className="form-group">
