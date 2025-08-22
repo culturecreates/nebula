@@ -14,12 +14,14 @@ import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
-// Enhanced helper for filtering rows - searches all visible content including matches
+// Enhanced helper for filtering rows - searches all visible content and filters matches
 function filterItems(items, filterText) {
   if (!filterText || filterText.trim() === '') return items;
   const lower = filterText.toLowerCase().trim();
   
-  return items.filter((item) => {
+  const filteredItems = [];
+  
+  items.forEach((item) => {
     // Search in parent entity fields (all visible content)
     const parentFields = [
       item.name,
@@ -42,11 +44,10 @@ function filterItems(items, filterText) {
       field && typeof field === 'string' && field.toLowerCase().includes(lower)
     );
     
-    if (parentMatch) return true;
-    
-    // Search in match candidates (child rows)
+    // Filter match candidates that match the search term
+    let filteredMatches = [];
     if (item.matches && Array.isArray(item.matches)) {
-      const matchFound = item.matches.some(match => {
+      filteredMatches = item.matches.filter(match => {
         const matchFields = [
           match.name,
           match.description,
@@ -67,12 +68,29 @@ function filterItems(items, filterText) {
           field && typeof field === 'string' && field.toLowerCase().includes(lower)
         );
       });
-      
-      if (matchFound) return true;
     }
     
-    return false;
+    // Include item if parent matches OR if any match candidates match
+    if (parentMatch || filteredMatches.length > 0) {
+      // Create filtered item
+      const filteredItem = { ...item };
+      
+      // Always apply match filtering when there's a search term
+      // If parent matches AND there are filtered matches, show only filtered matches
+      // If parent matches but no matches contain search term, show all matches
+      // If parent doesn't match, show only filtered matches
+      if (filteredMatches.length > 0) {
+        filteredItem.matches = filteredMatches;
+        filteredItem.matchesFiltered = true; // Flag to indicate matches have been filtered
+      }
+      // If parent matches but no matches contain the search term, keep all matches
+      // This case: parent has search term but matches don't
+      
+      filteredItems.push(filteredItem);
+    }
   });
+  
+  return filteredItems;
 }
 
 
