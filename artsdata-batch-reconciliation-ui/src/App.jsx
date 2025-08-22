@@ -69,9 +69,6 @@ const App = ({ config }) => {
   const [requestSequence, setRequestSequence] = useState(0);
   const [abortController, setAbortController] = useState(null);
 
-  // Track if initial URL parameters have been processed
-  const [urlParamsProcessed, setUrlParamsProcessed] = useState(false);
-
   // URL parameter utilities
   const getUrlParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -101,33 +98,18 @@ const App = ({ config }) => {
 
   // Process initial URL parameters on component mount
   useEffect(() => {
-    if (!urlParamsProcessed) {
-      const urlParams = getUrlParams();
-      console.log('Processing initial URL parameters:', urlParams);
-      
-      if (urlParams.feedUrl || urlParams.type) {
-        // Set the state from URL parameters
-        if (urlParams.feedUrl) {
-          setDataFeed(urlParams.feedUrl);
-        }
-        if (urlParams.type) {
-          setType(urlParams.type);
-        }
-        
-        // If both parameters are present, automatically trigger search directly
-        if (urlParams.feedUrl && urlParams.type) {
-          console.log('Auto-triggering search from URL parameters');
-          // Call loadDataInternal directly to avoid double loading
-          const validation = validateGraphUrl(urlParams.feedUrl);
-          if (validation.isValid && !validation.isWarning) {
-            loadDataInternal(urlParams.type, urlParams.feedUrl, 1, pageSize);
-          }
-        }
+    const urlParams = getUrlParams();
+    
+    if (urlParams.feedUrl || urlParams.type) {
+      // Set the state from URL parameters to populate input fields
+      if (urlParams.feedUrl) {
+        setDataFeed(urlParams.feedUrl);
       }
-      
-      setUrlParamsProcessed(true);
+      if (urlParams.type) {
+        setType(urlParams.type);
+      }
     }
-  }, [urlParamsProcessed]);
+  }, []); // Run only on component mount
 
   // Internal load function that does the actual API call
   const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize) => {
@@ -181,18 +163,12 @@ const App = ({ config }) => {
     }
   };
 
-  // Load data when page changes (but not on type/dataFeed changes anymore)
+  // Load data when page changes
   useEffect(() => {
-    console.log('Page/PageSize useEffect triggered:', { type, dataFeed, currentPage, pageSize, urlParamsProcessed });
-    
-    // Don't load during URL parameter processing to prevent double loading
-    if (!urlParamsProcessed) return;
-    
     // Only load if we have both type and dataFeed filled, and URL is valid
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
-        console.log('Page/PageSize useEffect calling loadDataInternal');
         loadDataInternal(type, dataFeed, currentPage, pageSize);
       }
     }
@@ -203,7 +179,7 @@ const App = ({ config }) => {
         abortController.abort();
       }
     };
-  }, [currentPage, pageSize]); // Only reload on page/pageSize changes
+  }, [currentPage, pageSize, type, dataFeed]);
 
   // Separate effect to apply saved judgments when items change
   useEffect(() => {
@@ -257,7 +233,6 @@ const App = ({ config }) => {
         const itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
         
         if (itemsToReconcile.length > 0) {
-          console.log(`Reconciling ${itemsToReconcile.length} items of type ${schemaType}`);
           // Batch reconcile new items
           const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length, config);
           
@@ -474,10 +449,16 @@ const App = ({ config }) => {
     // Update URL parameters first
     updateUrlParams(newDataFeed, newType);
     
-    // Update the state variables and let useEffect handle the loading
+    // Update the state variables
     setDataFeed(newDataFeed);
     setType(newType);
     setCurrentPage(1); // Reset to first page
+    
+    // Force API call even if values haven't changed (for manual search)
+    const validation = validateGraphUrl(newDataFeed);
+    if (validation.isValid && !validation.isWarning) {
+      loadDataInternal(newType, newDataFeed, 1, pageSize);
+    }
   };
 
   const handleSearchAcceptAll = () => {
@@ -791,11 +772,9 @@ const App = ({ config }) => {
     const totalItemsToAccept = allGlobalItemsToAccept.length + currentPageReadyItems.length;
     
     if (totalItemsToAccept === 0) {
-      console.log("No items ready to accept");
       return;
     }
     
-    console.log(`Accepting ${totalItemsToAccept} items across all pages`);
     
     // Update all items in global storage to reconciled status
     setGlobalJudgments(prev => {
