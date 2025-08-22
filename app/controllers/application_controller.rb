@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
   def user_signed_in!
     unless user_signed_in?
       logout
-      flash.alert = "You must be logged in to access this section"
+      flash.alert = "You must be logged in to access this section. Artsdata uses GitHub.com accounts which can be created for free."
       redirect_back(fallback_location: root_path) and return
     end
   end
@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
     return unless user_signed_in?
 
     unless user_has_access?(feature)
-      flash.alert = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin."
+      flash.alert = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin at artsdata-support@capacoa.ca."
       redirect_to root_path and return
     end
     
