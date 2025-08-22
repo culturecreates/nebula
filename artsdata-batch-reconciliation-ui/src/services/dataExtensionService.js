@@ -26,13 +26,11 @@ export async function getAvailableProperties(entityType, config = {}) {
   
   // Return cached result if available
   if (propertiesCache.has(cacheKey)) {
-    console.log('Using cached properties for', entityType);
     return propertiesCache.get(cacheKey);
   }
   
   try {
     const url = `${reconciliationBaseUrl}/extend/propose?type=${entityType}`;
-    console.log('Fetching available properties for', entityType, 'from', url);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -49,7 +47,6 @@ export async function getAvailableProperties(entityType, config = {}) {
     
     // Cache the result
     propertiesCache.set(cacheKey, data);
-    console.log('Cached available properties for', entityType, ':', data);
     
     return data;
   } catch (error) {
@@ -73,14 +70,11 @@ export function filterTargetProperties(properties, entityType, config = {}) {
   
   // Return cached result if available
   if (targetPropertiesCache.has(cacheKey)) {
-    console.log('Using cached target properties for', entityType);
     return targetPropertiesCache.get(cacheKey);
   }
   
-  console.log(`Filtering properties for ${entityType}:`, properties);
   
   if (!Array.isArray(properties)) {
-    console.log('Properties is not an array:', properties);
     return [];
   }
   
@@ -90,11 +84,9 @@ export function filterTargetProperties(properties, entityType, config = {}) {
     const id = property.id ? property.id.toLowerCase() : '';
     const name = property.name ? property.name.toLowerCase() : '';
     
-    console.log('Checking property:', property);
     
     // Check for sameAs property (contains ISNI and Wikidata)
     if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
-      console.log('Found sameAs property (contains ISNI and Wikidata):', property);
       targetProperties.push({
         ...property,
         type: 'sameAs' // Use sameAs type for processing
@@ -102,7 +94,6 @@ export function filterTargetProperties(properties, entityType, config = {}) {
     }
     // Check for URL property
     else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
-      console.log('Found URL property:', property);
       targetProperties.push({
         ...property,
         type: 'url'
@@ -111,7 +102,6 @@ export function filterTargetProperties(properties, entityType, config = {}) {
     // Check for address property (contains postal code for Place entities)
     // COMMENTED OUT: Address property handling temporarily disabled
     // else if (id === 'address' || name === 'address') {
-    //   console.log('Found address property (contains postal code):', property);
     //   targetProperties.push({
     //     ...property,
     //     type: 'address'
@@ -124,7 +114,6 @@ export function filterTargetProperties(properties, entityType, config = {}) {
   
   // Cache the filtered result
   targetPropertiesCache.set(cacheKey, targetProperties);
-  console.log('Cached filtered target properties for', entityType, ':', targetProperties);
   
   return targetProperties;
 }
@@ -150,11 +139,8 @@ export async function extendEntities(entityIds, properties, config = {}) {
       }))
     };
     
-    console.log('Extend query:', extendQuery);
     
     const url = `${reconciliationBaseUrl}/extend`;
-    console.log('Making extend API call to:', url);
-    console.log('Extend query JSON:', JSON.stringify(extendQuery, null, 2));
 
     const response = await fetch(url, {
       method: 'POST',
@@ -165,7 +151,6 @@ export async function extendEntities(entityIds, properties, config = {}) {
       body: JSON.stringify(extendQuery)
     });
 
-    console.log('Extend API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -174,7 +159,6 @@ export async function extendEntities(entityIds, properties, config = {}) {
     }
 
     const data = await response.json();
-    console.log('Extended data received:', data);
     return data;
   } catch (error) {
     console.error('Error extending entities:', error);
@@ -191,10 +175,8 @@ export async function extendEntities(entityIds, properties, config = {}) {
 export function processExtendedData(extendedData, properties) {
   const processedData = {};
   
-  console.log('Processing extended data:', extendedData);
   
   if (!extendedData || !extendedData.rows || !Array.isArray(extendedData.rows)) {
-    console.log('No rows found in extended data');
     return processedData;
   }
   
@@ -208,7 +190,6 @@ export function processExtendedData(extendedData, properties) {
       postalCode: null
     };
     
-    console.log(`Processing entity ${entityId} with properties:`, entityRow.properties);
     
     if (entityRow.properties && Array.isArray(entityRow.properties)) {
       entityRow.properties.forEach(propertyData => {
@@ -220,7 +201,6 @@ export function processExtendedData(extendedData, properties) {
           return;
         }
         
-        console.log(`Processing property ${propertyId} (type: ${propertyConfig.type}):`, propertyData.values);
         
         if (propertyData.values && Array.isArray(propertyData.values) && propertyData.values.length > 0) {
           
@@ -228,36 +208,28 @@ export function processExtendedData(extendedData, properties) {
             // For URL, take the first value
             const value = propertyData.values[0];
             const stringValue = value.str || value.id || '';
-            console.log(`Extracted URL value for ${propertyId}:`, stringValue);
             processed.url = stringValue;
           } else if (propertyConfig.type === 'sameAs' && propertyId === 'sameAs') {
             // For sameAs, check all values for ISNI and Wikidata URIs
-            console.log(`Processing sameAs values for ISNI and Wikidata:`, propertyData.values);
             
             propertyData.values.forEach(value => {
               const stringValue = value.str || value.id || '';
-              console.log(`Checking sameAs value:`, stringValue);
               
               // Check for ISNI format: https://isni.org/isni/{isni_id}
               if (stringValue.includes('isni.org/isni/')) {
                 processed.isni = stringValue; // Store full ISNI URL
-                console.log(`Found ISNI in sameAs:`, stringValue);
               }
               
               // Check for Wikidata format: http://www.wikidata.org/entity/{entityid}
               if (stringValue.includes('wikidata.org/entity/')) {
                 processed.wikidata = stringValue; // Store full Wikidata URL
-                console.log(`Found Wikidata in sameAs:`, stringValue);
               }
             });
           // COMMENTED OUT: Address property processing temporarily disabled
           // } else if (propertyConfig.type === 'address' && propertyId === 'address') {
           //   // For address, extract postal code from nested structure
-          //   console.log(`Processing address values for postal code:`, propertyData.values);
           //   
           //   propertyData.values.forEach(addressValue => {
-          //     console.log(`Checking address value:`, addressValue);
-          //     
           //     // Address has nested properties structure
           //     if (addressValue.properties && Array.isArray(addressValue.properties)) {
           //       addressValue.properties.forEach(addressProperty => {
@@ -265,7 +237,6 @@ export function processExtendedData(extendedData, properties) {
           //           const postalCodeValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
           //           if (postalCodeValue) {
           //             processed.postalCode = postalCodeValue;
-          //             console.log(`Found postal code in address:`, postalCodeValue);
           //           }
           //         }
           //       });
@@ -278,10 +249,8 @@ export function processExtendedData(extendedData, properties) {
     }
     
     processedData[entityId] = processed;
-    console.log(`Processed data for ${entityId}:`, processed);
   });
   
-  console.log('Final processed extended data:', processedData);
   return processedData;
 }
 
@@ -396,14 +365,12 @@ export async function preloadAllEntityTypeProperties(config = {}) {
   const entityTypes = ['Event', 'Person', 'Organization', 'Place'];
   const allProperties = {};
   
-  console.log('Preloading properties for all entity types...');
   
   try {
     // Load properties for all entity types in parallel
     const propertyPromises = entityTypes.map(async (entityType) => {
       try {
         const availableProperties = await getAvailableProperties(entityType, config);
-        console.log(`Raw properties response for ${entityType}:`, availableProperties);
         
         // Handle the response format - it might be {type: "Organization", properties: [...]}
         const propertiesArray = Array.isArray(availableProperties) ? 
@@ -423,10 +390,8 @@ export async function preloadAllEntityTypeProperties(config = {}) {
     // Build properties map
     results.forEach(({ entityType, targetProperties }) => {
       allProperties[entityType] = targetProperties;
-      console.log(`Target properties for ${entityType}:`, targetProperties);
     });
     
-    console.log('Preloaded properties for all entity types:', allProperties);
     return allProperties;
     
   } catch (error) {
@@ -462,7 +427,6 @@ function getTargetPropertiesForCandidate(candidate, allProperties) {
     // Try all entity types and return the first one that has properties
     for (const entityType of ['Person', 'Organization', 'Event', 'Place']) {
       if (allProperties[entityType] && allProperties[entityType].length > 0) {
-        console.log(`Using ${entityType} properties for candidate ${candidate.id} (type: ${JSON.stringify(candidate.type)})`);
         return allProperties[entityType];
       }
     }
@@ -479,6 +443,18 @@ function getTargetPropertiesForCandidate(candidate, allProperties) {
  * @param {Object} config - Configuration object
  * @returns {Promise<Array>} - Enriched candidates with extended data
  */
+/**
+ * Remove duplicate entity IDs from array
+ * @param {Array} entityIds - Array of entity IDs (may contain duplicates)
+ * @returns {Array} - Array of unique entity IDs
+ */
+function deduplicateEntityIds(entityIds) {
+  const uniqueIds = [...new Set(entityIds)];
+  if (uniqueIds.length !== entityIds.length) {
+  }
+  return uniqueIds;
+}
+
 export async function enrichMatchCandidates(candidates, entityType, config = {}) {
   try {
     if (!candidates || candidates.length === 0) {
@@ -502,33 +478,28 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     });
     
     if (allTargetProperties.length === 0) {
-      console.log('No target properties found for any entity type');
       return candidates;
     }
     
-    console.log('Using target properties:', allTargetProperties);
     
-    // Extract entity IDs from candidates
+    // Extract entity IDs from candidates and remove duplicates
     const entityIds = candidates.map(candidate => candidate.id).filter(id => id);
+    const uniqueEntityIds = deduplicateEntityIds(entityIds);
     
-    if (entityIds.length === 0) {
-      console.log('No valid entity IDs found in candidates');
+    if (uniqueEntityIds.length === 0) {
       return candidates;
     }
     
-    console.log('Extending entities with IDs:', entityIds);
-    console.log('Will call /extend API with properties:', allTargetProperties.map(p => ({id: p.id, type: p.type})));
     
-    // Extend entities with target properties
-    const extendedData = await extendEntities(entityIds, allTargetProperties, config);
+    // Extend entities with target properties using deduplicated IDs
+    const extendedData = await extendEntities(uniqueEntityIds, allTargetProperties, config);
     const processedExtension = processExtendedData(extendedData, allTargetProperties);
     
-    console.log('Processed extension data:', processedExtension);
     
     // Merge extended data with candidates
     const enrichedCandidates = candidates.map(candidate => {
       const extendedInfo = processedExtension[candidate.id] || {};
-      return {
+      const enriched = {
         ...candidate,
         // Add extended properties while preserving existing ones
         isni: extendedInfo.isni || candidate.isni || '',
@@ -536,9 +507,9 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         url: extendedInfo.url || candidate.url || '',
         postalCode: extendedInfo.postalCode || candidate.postalCode || ''
       };
+      return enriched;
     });
     
-    console.log('Enriched candidates with extended data:', enrichedCandidates);
     return enrichedCandidates;
     
   } catch (error) {

@@ -20,14 +20,12 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
   try {
     // Check if graphUrl is empty or undefined
     if (!graphUrl || graphUrl.trim() === '') {
-      console.log('Empty graph URL provided, returning empty array');
       return [];
     }
     
     const encodedGraphUrl = encodeURIComponent(graphUrl);
     const apiUrl = `${apiBaseUrl}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
     
-    console.log('Fetching from API:', apiUrl);
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -42,12 +40,9 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
     }
 
     const data = await response.json();
-    console.log('API Response Data:', data);
-    console.log('Selected Type:', type);
     
     // Handle empty API results
     if (!data || (Array.isArray(data) && data.length === 0)) {
-      console.log('Empty results from API');
       return [];
     }
     
