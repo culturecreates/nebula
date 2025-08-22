@@ -109,13 +109,14 @@ export function filterTargetProperties(properties, entityType, config = {}) {
       });
     }
     // Check for address property (contains postal code for Place entities)
-    else if (id === 'address' || name === 'address') {
-      console.log('Found address property (contains postal code):', property);
-      targetProperties.push({
-        ...property,
-        type: 'address'
-      });
-    }
+    // COMMENTED OUT: Address property handling temporarily disabled
+    // else if (id === 'address' || name === 'address') {
+    //   console.log('Found address property (contains postal code):', property);
+    //   targetProperties.push({
+    //     ...property,
+    //     type: 'address'
+    //   });
+    // }
     else {
       console.log('Skipping property (not target):', property);
     }
@@ -143,7 +144,9 @@ export async function extendEntities(entityIds, properties, config = {}) {
       ids: entityIds,
       properties: properties.map(prop => ({ 
         id: prop.id,
-        expand: prop.type === 'address' // Only expand address property for nested structure
+        // COMMENTED OUT: Address expand handling temporarily disabled
+        // expand: prop.type === 'address' // Only expand address property for nested structure
+        expand: false // Disabled address expansion
       }))
     };
     
@@ -247,26 +250,28 @@ export function processExtendedData(extendedData, properties) {
                 console.log(`Found Wikidata in sameAs:`, stringValue);
               }
             });
-          } else if (propertyConfig.type === 'address' && propertyId === 'address') {
-            // For address, extract postal code from nested structure
-            console.log(`Processing address values for postal code:`, propertyData.values);
-            
-            propertyData.values.forEach(addressValue => {
-              console.log(`Checking address value:`, addressValue);
-              
-              // Address has nested properties structure
-              if (addressValue.properties && Array.isArray(addressValue.properties)) {
-                addressValue.properties.forEach(addressProperty => {
-                  if (addressProperty.id === 'postalCode' && addressProperty.values && addressProperty.values.length > 0) {
-                    const postalCodeValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
-                    if (postalCodeValue) {
-                      processed.postalCode = postalCodeValue;
-                      console.log(`Found postal code in address:`, postalCodeValue);
-                    }
-                  }
-                });
-              }
-            });
+          // COMMENTED OUT: Address property processing temporarily disabled
+          // } else if (propertyConfig.type === 'address' && propertyId === 'address') {
+          //   // For address, extract postal code from nested structure
+          //   console.log(`Processing address values for postal code:`, propertyData.values);
+          //   
+          //   propertyData.values.forEach(addressValue => {
+          //     console.log(`Checking address value:`, addressValue);
+          //     
+          //     // Address has nested properties structure
+          //     if (addressValue.properties && Array.isArray(addressValue.properties)) {
+          //       addressValue.properties.forEach(addressProperty => {
+          //         if (addressProperty.id === 'postalCode' && addressProperty.values && addressProperty.values.length > 0) {
+          //           const postalCodeValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
+          //           if (postalCodeValue) {
+          //             processed.postalCode = postalCodeValue;
+          //             console.log(`Found postal code in address:`, postalCodeValue);
+          //           }
+          //         }
+          //       });
+          //     }
+          //   });
+          // }
           }
         }
       });
