@@ -13,26 +13,26 @@
   --bg-gray-50: #f9fafb;
   --bg-blue-50: #dbeafe;
   --bg-red-50: #fef2f2;
-  
+
   /* Text Colors */
   --text-primary: #374151;
   --text-secondary: #6b7280;
   --text-dark: #1f2937;
   --text-muted: #9ca3af;
   --text-white: #ffffff;
-  
+
   /* Border Colors */
   --border-light: #e5e7eb;
   --border-medium: #d1d5db;
   --border-red: #fecaca;
-  
+
   /* Button Colors */
   --btn-primary: #3b82f6;
   --btn-primary-hover: #2563eb;
   --btn-primary-focus: #1d4ed8;
   --btn-danger: #dc2626;
   --btn-success: #10b981;
-  
+
   /* Status Colors */
   --status-orange: #f59e0b;
   --status-green: #10b981;
@@ -41,13 +41,14 @@
   --status-red: #dc2626;
   --status-light-gray: #d1d5db;
   --status-dark-gray: #e5e7eb;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
@@ -131,6 +132,7 @@ body {
   background-color: var(--bg-gray-50);
   border-bottom: 1px solid var(--border-light);
   padding: 1rem 1.5rem;
+  width: 100%; /* Always use full available width */
 }
 
 .filter-grid {
@@ -342,6 +344,13 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+/* Table Scroll Container - only for the table */
+.table-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  position: relative; /* Ensure sticky positioning works within scroll container */
+}
+
 /* Remove background and shadow for empty states */
 .table-container.empty-state {
   background-color: transparent;
@@ -362,9 +371,8 @@ body {
   z-index: 1020 !important; /* Above content but below modals */
   background-color: #f8f9fa !important; /* Ensure solid background */
   border-bottom: 1px solid #dee2e6 !important; /* Bootstrap table border */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; /* Add shadow for better separation */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Add shadow for better separation */
   /* Ensure full coverage to prevent content bleeding through */
-  width: 100% !important;
   left: 0 !important;
 }
 
@@ -412,6 +420,8 @@ body {
   align-items: start;
   margin-bottom: 2.5rem; /* Increased spacing to prevent overlap with validation messages */
   min-height: 4rem; /* Reserve space for validation messages */
+  width: 100%;
+  flex-wrap: wrap; /* Allow wrapping when buttons go off screen */
 }
 
 .filter-row-1 .form-group {
@@ -431,7 +441,9 @@ body {
   display: flex;
   align-items: start;
   padding-top: 1.5rem; /* Align with input labels */
-  margin-left: 1rem;
+  flex-shrink: 0; /* Don't shrink the button */
+  white-space: nowrap; /* Prevent button text wrapping */
+  order: 3; /* Ensure it comes after the form groups when wrapping */
 }
 
 .accept-all-container {
@@ -439,7 +451,18 @@ body {
   display: flex;
   align-items: start;
   padding-top: 1.5rem; /* Align with input fields */
-  padding-right: 1rem; /* Match bottom button alignment */
+  flex-shrink: 0; /* Don't shrink the button */
+  white-space: nowrap; /* Prevent button text wrapping */
+  order: 4; /* Ensure it comes last when wrapping */
+}
+
+/* When wrapping occurs, adjust spacing */
+@media (max-width: 768px) {
+  .search-button-container,
+  .accept-all-container {
+    margin-left: 0; /* Remove auto margin when wrapping */
+    padding-top: 0.5rem; /* Less top padding when wrapped */
+  }
 }
 
 .filter-row-2 {
@@ -447,6 +470,8 @@ body {
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
+  width: 100%;
+  flex-wrap: wrap; /* Allow wrapping when checkbox goes off screen */
 }
 
 .filter-row-2 .form-group:first-child {
@@ -455,7 +480,9 @@ body {
 }
 
 .filter-row-2 .form-group:last-child {
-  flex: none; /* Show all checkbox keeps its size */
+  flex-shrink: 0; /* Show all checkbox keeps its size */
+  white-space: nowrap; /* Prevent text wrapping */
+  order: 2; /* Ensure it comes after the filter results field when wrapping */
 }
 
 .pagination-container {
@@ -617,6 +644,10 @@ body {
 .name-cell {
   display: flex;
   flex-direction: column;
+  /* Let Bootstrap handle width constraints for responsiveness */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .name-primary {
@@ -884,13 +915,39 @@ body {
   margin-left: 0.5rem;
 }
 
+/* Parent Row - no alternating background */
+.parent-row {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.parent-row td,
+.parent-row th {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Hover for nested table match rows only */
+.nested-table.table-hover tbody tr:hover td,
+.nested-table.table-hover tbody tr:hover th {
+  background-color: rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Main table border handling */
+.table-no-header {
+  border-collapse: collapse !important;
+}
+
+/* Let Bootstrap handle outer table column widths for responsiveness */
+
 /* Enhanced Action Buttons */
 .judgement-cell {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
-  min-width: 140px;
+  width: 100%;
+  max-width: 150px; /* Constrain width */
 }
 
 /* Two-column layout within judgement cell */
@@ -989,7 +1046,7 @@ body {
 }
 
 .action-link {
-  color: #53585F;
+  color: #2563eb;
   font-size: 0.75rem;
   text-decoration: underline;
   background: none;
@@ -1000,29 +1057,158 @@ body {
 }
 
 .action-link:hover {
-  color: #2563eb;
+  color: #1d4ed8;
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
+/* Nested Table Styles */
+.nested-table-container {
+  width: 100%;
+  background: none;
+  margin: 0;
+  padding: 0;
+}
 
-  .filter-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
+.nested-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
 
-  .table-container {
-    margin: 1rem;
-  }
+.nested-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 600px; /* Minimum width to trigger horizontal scroll */
+  /* Let Bootstrap handle table layout for responsiveness */
+}
 
-  .table-cell {
-    padding: 0.5rem;
-    font-size: 0.75rem;
+/* Row number sticky positioning - same as nested table headers */
+.row-number.sticky-top {
+  position: sticky !important;
+  top: 0 !important; /* Stick directly to top of viewport */
+  z-index: 1020 !important; /* Same as nested table headers */
+  background-color: #ffffff !important; /* White background for row numbers */
+  border-bottom: 1px solid #dee2e6 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Row number sticky positioning - same as nested table headers */
+.row-number.sticky-top {
+  position: sticky !important;
+  top: 0 !important; /* Stick directly to top of viewport */
+  z-index: 1020 !important; /* Same as nested table headers */
+  background-color: #ffffff !important; /* White background for row numbers */
+  border-bottom: 1px solid #dee2e6 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Inner table headers - sticky to viewport top */
+.nested-table .sticky-top {
+  position: sticky !important;
+  top: 0 !important; /* Stick directly to top of viewport */
+  z-index: 1020 !important; /* Above content */
+  background-color: #f8f9fa !important;
+  box-shadow: none !important; /* Remove box shadow for nested table headers */
+}
+
+/* Only add border to nested table headers that are NOT borderless */
+.nested-table:not(.table-borderless) .sticky-top {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Source entity row styling */
+.source-entity-row {
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Match rows styling - no background color */
+.nested-table .table-active {
+  background-color: transparent !important;
+}
+
+.nested-table .table-active td {
+  background-color: transparent !important;
+}
+
+/* Mobile responsive adjustments for filter controls */
+@media (max-width: 576px) {
+  .filter-controls {
+    padding: 0.75rem 1rem; /* Reduce padding on mobile */
   }
+  
+  .filter-row-1 {
+    gap: 0.5rem; /* Smaller gap on mobile */
+  }
+  
+  .filter-row-2 {
+    gap: 0.5rem; /* Smaller gap on mobile */
+  }
+  
+  .search-button-container .btn,
+  .accept-all-container .btn {
+    padding: 0.375rem 0.5rem; /* Smaller buttons on mobile */
+    font-size: 0.8rem;
+  }
+  
+  .filter-row-1 .form-group:first-child {
+    min-width: 120px; /* Even smaller minimum for very small screens */
+  }
+  
+  .filter-row-1 .form-group:nth-child(2) {
+    min-width: 60px; /* Even smaller minimum for very small screens */
+  }
+}
+
+/* Minimal nested table styling - let Bootstrap handle responsiveness */
+
+/* Eye icon styling in nested table */
+.nested-table .eye-externalid-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.nested-table .eye-externalid-btn:hover {
+  color: #374151;
+}
+
+/* Action links in nested table */
+.nested-table .action-link {
+  color: #2563eb;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nested-table .action-link:hover {
+  color: #1d4ed8;
+}
+
+/* Match score styling in nested table */
+.nested-table .match-score {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.nested-table .true-match {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.nested-table .candidate-match {
+  color: #6b7280;
+}
+
+/* Selected indicator in nested table */
+.nested-table .selected-indicator {
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
 }

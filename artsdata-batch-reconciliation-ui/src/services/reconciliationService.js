@@ -3,6 +3,8 @@
  * Handles batch reconciliation, minting, and linking operations
  */
 
+import { enrichMatchCandidates, getEntityTypeFromUrl } from './dataExtensionService.js';
+
 // Default endpoints for development (when no config is passed)
 const DEFAULT_STAGING_API_BASE = 'https://staging.api.artsdata.ca';
 const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
@@ -34,8 +36,8 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     const reconciliationType = getReconciliationType(entityType);
     
     // Build queries for batch reconciliation
-    const queries = entities.map(entity => ({
-      conditions: [
+    const queries = entities.map(entity => {
+      const conditions = [
         {
           matchType: "name",
           propertyId: "schema:name",
@@ -43,10 +45,46 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
           required: true,
           matchQuantifier: "any"
         }
-      ],
-      type: reconciliationType,
-      limit: 10 // Limit candidates per entity
-    }));
+      ];
+      
+      // Add URL as separate property
+      if (entity.url && entity.url.trim() !== '') {
+        conditions.push({
+          matchType: "property",
+          propertyId: "http://schema.org/url",
+          propertyValue: entity.url,
+          required: false,
+          matchQuantifier: "any"
+        });
+      }
+      
+      // Combine ISNI and Wikidata into sameAs property
+      const sameAsValues = [];
+      
+      if (entity.isni && entity.isni.trim() !== '') {
+        sameAsValues.push(entity.isni);
+      }
+      
+      if (entity.wikidata && entity.wikidata.trim() !== '') {
+        sameAsValues.push(entity.wikidata);
+      }
+      
+      if (sameAsValues.length > 0) {
+        conditions.push({
+          matchType: "property",
+          propertyId: "http://schema.org/sameAs",
+          propertyValue: sameAsValues.length === 1 ? sameAsValues[0] : sameAsValues,
+          required: false,
+          matchQuantifier: "any"
+        });
+      }
+      
+      return {
+        conditions,
+        type: reconciliationType,
+        limit: 10 // Limit candidates per entity
+      };
+    });
 
     console.log('Reconciliation Query:', { queries });
     console.log('Reconciliation EntityType:', entityType, '-> Reconciliation Type:', reconciliationType);
@@ -66,6 +104,48 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
 
     const data = await response.json();
     console.log('Reconciliation API Response:', data);
+    
+    // Enrich match candidates with extended data if we have candidates
+    if (data && data.results && Array.isArray(data.results)) {
+      try {
+        // Get entity type for data extension (convert from schema: format)
+        const extensionEntityType = getEntityTypeFromUrl(entityType);
+        console.log('Entity type for extension:', extensionEntityType);
+        
+        // Collect all candidates from all results for batch enrichment
+        const allCandidates = [];
+        const candidateToResultMap = new Map(); // Track which candidates belong to which result (by ID)
+        
+        data.results.forEach((result, resultIndex) => {
+          if (result && result.candidates && Array.isArray(result.candidates)) {
+            result.candidates.forEach((candidate, candidateIndex) => {
+              allCandidates.push(candidate);
+              // Use candidate.id as key instead of object reference
+              candidateToResultMap.set(candidate.id, { resultIndex, candidateIndex });
+            });
+          }
+        });
+        
+        if (allCandidates.length > 0) {
+          console.log(`Enriching ${allCandidates.length} candidates in single batch`);
+          const enrichedCandidates = await enrichMatchCandidates(allCandidates, extensionEntityType, config);
+          
+          // Map enriched candidates back to their original results using candidate ID
+          enrichedCandidates.forEach((enrichedCandidate) => {
+            const mapping = candidateToResultMap.get(enrichedCandidate.id);
+            if (mapping) {
+              data.results[mapping.resultIndex].candidates[mapping.candidateIndex] = enrichedCandidate;
+            }
+          });
+          
+          console.log('Reconciliation results enriched with extended data');
+        }
+      } catch (enrichmentError) {
+        console.error('Error enriching match candidates:', enrichmentError);
+        // Continue with original data if enrichment fails
+      }
+    }
+    
     return data;
   } catch (error) {
     console.error('Error getting match candidates:', error);
@@ -249,7 +329,12 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         type: candidate.type || [],
         score: normalizeScore(candidate.score),
         match: isMatchingCandidate ? true : (candidate.match || false), // Override match for pre-reconciled
-        externalId: candidate.id || ''
+        externalId: candidate.id || '',
+        // Additional fields from Artsdata entities
+        url: candidate.url || candidate['http://schema.org/url'] || '',
+        isni: candidate.isni || candidate['http://www.wikidata.org/prop/direct/P213'] || '',
+        wikidata: candidate.wikidata || candidate['http://www.wikidata.org/entity/'] || '',
+        postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || ''
       };
     });
 

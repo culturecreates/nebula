@@ -9,6 +9,7 @@ import NavigationConfirmation from "./components/NavigationConfirmation";
 import TypeSwitchConfirmation from "./components/TypeSwitchConfirmation";
 import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation";
 import SearchConfirmation from "./components/SearchConfirmation";
+import ShowAllToggleConfirmation from "./components/ShowAllToggleConfirmation";
 import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
@@ -31,9 +32,9 @@ const App = ({ config }) => {
   const [dataFeed, setDataFeed] = useState('');
   const [type, setType] = useState("");
   const [minScore, setMinScore] = useState(50);
-  const [showAll, setShowAll] = useState(true);
+  const [showAll, setShowAll] = useState(false); // Default to false (hide reconciled)
   const [filterText, setFilterText] = useState("");
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -57,6 +58,10 @@ const App = ({ config }) => {
   const [showSearchConfirm, setShowSearchConfirm] = useState(false);
   const [pendingSearch, setPendingSearch] = useState(null);
   
+  // Show all toggle confirmation state
+  const [showShowAllConfirm, setShowShowAllConfirm] = useState(false);
+  const [pendingShowAllToggle, setPendingShowAllToggle] = useState(null);
+  
   // Global judgment storage across all pages
   const [globalJudgments, setGlobalJudgments] = useState(new Map());
 
@@ -64,6 +69,47 @@ const App = ({ config }) => {
   const [requestSequence, setRequestSequence] = useState(0);
   const [abortController, setAbortController] = useState(null);
 
+  // URL parameter utilities
+  const getUrlParams = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+      feedUrl: urlParams.get('feedUrl') || '',
+      type: urlParams.get('type') || ''
+    };
+  };
+
+  const updateUrlParams = (feedUrl, type) => {
+    const url = new URL(window.location);
+    if (feedUrl) {
+      url.searchParams.set('feedUrl', feedUrl);
+    } else {
+      url.searchParams.delete('feedUrl');
+    }
+    
+    if (type) {
+      url.searchParams.set('type', type);
+    } else {
+      url.searchParams.delete('type');
+    }
+    
+    // Update the URL without triggering a page reload
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  // Process initial URL parameters on component mount
+  useEffect(() => {
+    const urlParams = getUrlParams();
+    
+    if (urlParams.feedUrl || urlParams.type) {
+      // Set the state from URL parameters to populate input fields
+      if (urlParams.feedUrl) {
+        setDataFeed(urlParams.feedUrl);
+      }
+      if (urlParams.type) {
+        setType(urlParams.type);
+      }
+    }
+  }, []); // Run only on component mount
 
   // Internal load function that does the actual API call
   const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize) => {
@@ -117,7 +163,7 @@ const App = ({ config }) => {
     }
   };
 
-  // Load data when page changes (but not on type/dataFeed changes anymore)
+  // Load data when page changes
   useEffect(() => {
     // Only load if we have both type and dataFeed filled, and URL is valid
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
@@ -133,7 +179,7 @@ const App = ({ config }) => {
         abortController.abort();
       }
     };
-  }, [currentPage, pageSize]); // Only reload on page/pageSize changes
+  }, [currentPage, pageSize, type, dataFeed]);
 
   // Separate effect to apply saved judgments when items change
   useEffect(() => {
@@ -187,7 +233,6 @@ const App = ({ config }) => {
         const itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
         
         if (itemsToReconcile.length > 0) {
-          console.log(`Reconciling ${itemsToReconcile.length} items of type ${schemaType}`);
           // Batch reconcile new items
           const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length, config);
           
@@ -401,12 +446,15 @@ const App = ({ config }) => {
     setReconciliationStatus('idle');
     setError(null);
     
+    // Update URL parameters first
+    updateUrlParams(newDataFeed, newType);
+    
     // Update the state variables
     setDataFeed(newDataFeed);
     setType(newType);
     setCurrentPage(1); // Reset to first page
     
-    // Perform the search
+    // Force API call even if values haven't changed (for manual search)
     const validation = validateGraphUrl(newDataFeed);
     if (validation.isValid && !validation.isWarning) {
       loadDataInternal(newType, newDataFeed, 1, pageSize);
@@ -442,6 +490,69 @@ const App = ({ config }) => {
     // Cancel the search
     setShowSearchConfirm(false);
     setPendingSearch(null);
+  };
+
+  // Handle show all toggle request
+  const handleShowAllToggle = (newShowAllValue) => {
+    const unsavedCount = getUnsavedJudgmentCount();
+    
+    if (unsavedCount > 0) {
+      setPendingShowAllToggle(newShowAllValue);
+      setShowShowAllConfirm(true);
+    } else {
+      // No unsaved work, toggle directly
+      performShowAllToggle(newShowAllValue);
+    }
+  };
+
+  const performShowAllToggle = (newShowAllValue) => {
+    // Clear previous results when toggling show all
+    setItems([]);
+    setReconciledItems([]);
+    setGlobalJudgments(new Map());
+    setReconciliationStatus('idle');
+    setError(null);
+    
+    // Set the new show all value
+    setShowAll(newShowAllValue);
+    setCurrentPage(1); // Reset to first page
+    
+    // Reload data with new show all setting
+    const validation = validateGraphUrl(dataFeed);
+    if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning) {
+      loadDataInternal(type, dataFeed, 1, pageSize);
+    }
+  };
+
+  const handleShowAllToggleAcceptAll = () => {
+    // Accept all current judgments first
+    handleAcceptAll();
+    
+    // Then toggle show all
+    if (pendingShowAllToggle !== null) {
+      performShowAllToggle(pendingShowAllToggle);
+    }
+    
+    // Close confirmation
+    setShowShowAllConfirm(false);
+    setPendingShowAllToggle(null);
+  };
+
+  const handleShowAllToggleContinue = () => {
+    // Toggle show all and lose work
+    if (pendingShowAllToggle !== null) {
+      performShowAllToggle(pendingShowAllToggle);
+    }
+    
+    // Close confirmation
+    setShowShowAllConfirm(false);
+    setPendingShowAllToggle(null);
+  };
+
+  const handleShowAllToggleCancel = () => {
+    // Cancel the show all toggle
+    setShowShowAllConfirm(false);
+    setPendingShowAllToggle(null);
   };
 
   // Override browser back/forward navigation
@@ -661,11 +772,9 @@ const App = ({ config }) => {
     const totalItemsToAccept = allGlobalItemsToAccept.length + currentPageReadyItems.length;
     
     if (totalItemsToAccept === 0) {
-      console.log("No items ready to accept");
       return;
     }
     
-    console.log(`Accepting ${totalItemsToAccept} items across all pages`);
     
     // Update all items in global storage to reconciled status
     setGlobalJudgments(prev => {
@@ -837,6 +946,7 @@ const App = ({ config }) => {
         setCurrentPage={setCurrentPage}
         hasResults={currentPageItems.length > 0}
         onSearch={handleSearch}
+        onShowAllToggle={handleShowAllToggle}
       />
 
       <div className={`table-container ${currentPageItems.length === 0 ? 'empty-state' : ''}`}>
@@ -881,36 +991,25 @@ const App = ({ config }) => {
         )}
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
-          <div className="table-responsive-sm">
-            <table className="table table-hover table-striped">
-              <thead className="sticky-top">
+          <div className="table-scroll-container">
+            <table className="table table-responsive">
+              <thead>
                 <tr>
-                  {[
-                    { key: 'id', label: '#' },
-                    { key: 'status', label: 'Judgement' },
-                    { key: 'externalId', label: 'ID' },
-                    { key: 'name', label: 'Name' },
-                    { key: 'url', label: 'URL' },
-                    { key: 'isni', label: 'ISNI' },
-                    { key: 'wikidata', label: 'Wikidata' },
-                    { key: 'type', label: 'Type' },
-                    { key: '', label: '' }
-                  ].map((col, idx) => (
-                    <th
-                      key={col.key || idx}
-                      scope="col"
-                      className=""
-                    >
-                      {col.label}
-                    </th>
-                  ))}
+                  <th scope="col">#</th>
+                  <th scope="col">Judgement</th>
+                  <th scope="col">
+                  </th>
+                  <th scope="col"> Refresh
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {currentPageItems.map((item) => (
+                {currentPageItems.map((item, index) => (
                   <TableRow
                     key={item.id}
                     item={item}
+                    displayIndex={index + 1}
+                    parentRowIndex={index}
                     onAction={handleAction}
                     onRefresh={handleRefreshRow}
                   />
@@ -969,6 +1068,15 @@ const App = ({ config }) => {
         currentType={type}
         newDataFeed={pendingSearch?.dataFeed}
         newType={pendingSearch?.type}
+        unsavedCount={getUnsavedJudgmentCount()}
+      />
+      
+      <ShowAllToggleConfirmation
+        show={showShowAllConfirm}
+        onAcceptAll={handleShowAllToggleAcceptAll}
+        onContinue={handleShowAllToggleContinue}
+        onCancel={handleShowAllToggleCancel}
+        newShowAllValue={pendingShowAllToggle}
         unsavedCount={getUnsavedJudgmentCount()}
       />
     </div>

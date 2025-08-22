@@ -4,7 +4,7 @@ import { validateGraphUrl } from '../utils/urlValidation';
 const FilterControls = ({ 
   dataFeed, setDataFeed, type, setType, minScore, setMinScore, showAll, setShowAll,
   filterText, setFilterText, pageSize, setPageSize, loading, error,
-  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch
+  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch, onShowAllToggle
 }) => {
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
@@ -160,9 +160,9 @@ const FilterControls = ({
           <input
             type="checkbox"
             checked={showAll}
-            onChange={(e) => setShowAll(e.target.checked)}
+            onChange={(e) => onShowAllToggle(e.target.checked)}
             className="checkbox"
-            disabled={true}
+            disabled={loading}
           />
           <span className="checkbox-label">Show all</span>
         </label>
