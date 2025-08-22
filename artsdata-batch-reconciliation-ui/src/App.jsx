@@ -11,7 +11,7 @@ import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation"
 import SearchConfirmation from "./components/SearchConfirmation";
 import ShowAllToggleConfirmation from "./components/ShowAllToggleConfirmation";
 import { fetchDynamicData } from "./services/dataFeedService";
-import { batchReconcile, previewMint, mintEntity, linkEntity } from "./services/reconciliationService";
+import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper for filtering rows
@@ -296,7 +296,7 @@ const App = ({ config }) => {
     const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
       // Exclude pre-reconciled entities from unsaved work count
       !item.isPreReconciled &&
-      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
       (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
     );
     
@@ -304,7 +304,7 @@ const App = ({ config }) => {
       if (globalJudgments.has(item.id)) return false;
       // Exclude pre-reconciled entities from unsaved work count
       if (item.isPreReconciled) return false;
-      return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
              (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     });
     
@@ -641,11 +641,28 @@ const App = ({ config }) => {
           linkError: null,
           actionError: null
         };
-      } else if (action === "skip") {
+      } else if (action === "flag") {
+        // Just set flagged status when flag link is clicked (no API call yet)
         updateData = {
-          status: "skipped",
+          status: "flagged",
           actionError: null
         };
+      } else if (action === "flag_final") {
+        // Call flag API when blue Flag button is clicked
+        try {
+          await flagEntity(item.uri, config);
+          console.log(`Successfully flagged entity: ${item.name} (${item.uri})`);
+          updateData = {
+            status: "flagged-complete", // New status for successfully flagged entities
+            isFlaggedForReview: true, // Mark as flagged for review
+            actionError: null
+          };
+        } catch (error) {
+          console.error(`Failed to flag entity: ${item.name} (${item.uri})`, error);
+          updateData = {
+            actionError: `Flag failed: ${error.message}`
+          };
+        }
       } else if (action === "reset_mint") {
         // Reset mint state when user clicks Change from mint-ready
         updateData = {
@@ -676,8 +693,8 @@ const App = ({ config }) => {
           actionError: null,
           selectedMatch: null
         };
-      } else if (action === "reset_skip") {
-        // Reset skip state when user clicks Change from skipped
+      } else if (action === "reset_flag") {
+        // Reset flag state when user clicks Change from flagged
         updateData = {
           status: 'needs-judgment',
           actionError: null
@@ -751,12 +768,12 @@ const App = ({ config }) => {
     setCurrentPage(1);
   }, [showAll]);
 
-  const handleAcceptAll = () => {
+  const handleAcceptAll = async () => {
     // Count items from ALL pages that have judgments ready to be accepted
     const allGlobalItemsToAccept = Array.from(globalJudgments.values()).filter(item => 
       // Exclude pre-reconciled entities from accept all
       !item.isPreReconciled &&
-      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
       (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
     );
     
@@ -765,7 +782,7 @@ const App = ({ config }) => {
       if (globalJudgments.has(item.id)) return false;
       // Exclude pre-reconciled entities from accept all
       if (item.isPreReconciled) return false;
-      return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+      return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
              (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     });
     
@@ -775,6 +792,18 @@ const App = ({ config }) => {
       return;
     }
     
+    // Process flag API calls for flagged entities
+    const allFlaggedItems = [...allGlobalItemsToAccept, ...currentPageReadyItems].filter(item => item.status === 'flagged');
+    
+    for (const item of allFlaggedItems) {
+      try {
+        await flagEntity(item.uri, config);
+        console.log(`Successfully flagged entity: ${item.name} (${item.uri})`);
+      } catch (error) {
+        console.error(`Failed to flag entity: ${item.name} (${item.uri})`, error);
+        // Continue with other items even if one fails
+      }
+    }
     
     // Update all items in global storage to reconciled status
     setGlobalJudgments(prev => {
@@ -782,7 +811,7 @@ const App = ({ config }) => {
       for (const [itemId, item] of prev) {
         // Only mark non-pre-reconciled items as reconciled through accept all
         if (!item.isPreReconciled &&
-            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
             (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
           newMap.set(itemId, {
             ...item,
@@ -807,7 +836,7 @@ const App = ({ config }) => {
       prev.map(item => {
         // Only mark non-pre-reconciled items as reconciled through accept all
         if (!item.isPreReconciled &&
-            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
             (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
           return {
             ...item,
@@ -903,7 +932,7 @@ const App = ({ config }) => {
   const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
     // Exclude pre-reconciled entities from accept all count
     !item.isPreReconciled &&
-    (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+    (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
     (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
   );
   
@@ -915,7 +944,7 @@ const App = ({ config }) => {
     if (item.isPreReconciled) return false;
     
     // Check if item is ready to accept
-    const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || 
+    const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' || 
                    (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
     return isReady;
   });

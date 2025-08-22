@@ -270,6 +270,42 @@ export async function linkEntity(externalUri, classToLink, adUri, config = {}) {
 }
 
 /**
+ * Flag an entity for review
+ * @param {string} uri - URI of the entity to flag
+ * @param {Object} config - Configuration object with endpoints
+ * @returns {Promise<Object>} - Flag results
+ */
+export async function flagEntity(uri, config = {}) {
+  // Use config endpoints or fall back to defaults
+  const flagEndpoint = config.linkEndpoint || DEFAULT_STAGING_API_BASE;
+  const publisherUri = config.userUri || DEFAULT_PUBLISHER_URI;
+  
+  try {
+    const params = new URLSearchParams({
+      uri,
+      publisher: publisherUri
+    });
+    
+    const response = await fetch(`${flagEndpoint}/maintenance/flag_for_review?${params}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error flagging entity:', error);
+    throw error;
+  }
+}
+
+/**
  * Process reconciliation results and transform them for UI
  * @param {Object} reconciliationResults - Raw reconciliation results
  * @param {Array} originalEntities - Original entities that were reconciled

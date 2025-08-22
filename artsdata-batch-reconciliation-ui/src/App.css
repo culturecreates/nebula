@@ -20,6 +20,7 @@
   --text-dark: #1f2937;
   --text-muted: #9ca3af;
   --text-white: #ffffff;
+  --flag-color: rgb(97, 102, 108);
 
   /* Border Colors */
   --border-light: #e5e7eb;
@@ -591,7 +592,7 @@ body {
   color: var(--text-white);
 }
 
-.status-skipped {
+.status-flagged {
   background-color: var(--status-light-gray);
   color: var(--text-primary);
 }
