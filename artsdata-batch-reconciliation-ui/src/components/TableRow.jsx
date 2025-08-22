@@ -29,7 +29,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   
   // Determine the current status based on matches and user selections
   const getItemStatus = () => {
-    if (item.status === 'reconciled' || item.status === 'flagged' || item.status === 'flagged-complete') {
+    if (item.status === 'reconciled' || item.status === 'flagged') {
       return item.status;
     }
     
@@ -47,6 +47,10 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
     
     if (item.mintReady) {
       return 'mint-ready';
+    }
+    
+    if (item.status === 'flagged-complete') {
+      return item.status;
     }
     
     // Check if there's a single true match (and it hasn't been reset)
@@ -228,8 +232,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   isFlaggedForReview={item.isFlaggedForReview}
                 />
                 {currentStatus === 'flagged-complete' && (
-                  <div style={{fontSize: '12px', color: 'var(--flag-color)'}}>
-                    <Flag className="flag-icon me-1" size={12} fill="currentColor" title="Flagged for review" style={{display: 'inline'}} />
+                  <div style={{fontSize: '11px', color: 'var(--flag-color)', whiteSpace: 'nowrap'}}>
+                    <Flag className="flag-icon me-1" size={11} fill="currentColor" title="Flagged for review" style={{display: 'inline'}} />
                     <span style={{fontWeight: 'bold'}}>Needs review</span>
                   </div>
                 )}

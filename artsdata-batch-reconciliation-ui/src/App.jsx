@@ -14,9 +14,9 @@ import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
-// Helper function to calculate current item status (matches TableRow.jsx logic)
+// Helper function to calculate current item status (matches TableRow.jsx logic exactly)
 function getCurrentItemStatus(item, globalJudgments) {
-  if (item.status === 'reconciled' || item.status === 'flagged' || item.status === 'flagged-complete') {
+  if (item.status === 'reconciled' || item.status === 'flagged') {
     return item.status;
   }
   
@@ -36,6 +36,16 @@ function getCurrentItemStatus(item, globalJudgments) {
   
   if (item.mintReady) {
     return 'mint-ready';
+  }
+  
+  if (item.status === 'flagged-complete') {
+    return item.status;
+  }
+  
+  // Check if there's a single true match (and it hasn't been reset)
+  const trueMatches = item.matches?.filter(match => match.match === true) || [];
+  if (trueMatches.length === 1 && item.hasAutoMatch !== false) {
+    return 'judgment-ready';
   }
   
   // Default to needs-judgment
