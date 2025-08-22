@@ -34,7 +34,6 @@ export function getAppConfig() {
 
   // Log configuration in development
   if (process.env.NODE_ENV === 'development') {
-    console.log('App Configuration:', config);
     
     // Check if we're using defaults (development mode)
     const usingDefaults = Object.keys(config).some(key => 

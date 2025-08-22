@@ -86,8 +86,6 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
       };
     });
 
-    console.log('Reconciliation Query:', { queries });
-    console.log('Reconciliation EntityType:', entityType, '-> Reconciliation Type:', reconciliationType);
 
     const response = await fetch(`${reconciliationBaseUrl}${RECONCILIATION_ENDPOINT}`, {
       method: 'POST',
@@ -103,42 +101,41 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     }
 
     const data = await response.json();
-    console.log('Reconciliation API Response:', data);
     
     // Enrich match candidates with extended data if we have candidates
     if (data && data.results && Array.isArray(data.results)) {
       try {
         // Get entity type for data extension (convert from schema: format)
         const extensionEntityType = getEntityTypeFromUrl(entityType);
-        console.log('Entity type for extension:', extensionEntityType);
         
         // Collect all candidates from all results for batch enrichment
         const allCandidates = [];
-        const candidateToResultMap = new Map(); // Track which candidates belong to which result (by ID)
+        const candidatePositions = []; // Track ALL positions for each candidate (handles duplicates)
         
         data.results.forEach((result, resultIndex) => {
           if (result && result.candidates && Array.isArray(result.candidates)) {
             result.candidates.forEach((candidate, candidateIndex) => {
               allCandidates.push(candidate);
-              // Use candidate.id as key instead of object reference
-              candidateToResultMap.set(candidate.id, { resultIndex, candidateIndex });
+              // Store position info for each candidate occurrence
+              candidatePositions.push({ resultIndex, candidateIndex, entityId: candidate.id });
             });
           }
         });
         
         if (allCandidates.length > 0) {
-          console.log(`Enriching ${allCandidates.length} candidates in single batch`);
           const enrichedCandidates = await enrichMatchCandidates(allCandidates, extensionEntityType, config);
           
-          // Map enriched candidates back to their original results using candidate ID
-          enrichedCandidates.forEach((enrichedCandidate) => {
-            const mapping = candidateToResultMap.get(enrichedCandidate.id);
-            if (mapping) {
-              data.results[mapping.resultIndex].candidates[mapping.candidateIndex] = enrichedCandidate;
-            }
+          // Map enriched candidates back to ALL their positions (handles duplicates)
+          enrichedCandidates.forEach((enrichedCandidate, enrichedIndex) => {
+            // Find ALL positions where this entity ID appears
+            const allPositions = candidatePositions.filter(pos => pos.entityId === enrichedCandidate.id);
+            
+            // Apply enriched data to ALL occurrences of this entity
+            allPositions.forEach(position => {
+              data.results[position.resultIndex].candidates[position.candidateIndex] = { ...enrichedCandidate };
+            });
           });
           
-          console.log('Reconciliation results enriched with extended data');
         }
       } catch (enrichmentError) {
         console.error('Error enriching match candidates:', enrichmentError);
@@ -279,13 +276,11 @@ export async function linkEntity(externalUri, classToLink, adUri, config = {}) {
  * @returns {Array} - Transformed entities with match candidates
  */
 export function processReconciliationResults(reconciliationResults, originalEntities) {
-  console.log('Processing reconciliation results:', { reconciliationResults, originalEntities });
   
   // Handle the actual API response format
   const results = reconciliationResults?.results || [];
   
   if (!results || !Array.isArray(results)) {
-    console.log('No reconciliation results or not an array, returning entities with empty matches');
     return originalEntities.map(entity => ({
       ...entity,
       matches: [],
