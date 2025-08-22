@@ -2,6 +2,7 @@ require 'net/http'
 require 'uri'
 
 class ReconcileController < ApplicationController
+  before_action :check_minting_access # ensure user has permissions
 
   def batch; end
 
@@ -54,5 +55,12 @@ class ReconcileController < ApplicationController
       redirect_back(fallback_location: root_path)
     end
     
+  end
+
+  private
+
+  # Check if the user has access the the minting feature
+  def check_minting_access
+    ensure_access("minting")
   end
 end
