@@ -216,11 +216,13 @@ const App = ({ config }) => {
     const urlParams = new URLSearchParams(window.location.search);
     return {
       feedUrl: urlParams.get('feedUrl') || '',
-      type: urlParams.get('type') || ''
+      type: urlParams.get('type') || '',
+      showAll: urlParams.get('showAll') === 'true', // Convert string to boolean
+      filterText: urlParams.get('filterText') || ''
     };
   };
 
-  const updateUrlParams = (feedUrl, type) => {
+  const updateUrlParams = (feedUrl, type, showAll, filterText) => {
     const url = new URL(window.location);
     if (feedUrl) {
       url.searchParams.set('feedUrl', feedUrl);
@@ -234,6 +236,18 @@ const App = ({ config }) => {
       url.searchParams.delete('type');
     }
     
+    if (showAll) {
+      url.searchParams.set('showAll', 'true');
+    } else {
+      url.searchParams.delete('showAll');
+    }
+    
+    if (filterText && filterText.trim() !== '') {
+      url.searchParams.set('filterText', filterText.trim());
+    } else {
+      url.searchParams.delete('filterText');
+    }
+    
     // Update the URL without triggering a page reload
     window.history.replaceState({}, '', url.toString());
   };
@@ -242,19 +256,33 @@ const App = ({ config }) => {
   useEffect(() => {
     const urlParams = getUrlParams();
     
-    if (urlParams.feedUrl || urlParams.type) {
-      // Set the state from URL parameters to populate input fields
+    if (urlParams.feedUrl || urlParams.type || urlParams.showAll || urlParams.filterText) {
+      // Set the state from URL parameters to populate input fields and controls
       if (urlParams.feedUrl) {
         setDataFeed(urlParams.feedUrl);
       }
       if (urlParams.type) {
         setType(urlParams.type);
       }
+      if (urlParams.showAll) {
+        setShowAll(urlParams.showAll);
+      }
+      if (urlParams.filterText) {
+        setFilterText(urlParams.filterText);
+      }
     }
   }, []); // Run only on component mount
 
+  // Update URL parameters when filterText changes
+  useEffect(() => {
+    // Only update URL if other parameters are set (avoid updating URL on initial empty state)
+    if (dataFeed || type || showAll || filterText) {
+      updateUrlParams(dataFeed, type, showAll, filterText);
+    }
+  }, [filterText]);
+
   // Internal load function that does the actual API call
-  const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize) => {
+  const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize, currentShowAll) => {
     // Cancel previous request if it exists
     if (abortController) {
       abortController.abort();
@@ -273,13 +301,34 @@ const App = ({ config }) => {
     setReconciliationStatus('idle');
     
     try {
-      const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, currentPageSize, config, controller.signal);
+      // Determine API limit based on showAll toggle
+      let apiLimit = currentPageSize;
+      if (!currentShowAll) {
+        // When showAll is unchecked, fetch more entities to ensure we have enough non-reconciled ones
+        apiLimit = 2000;
+      }
+      
+      const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, apiLimit, config, controller.signal);
+      
+      // Sort API results when showAll is unchecked - non-reconciled first, then reconciled
+      let sortedData = data;
+      if (!currentShowAll) {
+        sortedData = data.sort((a, b) => {
+          const aIsReconciled = a.status === 'reconciled' || a.isPreReconciled || a.linkedTo || a.mintedAs;
+          const bIsReconciled = b.status === 'reconciled' || b.isPreReconciled || b.linkedTo || b.mintedAs;
+          
+          // Non-reconciled entities first (aIsReconciled = false comes before bIsReconciled = true)
+          if (!aIsReconciled && bIsReconciled) return -1;
+          if (aIsReconciled && !bIsReconciled) return 1;
+          return 0; // Keep original order within each group
+        });
+      }
       
       // Only update state if this is still the latest request
       setRequestSequence(prev => {
         if (currentSequence >= prev) {
-          setItems(data);
-          setReconciledItems(data); // Initialize with original data
+          setItems(sortedData);
+          setReconciledItems(sortedData); // Initialize with sorted data
         }
         return prev;
       });
@@ -311,7 +360,7 @@ const App = ({ config }) => {
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
-        loadDataInternal(type, dataFeed, currentPage, pageSize);
+        loadDataInternal(type, dataFeed, currentPage, pageSize, showAll);
       }
     }
 
@@ -371,8 +420,25 @@ const App = ({ config }) => {
         // Get current globalJudgments to filter items
         const currentGlobalJudgments = globalJudgments;
         
-        // Only reconcile items that don't have saved judgments
-        const itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
+        // Determine which items to reconcile based on showAll setting
+        let itemsToReconcile;
+        
+        if (!showAll) {
+          // When showAll is unchecked, only reconcile first 100 non-reconciled entities
+          // Items are already sorted with non-reconciled first from loadDataInternal
+          const nonReconciledItems = items.filter(item => 
+            item.status !== 'reconciled' && 
+            !item.linkedTo && 
+            !item.mintedAs &&
+            !currentGlobalJudgments.has(item.id) // Exclude items with saved judgments
+          );
+          
+          // Limit to first 100 for performance
+          itemsToReconcile = nonReconciledItems.slice(0, pageSize);
+        } else {
+          // When showAll is checked, reconcile all entities (already limited to 100 by API call)
+          itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
+        }
         
         if (itemsToReconcile.length > 0) {
           // Batch reconcile new items
@@ -589,7 +655,7 @@ const App = ({ config }) => {
     setError(null);
     
     // Update URL parameters first
-    updateUrlParams(newDataFeed, newType);
+    updateUrlParams(newDataFeed, newType, showAll, filterText);
     
     // Update the state variables
     setDataFeed(newDataFeed);
@@ -599,7 +665,7 @@ const App = ({ config }) => {
     // Force API call even if values haven't changed (for manual search)
     const validation = validateGraphUrl(newDataFeed);
     if (validation.isValid && !validation.isWarning) {
-      loadDataInternal(newType, newDataFeed, 1, pageSize);
+      loadDataInternal(newType, newDataFeed, 1, pageSize, showAll);
     }
   };
 
@@ -659,10 +725,13 @@ const App = ({ config }) => {
     setShowAll(newShowAllValue);
     setCurrentPage(1); // Reset to first page
     
+    // Update URL parameters to reflect the new showAll state
+    updateUrlParams(dataFeed, type, newShowAllValue, filterText);
+    
     // Reload data with new show all setting
     const validation = validateGraphUrl(dataFeed);
     if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning) {
-      loadDataInternal(type, dataFeed, 1, pageSize);
+      loadDataInternal(type, dataFeed, 1, pageSize, newShowAllValue);
     }
   };
 
@@ -1063,6 +1132,10 @@ const App = ({ config }) => {
       !item.linkedTo && 
       !item.mintedAs
     );
+    
+    // Limit to pageSize (100) when showAll is unchecked to maintain UI performance
+    // Since we sorted non-reconciled first, this gives us the first 100 non-reconciled entities
+    filtered = filtered.slice(0, pageSize);
   }
   
   const sorted = filtered;
@@ -1155,7 +1228,7 @@ const App = ({ config }) => {
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && reconciledItems.length === 0 && (
           <div className="alert alert-warning" role="alert">
             No entities found for the selected data feed and type.
           </div>
