@@ -555,7 +555,7 @@ body {
 .status-badge {
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 
@@ -988,7 +988,7 @@ body {
   color: #000;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+  font-size: 1rem;
 }
 
 /* Change link container - full width */
