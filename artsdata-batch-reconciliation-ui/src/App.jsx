@@ -10,8 +10,11 @@ import TypeSwitchConfirmation from "./components/TypeSwitchConfirmation";
 import DataFeedSwitchConfirmation from "./components/DataFeedSwitchConfirmation";
 import SearchConfirmation from "./components/SearchConfirmation";
 import ShowAllToggleConfirmation from "./components/ShowAllToggleConfirmation";
+import AcceptAllConfirmation from "./components/AcceptAllConfirmation";
+import AcceptAllProgress from "./components/AcceptAllProgress";
+import AcceptAllSummary from "./components/AcceptAllSummary";
 import { fetchDynamicData } from "./services/dataFeedService";
-import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
+import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity, getReferenceUri } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper function to calculate current item status (matches TableRow.jsx logic exactly)
@@ -176,7 +179,7 @@ const App = ({ config }) => {
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(false); // Default to false (hide reconciled)
   const [filterText, setFilterText] = useState("");
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -203,6 +206,23 @@ const App = ({ config }) => {
   // Show all toggle confirmation state
   const [showShowAllConfirm, setShowShowAllConfirm] = useState(false);
   const [pendingShowAllToggle, setPendingShowAllToggle] = useState(null);
+  
+  // Accept All popup states
+  const [showAcceptAllConfirm, setShowAcceptAllConfirm] = useState(false);
+  const [showAcceptAllProgress, setShowAcceptAllProgress] = useState(false);
+  const [showAcceptAllSummary, setShowAcceptAllSummary] = useState(false);
+  const [acceptAllProgress, setAcceptAllProgress] = useState({
+    currentAction: '',
+    currentEntity: '',
+    processedCount: 0,
+    totalCount: 0,
+    isComplete: false
+  });
+  const [acceptAllResults, setAcceptAllResults] = useState({
+    successCounts: { matched: 0, minted: 0, flagged: 0 },
+    errorCounts: { matchErrors: 0, mintErrors: 0, flagErrors: 0 },
+    totalProcessed: 0
+  });
   
   // Global judgment storage across all pages
   const [globalJudgments, setGlobalJudgments] = useState(new Map());
@@ -842,9 +862,10 @@ const App = ({ config }) => {
           }
         }
       } else if (action === "link" && matchCandidate) {
-        // Link to matched entity
+        // Link to matched entity - use schema: format for classToLink
+        const classToLink = `schema:${type}`;
         const adUri = `http://kg.artsdata.ca/resource/${matchCandidate.id}`;
-        const linkResult = await linkEntity(item.uri, `schema:${type}`, adUri, config);
+        const linkResult = await linkEntity(item.uri, classToLink, adUri, config);
         updateData = {
           status: "reconciled",
           linkedTo: matchCandidate.id,
@@ -979,88 +1000,200 @@ const App = ({ config }) => {
     setCurrentPage(1);
   }, [showAll]);
 
-  const handleAcceptAll = async () => {
-    // Count items from ALL pages that have judgments ready to be accepted
-    const allGlobalItemsToAccept = Array.from(globalJudgments.values()).filter(item => 
-      // Exclude pre-reconciled entities from accept all
-      !item.isPreReconciled &&
-      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
-      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
-    );
-    
-    // Also count current page items that are ready but not in global storage
+  const handleAcceptAll = () => {
+    // Get items ready to accept from current page
     const currentPageReadyItems = reconciledItems.filter(item => {
-      if (globalJudgments.has(item.id)) return false;
       // Exclude pre-reconciled entities from accept all
       if (item.isPreReconciled) return false;
-      return item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
-             (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
+      
+      const currentStatus = getCurrentItemStatus(item, globalJudgments);
+      
+      // Exclude already processed entities
+      if (currentStatus === 'reconciled') return false; // Already matched/minted
+      if (currentStatus === 'flagged-complete') return false; // Already flagged via API
+      
+      // Only include entities that have action buttons ready (not already processed)
+      return currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged';
     });
     
-    const totalItemsToAccept = allGlobalItemsToAccept.length + currentPageReadyItems.length;
-    
-    if (totalItemsToAccept === 0) {
+    if (currentPageReadyItems.length === 0) {
       return;
     }
     
-    // Process flag API calls for flagged entities
-    const allFlaggedItems = [...allGlobalItemsToAccept, ...currentPageReadyItems].filter(item => item.status === 'flagged');
+    // Count entities by action type
+    let matchCount = 0;
+    let mintCount = 0;
+    let flagCount = 0;
     
-    for (const item of allFlaggedItems) {
+    currentPageReadyItems.forEach(item => {
+      const currentStatus = getCurrentItemStatus(item, globalJudgments);
+      if (currentStatus === 'judgment-ready') {
+        matchCount++;
+      } else if (currentStatus === 'mint-ready') {
+        mintCount++;
+      } else if (currentStatus === 'flagged') {
+        flagCount++;
+      }
+    });
+    
+    // Show confirmation popup with counts
+    setAcceptAllResults({
+      matchCount,
+      mintCount, 
+      flagCount,
+      totalCount: currentPageReadyItems.length
+    });
+    setShowAcceptAllConfirm(true);
+  };
+  
+  const handleAcceptAllConfirm = async () => {
+    setShowAcceptAllConfirm(false);
+    
+    // Get items ready to process
+    const itemsToProcess = reconciledItems.filter(item => {
+      if (item.isPreReconciled) return false;
+      
+      const currentStatus = getCurrentItemStatus(item, globalJudgments);
+      
+      // Exclude already processed entities
+      if (currentStatus === 'reconciled') return false; // Already matched/minted
+      if (currentStatus === 'flagged-complete') return false; // Already flagged via API
+      
+      // Only process entities that have action buttons ready (not already processed)
+      return currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged';
+    });
+    
+    // Initialize progress
+    setAcceptAllProgress({
+      currentAction: '',
+      currentEntity: '',
+      processedCount: 0,
+      totalCount: itemsToProcess.length,
+      isComplete: false
+    });
+    setShowAcceptAllProgress(true);
+    
+    // Process each entity
+    const results = {
+      successCounts: { matched: 0, minted: 0, flagged: 0 },
+      errorCounts: { matchErrors: 0, mintErrors: 0, flagErrors: 0 },
+      totalProcessed: itemsToProcess.length
+    };
+    
+    for (let i = 0; i < itemsToProcess.length; i++) {
+      const item = itemsToProcess[i];
+      const currentStatus = getCurrentItemStatus(item, globalJudgments);
+      
       try {
-        await flagEntity(item.uri, config);
-        console.log(`Successfully flagged entity: ${item.name} (${item.uri})`);
+        if (currentStatus === 'judgment-ready') {
+          // Update progress
+          setAcceptAllProgress(prev => ({
+            ...prev,
+            currentAction: 'matching',
+            currentEntity: item.name,
+            processedCount: i
+          }));
+          
+          // Get the selected match
+          const judgment = globalJudgments.get(item.id);
+          let matchToLink = judgment?.selectedMatch;
+          
+          if (!matchToLink && item.matches) {
+            // Auto-match case - find the true match
+            const trueMatches = item.matches.filter(match => match.match === true);
+            if (trueMatches.length === 1) {
+              matchToLink = trueMatches[0];
+            }
+          }
+          
+          if (matchToLink) {
+            // Use schema: format for classToLink and full Artsdata URI for adUri
+            const classToLink = `schema:${type}`;
+            const adUri = `http://kg.artsdata.ca/resource/${matchToLink.id}`;
+            await linkEntity(item.uri, classToLink, adUri, config);
+            results.successCounts.matched++;
+          }
+        } else if (currentStatus === 'mint-ready') {
+          // Update progress
+          setAcceptAllProgress(prev => ({
+            ...prev,
+            currentAction: 'minting',
+            currentEntity: item.name,
+            processedCount: i
+          }));
+          
+          // Get the class to mint from judgment or item
+          const judgment = globalJudgments.get(item.id);
+          let classToMint = judgment?.selectedMintType || item.type;
+          
+          // Ensure schema: prefix is present for mint API
+          if (classToMint && !classToMint.startsWith('schema:')) {
+            classToMint = `schema:${classToMint}`;
+          }
+          
+          // Extract feed identifier from data feed URL
+          const feedIdentifier = dataFeed.split('/').pop() || dataFeed;
+          const referenceUri = getReferenceUri(feedIdentifier);
+          
+          await mintEntity(item.uri, classToMint, referenceUri, config);
+          results.successCounts.minted++;
+        } else if (currentStatus === 'flagged') {
+          // Update progress
+          setAcceptAllProgress(prev => ({
+            ...prev,
+            currentAction: 'flagging',
+            currentEntity: item.name,
+            processedCount: i
+          }));
+          
+          await flagEntity(item.uri, config);
+          results.successCounts.flagged++;
+        }
       } catch (error) {
-        console.error(`Failed to flag entity: ${item.name} (${item.uri})`, error);
-        // Continue with other items even if one fails
+        console.error(`Failed to process entity: ${item.name} (${item.uri})`, error);
+        
+        // Count errors by type
+        if (currentStatus === 'judgment-ready') {
+          results.errorCounts.matchErrors++;
+        } else if (currentStatus === 'mint-ready') {
+          results.errorCounts.mintErrors++;
+        } else if (currentStatus === 'flagged') {
+          results.errorCounts.flagErrors++;
+        }
       }
     }
     
-    // Update all items in global storage to reconciled status
-    setGlobalJudgments(prev => {
-      const newMap = new Map(prev);
-      for (const [itemId, item] of prev) {
-        // Only mark non-pre-reconciled items as reconciled through accept all
-        if (!item.isPreReconciled &&
-            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
-            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
-          newMap.set(itemId, {
-            ...item,
-            status: 'reconciled'
-          });
-        }
+    // Mark progress as complete
+    setAcceptAllProgress(prev => ({
+      ...prev,
+      processedCount: itemsToProcess.length,
+      isComplete: true
+    }));
+    
+    // Show completion briefly, then show summary
+    setTimeout(() => {
+      setShowAcceptAllProgress(false);
+      setAcceptAllResults(results);
+      setShowAcceptAllSummary(true);
+    }, 1500);
+  };
+  
+  const handleAcceptAllCancel = () => {
+    setShowAcceptAllConfirm(false);
+  };
+  
+  const handleAcceptAllSummaryClose = () => {
+    setShowAcceptAllSummary(false);
+    
+    // Clear all saved judgments for fresh start
+    setGlobalJudgments(new Map());
+    
+    // Reload data with existing filters
+    if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '') {
+      const validation = validateGraphUrl(dataFeed);
+      if (validation.isValid && !validation.isWarning) {
+        loadDataInternal(type, dataFeed, 1, pageSize, showAll);
       }
-      
-      // Add current page ready items to global storage as reconciled
-      currentPageReadyItems.forEach(item => {
-        newMap.set(item.id, {
-          ...item,
-          status: 'reconciled'
-        });
-      });
-      
-      return newMap;
-    });
-    
-    // Update current page items
-    setReconciledItems(prev => 
-      prev.map(item => {
-        // Only mark non-pre-reconciled items as reconciled through accept all
-        if (!item.isPreReconciled &&
-            (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
-            (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))) {
-          return {
-            ...item,
-            status: 'reconciled'
-          };
-        }
-        return item;
-      })
-    );
-    
-    // If showAll is unchecked, navigate to page 1 to show remaining unreconciled items
-    if (!showAll) {
-      setCurrentPage(1);
     }
   };
 
@@ -1268,7 +1401,7 @@ const App = ({ config }) => {
             <button 
               onClick={handleAcceptAll} 
               className="btn btn-primary"
-              disabled={true}
+              disabled={itemsReadyToAccept === 0 || loading}
             >
               Accept All ({itemsReadyToAccept})
             </button>
@@ -1322,6 +1455,33 @@ const App = ({ config }) => {
         onCancel={handleShowAllToggleCancel}
         newShowAllValue={pendingShowAllToggle}
         unsavedCount={getUnsavedJudgmentCount()}
+      />
+      
+      <AcceptAllConfirmation
+        show={showAcceptAllConfirm}
+        onConfirm={handleAcceptAllConfirm}
+        onCancel={handleAcceptAllCancel}
+        matchCount={acceptAllResults.matchCount || 0}
+        mintCount={acceptAllResults.mintCount || 0}
+        flagCount={acceptAllResults.flagCount || 0}
+        totalCount={acceptAllResults.totalCount || 0}
+      />
+      
+      <AcceptAllProgress
+        show={showAcceptAllProgress}
+        currentAction={acceptAllProgress.currentAction}
+        currentEntity={acceptAllProgress.currentEntity}
+        processedCount={acceptAllProgress.processedCount}
+        totalCount={acceptAllProgress.totalCount}
+        isComplete={acceptAllProgress.isComplete}
+      />
+      
+      <AcceptAllSummary
+        show={showAcceptAllSummary}
+        onClose={handleAcceptAllSummaryClose}
+        successCounts={acceptAllResults.successCounts}
+        errorCounts={acceptAllResults.errorCounts}
+        totalProcessed={acceptAllResults.totalProcessed}
       />
     </div>
   );
