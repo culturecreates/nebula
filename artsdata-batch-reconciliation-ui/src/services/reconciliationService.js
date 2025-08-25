@@ -79,6 +79,17 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         });
       }
       
+      // Add postal code condition for Place entities
+      if (entityType.toLowerCase().includes('place') && entity.postalCode && entity.postalCode.trim() !== '') {
+        conditions.push({
+          matchType: "property",
+          propertyId: "http://schema.org/postalCode",
+          propertyValue: entity.postalCode,
+          required: false,
+          matchQuantifier: "any"
+        });
+      }
+      
       return {
         conditions,
         type: reconciliationType,

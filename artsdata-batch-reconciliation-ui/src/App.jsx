@@ -1259,15 +1259,47 @@ const App = ({ config }) => {
   
   // Apply "Show All" filter
   if (!showAll) {
-    filtered = filtered.filter(item => 
-      item.status !== 'reconciled' && 
-      !item.linkedTo && 
-      !item.mintedAs
-    );
+    filtered = filtered.filter(item => {
+      // Always show entities that have judgments in current session (user reconciled them)
+      if (globalJudgments.has(item.id)) {
+        return true;
+      }
+      
+      // Hide pre-reconciled entities (entities that were already reconciled when loaded)
+      if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) {
+        return false;
+      }
+      
+      // Show all other non-reconciled entities
+      return true;
+    });
     
     // Limit to pageSize (100) when showAll is unchecked to maintain UI performance
-    // Since we sorted non-reconciled first, this gives us the first 100 non-reconciled entities
-    filtered = filtered.slice(0, pageSize);
+    // Preserve original order - don't reorder entities based on judgment status
+    const entitiesWithJudgments = filtered.filter(item => globalJudgments.has(item.id));
+    const judgmentCount = entitiesWithJudgments.length;
+    
+    // If we have too many entities, prioritize keeping entities with judgments
+    // but maintain their original positions in the array
+    if (filtered.length > pageSize) {
+      const kept = [];
+      let nonJudgmentCount = 0;
+      const maxNonJudgment = pageSize - judgmentCount;
+      
+      for (const item of filtered) {
+        if (globalJudgments.has(item.id)) {
+          // Always keep entities with judgments in their original position
+          kept.push(item);
+        } else if (nonJudgmentCount < maxNonJudgment) {
+          // Keep non-judgment entities up to the limit, in original order
+          kept.push(item);
+          nonJudgmentCount++;
+        }
+        // Skip entities that would exceed the page limit
+      }
+      
+      filtered = kept;
+    }
   }
   
   const sorted = filtered;
