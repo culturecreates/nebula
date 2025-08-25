@@ -179,7 +179,7 @@ const App = ({ config }) => {
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(false); // Default to false (hide reconciled)
   const [filterText, setFilterText] = useState("");
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -1361,9 +1361,12 @@ const App = ({ config }) => {
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && reconciledItems.length === 0 && (
-          <div className="alert alert-warning" role="alert">
-            No entities found for the selected data feed and type.
+        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
+          <div className="alert alert-info" role="alert">
+            {reconciledItems.length === 0 
+              ? "No entities found for the selected data feed and type."
+              : "All entities have been reconciled! Toggle 'Show All' to see reconciled entities or search for different data."
+            }
           </div>
         )}
         
