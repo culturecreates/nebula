@@ -183,13 +183,25 @@ const FilterControls = ({
     {/* Second row: Filter results, Minimum Score, Show All, Page Size, Pagination */}
     <div className="filter-row-2">
       <div className="form-group">
-        <input
-          type="text"
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
-          className="form-input"
-          placeholder="Filter results"
-        />
+        <div className="input-wrapper">
+          <input
+            type="text"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            className="form-input"
+            placeholder="Filter results"
+          />
+          {filterText && (
+            <button
+              type="button"
+              className="clear-button"
+              onClick={() => setFilterText('')}
+              title="Clear filter"
+            >
+              ×
+            </button>
+          )}
+        </div>
       </div>
       <div className="form-group">
         <label className="checkbox-container">
