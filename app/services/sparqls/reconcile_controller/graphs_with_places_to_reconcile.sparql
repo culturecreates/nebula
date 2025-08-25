@@ -1,0 +1,39 @@
+PREFIX schema: <http://schema.org/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dataid: <http://dataid.dbpedia.org/ns/core#>
+
+# This SPARQL lists graph with schema:Place and counts the number needing to be reconciled
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?graph_uri 
+(SAMPLE(?dataset) as ?dataset) 
+(SAMPLE(?name) as ?graph_name) 
+((COUNT(?place) - COUNT(?sameAs)) as ?to_reconcile)  
+(count(?sameAs) as ?reconciled) 
+?action
+WHERE {
+    ?graph_uri a prov:Entity , schema:Dataset ;
+               schema:contentRating ?rating ;
+               schema:name ?name .
+    OPTIONAL {
+        ?graph_uri prov:wasDerivedFrom/foaf:primaryTopic/rdfs:label ?dataset .
+    }
+    ?place a schema:Place .
+    filter(!isBLANK(?place))
+    graph ?graph_uri {
+        ?place a ?type .
+    }
+    optional {
+        ?place schema:sameAs ?sameAs .
+        filter(
+            strstarts(str(?sameAs), "http://kg.artsdata.ca"))
+    }
+    optional {
+        ?sameAs schema:sameAs ?place .
+        filter(
+            strstarts(str(?sameAs), "http://kg.artsdata.ca"))
+    }
+ bind(CONCAT("<a class='btn btn-primary btn-sm' href='/reconcile/batch?feedUrl=",str(?graph_uri),"&type=Place' >Batch Reconcile</a>") as ?action)
+} group by ?graph_uri ?action  order by DESC(?to_reconcile)
