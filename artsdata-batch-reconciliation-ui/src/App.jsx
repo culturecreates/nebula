@@ -1360,11 +1360,14 @@ const App = ({ config }) => {
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
+        {!loading && !error && reconciliationStatus !== 'loading' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
           <div className="alert alert-info" role="alert">
-            {reconciledItems.length === 0 
+            {items.length === 0 
               ? "No entities found for the selected data feed and type."
-              : "All entities have been reconciled! Toggle 'Show All' to see reconciled entities or search for different data."
+              : (items.every(item => item.isPreReconciled || item.linkedTo || item.mintedAs || item.status === 'reconciled')
+                  ? "All entities have been reconciled! Toggle 'Show All' to see reconciled entities or search for different data."
+                  : "No entities match the current filters."
+                )
             }
           </div>
         )}
