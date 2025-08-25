@@ -365,7 +365,8 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         url: candidate.url || candidate['http://schema.org/url'] || '',
         isni: candidate.isni || candidate['http://www.wikidata.org/prop/direct/P213'] || '',
         wikidata: candidate.wikidata || candidate['http://www.wikidata.org/entity/'] || '',
-        postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || ''
+        postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || '',
+        startDate: candidate.startDate || '',
       };
     });
 

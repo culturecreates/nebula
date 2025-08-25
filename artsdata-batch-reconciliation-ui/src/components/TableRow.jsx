@@ -7,9 +7,18 @@ import { Eye, RefreshCw, Flag } from 'lucide-react';
 // Helper to truncate URLs in the middle
 function truncateUrl(url, maxLength = 24) {
   if (!url) return '';
-  if (url.length <= maxLength) return url;
-  const start = url.slice(0, Math.ceil(maxLength / 2));
-  const end = url.slice(-Math.floor(maxLength / 2));
+  
+  // Remove protocol and www prefix for display
+  let displayUrl = url;
+  displayUrl = displayUrl.replace(/^https?:\/\//, ''); // Remove http:// or https://
+  displayUrl = displayUrl.replace(/^www\./, ''); // Remove www.
+  
+  // If the cleaned URL is short enough, return it
+  if (displayUrl.length <= maxLength) return displayUrl;
+  
+  // Truncate with ellipsis in the middle
+  const start = displayUrl.slice(0, Math.ceil(maxLength / 2));
+  const end = displayUrl.slice(-Math.floor(maxLength / 2));
   return `${start}...${end}`;
 }
 
@@ -271,6 +280,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <th>Wikidata</th>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
+                  {/* Show StartDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Start Date</th>}
                   <th>Type</th>
                 </tr>
               </thead>
@@ -331,6 +342,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <td>{item.wikidata || ''}</td>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
+                  {/* Show StartDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                      {item.startDate || ''}
+                    </td>
+                  )}
                   <td>{item.type?.split('/').pop() || item.type}</td>
                 </tr>
                 
@@ -408,6 +425,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       </td>
                       {/* Show PostalCode column for Place entities */}
                       {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
+                      {/* Show StartDate column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                          {match.startDate || ''}
+                        </td>
+                      )}
                       <td>
                         {Array.isArray(match.type) 
                           ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])

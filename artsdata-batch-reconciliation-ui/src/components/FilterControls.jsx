@@ -9,11 +9,18 @@ const FilterControls = ({
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
   const [typeInputValue, setTypeInputValue] = useState(type || '');
+  const [validationTimeout, setValidationTimeout] = useState(null);
 
   // Update input value when dataFeed prop changes
   useEffect(() => {
     if (dataFeed !== inputValue) {
       setInputValue(dataFeed || '');
+    }
+    
+    // Validate current input value (handles page refresh with existing URL)
+    if (dataFeed && dataFeed.trim() !== '') {
+      const result = validateGraphUrl(dataFeed);
+      setValidationWithTimeout(result);
     }
   }, [dataFeed]);
 
@@ -24,14 +31,44 @@ const FilterControls = ({
     }
   }, [type]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (validationTimeout) {
+        clearTimeout(validationTimeout);
+      }
+    };
+  }, [validationTimeout]);
+
+  // Helper function to set validation with auto-hide for success messages
+  const setValidationWithTimeout = (result) => {
+    // Clear any existing timeout
+    if (validationTimeout) {
+      clearTimeout(validationTimeout);
+      setValidationTimeout(null);
+    }
+    
+    // Set validation
+    setValidation(result);
+    
+    // If validation is successful (not warning or error), hide message after 3 seconds
+    if (result.isValid && !result.isWarning && result.message) {
+      const timeout = setTimeout(() => {
+        setValidation(prev => ({ ...prev, message: '' }));
+        setValidationTimeout(null);
+      }, 3000);
+      setValidationTimeout(timeout);
+    }
+  };
+
   // Handle input change
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInputValue(value);
     
-    // Update validation immediately for UI feedback
+    // Update validation with auto-hide for success messages
     const result = validateGraphUrl(value);
-    setValidation(result);
+    setValidationWithTimeout(result);
   };
 
   // Handle type input change
@@ -44,7 +81,7 @@ const FilterControls = ({
   const handleSearchClick = () => {
     // Validate inputs before searching
     const urlValidation = validateGraphUrl(inputValue);
-    setValidation(urlValidation);
+    setValidationWithTimeout(urlValidation);
     
     if (urlValidation.isValid && !urlValidation.isWarning && typeInputValue.trim() !== '') {
       // Call the parent's search handler with current input values
@@ -135,7 +172,7 @@ const FilterControls = ({
           <button 
             onClick={onAcceptAll} 
             className="btn btn-primary"
-            disabled={true}
+            disabled={!hasResults || loading || totalItems === 0}
           >
             Accept All ({totalItems})
           </button>
@@ -146,13 +183,25 @@ const FilterControls = ({
     {/* Second row: Filter results, Minimum Score, Show All, Page Size, Pagination */}
     <div className="filter-row-2">
       <div className="form-group">
-        <input
-          type="text"
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
-          className="form-input"
-          placeholder="Filter results"
-        />
+        <div className="input-wrapper">
+          <input
+            type="text"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            className="form-input"
+            placeholder="Filter results"
+          />
+          {filterText && (
+            <button
+              type="button"
+              className="clear-button"
+              onClick={() => setFilterText('')}
+              title="Clear filter"
+            >
+              ×
+            </button>
+          )}
+        </div>
       </div>
       <div className="form-group">
         <label className="checkbox-container">

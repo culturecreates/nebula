@@ -99,14 +99,22 @@ export function filterTargetProperties(properties, entityType, config = {}) {
         type: 'url'
       });
     }
-    // Check for address property (contains postal code for Place entities)
-    // COMMENTED OUT: Address property handling temporarily disabled
-    // else if (id === 'address' || name === 'address') {
-    //   targetProperties.push({
-    //     ...property,
-    //     type: 'address'
-    //   });
-    // }
+    // Check for address property (contains postal code for Place entities only)
+    else if (id === 'address' || name === 'address') {
+      if (entityType === 'Place') {
+        targetProperties.push({
+          ...property,
+          type: 'address'
+        });
+      }
+    }
+    // Check for startDate property (for Event entities only)
+    else if ((id === 'startdate' || name === 'startdate' || id === 'startDate' || name === 'startDate') && entityType === 'Event') {
+      targetProperties.push({
+        ...property,
+        type: 'startDate'
+      });
+    }
     else {
       console.log('Skipping property (not target):', property);
     }
@@ -133,9 +141,7 @@ export async function extendEntities(entityIds, properties, config = {}) {
       ids: entityIds,
       properties: properties.map(prop => ({ 
         id: prop.id,
-        // COMMENTED OUT: Address expand handling temporarily disabled
-        // expand: prop.type === 'address' // Only expand address property for nested structure
-        expand: false // Disabled address expansion
+        expand: prop.type === 'address' // Only expand address property for nested structure
       }))
     };
     
@@ -225,24 +231,32 @@ export function processExtendedData(extendedData, properties) {
                 processed.wikidata = stringValue; // Store full Wikidata URL
               }
             });
-          // COMMENTED OUT: Address property processing temporarily disabled
-          // } else if (propertyConfig.type === 'address' && propertyId === 'address') {
-          //   // For address, extract postal code from nested structure
-          //   
-          //   propertyData.values.forEach(addressValue => {
-          //     // Address has nested properties structure
-          //     if (addressValue.properties && Array.isArray(addressValue.properties)) {
-          //       addressValue.properties.forEach(addressProperty => {
-          //         if (addressProperty.id === 'postalCode' && addressProperty.values && addressProperty.values.length > 0) {
-          //           const postalCodeValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
-          //           if (postalCodeValue) {
-          //             processed.postalCode = postalCodeValue;
-          //           }
-          //         }
-          //       });
-          //     }
-          //   });
-          // }
+          } else if (propertyConfig.type === 'address' && propertyId === 'address') {
+            // For address, extract postal code from nested structure
+            
+            propertyData.values.forEach(addressValue => {
+              // Address has nested properties structure
+              if (addressValue.properties && Array.isArray(addressValue.properties)) {
+                addressValue.properties.forEach(addressProperty => {
+                  if (addressProperty.id === 'postalCode' && addressProperty.values && addressProperty.values.length > 0) {
+                    const postalCodeValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
+                    if (postalCodeValue) {
+                      processed.postalCode = postalCodeValue;
+                    }
+                  }
+                });
+              }
+            });
+          } else if (propertyConfig.type === 'startDate' && propertyId === 'startDate') {
+            // For startDate, extract date value
+            propertyData.values.forEach(dateValue => {
+              if (dateValue.str) {
+                const startDateValue = dateValue.str;
+                if (startDateValue) {
+                  processed.startDate = startDateValue;
+                }
+              }
+            });
           }
         }
       });
@@ -505,7 +519,8 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         isni: extendedInfo.isni || candidate.isni || '',
         wikidata: extendedInfo.wikidata || candidate.wikidata || '',
         url: extendedInfo.url || candidate.url || '',
-        postalCode: extendedInfo.postalCode || candidate.postalCode || ''
+        postalCode: extendedInfo.postalCode || candidate.postalCode || '',
+        startDate: extendedInfo.startDate || candidate.startDate || ''
       };
       return enriched;
     });
