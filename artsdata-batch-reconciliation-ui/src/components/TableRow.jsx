@@ -7,9 +7,18 @@ import { Eye, RefreshCw, Flag } from 'lucide-react';
 // Helper to truncate URLs in the middle
 function truncateUrl(url, maxLength = 24) {
   if (!url) return '';
-  if (url.length <= maxLength) return url;
-  const start = url.slice(0, Math.ceil(maxLength / 2));
-  const end = url.slice(-Math.floor(maxLength / 2));
+  
+  // Remove protocol and www prefix for display
+  let displayUrl = url;
+  displayUrl = displayUrl.replace(/^https?:\/\//, ''); // Remove http:// or https://
+  displayUrl = displayUrl.replace(/^www\./, ''); // Remove www.
+  
+  // If the cleaned URL is short enough, return it
+  if (displayUrl.length <= maxLength) return displayUrl;
+  
+  // Truncate with ellipsis in the middle
+  const start = displayUrl.slice(0, Math.ceil(maxLength / 2));
+  const end = displayUrl.slice(-Math.floor(maxLength / 2));
   return `${start}...${end}`;
 }
 
