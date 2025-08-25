@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { CheckCircle } from 'lucide-react';
 
 const AcceptAllSummary = ({ 
   show, 
@@ -40,7 +41,7 @@ const AcceptAllSummary = ({
           <div className="modal-body">
             <div className="text-center mb-4">
               <div className="text-success mb-2">
-                <i className="bi bi-check-circle-fill" style={{ fontSize: '2.5rem' }}></i>
+                <CheckCircle size={40} className="text-success" />
               </div>
               <h6>Processing Complete!</h6>
               <p className="text-muted">Processed {totalProcessed} entities</p>

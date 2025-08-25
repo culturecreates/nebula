@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { CheckCircle } from 'lucide-react';
 
 const AcceptAllProgress = ({ 
   show, 
@@ -72,7 +73,7 @@ const AcceptAllProgress = ({
             ) : (
               <div className="text-center">
                 <div className="text-success mb-3">
-                  <i className="bi bi-check-circle-fill" style={{ fontSize: '3rem' }}></i>
+                  <CheckCircle size={48} className="text-success" />
                 </div>
                 <p className="mb-0">All entities have been processed successfully!</p>
               </div>
