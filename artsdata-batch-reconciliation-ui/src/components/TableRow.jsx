@@ -280,6 +280,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <th>Wikidata</th>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
+                  {/* Show StartDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Start Date</th>}
                   <th>Type</th>
                 </tr>
               </thead>
@@ -340,6 +342,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <td>{item.wikidata || ''}</td>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
+                  {/* Show StartDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                      {item.startDate || ''}
+                    </td>
+                  )}
                   <td>{item.type?.split('/').pop() || item.type}</td>
                 </tr>
                 
@@ -417,6 +425,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       </td>
                       {/* Show PostalCode column for Place entities */}
                       {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
+                      {/* Show StartDate column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                          {match.startDate || ''}
+                        </td>
+                      )}
                       <td>
                         {Array.isArray(match.type) 
                           ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])

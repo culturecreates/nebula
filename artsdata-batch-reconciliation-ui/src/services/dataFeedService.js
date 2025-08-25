@@ -138,7 +138,7 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       type: extractFirstType(item.type) || schemaType, // Use first API-provided type, fallback to generated schema type
       description: item.description || '',
       location: item.location || '', // New field from API
-      startDate: item.startDate || '', // New field from API
+      startDate: item.start_date || item.startDate || '', // Map start_date to startDate
       endDate: item.endDate || '', // New field from API
       isni: extractIsniId(item.isni_uri), // Extract ISNI from new isni_uri field
       wikidata: extractWikidataId(item.wikidata_uri), // Extract Wikidata from new wikidata_uri field

@@ -883,7 +883,6 @@ const App = ({ config }) => {
         // Call flag API when blue Flag button is clicked
         try {
           await flagEntity(item.uri, config);
-          console.log(`Successfully flagged entity: ${item.name} (${item.uri})`);
           updateData = {
             status: "flagged-complete", // New status for successfully flagged entities
             isFlaggedForReview: true, // Mark as flagged for review

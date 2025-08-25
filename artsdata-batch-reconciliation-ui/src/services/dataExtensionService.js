@@ -108,6 +108,13 @@ export function filterTargetProperties(properties, entityType, config = {}) {
         });
       }
     }
+    // Check for startDate property (for Event entities only)
+    else if ((id === 'startdate' || name === 'startdate' || id === 'startDate' || name === 'startDate') && entityType === 'Event') {
+      targetProperties.push({
+        ...property,
+        type: 'startDate'
+      });
+    }
     else {
       console.log('Skipping property (not target):', property);
     }
@@ -238,6 +245,16 @@ export function processExtendedData(extendedData, properties) {
                     }
                   }
                 });
+              }
+            });
+          } else if (propertyConfig.type === 'startDate' && propertyId === 'startDate') {
+            // For startDate, extract date value
+            propertyData.values.forEach(dateValue => {
+              if (dateValue.str) {
+                const startDateValue = dateValue.str;
+                if (startDateValue) {
+                  processed.startDate = startDateValue;
+                }
               }
             });
           }
@@ -502,7 +519,8 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         isni: extendedInfo.isni || candidate.isni || '',
         wikidata: extendedInfo.wikidata || candidate.wikidata || '',
         url: extendedInfo.url || candidate.url || '',
-        postalCode: extendedInfo.postalCode || candidate.postalCode || ''
+        postalCode: extendedInfo.postalCode || candidate.postalCode || '',
+        startDate: extendedInfo.startDate || candidate.startDate || ''
       };
       return enriched;
     });
