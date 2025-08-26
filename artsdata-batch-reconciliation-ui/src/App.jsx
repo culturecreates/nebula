@@ -272,8 +272,8 @@ const App = ({ config }) => {
     window.history.replaceState({}, '', url.toString());
   };
 
-  // Process initial URL parameters on component mount
-  useEffect(() => {
+  // Function to initialize from URL parameters
+  const initializeFromUrlParams = () => {
     const urlParams = getUrlParams();
     
     if (urlParams.feedUrl || urlParams.type || urlParams.showAll || urlParams.filterText) {
@@ -291,6 +291,22 @@ const App = ({ config }) => {
         setFilterText(urlParams.filterText);
       }
     }
+  };
+
+  // Process initial URL parameters on component mount
+  useEffect(() => {
+    initializeFromUrlParams();
+  }, []); // Run only on component mount
+
+  // Handle browser navigation (back/forward buttons)
+  useEffect(() => {
+    const handlePopState = (event) => {
+      // Re-initialize from URL parameters when user navigates back/forward
+      initializeFromUrlParams();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []); // Run only on component mount
 
   // Update URL parameters when filterText changes

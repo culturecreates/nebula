@@ -23,14 +23,14 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, enti
 
   const getStatusText = () => {
     switch (status) {
-      case 'needs-judgment': return 'Select';
+      case 'needs-judgment': return <span className="fs-3">Select</span>;
       case 'judgment-ready': return 'Match';
       case 'mint-ready': return `Mint ${entityType || 'Entity'}`;
       case 'reconciled': return 'Reconciled';
       case 'mint-error': return `Mint ${entityType || 'Entity'}`;
       case 'link-error': return 'Link Error';
       case 'flagged': return 'Needs review';
-      case 'flagged-complete': return 'Select';
+      case 'flagged-complete': return <span className="fs-3">Select</span>;
       default: return status;
     }
   };
