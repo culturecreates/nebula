@@ -87,20 +87,26 @@
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="true"
+            data-turbo="false"
           >
             Batch Reconcile
           </a>
           <ul class="dropdown-menu">
             <li>
+              <a class="dropdown-item disabled" href="#" data-turbo="false">Introduction</a>
+            </li>
+            <li>
               <a
                 class="dropdown-item"
                 href="/query/show?sparql=reconcile_controller/graphs_with_agents_to_reconcile"
+                data-turbo="false"
               >Graphs with People, Organizations (test)</a>
             </li>
             <li>
               <a
                 class="dropdown-item"
                 href="/query/show?sparql=reconcile_controller/graphs_with_places_to_reconcile"
+                data-turbo="false"
               >Graphs with Places (test)</a>
             </li>
             <li>
