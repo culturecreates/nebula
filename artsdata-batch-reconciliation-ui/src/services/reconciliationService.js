@@ -83,7 +83,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
       if (entityType.toLowerCase().includes('place') && entity.postalCode && entity.postalCode.trim() !== '') {
         conditions.push({
           matchType: "property",
-          propertyId: "http://schema.org/postalCode",
+          propertyId: "<http://schema.org/address>/<http://schema.org/postalCode>",
           propertyValue: entity.postalCode,
           required: false,
           matchQuantifier: "any"

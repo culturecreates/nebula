@@ -167,7 +167,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   const getVisibleMatches = () => {
     if (!item.matches) return [];
     
-    return item.matches.filter((match) => {
+    const filteredMatches = item.matches.filter((match) => {
       // If a match is selected, only show the selected match
       if (selectedMatch) {
         return selectedMatch.id === match.id;
@@ -189,6 +189,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         return true;
       }
       return false;
+    });
+    
+    // Sort matches by score (highest score first)
+    return filteredMatches.sort((a, b) => {
+      const scoreA = parseFloat(a.score) || 0;
+      const scoreB = parseFloat(b.score) || 0;
+      return scoreB - scoreA; // Descending order (highest first)
     });
   };
 
