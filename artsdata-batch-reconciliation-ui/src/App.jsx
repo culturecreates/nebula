@@ -68,6 +68,17 @@ function getStatusSearchTerms(item, globalJudgments) {
       break;
     case 'judgment-ready':
       terms.push('match');
+      
+      // Check if this is an auto-selected match
+      const judgment = globalJudgments.get(item.id);
+      const hasManualSelection = judgment && judgment.selectedMatch;
+      
+      // Auto-match detection: check if this entity has an auto-match
+      // An entity is "auto-selected" if it has hasAutoMatch=true, regardless of whether
+      // it's stored in globalJudgments (since auto-matches are automatically stored there)
+      if (item.hasAutoMatch === true) {
+        terms.push('auto-selected', 'auto-match', 'auto selected', 'auto match');
+      }
       break;
     case 'mint-ready':
       terms.push('mint', `mint ${entityType.toLowerCase()}`);
@@ -132,6 +143,7 @@ function filterItems(items, filterText, globalJudgments) {
     const statusMatch = statusTerms.some(term => 
       term.toLowerCase().includes(lower)
     );
+    
     
     // Filter match candidates that match the search term
     let filteredMatches = [];
