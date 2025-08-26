@@ -115,9 +115,6 @@ export function filterTargetProperties(properties, entityType, config = {}) {
         type: 'startDate'
       });
     }
-    else {
-      console.log('Skipping property (not target):', property);
-    }
   });
   
   // Cache the filtered result
