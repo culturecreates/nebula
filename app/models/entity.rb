@@ -10,12 +10,17 @@ class Entity
 
   # Try to get a label of name property
   # Return RDF::Literal that may contain language
+  # TODO: return in I18n.locale set by user in UI
   def label
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2000/01/rdf-schema#label"), nil])
     return  solution.first.object if solution.count > 0
   
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/name"), nil])
-    solution.first.object if solution.count > 0
+    return solution.first.object if solution.count > 0
+
+    solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2004/02/skos/core#prefLabel"), nil])
+    return solution.first.object if solution.count > 0
+    return nil
   end
 
   def k_number
