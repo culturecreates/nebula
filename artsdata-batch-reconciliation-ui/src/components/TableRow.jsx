@@ -3,6 +3,7 @@ import StatusBadge from './StatusBadge';
 import ActionButton from './ActionButton';
 import MintConfirmPopup from './MintConfirmPopup';
 import { Eye, RefreshCw, Flag } from 'lucide-react';
+import { extractWikidataId } from '../services/dataFeedService';
 
 // Helper to truncate URLs in the middle
 function truncateUrl(url, maxLength = 24) {
@@ -21,6 +22,7 @@ function truncateUrl(url, maxLength = 24) {
   const end = displayUrl.slice(-Math.floor(maxLength / 2));
   return `${start}...${end}`;
 }
+
 
 const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) => {
   const [selectedMatch, setSelectedMatch] = useState(item.selectedMatch || null);
@@ -345,8 +347,20 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       </a>
                     )}
                   </td>
-                  <td>{item.isni || ''}</td>
-                  <td>{item.wikidata || ''}</td>
+                  <td>
+                    {item.isni && (
+                      <a href={item.isni} target="_blank" rel="noopener noreferrer" title={item.isni}>
+                        {truncateUrl(item.isni)}
+                      </a>
+                    )}
+                  </td>
+                  <td>
+                    {item.wikidata && (
+                      <a href={item.wikidata} target="_blank" rel="noopener noreferrer" title={item.wikidata}>
+                        {item.wikidataId || truncateUrl(item.wikidata)}
+                      </a>
+                    )}
+                  </td>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
                   {/* Show StartDate column for Event entities */}
@@ -426,7 +440,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       <td className="text-nowrap">
                         {match.wikidata && (
                           <a href={match.wikidata} target="_blank" rel="noopener noreferrer" title={match.wikidata}>
-                            {truncateUrl(match.wikidata)}
+                            {extractWikidataId(match.wikidata) || truncateUrl(match.wikidata)}
                           </a>
                         )}
                       </td>

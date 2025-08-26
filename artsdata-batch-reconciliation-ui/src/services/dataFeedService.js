@@ -77,7 +77,7 @@ function extractIsniId(isni_uri) {
  * @param {string} wikidata_uri - Wikidata URI from API
  * @returns {string} - Wikidata ID or empty string
  */
-function extractWikidataId(wikidata_uri) {
+export function extractWikidataId(wikidata_uri) {
   // Check direct wikidata_uri field first (new format)
   if (wikidata_uri && typeof wikidata_uri === 'string') {
     // Extract just the Q-ID from the full URL
@@ -140,8 +140,11 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       location: item.location || '', // New field from API
       startDate: item.start_date || item.startDate || '', // Map start_date to startDate
       endDate: item.endDate || '', // New field from API
-      isni: extractIsniId(item.isni_uri), // Extract ISNI from new isni_uri field
-      wikidata: extractWikidataId(item.wikidata_uri), // Extract Wikidata from new wikidata_uri field
+      isni: item.isni_uri || '', // Preserve original ISNI URI for API calls
+      wikidata: item.wikidata_uri || '', // Preserve original Wikidata URI for API calls
+      // Store extracted IDs for display purposes  
+      isniId: extractIsniId(item.isni_uri), // Extract ISNI ID for display
+      wikidataId: extractWikidataId(item.wikidata_uri), // Extract Wikidata ID for display
       postalCode: item.postal_code || '', // Extract postal code from new postal_code field
       // Check if entity is flagged for review
       isFlaggedForReview: item.is_flagged_for_review === true,
