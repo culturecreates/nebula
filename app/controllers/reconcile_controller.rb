@@ -2,7 +2,7 @@ require 'net/http'
 require 'uri'
 
 class ReconcileController < ApplicationController
-  before_action :check_minting_access # ensure user has permissions
+  before_action :check_minting_access, only: [:batch] # ensure user has permissions
 
   def batch; end
 
