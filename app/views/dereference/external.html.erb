@@ -56,7 +56,7 @@
 
     <% solutions.take(@max_entities_per_page).each do |s| %>
       <% type = @entity.graph.query([s.subject, RDF.type, nil]).first&.object&.value %>
-      <% next if !type %>
+
       <h3>
         <%= @entity
           .graph
