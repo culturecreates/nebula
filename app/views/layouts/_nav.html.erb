@@ -4,6 +4,10 @@
       <%= image_tag "artsdata_logo_circle.png",
       alt: "Artsdata Logo",
       style: "height: 40px; width: auto;" %>
+      <% if Rails.application.config.graph_api_endpoint.include?("staging") %>
+        <span class='badge bg-primary'>staging</span>
+      <% end %>
+
     <% end %>
 
     <div class="d-none d-md-block" style="margin-left: auto;">
