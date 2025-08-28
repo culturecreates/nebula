@@ -2,6 +2,10 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  
+  Rails.application.config.middleware.insert_before 0, Rack::Auth::Basic, "Staging" do |username, password|
+    username == ENV["STAGING_USER"] && password == ENV["STAGING_PASSWORD"]
+  end
 
   # External API endpoints for Artsdata services
   config.graph_api_endpoint = "http://staging.db.artsdata.ca" 
