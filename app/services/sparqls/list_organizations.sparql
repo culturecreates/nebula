@@ -1,33 +1,38 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT ?uri (sample(?name_language) as ?name)  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
+SELECT 
+?uri 
+(sample(?name_language) as ?name)  
+(sample(?adid) as ?sameAs) 
+(sample(?resultSeverity) as ?conforms)
+(sample(?location_regions) as ?region_in_location)
+(sample(?regions) as ?region_in_address)
 WHERE {
     graph <GRAPH_PLACEHOLDER> {
         ?uri  a ?type  .
         {
-         ?uri  schema:name  ?name_language  . 
+            ?uri  schema:name  ?name_language  .
         }
-       
+        OPTIONAL {
+            ?uri  schema:location/schema:address/schema:addressRegion  ?location_regions .
+        }
+        OPTIONAL {
+            ?uri  schema:address/schema:addressRegion  ?regions .
+        }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
-                sh:resultSeverity ?resultSeverity .
+                   sh:resultSeverity ?resultSeverity .
         }
     }
-    ?uri a schema:Organization .      
-   
+    ?uri a schema:Organization .
     OPTIONAL {
-      ?adid_sub schema:sameAs ?uri .
-      filter(contains(str(?adid_sub),"http://kg.artsdata.ca/resource/K"))
+        ?adid_sub schema:sameAs ?uri .
+        filter(contains(str(?adid_sub),"http://kg.artsdata.ca/resource/K"))
     }
-
     OPTIONAL {
-      ?uri schema:sameAs ?adid_obj .
-      filter(contains(str(?adid_obj),"http://kg.artsdata.ca/resource/K"))
+        ?uri schema:sameAs ?adid_obj .
+        filter(contains(str(?adid_obj),"http://kg.artsdata.ca/resource/K"))
     }
-
     bind(COALESCE(?adid_obj, ?adid_sub) as ?adid)
-
-    
-
 } GROUP BY ?uri 
 ORDER BY ?uri
