@@ -3,6 +3,8 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   
+  # Basic authentication for staging environment
+  # >heroku config:set STAGING_USER=your_username STAGING_PASSWORD=your_password --app artsdata-nebula-staging
   Rails.application.config.middleware.insert_before 0, Rack::Auth::Basic, "Staging" do |username, password|
     username == ENV["STAGING_USER"] && password == ENV["STAGING_PASSWORD"]
   end
