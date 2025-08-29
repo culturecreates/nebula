@@ -3,7 +3,7 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 SELECT distinct 
 ?uri 
 (sample(?name_language) as ?name) 
-(sample(?parent_entitys) as ?parent)  
+(sample(?parents) as ?parent)  
 (sample(?adid) as ?sameAs) 
 (sample(?resultSeverity) as ?conforms)
 WHERE {
@@ -15,6 +15,13 @@ WHERE {
         OPTIONAL {
           ?parent_entitys ?link  ?uri .
           filter(isblank(?uri))
+          OPTIONAL {
+            ?super_parent_entitys ?parent_link ?parent_entitys
+            filter(isblank(?parent_entitys))
+            filter(!isblank(?super_parent_entitys))
+          }
+          BIND (COALESCE(?super_parent_entitys, ?parent_entitys) as ?parents)
+          filter(!isblank(?parents))
         }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;

@@ -3,7 +3,7 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 SELECT 
 ?uri 
 (sample(?name_language) as ?name)  
-(sample(?parent_entitys) as ?parent) 
+(sample(?parents) as ?parent) 
 (sample(?adid) as ?sameAs) 
 (sample(?location_regions) as ?region_in_location)
 (sample(?regions) as ?region_in_address)
@@ -15,8 +15,15 @@ WHERE {
             ?uri  schema:name  ?name_language  .
         }
         OPTIONAL {
-            ?parent_entitys ?link  ?uri .
-            filter(isblank(?uri))
+          ?parent_entitys ?link  ?uri .
+          filter(isblank(?uri))
+          OPTIONAL {
+            ?super_parent_entitys ?parent_link ?parent_entitys
+            filter(isblank(?parent_entitys))
+            filter(!isblank(?super_parent_entitys))
+          }
+          BIND (COALESCE(?super_parent_entitys, ?parent_entitys) as ?parents)
+          filter(!isblank(?parents))
         }
         OPTIONAL {
             ?uri  schema:location/schema:address/schema:addressRegion  ?location_regions .
