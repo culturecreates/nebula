@@ -1,13 +1,21 @@
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-SELECT distinct ?uri (sample(?name_language) as ?name)  (sample(?adid) as ?sameAs) (sample(?resultSeverity) as ?conforms)
+SELECT distinct 
+?uri 
+(sample(?name_language) as ?name) 
+(sample(?parent_entitys) as ?parent)  
+(sample(?adid) as ?sameAs) 
+(sample(?resultSeverity) as ?conforms)
 WHERE {
     graph <GRAPH_PLACEHOLDER> {
         ?uri  a ?type  . 
         OPTIONAL {
          ?uri schema:name  ?name_language ;
         }
-       
+        OPTIONAL {
+          ?parent_entitys ?link  ?uri .
+          filter(isblank(?uri))
+        }
         OPTIONAL {
             ?shacl sh:focusNode ?uri ;
                 sh:resultSeverity ?resultSeverity .
