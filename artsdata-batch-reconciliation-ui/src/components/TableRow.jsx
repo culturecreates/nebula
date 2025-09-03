@@ -193,12 +193,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
       return false;
     });
     
-    // Sort matches by score (highest score first)
-    return filteredMatches.sort((a, b) => {
-      const scoreA = parseFloat(a.score) || 0;
-      const scoreB = parseFloat(b.score) || 0;
-      return scoreB - scoreA; // Descending order (highest first)
-    });
+    // Return filtered matches (API already provides them sorted)
+    return filteredMatches;
   };
 
   const visibleMatches = getVisibleMatches();

@@ -141,9 +141,20 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
             // Find ALL positions where this entity ID appears
             const allPositions = candidatePositions.filter(pos => pos.entityId === enrichedCandidate.id);
             
-            // Apply enriched data to ALL occurrences of this entity
+            // Apply enriched data to ALL occurrences of this entity while preserving original scores
             allPositions.forEach(position => {
-              data.results[position.resultIndex].candidates[position.candidateIndex] = { ...enrichedCandidate };
+              const originalCandidate = data.results[position.resultIndex].candidates[position.candidateIndex];
+              
+              // Merge enriched properties with original candidate, preserving parent-specific data like score
+              data.results[position.resultIndex].candidates[position.candidateIndex] = {
+                ...originalCandidate, // Keep original data (especially score, match status)
+                // Only override with extended properties from enrichment
+                isni: enrichedCandidate.isni || originalCandidate.isni || '',
+                wikidata: enrichedCandidate.wikidata || originalCandidate.wikidata || '',
+                url: enrichedCandidate.url || originalCandidate.url || '',
+                postalCode: enrichedCandidate.postalCode || originalCandidate.postalCode || '',
+                startDate: enrichedCandidate.startDate || originalCandidate.startDate || ''
+              };
             });
           });
           
@@ -340,6 +351,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     const result = results[index] || {};
     const candidates = result.candidates || [];
     
+    
     // Check if entity is pre-reconciled and find matching candidate
     let hasAutoMatch = false;
     let autoMatchCandidate = null;
@@ -369,7 +381,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         name: candidate.name,
         description: candidate.description || candidate.disambiguatingDescription || '',
         type: candidate.type || [],
-        score: normalizeScore(candidate.score),
+        score: candidate.score || 0,
         match: isMatchingCandidate ? true : (candidate.match || false), // Override match for pre-reconciled
         externalId: candidate.id || '',
         // Additional fields from Artsdata entities
@@ -380,6 +392,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         startDate: candidate.startDate || '',
       };
     });
+
 
     const processedEntity = {
       ...entity,
@@ -394,26 +407,6 @@ export function processReconciliationResults(reconciliationResults, originalEnti
   });
 }
 
-/**
- * Normalize score to 0-100 range
- * @param {number} score - Raw score from reconciliation service
- * @returns {number} - Normalized score (0-100)
- */
-function normalizeScore(score) {
-  if (typeof score !== 'number') return 0;
-  
-  // If score is already in 0-100 range, return as is
-  if (score >= 0 && score <= 100) {
-    return Math.round(score);
-  }
-  
-  // For other scoring systems, truncate long numbers
-  if (score > 100) {
-    return Math.round(score / 10); // Simple normalization fallback
-  }
-  
-  return Math.max(0, Math.round(score));
-}
 
 /**
  * Get reference URI for a given feed
