@@ -1,7 +1,24 @@
 class ApplicationController < ActionController::Base
   helper_method :ensure_access, :user_has_access?
-  before_action :set_locale, :maintenance_mode?
+  before_action :set_locale, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
+
+  def announcement_flash
+    if Rails.application.config.announcement_enabled &&
+       Rails.application.config.announcement_message.present?
+      announcement_start = (Rails.application.config.respond_to?(:announcement_start_time) && Rails.application.config.announcement_start_time) || nil
+      now = Time.now.to_i
+      one_week = 7 * 24 * 60 * 60
+      # Only show if this is the first page load in the session, and within 7 days of announcement start
+      if session[:announcement_shown].nil?
+        if announcement_start.nil? || now - announcement_start < one_week
+          flash.now[:notice] = Rails.application.config.announcement_message
+        end
+        session[:announcement_shown] = true
+      end
+    end
+  end
+  
 
   def home; end
 
