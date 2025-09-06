@@ -9,8 +9,12 @@ class ApplicationController < ActionController::Base
       announcement_start = (Rails.application.config.respond_to?(:announcement_start_time) && Rails.application.config.announcement_start_time) || nil
       now = Time.now.to_i
       one_week = 7 * 24 * 60 * 60
-      # Only show if this is the first page load in the session, and within 7 days of announcement start
-      if session[:announcement_shown].nil?
+      on_home = (request.path == root_path || request.path == "/")
+      if on_home
+        if announcement_start.nil? || now - announcement_start < one_week
+          flash.now[:notice] = Rails.application.config.announcement_message
+        end
+      elsif session[:announcement_shown].nil?
         if announcement_start.nil? || now - announcement_start < one_week
           flash.now[:notice] = Rails.application.config.announcement_message
         end
