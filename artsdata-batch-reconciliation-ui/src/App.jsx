@@ -1441,7 +1441,7 @@ const App = ({ config }) => {
             <table className="table table-responsive">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
+                  <th scope="col" className="sticky-left">#</th>
                   <th scope="col">Judgement</th>
                   <th scope="col">
                   </th>

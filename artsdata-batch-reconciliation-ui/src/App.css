@@ -377,6 +377,15 @@ body {
   left: 0 !important;
 }
 
+/* Sticky left column for row numbers */
+.sticky-left {
+  position: sticky !important;
+  left: 0 !important; /* Stick to left side during horizontal scroll */
+  z-index: 1025 !important; /* Above other content but below top sticky headers */
+  background-color: #ffffff !important; /* White background to cover scrolled content */
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; /* Shadow on the right side */
+}
+
 /* Modal z-index management for sticky header compatibility */
 
 /* Enhanced button hover states for better visibility */

@@ -202,7 +202,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   return (
     <>
       <tr className="parent-row">
-        <th scope="row" className="sticky-top row-number">{displayIndex}</th>
+        <th scope="row" className="sticky-left row-number">{displayIndex}</th>
         <td>
           {/* Judgement cell with action buttons */}
           <div className="judgement-cell">
