@@ -285,6 +285,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <th>Wikidata</th>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
+                  {/* Show Locality and Region columns for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <th>Locality</th>}
+                  {item.type?.toLowerCase().includes('place') && <th>Region</th>}
                   {/* Show StartDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <th>Start Date</th>}
                   <th>Type</th>
@@ -359,6 +362,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   </td>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
+                  {/* Show Locality and Region columns for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.addressLocality || ''}</td>}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.addressRegion || ''}</td>}
                   {/* Show StartDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
                     <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
@@ -442,6 +448,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       </td>
                       {/* Show PostalCode column for Place entities */}
                       {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
+                      {/* Show Locality and Region columns for Place entities */}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.addressLocality || ''}</td>}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.addressRegion || ''}</td>}
                       {/* Show StartDate column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td style={{fontSize: '0.75rem', color: '#6b7280'}}>

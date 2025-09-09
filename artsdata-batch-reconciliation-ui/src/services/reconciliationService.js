@@ -79,15 +79,43 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         });
       }
       
-      // Add postal code condition for Place entities
-      if (entityType.toLowerCase().includes('place') && entity.postalCode && entity.postalCode.trim() !== '') {
-        conditions.push({
-          matchType: "property",
-          propertyId: "<http://schema.org/address>/<http://schema.org/postalCode>",
-          propertyValue: entity.postalCode,
-          required: false,
-          matchQuantifier: "any"
-        });
+      // Add Place-specific conditions for enhanced matching
+      if (entityType.toLowerCase().includes('place')) {
+        // Add postal code condition
+        if (entity.postalCode && entity.postalCode.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<http://schema.org/address>/<http://schema.org/postalCode>",
+            propertyValue: entity.postalCode,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+        
+        // Add address locality condition
+        if (entity.addressLocality && entity.addressLocality.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+            propertyValue: entity.addressLocality,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+        
+        // Add address region condition
+        if (entity.addressRegion && entity.addressRegion.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<http://schema.org/address>/<http://schema.org/addressRegion>",
+            propertyValue: entity.addressRegion,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+        
+        // Add ISNI and Wikidata for Places (same as other entity types)
+        // This ensures Places also get matched on these identifiers when available
       }
       
       return {
@@ -153,6 +181,8 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 wikidata: enrichedCandidate.wikidata || originalCandidate.wikidata || '',
                 url: enrichedCandidate.url || originalCandidate.url || '',
                 postalCode: enrichedCandidate.postalCode || originalCandidate.postalCode || '',
+                addressLocality: enrichedCandidate.addressLocality || originalCandidate.addressLocality || '',
+                addressRegion: enrichedCandidate.addressRegion || originalCandidate.addressRegion || '',
                 startDate: enrichedCandidate.startDate || originalCandidate.startDate || ''
               };
             });
@@ -389,6 +419,8 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         isni: candidate.isni || candidate['http://www.wikidata.org/prop/direct/P213'] || '',
         wikidata: candidate.wikidata || candidate['http://www.wikidata.org/entity/'] || '',
         postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || '',
+        addressLocality: candidate.addressLocality || candidate['http://schema.org/addressLocality'] || '',
+        addressRegion: candidate.addressRegion || candidate['http://schema.org/addressRegion'] || '',
         startDate: candidate.startDate || '',
       };
     });
