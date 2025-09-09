@@ -37,6 +37,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
     setMintPreviewLoading(false);
     setMintPreviewError(null);
   }, [item.id, item.reconciliationStatus, item.selectedMatch]);
+
   
   // Determine the current status based on matches and user selections
   const getItemStatus = () => {
@@ -472,15 +473,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         </td>
         <td>
           {/* Refresh button */}
-          {(currentStatus !== 'reconciled' && !item.linkedTo && !item.mintedAs) && (
-            <button
-              onClick={e => { e.stopPropagation(); onRefresh && onRefresh(item.id); }}
-              className="icon-button"
-              title="Refresh row"
-            >
-              <RefreshCw className="table-icon" />
-            </button>
-          )}
+          <button
+            onClick={e => { e.stopPropagation(); onRefresh && onRefresh(item.id); }}
+            className="icon-button"
+            title="Refresh row"
+          >
+            <RefreshCw className="table-icon" />
+          </button>
         </td>
       </tr>
       
