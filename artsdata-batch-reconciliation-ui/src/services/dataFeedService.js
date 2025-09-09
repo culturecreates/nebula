@@ -154,6 +154,7 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       status: hasArtsdataUri ? 'reconciled' : (item.is_flagged_for_review === true ? 'flagged-complete' : 'needs-judgment'),
       linkedTo: artsdataId,
       linkedToName: artsdataName,
+      artsdataUri: hasArtsdataUri ? item.artsdata_uri : '', // Preserve full artsdata_uri from data feed
       matches: [], // Initialize empty matches array
       isPreReconciled: hasArtsdataUri // Flag to identify pre-reconciled entities
     };

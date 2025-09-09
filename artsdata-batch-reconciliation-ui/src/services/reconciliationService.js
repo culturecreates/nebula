@@ -41,7 +41,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         {
           matchType: "name",
           propertyId: "schema:name",
-          propertyValue: entity.name,
+          propertyValue: entity.artsdataUri && entity.artsdataUri.trim() !== '' ? entity.artsdataUri : entity.name,
           required: true,
           matchQuantifier: "any"
         }
