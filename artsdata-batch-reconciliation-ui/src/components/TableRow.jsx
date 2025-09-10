@@ -274,11 +274,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         </td>
         <td>
           {/* Nested table containing source entity and all matches */}
-          <div className="nested-table-container">
+          <div className={`nested-table-container ${currentStatus === 'reconciled' ? 'reconciled-indented' : ''}`}>
             <table className="table table-hover table-responsive table-borderless nested-table">
               <thead className="sticky-top">
                 <tr>
-                  <th style={{width: '100px'}}></th>
+                  {/* Only show action column header for non-reconciled entities */}
+                  {currentStatus !== 'reconciled' && <th style={{width: '100px'}}></th>}
                   <th style={{width: '60px'}}>ID</th>
                   <th style={{minWidth: '300px'}}>Name</th>
                   <th>URL</th>
@@ -297,26 +298,29 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
               <tbody>
                 {/* Source entity row */}
                 <tr className="source-entity-row">
-                  <td>
-                    {/* Action links for source entity */}
-                    {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
-                      <>
-                        <button 
-                          className="action-link"
-                          onClick={handleMintClick}
-                        >
-                          mint&nbsp;new
-                        </button>
-                        <br />
-                        <button 
-                          className="action-link"
-                          onClick={() => onAction(item.id, 'flag')}
-                        >
-                          flag
-                        </button>
-                      </>
-                    )}
-                  </td>
+                  {/* Only show user actions td for non-reconciled entities */}
+                  {currentStatus !== 'reconciled' && (
+                    <td>
+                      {/* Action links for source entity */}
+                      {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
+                        <>
+                          <button 
+                            className="action-link"
+                            onClick={handleMintClick}
+                          >
+                            mint&nbsp;new
+                          </button>
+                          <br />
+                          <button 
+                            className="action-link"
+                            onClick={() => onAction(item.id, 'flag')}
+                          >
+                            flag
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  )}
                   <td>
                     {canShowEye ? (
                       <button
@@ -384,32 +388,35 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   
                   return (
                     <tr key={`${item.id}-match-${index}`} className="table-active">
-                      <td>
-                        {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
-                          <>
-                            <button 
-                              className="action-link match-link"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleMatchSelect(match);
-                              }}
-                              title="Choose this match"
-                            >
-                              match
-                            </button>
-                            {!item.isPreReconciled && (
-                              <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
-                                &nbsp;({match.score})
-                              </span>
-                            )}
-                          </>
-                        )}
-                        {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
-                          <div className="selected-indicator">
-                            ✓ Auto-Selected
-                          </div>
-                        )}
-                      </td>
+                      {/* Only show user actions td for non-reconciled entities */}
+                      {currentStatus !== 'reconciled' && (
+                        <td>
+                          {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
+                            <>
+                              <button 
+                                className="action-link match-link"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMatchSelect(match);
+                                }}
+                                title="Choose this match"
+                              >
+                                match
+                              </button>
+                              {!item.isPreReconciled && (
+                                <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
+                                  &nbsp;({match.score})
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
+                            <div className="selected-indicator">
+                              ✓ Auto-Selected
+                            </div>
+                          )}
+                        </td>
+                      )}
                       <td className="text-nowrap">
                         <a 
                           href={`https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(`http://kg.artsdata.ca/resource/${match.id}`)}`}

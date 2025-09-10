@@ -386,6 +386,14 @@ body {
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; /* Shadow on the right side */
 }
 
+/* Indentation for reconciled entities nested tables */
+.nested-table-container.reconciled-indented {
+  margin-left: 100px !important;
+  /* Ensure the container doesn't overflow and hide refresh column */
+  max-width: calc(100% - 100px) !important;
+  box-sizing: border-box !important;
+}
+
 /* Modal z-index management for sticky header compatibility */
 
 /* Enhanced button hover states for better visibility */
@@ -1114,7 +1122,7 @@ body {
 }
 
 /* Inner table headers - sticky to viewport top */
-.nested-table .sticky-top {
+.nested-table-container .sticky-top {
   position: sticky !important;
   top: 0 !important; /* Stick directly to top of viewport */
   z-index: 1020 !important; /* Above content */
