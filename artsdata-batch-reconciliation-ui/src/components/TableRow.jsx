@@ -274,12 +274,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         </td>
         <td>
           {/* Nested table containing source entity and all matches */}
-          <div className={`nested-table-container ${currentStatus === 'reconciled' ? 'reconciled-indented' : ''}`}>
+          <div className={`nested-table-container ${(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') ? 'reconciled-indented' : ''}`}>
             <table className="table table-hover table-responsive table-borderless nested-table">
               <thead className="sticky-top">
                 <tr>
-                  {/* Only show action column header for non-reconciled entities */}
-                  {currentStatus !== 'reconciled' && <th style={{width: '100px'}}></th>}
+                  {/* Only show action column header for entities that need user actions */}
+                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && <th style={{width: '100px'}}></th>}
                   <th style={{width: '60px'}}>ID</th>
                   <th style={{minWidth: '300px'}}>Name</th>
                   <th>URL</th>
@@ -298,8 +298,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
               <tbody>
                 {/* Source entity row */}
                 <tr className="source-entity-row">
-                  {/* Only show user actions td for non-reconciled entities */}
-                  {currentStatus !== 'reconciled' && (
+                  {/* Only show user actions td for entities that need user actions */}
+                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && (
                     <td>
                       {/* Action links for source entity */}
                       {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
@@ -388,8 +388,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   
                   return (
                     <tr key={`${item.id}-match-${index}`} className="table-active">
-                      {/* Only show user actions td for non-reconciled entities */}
-                      {currentStatus !== 'reconciled' && (
+                      {/* Only show user actions td for entities that need user actions */}
+                      {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && (
                         <td>
                           {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
                             <>
