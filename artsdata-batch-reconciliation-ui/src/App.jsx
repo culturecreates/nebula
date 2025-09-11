@@ -13,6 +13,7 @@ import ShowAllToggleConfirmation from "./components/ShowAllToggleConfirmation";
 import AcceptAllConfirmation from "./components/AcceptAllConfirmation";
 import AcceptAllProgress from "./components/AcceptAllProgress";
 import AcceptAllSummary from "./components/AcceptAllSummary";
+import { StickyHeadersProvider } from "./components/StickyHeadersProvider";
 import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity, getReferenceUri } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
@@ -1363,9 +1364,10 @@ const App = ({ config }) => {
   const itemsReadyToAccept = globalReadyItems.length + currentPageReadyItems.length;
 
   return (
-    <div className="app">
-      
-      <FilterControls
+    <StickyHeadersProvider>
+      <div className="app">
+        
+        <FilterControls
         dataFeed={dataFeed}
         setDataFeed={handleDataFeedSwitch}
         type={type}
@@ -1438,7 +1440,7 @@ const App = ({ config }) => {
         
         {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-scroll-container">
-            <table className="table table-responsive">
+            <table className="table">
               <thead>
                 <tr>
                   <th scope="col" className="sticky-left">#</th>
@@ -1552,7 +1554,8 @@ const App = ({ config }) => {
         errorCounts={acceptAllResults.errorCounts}
         totalProcessed={acceptAllResults.totalProcessed}
       />
-    </div>
+      </div>
+    </StickyHeadersProvider>
   );
 };
 

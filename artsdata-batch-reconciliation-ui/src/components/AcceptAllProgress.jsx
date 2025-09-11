@@ -28,9 +28,10 @@ const AcceptAllProgress = ({
   const progressPercentage = totalCount > 0 ? Math.round((processedCount / totalCount) * 100) : 0;
 
   return (
-    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <>
       <div className="modal-backdrop fade show"></div>
-      <div className="modal-dialog modal-dialog-centered" style={{ zIndex: 1051 }}>
+      <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
@@ -87,8 +88,9 @@ const AcceptAllProgress = ({
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

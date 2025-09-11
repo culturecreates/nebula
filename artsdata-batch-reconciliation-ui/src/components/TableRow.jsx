@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import StatusBadge from './StatusBadge';
 import ActionButton from './ActionButton';
 import MintConfirmPopup from './MintConfirmPopup';
 import { Eye, RefreshCw, Flag } from 'lucide-react';
 import { extractWikidataId } from '../services/dataFeedService';
+import { useStickyHeadersContext } from './StickyHeadersProvider';
 
 // Helper to truncate URLs in the middle
 function truncateUrl(url, maxLength = 24) {
@@ -29,6 +30,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   const [showMintConfirm, setShowMintConfirm] = useState(false);
   const [mintPreviewLoading, setMintPreviewLoading] = useState(false);
   const [mintPreviewError, setMintPreviewError] = useState(null);
+  const headerRef = useRef(null);
+  const { registerHeader, unregisterHeader } = useStickyHeadersContext();
 
   // Reset local state when item changes (e.g., after refresh) but preserve saved selectedMatch
   React.useEffect(() => {
@@ -37,6 +40,19 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
     setMintPreviewLoading(false);
     setMintPreviewError(null);
   }, [item.id, item.reconciliationStatus, item.selectedMatch]);
+
+  // Register/unregister header for sticky behavior
+  React.useEffect(() => {
+    if (headerRef.current) {
+      registerHeader(headerRef.current);
+    }
+    
+    return () => {
+      if (headerRef.current) {
+        unregisterHeader(headerRef.current);
+      }
+    };
+  }, [registerHeader, unregisterHeader]);
 
   
   // Determine the current status based on matches and user selections
@@ -274,12 +290,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         </td>
         <td>
           {/* Nested table containing source entity and all matches */}
-          <div className={`nested-table-container ${(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') ? 'reconciled-indented' : ''}`}>
-            <table className="table table-hover table-responsive table-borderless nested-table">
-              <thead className="sticky-top">
+          <div className={`nested-table-container ${(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged') ? 'reconciled-indented' : ''}`}>
+            <div className="table-scroll-wrapper">
+              <table className="table table-hover table-borderless nested-table">
+              <thead className="sticky-top" ref={headerRef}>
                 <tr>
                   {/* Only show action column header for entities that need user actions */}
-                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && <th style={{width: '100px'}}></th>}
+                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged') && <th style={{width: '100px'}}></th>}
                   <th style={{width: '60px'}}>ID</th>
                   <th style={{minWidth: '300px'}}>Name</th>
                   <th>URL</th>
@@ -299,7 +316,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                 {/* Source entity row */}
                 <tr className="source-entity-row">
                   {/* Only show user actions td for entities that need user actions */}
-                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && (
+                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged') && (
                     <td>
                       {/* Action links for source entity */}
                       {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
@@ -389,7 +406,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   return (
                     <tr key={`${item.id}-match-${index}`} className="table-active">
                       {/* Only show user actions td for entities that need user actions */}
-                      {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && (
+                      {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged') && (
                         <td>
                           {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
                             <>
@@ -475,7 +492,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   );
                 })}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         </td>
         <td>

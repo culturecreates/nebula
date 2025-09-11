@@ -26,9 +26,10 @@ const AcceptAllConfirmation = ({
   if (!show) return null;
 
   return (
-    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+    <>
       <div className="modal-backdrop fade show"></div>
-      <div className="modal-dialog modal-dialog-centered" style={{ zIndex: 1051 }}>
+      <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+        <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Accept All Judgments</h5>
@@ -81,8 +82,9 @@ const AcceptAllConfirmation = ({
             </button>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
