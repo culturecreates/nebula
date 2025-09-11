@@ -345,11 +345,14 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* Table Scroll Container - only for the table */
+/* Table Scroll Container - horizontal scroll only, no vertical interference */
 .table-scroll-container {
   overflow-x: auto;
+  overflow-y: visible; /* Critical: Allow vertical overflow for sticky positioning */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  position: relative; /* Ensure sticky positioning works within scroll container */
+  position: relative;
+  /* Remove any height constraints that might create scroll context */
+  height: auto;
 }
 
 /* Remove background and shadow for empty states */
@@ -381,7 +384,7 @@ body {
 .sticky-left {
   position: sticky !important;
   left: 0 !important; /* Stick to left side during horizontal scroll */
-  z-index: 1025 !important; /* Above other content but below top sticky headers */
+  z-index: 1031 !important; /* Above sticky headers (1030) but below modals (1050+) */
   background-color: #ffffff !important; /* White background to cover scrolled content */
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; /* Shadow on the right side */
 }
@@ -394,7 +397,29 @@ body {
   box-sizing: border-box !important;
 }
 
+/* Ensure indented scroll wrapper maintains proper sizing */
+.nested-table-container.reconciled-indented .table-scroll-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 /* Modal z-index management for sticky header compatibility */
+.modal {
+  z-index: 1060 !important; /* Ensure modals are above all sticky elements */
+}
+
+.modal-backdrop {
+  z-index: 1055 !important; /* Ensure backdrop is well above sticky headers (1030) and sticky left (1031) */
+}
+
+/* Hide sticky headers when modal is open - Bootstrap adds 'modal-open' class to body */
+body.modal-open .nested-table-container .sticky-top {
+  display: none !important;
+}
+
+body.modal-open .sticky-left {
+  z-index: 999 !important; /* Lower z-index when modal is open */
+}
 
 /* Enhanced button hover states for better visibility */
 .modal-content .btn:hover {
@@ -1121,13 +1146,162 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Inner table headers - sticky to viewport top */
+/* Custom table scroll wrapper - simplified for proper sticky behavior */
+.table-scroll-wrapper {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible; /* Critical: Must be visible for sticky to work */
+  -webkit-overflow-scrolling: touch;
+  /* No height constraints - let content determine height */
+  height: auto;
+  /* Ensure no scroll context interference */
+  contain: none; /* Critical: Prevent new stacking context */
+}
+
+/* Nested table with proper sizing */
+.table-scroll-wrapper .nested-table {
+  min-width: 100%;
+  /* Ensure table expands to full content width */
+  width: max-content;
+  margin: 0;
+}
+
+/* Inner table headers - escape table cell context for true sticky behavior */
 .nested-table-container .sticky-top {
   position: sticky !important;
-  top: 0 !important; /* Stick directly to top of viewport */
-  z-index: 1020 !important; /* Above content */
+  top: 0 !important; 
+  z-index: 1030 !important; 
   background-color: #f8f9fa !important;
-  box-shadow: none !important; /* Remove box shadow for nested table headers */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; 
+  -webkit-position: sticky !important;
+  will-change: transform !important;
+  
+  /* Critical: Break out of table cell context */
+  transform: translateZ(0); /* Force hardware acceleration */
+  isolation: isolate; /* Create new stacking context */
+}
+
+/* Alternative approach: Make nested table container break out of cell */
+.nested-table-container {
+  position: relative !important;
+  /* Allow child elements to position relative to viewport */
+  contain: none !important;
+}
+
+/* Ensure the parent table cell doesn't clip the sticky header */
+.parent-row td {
+  overflow: visible !important;
+  position: static !important;
+}
+
+/* Critical fix: Ensure proper scroll context hierarchy */
+body {
+  position: relative;
+  /* Ensure body is the scroll container */
+  overflow-x: visible;
+  overflow-y: auto;
+}
+
+/* Main app container - no scroll interference */
+.app {
+  position: relative;
+  overflow: visible !important;
+  /* Ensure sticky positioning works from viewport */
+  height: auto;
+}
+
+/* Ensure main container doesn't interfere with sticky positioning */
+.container-fluid {
+  overflow: visible !important;
+}
+
+/* Main table - no Bootstrap scroll context */
+.table-scroll-container .table {
+  /* Prevent table from creating scroll context */
+  overflow: visible !important;
+  /* Ensure table can expand */
+  width: 100%;
+  min-width: 100%;
+  /* Allow nested sticky elements to work */
+  position: relative;
+}
+
+/* Ensure all table elements allow overflow */
+.table-scroll-container .table,
+.table-scroll-container .table tbody,
+.table-scroll-container .table tbody tr,
+.table-scroll-container .table tbody tr td {
+  overflow: visible !important;
+}
+
+/* Responsive enhancements for mobile devices */
+@media (max-width: 768px) {
+  .table-scroll-wrapper {
+    /* Increase scroll area for better mobile experience */
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  /* Ensure sticky headers work on mobile */
+  .nested-table-container .sticky-top {
+    /* Mobile Safari sticky fix */
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    z-index: 1030 !important; /* Same as desktop */
+    top: 0 !important; /* Ensure consistent top positioning */
+  }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  .table-scroll-wrapper {
+    max-height: 60vh;
+  }
+  
+  /* Smaller shadow on mobile for better performance */
+  .nested-table-container .sticky-top {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Sticky headers overlay system */
+.sticky-headers-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0; /* No height, just a container */
+  pointer-events: none; /* Don't interfere with interactions */
+  z-index: 1030;
+}
+
+.sticky-header-fixed {
+  background-color: #f8f9fa !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Sticky header wrapper - matches original scroll wrapper */
+.sticky-header-fixed .sticky-header-wrapper {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Minimal styling - let computed styles from JS handle exact matching */
+.sticky-header-fixed table {
+  /* Only essential overrides */
+  border-collapse: inherit !important;
+  margin-bottom: 0 !important;
+}
+
+.sticky-header-fixed th {
+  /* Let inline styles from computed values handle all styling */
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
 }
 
 /* Only add border to nested table headers that are NOT borderless */

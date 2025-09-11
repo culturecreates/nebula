@@ -31,9 +31,10 @@ const AcceptAllSummary = ({
   const totalSuccess = matched + minted + flagged;
 
   return (
-    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+    <>
       <div className="modal-backdrop fade show"></div>
-      <div className="modal-dialog modal-dialog-centered" style={{ zIndex: 1051 }}>
+      <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+        <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Reconciliation Complete</h5>
@@ -96,8 +97,9 @@ const AcceptAllSummary = ({
             </button>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

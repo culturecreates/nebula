@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle } from "lucide-react";
 
 const MintConfirmPopup = ({
@@ -29,91 +30,103 @@ const MintConfirmPopup = ({
   const handleConfirm = () => {
     onConfirm(selectedType);
   };
+  
+  // Disable background scrolling when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+  
   if (!isOpen) return null;
 
-  return (
-    <div
-      className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50"
-      style={{ zIndex: 1055 }}
-      role="dialog"
-      tabIndex="-1"
-    >
-      <div
-        className="modal-content shadow-lg border-0 rounded-3"
-        style={{ maxWidth: "500px", width: "90%" }}
-      >
-        <div className="modal-header border-bottom-0 pb-2 px-4 pt-4 d-flex justify-content-between align-items-center">
-          <h5 className="modal-title d-flex align-items-center fw-semibold text-dark mb-0">
-            <AlertTriangle className="text-warning me-3" size={24} />
-            Mint New Entity
-          </h5>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={onCancel}
-            disabled={isLoading}
-            aria-label="Close"
-          ></button>
-        </div>
-        <div className="modal-body pt-3 pb-4 px-4">
-          <p className="mb-3 text-muted fs-6">
-            Select the entity type and confirm minting for:
-          </p>
-          <div className="bg-light border rounded-2 p-3 mb-3">
-            <p className="fw-bold mb-0 text-dark">{entityName}</p>
-          </div>
-          <div className="mb-3">
-            <label className="form-label fw-semibold text-dark">Entity Type</label>
-            <select 
-              className="form-select"
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              disabled={isLoading}
-            >
-              {!getMatchingType(entityType) && (
-                <option value="">Select a type...</option>
-              )}
-              <option value="Event">Event</option>
-              <option value="Person">Person</option>
-              <option value="Organization">Organization</option>
-              <option value="Place">Place</option>
-            </select>
-          </div>
-          {error && (
-            <div className="alert alert-danger border-0 rounded-2 mb-0" role="alert">
-              <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              <strong>Error:</strong> {error}
+  // Use React Portal to render modal at document body level with proper Bootstrap structure
+  return createPortal(
+    <>
+      <div className="modal-backdrop fade show"></div>
+      <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title d-flex align-items-center">
+                <AlertTriangle className="text-warning me-2" size={20} />
+                Mint New Entity
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={onCancel}
+                disabled={isLoading}
+                aria-label="Close"
+              ></button>
             </div>
-          )}
-        </div>
-        <div className="modal-footer border-top-0 pt-2 pb-4 px-4">
-          <button
-            type="button"
-            className="btn btn-secondary me-2"
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="btn btn-success px-4"
-            onClick={handleConfirm}
-            disabled={isLoading || error || !selectedType}
-          >
-            {isLoading && (
-              <span
-                className="spinner-border spinner-border-sm me-2"
-                role="status"
+            <div className="modal-body">
+              <p className="mb-3">
+                Select the entity type and confirm minting for:
+              </p>
+              <div className="bg-light border rounded p-3 mb-3">
+                <strong>{entityName}</strong>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Entity Type</label>
+                <select 
+                  className="form-select"
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  disabled={isLoading}
+                >
+                  {!getMatchingType(entityType) && (
+                    <option value="">Select a type...</option>
+                  )}
+                  <option value="Event">Event</option>
+                  <option value="Person">Person</option>
+                  <option value="Organization">Organization</option>
+                  <option value="Place">Place</option>
+                </select>
+              </div>
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  <strong>Error:</strong> {error}
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={onCancel}
+                disabled={isLoading}
               >
-                <span className="visually-hidden">Loading...</span>
-              </span>
-            )}
-            {isLoading ? "Checking..." : selectedType ? `Mint ${selectedType}` : "Select Type"}
-          </button>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleConfirm}
+                disabled={isLoading || error || !selectedType}
+              >
+                {isLoading && (
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                )}
+                {isLoading ? "Checking..." : selectedType ? `Mint ${selectedType}` : "Select Type"}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>,
+    document.body
   );
 };
 
