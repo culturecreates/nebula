@@ -125,6 +125,8 @@ function filterItems(items, filterText, globalJudgments) {
       item.isni,
       item.wikidata,
       item.postalCode,
+      item.addressLocality,
+      item.addressRegion,
       item.type,
       item.location,
       item.startDate,
@@ -157,6 +159,8 @@ function filterItems(items, filterText, globalJudgments) {
           match.isni,
           match.wikidata,
           match.postalCode,
+          match.addressLocality,
+          match.addressRegion,
           match.type,
           match.score?.toString(),
           // Handle type arrays and objects
@@ -1437,7 +1441,7 @@ const App = ({ config }) => {
             <table className="table table-responsive">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
+                  <th scope="col" className="sticky-left">#</th>
                   <th scope="col">Judgement</th>
                   <th scope="col">
                   </th>

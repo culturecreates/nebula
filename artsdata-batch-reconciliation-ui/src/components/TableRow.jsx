@@ -37,6 +37,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
     setMintPreviewLoading(false);
     setMintPreviewError(null);
   }, [item.id, item.reconciliationStatus, item.selectedMatch]);
+
   
   // Determine the current status based on matches and user selections
   const getItemStatus = () => {
@@ -202,7 +203,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
   return (
     <>
       <tr className="parent-row">
-        <th scope="row" className="sticky-top row-number">{displayIndex}</th>
+        <th scope="row" className="sticky-left row-number">{displayIndex}</th>
         <td>
           {/* Judgement cell with action buttons */}
           <div className="judgement-cell">
@@ -273,11 +274,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         </td>
         <td>
           {/* Nested table containing source entity and all matches */}
-          <div className="nested-table-container">
+          <div className={`nested-table-container ${(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') ? 'reconciled-indented' : ''}`}>
             <table className="table table-hover table-responsive table-borderless nested-table">
               <thead className="sticky-top">
                 <tr>
-                  <th style={{width: '100px'}}></th>
+                  {/* Only show action column header for entities that need user actions */}
+                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && <th style={{width: '100px'}}></th>}
                   <th style={{width: '60px'}}>ID</th>
                   <th style={{minWidth: '300px'}}>Name</th>
                   <th>URL</th>
@@ -285,6 +287,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   <th>Wikidata</th>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
+                  {/* Show Locality and Region columns for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <th>Locality</th>}
+                  {item.type?.toLowerCase().includes('place') && <th>Region</th>}
                   {/* Show StartDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <th>Start Date</th>}
                   <th>Type</th>
@@ -293,26 +298,29 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
               <tbody>
                 {/* Source entity row */}
                 <tr className="source-entity-row">
-                  <td>
-                    {/* Action links for source entity */}
-                    {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
-                      <>
-                        <button 
-                          className="action-link"
-                          onClick={handleMintClick}
-                        >
-                          mint&nbsp;new
-                        </button>
-                        <br />
-                        <button 
-                          className="action-link"
-                          onClick={() => onAction(item.id, 'flag')}
-                        >
-                          flag
-                        </button>
-                      </>
-                    )}
-                  </td>
+                  {/* Only show user actions td for entities that need user actions */}
+                  {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && (
+                    <td>
+                      {/* Action links for source entity */}
+                      {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
+                        <>
+                          <button 
+                            className="action-link"
+                            onClick={handleMintClick}
+                          >
+                            mint&nbsp;new
+                          </button>
+                          <br />
+                          <button 
+                            className="action-link"
+                            onClick={() => onAction(item.id, 'flag')}
+                          >
+                            flag
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  )}
                   <td>
                     {canShowEye ? (
                       <button
@@ -359,6 +367,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   </td>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
+                  {/* Show Locality and Region columns for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.addressLocality || ''}</td>}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.addressRegion || ''}</td>}
                   {/* Show StartDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
                     <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
@@ -377,32 +388,35 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   
                   return (
                     <tr key={`${item.id}-match-${index}`} className="table-active">
-                      <td>
-                        {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
-                          <>
-                            <button 
-                              className="action-link match-link"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleMatchSelect(match);
-                              }}
-                              title="Choose this match"
-                            >
-                              match
-                            </button>
-                            {!item.isPreReconciled && (
-                              <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
-                                &nbsp;({match.score})
-                              </span>
-                            )}
-                          </>
-                        )}
-                        {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
-                          <div className="selected-indicator">
-                            ✓ Auto-Selected
-                          </div>
-                        )}
-                      </td>
+                      {/* Only show user actions td for entities that need user actions */}
+                      {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged' || currentStatus === 'flagged-complete') && (
+                        <td>
+                          {(currentStatus === 'needs-judgment' || currentStatus === 'flagged-complete') && (
+                            <>
+                              <button 
+                                className="action-link match-link"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMatchSelect(match);
+                                }}
+                                title="Choose this match"
+                              >
+                                match
+                              </button>
+                              {!item.isPreReconciled && (
+                                <span className={`match-score ${match.match ? 'true-match' : 'candidate-match'}`}>
+                                  &nbsp;({match.score})
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
+                            <div className="selected-indicator">
+                              ✓ Auto-Selected
+                            </div>
+                          )}
+                        </td>
+                      )}
                       <td className="text-nowrap">
                         <a 
                           href={`https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(`http://kg.artsdata.ca/resource/${match.id}`)}`}
@@ -442,6 +456,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       </td>
                       {/* Show PostalCode column for Place entities */}
                       {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
+                      {/* Show Locality and Region columns for Place entities */}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.addressLocality || ''}</td>}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.addressRegion || ''}</td>}
                       {/* Show StartDate column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
@@ -463,15 +480,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
         </td>
         <td>
           {/* Refresh button */}
-          {(currentStatus !== 'reconciled' && !item.linkedTo && !item.mintedAs) && (
-            <button
-              onClick={e => { e.stopPropagation(); onRefresh && onRefresh(item.id); }}
-              className="icon-button"
-              title="Refresh row"
-            >
-              <RefreshCw className="table-icon" />
-            </button>
-          )}
+          <button
+            onClick={e => { e.stopPropagation(); onRefresh && onRefresh(item.id); }}
+            className="icon-button"
+            title="Refresh row"
+          >
+            <RefreshCw className="table-icon" />
+          </button>
         </td>
       </tr>
       

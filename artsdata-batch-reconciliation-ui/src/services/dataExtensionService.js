@@ -190,7 +190,9 @@ export function processExtendedData(extendedData, properties) {
       isni: null,
       wikidata: null,
       url: null,
-      postalCode: null
+      postalCode: null,
+      addressLocality: null,
+      addressRegion: null
     };
     
     
@@ -229,16 +231,31 @@ export function processExtendedData(extendedData, properties) {
               }
             });
           } else if (propertyConfig.type === 'address' && propertyId === 'address') {
-            // For address, extract postal code from nested structure
+            // For address, extract postal code, address locality, and address region from nested structure
             
             propertyData.values.forEach(addressValue => {
               // Address has nested properties structure
               if (addressValue.properties && Array.isArray(addressValue.properties)) {
                 addressValue.properties.forEach(addressProperty => {
+                  // Extract postal code
                   if (addressProperty.id === 'postalCode' && addressProperty.values && addressProperty.values.length > 0) {
                     const postalCodeValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
                     if (postalCodeValue) {
                       processed.postalCode = postalCodeValue;
+                    }
+                  }
+                  // Extract address locality 
+                  else if (addressProperty.id === 'addressLocality' && addressProperty.values && addressProperty.values.length > 0) {
+                    const addressLocalityValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
+                    if (addressLocalityValue) {
+                      processed.addressLocality = addressLocalityValue;
+                    }
+                  }
+                  // Extract address region
+                  else if (addressProperty.id === 'addressRegion' && addressProperty.values && addressProperty.values.length > 0) {
+                    const addressRegionValue = addressProperty.values[0].str || addressProperty.values[0].id || '';
+                    if (addressRegionValue) {
+                      processed.addressRegion = addressRegionValue;
                     }
                   }
                 });
@@ -517,6 +534,8 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         wikidata: extendedInfo.wikidata || candidate.wikidata || '',
         url: extendedInfo.url || candidate.url || '',
         postalCode: extendedInfo.postalCode || candidate.postalCode || '',
+        addressLocality: extendedInfo.addressLocality || candidate.addressLocality || '',
+        addressRegion: extendedInfo.addressRegion || candidate.addressRegion || '',
         startDate: extendedInfo.startDate || candidate.startDate || ''
       };
       return enriched;

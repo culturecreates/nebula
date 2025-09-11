@@ -146,12 +146,15 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       isniId: extractIsniId(item.isni_uri), // Extract ISNI ID for display
       wikidataId: extractWikidataId(item.wikidata_uri), // Extract Wikidata ID for display
       postalCode: item.postal_code || '', // Extract postal code from new postal_code field
+      addressLocality: item.address_locality || '', // Extract address locality from address_locality field
+      addressRegion: item.address_region || '', // Extract address region from address_region field
       // Check if entity is flagged for review
       isFlaggedForReview: item.is_flagged_for_review === true,
       // Mark status based on flags and reconciliation
       status: hasArtsdataUri ? 'reconciled' : (item.is_flagged_for_review === true ? 'flagged-complete' : 'needs-judgment'),
       linkedTo: artsdataId,
       linkedToName: artsdataName,
+      artsdataUri: hasArtsdataUri ? item.artsdata_uri : '', // Preserve full artsdata_uri from data feed
       matches: [], // Initialize empty matches array
       isPreReconciled: hasArtsdataUri // Flag to identify pre-reconciled entities
     };
