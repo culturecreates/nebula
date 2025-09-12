@@ -33,13 +33,25 @@ function extractSchemaStatus(uri) {
 
 // Helper to generate Artsdata entity URL based on environment
 function getArtsdataEntityUrl(uri, config = {}) {
-  // If config has a specific Artsdata URL endpoint, use it
-  if (config.artsdataBaseUrl) {
-    return `${config.artsdataBaseUrl}/entity?uri=${encodeURIComponent(uri)}`;
+  let artsdataBaseUrl = 'https://staging.kg.artsdata.ca'; // Default to staging
+  
+  // Try to derive from reconciliation endpoint
+  if (config.reconciliationEndpoint) {
+    // e.g., "https://staging.recon.artsdata.ca" -> "https://staging.kg.artsdata.ca"
+    // or "https://recon.artsdata.ca" -> "https://kg.artsdata.ca"
+    const url = new URL(config.reconciliationEndpoint);
+    artsdataBaseUrl = `${url.protocol}//${url.hostname.replace('recon.', 'kg.')}`;
+  } else {
+    // Fallback: detect from current browser URL
+    const currentHost = window.location.hostname;
+    if (currentHost.includes('localhost') || currentHost.includes('staging')) {
+      artsdataBaseUrl = 'https://staging.kg.artsdata.ca';
+    } else {
+      artsdataBaseUrl = 'https://kg.artsdata.ca';
+    }
   }
   
-  // Default to staging if no config provided
-  return `https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(uri)}`;
+  return `${artsdataBaseUrl}/entity?uri=${encodeURIComponent(uri)}`;
 }
 
 
