@@ -133,7 +133,13 @@ function filterItems(items, filterText, globalJudgments) {
       item.startDate,
       item.endDate,
       item.externalId,
-      item.id?.toString()
+      item.id?.toString(),
+      // Event-specific fields
+      item.locationName,
+      item.locationArtsdataUri,
+      item.eventStatus,
+      item.eventAttendanceMode,
+      item.offerUrl
     ];
     
     // Check parent entity fields
@@ -164,6 +170,12 @@ function filterItems(items, filterText, globalJudgments) {
           match.addressRegion,
           match.type,
           match.score?.toString(),
+          // Event-specific match fields
+          match.locationName,
+          match.locationArtsdataUri,
+          match.eventStatus,
+          match.eventAttendanceMode,
+          match.offerUrl,
           // Handle type arrays and objects
           Array.isArray(match.type) ? 
             match.type.map(t => typeof t === 'object' ? (t.id || t.name) : t).join(' ') :
@@ -1460,6 +1472,7 @@ const App = ({ config }) => {
                     parentRowIndex={index}
                     onAction={handleAction}
                     onRefresh={handleRefreshRow}
+                    config={config}
                   />
                 ))}
               </tbody>

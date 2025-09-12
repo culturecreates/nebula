@@ -139,7 +139,7 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       description: item.description || '',
       location: item.location || '', // New field from API
       startDate: item.start_date || item.startDate || '', // Map start_date to startDate
-      endDate: item.endDate || '', // New field from API
+      endDate: item.end_date || item.endDate || '', // Map end_date to endDate
       isni: item.isni_uri || '', // Preserve original ISNI URI for API calls
       wikidata: item.wikidata_uri || '', // Preserve original Wikidata URI for API calls
       // Store extracted IDs for display purposes  
@@ -148,6 +148,12 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       postalCode: item.postal_code || '', // Extract postal code from new postal_code field
       addressLocality: item.address_locality || '', // Extract address locality from address_locality field
       addressRegion: item.address_region || '', // Extract address region from address_region field
+      // Event-specific properties
+      locationName: item.location_name || '', // Map location_name to locationName for Events
+      locationArtsdataUri: item.location_artsdata_uri || '', // Map location_artsdata_uri
+      eventStatus: item.event_status || '', // Map event_status
+      eventAttendanceMode: item.event_attendance_mode || '', // Map event_attendance_mode
+      offerUrl: item.offer_url || '', // Map offer_url
       // Check if entity is flagged for review
       isFlaggedForReview: item.is_flagged_for_review === true,
       // Mark status based on flags and reconciliation
