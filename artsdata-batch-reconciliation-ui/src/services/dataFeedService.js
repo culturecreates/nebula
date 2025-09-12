@@ -154,6 +154,7 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       eventStatus: item.event_status || '', // Map event_status
       eventAttendanceMode: item.event_attendance_mode || '', // Map event_attendance_mode
       offerUrl: item.offer_url || '', // Map offer_url
+      performerName: item.performer_name || '', // Map performer_name to performerName for Events
       // Check if entity is flagged for review
       isFlaggedForReview: item.is_flagged_for_review === true,
       // Mark status based on flags and reconciliation

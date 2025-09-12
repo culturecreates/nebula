@@ -341,6 +341,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                   {item.type?.toLowerCase().includes('event') && <th>Attendance</th>}
                   {/* Show Buy URL column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <th>Buy URL</th>}
+                  {/* Show Performer column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Performer</th>}
                   <th>Type</th>
                 </tr>
               </thead>
@@ -465,6 +467,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                           {truncateUrl(item.offerUrl)}
                         </a>
                       )}
+                    </td>
+                  )}
+                  {/* Show Performer column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td className="text-nowrap">
+                      {item.performerName || ''}
                     </td>
                   )}
                   <td>{item.type?.split('/').pop() || item.type}</td>
@@ -597,6 +605,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                               {truncateUrl(match.offerUrl)}
                             </a>
                           )}
+                        </td>
+                      )}
+                      {/* Show Performer column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.performerName || ''}
                         </td>
                       )}
                       <td>

@@ -139,7 +139,8 @@ function filterItems(items, filterText, globalJudgments) {
       item.locationArtsdataUri,
       item.eventStatus,
       item.eventAttendanceMode,
-      item.offerUrl
+      item.offerUrl,
+      item.performerName
     ];
     
     // Check parent entity fields
@@ -176,6 +177,7 @@ function filterItems(items, filterText, globalJudgments) {
           match.eventStatus,
           match.eventAttendanceMode,
           match.offerUrl,
+          match.performerName,
           // Handle type arrays and objects
           Array.isArray(match.type) ? 
             match.type.map(t => typeof t === 'object' ? (t.id || t.name) : t).join(' ') :

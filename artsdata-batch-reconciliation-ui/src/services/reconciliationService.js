@@ -117,6 +117,53 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         // This ensures Places also get matched on these identifiers when available
       }
       
+      // Add Event-specific conditions for enhanced matching
+      if (entityType.toLowerCase().includes('event')) {
+        // Add location name condition
+        if (entity.locationName && entity.locationName.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<https://schema.org/location>/<https://schema.org/name>",
+            propertyValue: entity.locationName,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+        
+        // Add location postal code condition
+        if (entity.postalCode && entity.postalCode.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>",
+            propertyValue: entity.postalCode,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+        
+        // Add location Artsdata place URI condition
+        if (entity.locationArtsdataUri && entity.locationArtsdataUri.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<https://schema.org/location>/<https://schema.org/sameAs>",
+            propertyValue: entity.locationArtsdataUri,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+        
+        // Add performer name condition
+        if (entity.performerName && entity.performerName.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "<https://schema.org/performer>/<https://schema.org/name>",
+            propertyValue: entity.performerName,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+      }
+      
       return {
         conditions,
         type: reconciliationType,
