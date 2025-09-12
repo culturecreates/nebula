@@ -24,8 +24,38 @@ function truncateUrl(url, maxLength = 24) {
   return `${start}...${end}`;
 }
 
+// Helper to extract status from schema.org URI
+function extractSchemaStatus(uri) {
+  if (!uri) return '';
+  const parts = uri.split('/');
+  return parts[parts.length - 1] || uri;
+}
 
-const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) => {
+// Helper to generate Artsdata entity URL based on environment
+function getArtsdataEntityUrl(uri, config = {}) {
+  let artsdataBaseUrl = 'https://staging.kg.artsdata.ca'; // Default to staging
+  
+  // Try to derive from reconciliation endpoint
+  if (config.reconciliationEndpoint) {
+    // e.g., "https://staging.recon.artsdata.ca" -> "https://staging.kg.artsdata.ca"
+    // or "https://recon.artsdata.ca" -> "https://kg.artsdata.ca"
+    const url = new URL(config.reconciliationEndpoint);
+    artsdataBaseUrl = `${url.protocol}//${url.hostname.replace('recon.', 'kg.')}`;
+  } else {
+    // Fallback: detect from current browser URL
+    const currentHost = window.location.hostname;
+    if (currentHost.includes('localhost') || currentHost.includes('staging')) {
+      artsdataBaseUrl = 'https://staging.kg.artsdata.ca';
+    } else {
+      artsdataBaseUrl = 'https://kg.artsdata.ca';
+    }
+  }
+  
+  return `${artsdataBaseUrl}/entity?uri=${encodeURIComponent(uri)}`;
+}
+
+
+const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, config }) => {
   const [selectedMatch, setSelectedMatch] = useState(item.selectedMatch || null);
   const [showMintConfirm, setShowMintConfirm] = useState(false);
   const [mintPreviewLoading, setMintPreviewLoading] = useState(false);
@@ -308,7 +338,23 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   {item.type?.toLowerCase().includes('place') && <th>Locality</th>}
                   {item.type?.toLowerCase().includes('place') && <th>Region</th>}
                   {/* Show StartDate column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th>Start Date</th>}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Start Date</th>}
+                  {/* Show EndDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">End Date</th>}
+                  {/* Show Place column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Place</th>}
+                  {/* Show Artsdata Place column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Artsdata Place</th>}
+                  {/* Show PostalCode column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>PostalCode</th>}
+                  {/* Show Event Status column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Event Status</th>}
+                  {/* Show Attendance Mode column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Attendance</th>}
+                  {/* Show Buy URL column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Buy URL</th>}
+                  {/* Show Performer column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Performer</th>}
                   <th>Type</th>
                 </tr>
               </thead>
@@ -345,8 +391,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                         title={item.externalId}
                         onClick={e => { 
                           e.stopPropagation(); 
-                          const encodedUri = encodeURIComponent(item.uri);
-                          window.open(`https://staging.kg.artsdata.ca/entity?uri=${encodedUri}`, '_blank');
+                          window.open(getArtsdataEntityUrl(item.uri, config), '_blank');
                         }}
                       >
                         <Eye className="table-icon" />
@@ -389,8 +434,57 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                   {item.type?.toLowerCase().includes('place') && <td>{item.addressRegion || ''}</td>}
                   {/* Show StartDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
-                    <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                    <td className="text-nowrap" style={{fontSize: '0.75rem', color: '#6b7280'}}>
                       {item.startDate || ''}
+                    </td>
+                  )}
+                  {/* Show EndDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td className="text-nowrap" style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                      {item.endDate || ''}
+                    </td>
+                  )}
+                  {/* Show Place column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td className="text-nowrap">
+                      {item.locationName || ''}
+                    </td>
+                  )}
+                  {/* Show Artsdata Place column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td className="text-nowrap">
+                      {item.locationArtsdataUri ? (
+                        <a 
+                          href={getArtsdataEntityUrl(item.locationArtsdataUri, config)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={item.locationArtsdataUri}
+                        >
+                          {item.locationArtsdataUri.split('/').pop()}
+                        </a>
+                      ) : ''}
+                    </td>
+                  )}
+                  {/* Show PostalCode column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <td>{item.postalCode || ''}</td>}
+                  {/* Show Event Status column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(item.eventStatus)}</td>}
+                  {/* Show Attendance Mode column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(item.eventAttendanceMode)}</td>}
+                  {/* Show Buy URL column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td className="text-nowrap">
+                      {item.offerUrl && (
+                        <a href={item.offerUrl} target="_blank" rel="noopener noreferrer" title={item.offerUrl}>
+                          {truncateUrl(item.offerUrl)}
+                        </a>
+                      )}
+                    </td>
+                  )}
+                  {/* Show Performer column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                    <td className="text-nowrap">
+                      {item.performerName || ''}
                     </td>
                   )}
                   <td>{item.type?.split('/').pop() || item.type}</td>
@@ -436,7 +530,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       )}
                       <td className="text-nowrap">
                         <a 
-                          href={`https://staging.kg.artsdata.ca/entity?uri=${encodeURIComponent(`http://kg.artsdata.ca/resource/${match.id}`)}`}
+                          href={getArtsdataEntityUrl(`http://kg.artsdata.ca/resource/${match.id}`, config)}
                           target="_blank"
                           rel="noopener noreferrer"
                           title={match.id}
@@ -478,8 +572,57 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex }) =
                       {item.type?.toLowerCase().includes('place') && <td>{match.addressRegion || ''}</td>}
                       {/* Show StartDate column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
-                        <td style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                        <td className="text-nowrap" style={{fontSize: '0.75rem', color: '#6b7280'}}>
                           {match.startDate || ''}
+                        </td>
+                      )}
+                      {/* Show EndDate column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap" style={{fontSize: '0.75rem', color: '#6b7280'}}>
+                          {match.endDate || ''}
+                        </td>
+                      )}
+                      {/* Show Place column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.locationName || ''}
+                        </td>
+                      )}
+                      {/* Show Artsdata Place column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.locationArtsdataUri ? (
+                            <a 
+                              href={getArtsdataEntityUrl(match.locationArtsdataUri, config)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={match.locationArtsdataUri}
+                            >
+                              {match.locationArtsdataUri.split('/').pop()}
+                            </a>
+                          ) : ''}
+                        </td>
+                      )}
+                      {/* Show PostalCode column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && <td>{match.postalCode || ''}</td>}
+                      {/* Show Event Status column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(match.eventStatus)}</td>}
+                      {/* Show Attendance Mode column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(match.eventAttendanceMode)}</td>}
+                      {/* Show Buy URL column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.offerUrl && (
+                            <a href={match.offerUrl} target="_blank" rel="noopener noreferrer" title={match.offerUrl}>
+                              {truncateUrl(match.offerUrl)}
+                            </a>
+                          )}
+                        </td>
+                      )}
+                      {/* Show Performer column for Event entities */}
+                      {item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.performerName || ''}
                         </td>
                       )}
                       <td>
