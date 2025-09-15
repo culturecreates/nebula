@@ -555,13 +555,16 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                           </a>
                         )}
                       </td>
-                      <td className="text-nowrap">
-                        {match.isni && (
-                          <a href={match.isni} target="_blank" rel="noopener noreferrer" title={match.isni}>
-                            {truncateUrl(match.isni)}
-                          </a>
-                        )}
-                      </td>
+                      {/* Only show ISNI column for non-Place entities */}
+                      {!item.type?.toLowerCase().includes('place') && (
+                        <td className="text-nowrap">
+                          {match.isni && (
+                            <a href={match.isni} target="_blank" rel="noopener noreferrer" title={match.isni}>
+                              {truncateUrl(match.isni)}
+                            </a>
+                          )}
+                        </td>
+                      )}
                       <td className="text-nowrap">
                         {match.wikidata && (
                           <a href={match.wikidata} target="_blank" rel="noopener noreferrer" title={match.wikidata}>
