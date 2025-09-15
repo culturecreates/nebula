@@ -330,7 +330,8 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                   <th style={{width: '60px'}}>ID</th>
                   <th style={{minWidth: '300px'}}>Name</th>
                   <th>URL</th>
-                  <th>ISNI</th>
+                  {/* Only show ISNI column for non-Place entities */}
+                  {!item.type?.toLowerCase().includes('place') && <th>ISNI</th>}
                   <th>Wikidata</th>
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
@@ -413,13 +414,16 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       </a>
                     )}
                   </td>
-                  <td>
-                    {item.isni && (
-                      <a href={item.isni} target="_blank" rel="noopener noreferrer" title={item.isni}>
-                        {truncateUrl(item.isni)}
-                      </a>
-                    )}
-                  </td>
+                  {/* Only show ISNI column for non-Place entities */}
+                  {!item.type?.toLowerCase().includes('place') && (
+                    <td>
+                      {item.isni && (
+                        <a href={item.isni} target="_blank" rel="noopener noreferrer" title={item.isni}>
+                          {truncateUrl(item.isni)}
+                        </a>
+                      )}
+                    </td>
+                  )}
                   <td>
                     {item.wikidata && (
                       <a href={item.wikidata} target="_blank" rel="noopener noreferrer" title={item.wikidata}>
