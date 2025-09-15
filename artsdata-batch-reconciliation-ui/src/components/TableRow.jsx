@@ -272,12 +272,18 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                 )}
                 {currentStatus !== 'reconciled' && (
                   <div>
-                    <button 
+                    <button
                       className="action-link"
                       onClick={handleChange}
                     >
                       Change
                     </button>
+                    {/* Show Auto-Selected indicator for auto-matched items in judgment-ready state */}
+                    {currentStatus === 'judgment-ready' && !selectedMatch && item.hasAutoMatch && !item.isPreReconciled && !item.mintedAs && (
+                      <div className="selected-indicator" style={{fontSize: '0.75rem', color: '#059669', marginTop: '4px'}}>
+                        ✓ Auto-Selected
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -528,11 +534,6 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                                 </span>
                               )}
                             </>
-                          )}
-                          {isAutoSelected && !item.isPreReconciled && !item.mintedAs && (
-                            <div className="selected-indicator">
-                              ✓ Auto-Selected
-                            </div>
                           )}
                         </td>
                       )}
