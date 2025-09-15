@@ -329,33 +329,34 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                   {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged') && <th style={{width: '100px'}}></th>}
                   <th style={{width: '60px'}}>ID</th>
                   <th style={{minWidth: '300px'}}>Name</th>
+                  {/* Show StartDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Start Date</th>}
+                  {/* Show EndDate column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">End Date</th>}
+                  {/* Show Location column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Location</th>}
+                  {/* Show Location ID column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Location ID</th>}
+                  {/* Show PostalCode column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>PostalCode</th>}
                   <th>URL</th>
-                  {/* Only show ISNI column for non-Place entities */}
-                  {!item.type?.toLowerCase().includes('place') && <th>ISNI</th>}
-                  <th>Wikidata</th>
+                  {/* Show Status column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Status</th>}
+                  {/* Show Attendance Mode column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Attendance</th>}
+                  {/* Show Tickets column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th>Tickets</th>}
+                  {/* Show Performer column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Performer</th>}
+                  {/* Only show ISNI column for non-Place and non-Event entities */}
+                  {!item.type?.toLowerCase().includes('place') && !item.type?.toLowerCase().includes('event') && <th>ISNI</th>}
+                  {/* Only show Wikidata column for non-Event entities */}
+                  {!item.type?.toLowerCase().includes('event') && <th>Wikidata</th>}
                   {/* Show PostalCode column for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>PostalCode</th>}
                   {/* Show Locality and Region columns for Place entities */}
                   {item.type?.toLowerCase().includes('place') && <th>Locality</th>}
                   {item.type?.toLowerCase().includes('place') && <th>Region</th>}
-                  {/* Show StartDate column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Start Date</th>}
-                  {/* Show EndDate column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">End Date</th>}
-                  {/* Show Place column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Place</th>}
-                  {/* Show Artsdata Place column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Artsdata Place</th>}
-                  {/* Show PostalCode column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th>PostalCode</th>}
-                  {/* Show Event Status column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th>Event Status</th>}
-                  {/* Show Attendance Mode column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th>Attendance</th>}
-                  {/* Show Buy URL column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th>Buy URL</th>}
-                  {/* Show Performer column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Performer</th>}
                   <th>Type</th>
                 </tr>
               </thead>
@@ -407,35 +408,6 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       <div className="name-secondary">{item.description}</div>
                     </div>
                   </td>
-                  <td className="text-nowrap">
-                    {item.url && (
-                      <a href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
-                        {truncateUrl(item.url)}
-                      </a>
-                    )}
-                  </td>
-                  {/* Only show ISNI column for non-Place entities */}
-                  {!item.type?.toLowerCase().includes('place') && (
-                    <td>
-                      {item.isni && (
-                        <a href={item.isni} target="_blank" rel="noopener noreferrer" title={item.isni}>
-                          {truncateUrl(item.isni)}
-                        </a>
-                      )}
-                    </td>
-                  )}
-                  <td>
-                    {item.wikidata && (
-                      <a href={item.wikidata} target="_blank" rel="noopener noreferrer" title={item.wikidata}>
-                        {item.wikidataId || truncateUrl(item.wikidata)}
-                      </a>
-                    )}
-                  </td>
-                  {/* Show PostalCode column for Place entities */}
-                  {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
-                  {/* Show Locality and Region columns for Place entities */}
-                  {item.type?.toLowerCase().includes('place') && <td>{item.addressLocality || ''}</td>}
-                  {item.type?.toLowerCase().includes('place') && <td>{item.addressRegion || ''}</td>}
                   {/* Show StartDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
                     <td className="text-nowrap" style={{fontSize: '0.75rem', color: '#6b7280'}}>
@@ -448,17 +420,17 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       {item.endDate || ''}
                     </td>
                   )}
-                  {/* Show Place column for Event entities */}
+                  {/* Show Location column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
                     <td className="text-nowrap">
                       {item.locationName || ''}
                     </td>
                   )}
-                  {/* Show Artsdata Place column for Event entities */}
+                  {/* Show Location ID column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
                     <td className="text-nowrap">
                       {item.locationArtsdataUri ? (
-                        <a 
+                        <a
                           href={getArtsdataEntityUrl(item.locationArtsdataUri, config)}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -471,11 +443,18 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                   )}
                   {/* Show PostalCode column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <td>{item.postalCode || ''}</td>}
-                  {/* Show Event Status column for Event entities */}
+                  <td className="text-nowrap">
+                    {item.url && (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
+                        {truncateUrl(item.url)}
+                      </a>
+                    )}
+                  </td>
+                  {/* Show Status column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(item.eventStatus)}</td>}
                   {/* Show Attendance Mode column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(item.eventAttendanceMode)}</td>}
-                  {/* Show Buy URL column for Event entities */}
+                  {/* Show Tickets column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && (
                     <td className="text-nowrap">
                       {item.offerUrl && (
@@ -491,6 +470,31 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       {item.performerName || ''}
                     </td>
                   )}
+                  {/* Only show ISNI column for non-Place and non-Event entities */}
+                  {!item.type?.toLowerCase().includes('place') && !item.type?.toLowerCase().includes('event') && (
+                    <td>
+                      {item.isni && (
+                        <a href={item.isni} target="_blank" rel="noopener noreferrer" title={item.isni}>
+                          {truncateUrl(item.isni)}
+                        </a>
+                      )}
+                    </td>
+                  )}
+                  {/* Only show Wikidata column for non-Event entities */}
+                  {!item.type?.toLowerCase().includes('event') && (
+                    <td>
+                      {item.wikidata && (
+                        <a href={item.wikidata} target="_blank" rel="noopener noreferrer" title={item.wikidata}>
+                          {item.wikidataId || truncateUrl(item.wikidata)}
+                        </a>
+                      )}
+                    </td>
+                  )}
+                  {/* Show PostalCode column for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.postalCode || ''}</td>}
+                  {/* Show Locality and Region columns for Place entities */}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.addressLocality || ''}</td>}
+                  {item.type?.toLowerCase().includes('place') && <td>{item.addressRegion || ''}</td>}
                   <td>{item.type?.split('/').pop() || item.type}</td>
                 </tr>
                 
@@ -548,35 +552,6 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                           <div className="match-description">{match.description}</div>
                         </div>
                       </td>
-                      <td className="text-nowrap">
-                        {match.url && (
-                          <a href={match.url} target="_blank" rel="noopener noreferrer" title={match.url}>
-                            {truncateUrl(match.url)}
-                          </a>
-                        )}
-                      </td>
-                      {/* Only show ISNI column for non-Place entities */}
-                      {!item.type?.toLowerCase().includes('place') && (
-                        <td className="text-nowrap">
-                          {match.isni && (
-                            <a href={match.isni} target="_blank" rel="noopener noreferrer" title={match.isni}>
-                              {truncateUrl(match.isni)}
-                            </a>
-                          )}
-                        </td>
-                      )}
-                      <td className="text-nowrap">
-                        {match.wikidata && (
-                          <a href={match.wikidata} target="_blank" rel="noopener noreferrer" title={match.wikidata}>
-                            {extractWikidataId(match.wikidata) || truncateUrl(match.wikidata)}
-                          </a>
-                        )}
-                      </td>
-                      {/* Show PostalCode column for Place entities */}
-                      {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
-                      {/* Show Locality and Region columns for Place entities */}
-                      {item.type?.toLowerCase().includes('place') && <td>{match.addressLocality || ''}</td>}
-                      {item.type?.toLowerCase().includes('place') && <td>{match.addressRegion || ''}</td>}
                       {/* Show StartDate column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td className="text-nowrap" style={{fontSize: '0.75rem', color: '#6b7280'}}>
@@ -589,17 +564,17 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                           {match.endDate || ''}
                         </td>
                       )}
-                      {/* Show Place column for Event entities */}
+                      {/* Show Location column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td className="text-nowrap">
                           {match.locationName || ''}
                         </td>
                       )}
-                      {/* Show Artsdata Place column for Event entities */}
+                      {/* Show Location ID column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td className="text-nowrap">
                           {match.locationArtsdataUri ? (
-                            <a 
+                            <a
                               href={getArtsdataEntityUrl(match.locationArtsdataUri, config)}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -612,11 +587,18 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       )}
                       {/* Show PostalCode column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && <td>{match.postalCode || ''}</td>}
-                      {/* Show Event Status column for Event entities */}
+                      <td className="text-nowrap">
+                        {match.url && (
+                          <a href={match.url} target="_blank" rel="noopener noreferrer" title={match.url}>
+                            {truncateUrl(match.url)}
+                          </a>
+                        )}
+                      </td>
+                      {/* Show Status column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(match.eventStatus)}</td>}
                       {/* Show Attendance Mode column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && <td>{extractSchemaStatus(match.eventAttendanceMode)}</td>}
-                      {/* Show Buy URL column for Event entities */}
+                      {/* Show Tickets column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td className="text-nowrap">
                           {match.offerUrl && (
@@ -632,6 +614,31 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                           {match.performerName || ''}
                         </td>
                       )}
+                      {/* Only show ISNI column for non-Place and non-Event entities */}
+                      {!item.type?.toLowerCase().includes('place') && !item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.isni && (
+                            <a href={match.isni} target="_blank" rel="noopener noreferrer" title={match.isni}>
+                              {truncateUrl(match.isni)}
+                            </a>
+                          )}
+                        </td>
+                      )}
+                      {/* Only show Wikidata column for non-Event entities */}
+                      {!item.type?.toLowerCase().includes('event') && (
+                        <td className="text-nowrap">
+                          {match.wikidata && (
+                            <a href={match.wikidata} target="_blank" rel="noopener noreferrer" title={match.wikidata}>
+                              {extractWikidataId(match.wikidata) || truncateUrl(match.wikidata)}
+                            </a>
+                          )}
+                        </td>
+                      )}
+                      {/* Show PostalCode column for Place entities */}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.postalCode || ''}</td>}
+                      {/* Show Locality and Region columns for Place entities */}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.addressLocality || ''}</td>}
+                      {item.type?.toLowerCase().includes('place') && <td>{match.addressRegion || ''}</td>}
                       <td>
                         {Array.isArray(match.type) 
                           ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])
