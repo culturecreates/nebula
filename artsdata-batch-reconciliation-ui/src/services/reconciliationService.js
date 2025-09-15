@@ -162,6 +162,28 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
             matchQuantifier: "any"
           });
         }
+
+        // Add start date condition
+        if (entity.startDate && entity.startDate.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "https://schema.org/startDate",
+            propertyValue: entity.startDate,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+
+        // Add end date condition
+        if (entity.endDate && entity.endDate.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "https://schema.org/endDate",
+            propertyValue: entity.endDate,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
       }
       
       return {
