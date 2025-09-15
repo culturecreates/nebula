@@ -280,7 +280,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                     </button>
                     {/* Show Auto-Selected indicator for auto-matched items in judgment-ready state */}
                     {currentStatus === 'judgment-ready' && !selectedMatch && item.hasAutoMatch && !item.isPreReconciled && !item.mintedAs && (
-                      <div className="selected-indicator" style={{fontSize: '0.75rem', color: '#059669', marginTop: '4px'}}>
+                      <div className="selected-indicator" style={{fontSize: '0.75rem', color: '#059669', marginTop: '4px', marginLeft: '0'}}>
                         ✓ Auto-Selected
                       </div>
                     )}
