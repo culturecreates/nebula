@@ -83,37 +83,121 @@ export function filterTargetProperties(properties, entityType, config = {}) {
   properties.forEach(property => {
     const id = property.id ? property.id.toLowerCase() : '';
     const name = property.name ? property.name.toLowerCase() : '';
-    
-    
-    // Check for sameAs property (contains ISNI and Wikidata)
-    if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
-      targetProperties.push({
-        ...property,
-        type: 'sameAs' // Use sameAs type for processing
-      });
+
+    // Entity-specific property filtering
+    if (entityType === 'Event') {
+      // Event-specific properties only
+      // Start Date
+      if (id === 'startdate' || name === 'startdate' || id === 'startDate' || name === 'startDate') {
+        targetProperties.push({
+          ...property,
+          type: 'startDate'
+        });
+      }
+      // End Date
+      else if (id === 'enddate' || name === 'enddate' || id === 'endDate' || name === 'endDate') {
+        targetProperties.push({
+          ...property,
+          type: 'endDate'
+        });
+      }
+      // Location
+      else if (id === 'location' || name === 'location') {
+        targetProperties.push({
+          ...property,
+          type: 'location'
+        });
+      }
+      // Event Status
+      else if (id === 'eventstatus' || name === 'eventstatus' || id === 'eventStatus' || name === 'eventStatus') {
+        targetProperties.push({
+          ...property,
+          type: 'eventStatus'
+        });
+      }
+      // Event Attendance Mode
+      else if (id === 'eventattendancemode' || name === 'eventattendancemode' || id === 'eventAttendanceMode' || name === 'eventAttendanceMode') {
+        targetProperties.push({
+          ...property,
+          type: 'eventAttendanceMode'
+        });
+      }
+      // Offers
+      else if (id === 'offers' || name === 'offers') {
+        targetProperties.push({
+          ...property,
+          type: 'offers'
+        });
+      }
+      // Performer
+      else if (id === 'performer' || name === 'performer') {
+        targetProperties.push({
+          ...property,
+          type: 'performer'
+        });
+      }
+      // Organizer
+      else if (id === 'organizer' || name === 'organizer') {
+        targetProperties.push({
+          ...property,
+          type: 'organizer'
+        });
+      }
+      // URL property for Events
+      else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
+        targetProperties.push({
+          ...property,
+          type: 'url'
+        });
+      }
+      // SameAs property for Events
+      else if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+        targetProperties.push({
+          ...property,
+          type: 'sameAs'
+        });
+      }
     }
-    // Check for URL property
-    else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
-      targetProperties.push({
-        ...property,
-        type: 'url'
-      });
-    }
-    // Check for address property (contains postal code for Place entities only)
-    else if (id === 'address' || name === 'address') {
-      if (entityType === 'Place') {
+    // Place-specific properties
+    else if (entityType === 'Place') {
+      // Address property (Place only)
+      if (id === 'address' || name === 'address') {
         targetProperties.push({
           ...property,
           type: 'address'
         });
       }
+      // URL property for Places
+      else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
+        targetProperties.push({
+          ...property,
+          type: 'url'
+        });
+      }
+      // SameAs property for Places
+      else if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+        targetProperties.push({
+          ...property,
+          type: 'sameAs'
+        });
+      }
     }
-    // Check for startDate property (for Event entities only)
-    else if ((id === 'startdate' || name === 'startdate' || id === 'startDate' || name === 'startDate') && entityType === 'Event') {
-      targetProperties.push({
-        ...property,
-        type: 'startDate'
-      });
+    // Other entity types (Person, Organization, Agent, etc.)
+    else {
+      // SameAs property (contains ISNI and Wikidata)
+      if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+        targetProperties.push({
+          ...property,
+          type: 'sameAs'
+        });
+      }
+      // URL property
+      else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
+        targetProperties.push({
+          ...property,
+          type: 'url'
+        });
+      }
     }
   });
   
@@ -136,10 +220,14 @@ export async function extendEntities(entityIds, properties, config = {}) {
   try {
     const extendQuery = {
       ids: entityIds,
-      properties: properties.map(prop => ({ 
-        id: prop.id,
-        expand: prop.type === 'address' // Only expand address property for nested structure
-      }))
+      properties: properties.map(prop => {
+        const propertyObj = { id: prop.id };
+        // Only add expand property if the property is marked as expandable from the propose API
+        if (prop.expandable === true) {
+          propertyObj.expand = true;
+        }
+        return propertyObj;
+      })
     };
     
     
@@ -192,7 +280,16 @@ export function processExtendedData(extendedData, properties) {
       url: null,
       postalCode: null,
       addressLocality: null,
-      addressRegion: null
+      addressRegion: null,
+      startDate: null,
+      endDate: null,
+      locationName: null,
+      locationArtsdataUri: null,
+      eventStatus: null,
+      eventAttendanceMode: null,
+      offerUrl: null,
+      performerName: null,
+      organizerName: null
     };
     
     
@@ -268,6 +365,102 @@ export function processExtendedData(extendedData, properties) {
                 const startDateValue = dateValue.str;
                 if (startDateValue) {
                   processed.startDate = startDateValue;
+                }
+              }
+            });
+          } else if (propertyConfig.type === 'endDate' && propertyId === 'endDate') {
+            // For endDate, extract date value
+            propertyData.values.forEach(dateValue => {
+              if (dateValue.str) {
+                const endDateValue = dateValue.str;
+                if (endDateValue) {
+                  processed.endDate = endDateValue;
+                }
+              }
+            });
+          } else if (propertyConfig.type === 'location' && propertyId === 'location') {
+            // For location (not expanded), extract the location entity reference
+            propertyData.values.forEach(locationValue => {
+              // Since location is not expanded, we get the location entity ID/URI directly
+              const locationRef = locationValue.str || locationValue.id || '';
+              if (locationRef && locationRef.includes('kg.artsdata.ca')) {
+                processed.locationArtsdataUri = locationRef;
+              }
+              // If there's a name property directly on the location value
+              if (locationValue.name) {
+                processed.locationName = locationValue.name;
+              }
+            });
+          } else if (propertyConfig.type === 'eventStatus' && propertyId === 'eventStatus') {
+            // For eventStatus, extract status value
+            propertyData.values.forEach(statusValue => {
+              const status = statusValue.str || statusValue.id || '';
+              if (status) {
+                processed.eventStatus = status;
+              }
+            });
+          } else if (propertyConfig.type === 'eventAttendanceMode' && propertyId === 'eventAttendanceMode') {
+            // For eventAttendanceMode, extract attendance mode value
+            propertyData.values.forEach(attendanceValue => {
+              const attendance = attendanceValue.str || attendanceValue.id || '';
+              if (attendance) {
+                processed.eventAttendanceMode = attendance;
+              }
+            });
+          } else if (propertyConfig.type === 'offers' && propertyId === 'offers') {
+            // For offers, extract URL from nested structure
+            propertyData.values.forEach(offerValue => {
+              if (offerValue.properties && Array.isArray(offerValue.properties)) {
+                offerValue.properties.forEach(offerProperty => {
+                  // Extract offer URL
+                  if (offerProperty.id === 'url' && offerProperty.values && offerProperty.values.length > 0) {
+                    const urlValue = offerProperty.values[0].str || offerProperty.values[0].id || '';
+                    if (urlValue) {
+                      processed.offerUrl = urlValue;
+                    }
+                  }
+                });
+              }
+            });
+          } else if (propertyConfig.type === 'performer' && propertyId === 'performer') {
+            // For performer, extract name from nested structure (if expanded) or direct value
+            propertyData.values.forEach(performerValue => {
+              if (performerValue.properties && Array.isArray(performerValue.properties)) {
+                // Expanded performer - extract name from nested structure
+                performerValue.properties.forEach(performerProperty => {
+                  if (performerProperty.id === 'name' && performerProperty.values && performerProperty.values.length > 0) {
+                    const nameValue = performerProperty.values[0].str || performerProperty.values[0].id || '';
+                    if (nameValue) {
+                      processed.performerName = nameValue;
+                    }
+                  }
+                });
+              } else {
+                // Non-expanded performer - extract direct value or name
+                const performerName = performerValue.str || performerValue.id || performerValue.name || '';
+                if (performerName) {
+                  processed.performerName = performerName;
+                }
+              }
+            });
+          } else if (propertyConfig.type === 'organizer' && propertyId === 'organizer') {
+            // For organizer, extract name from nested structure (if expanded) or direct value
+            propertyData.values.forEach(organizerValue => {
+              if (organizerValue.properties && Array.isArray(organizerValue.properties)) {
+                // Expanded organizer - extract name from nested structure
+                organizerValue.properties.forEach(organizerProperty => {
+                  if (organizerProperty.id === 'name' && organizerProperty.values && organizerProperty.values.length > 0) {
+                    const nameValue = organizerProperty.values[0].str || organizerProperty.values[0].id || '';
+                    if (nameValue) {
+                      processed.organizerName = nameValue;
+                    }
+                  }
+                });
+              } else {
+                // Non-expanded organizer - extract direct value or name
+                const organizerName = organizerValue.str || organizerValue.id || organizerValue.name || '';
+                if (organizerName) {
+                  processed.organizerName = organizerName;
                 }
               }
             });
@@ -489,23 +682,17 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
       return candidates;
     }
     
-    // Preload properties for all entity types
-    const allProperties = await preloadAllEntityTypeProperties(config);
-    
-    // Collect all unique target properties across all entity types
-    const allTargetProperties = [];
-    const seenPropertyIds = new Set();
-    
-    Object.values(allProperties).forEach(properties => {
-      properties.forEach(property => {
-        if (!seenPropertyIds.has(property.id)) {
-          allTargetProperties.push(property);
-          seenPropertyIds.add(property.id);
-        }
-      });
-    });
-    
-    if (allTargetProperties.length === 0) {
+    // Get properties specific to the entity type being processed
+    const availableProperties = await getAvailableProperties(entityType, config);
+
+    // Handle the response format - it might be {type: "Event", properties: [...]}
+    const propertiesArray = Array.isArray(availableProperties) ?
+      availableProperties :
+      (availableProperties.properties || availableProperties);
+
+    const targetProperties = filterTargetProperties(propertiesArray, entityType, config);
+
+    if (targetProperties.length === 0) {
       return candidates;
     }
     
@@ -520,8 +707,8 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     
     
     // Extend entities with target properties using deduplicated IDs
-    const extendedData = await extendEntities(uniqueEntityIds, allTargetProperties, config);
-    const processedExtension = processExtendedData(extendedData, allTargetProperties);
+    const extendedData = await extendEntities(uniqueEntityIds, targetProperties, config);
+    const processedExtension = processExtendedData(extendedData, targetProperties);
     
     
     // Merge extended data with candidates
@@ -536,7 +723,15 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         postalCode: extendedInfo.postalCode || candidate.postalCode || '',
         addressLocality: extendedInfo.addressLocality || candidate.addressLocality || '',
         addressRegion: extendedInfo.addressRegion || candidate.addressRegion || '',
-        startDate: extendedInfo.startDate || candidate.startDate || ''
+        startDate: extendedInfo.startDate || candidate.startDate || '',
+        endDate: extendedInfo.endDate || candidate.endDate || '',
+        locationName: extendedInfo.locationName || candidate.locationName || '',
+        locationArtsdataUri: extendedInfo.locationArtsdataUri || candidate.locationArtsdataUri || '',
+        eventStatus: extendedInfo.eventStatus || candidate.eventStatus || '',
+        eventAttendanceMode: extendedInfo.eventAttendanceMode || candidate.eventAttendanceMode || '',
+        offerUrl: extendedInfo.offerUrl || candidate.offerUrl || '',
+        performerName: extendedInfo.performerName || candidate.performerName || '',
+        organizerName: extendedInfo.organizerName || candidate.organizerName || ''
       };
       return enriched;
     });
