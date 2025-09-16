@@ -162,6 +162,28 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
             matchQuantifier: "any"
           });
         }
+
+        // Add start date condition
+        if (entity.startDate && entity.startDate.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "https://schema.org/startDate",
+            propertyValue: entity.startDate,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
+
+        // Add end date condition
+        if (entity.endDate && entity.endDate.trim() !== '') {
+          conditions.push({
+            matchType: "property",
+            propertyId: "https://schema.org/endDate",
+            propertyValue: entity.endDate,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
       }
       
       return {
@@ -220,7 +242,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
               const originalCandidate = data.results[position.resultIndex].candidates[position.candidateIndex];
               
               // Merge enriched properties with original candidate, preserving parent-specific data like score
-              data.results[position.resultIndex].candidates[position.candidateIndex] = {
+              const mergedCandidate = {
                 ...originalCandidate, // Keep original data (especially score, match status)
                 // Only override with extended properties from enrichment
                 isni: enrichedCandidate.isni || originalCandidate.isni || '',
@@ -229,8 +251,19 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 postalCode: enrichedCandidate.postalCode || originalCandidate.postalCode || '',
                 addressLocality: enrichedCandidate.addressLocality || originalCandidate.addressLocality || '',
                 addressRegion: enrichedCandidate.addressRegion || originalCandidate.addressRegion || '',
-                startDate: enrichedCandidate.startDate || originalCandidate.startDate || ''
+                // Event-specific extended properties
+                startDate: enrichedCandidate.startDate || originalCandidate.startDate || '',
+                endDate: enrichedCandidate.endDate || originalCandidate.endDate || '',
+                locationName: enrichedCandidate.locationName || originalCandidate.locationName || '',
+                locationArtsdataUri: enrichedCandidate.locationArtsdataUri || originalCandidate.locationArtsdataUri || '',
+                eventStatus: enrichedCandidate.eventStatus || originalCandidate.eventStatus || '',
+                eventAttendanceMode: enrichedCandidate.eventAttendanceMode || originalCandidate.eventAttendanceMode || '',
+                offerUrl: enrichedCandidate.offerUrl || originalCandidate.offerUrl || '',
+                performerName: enrichedCandidate.performerName || originalCandidate.performerName || '',
+                performerId: enrichedCandidate.performerId || originalCandidate.performerId || ''
               };
+
+              data.results[position.resultIndex].candidates[position.candidateIndex] = mergedCandidate;
             });
           });
           
@@ -240,7 +273,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         // Continue with original data if enrichment fails
       }
     }
-    
+
     return data;
   } catch (error) {
     console.error('Error getting match candidates:', error);
@@ -468,6 +501,16 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         addressLocality: candidate.addressLocality || candidate['http://schema.org/addressLocality'] || '',
         addressRegion: candidate.addressRegion || candidate['http://schema.org/addressRegion'] || '',
         startDate: candidate.startDate || '',
+        // Event-specific extended properties
+        endDate: candidate.endDate || '',
+        locationName: candidate.locationName || '',
+        locationArtsdataUri: candidate.locationArtsdataUri || '',
+        eventStatus: candidate.eventStatus || '',
+        eventAttendanceMode: candidate.eventAttendanceMode || '',
+        offerUrl: candidate.offerUrl || '',
+        performerName: candidate.performerName || '',
+        performerId: candidate.performerId || '',
+        organizerName: candidate.organizerName || ''
       };
     });
 

@@ -13,6 +13,34 @@ const propertiesCache = new Map();
 const targetPropertiesCache = new Map();
 
 /**
+ * Extract the best language value from property values array
+ * Prioritizes 'en' (English) first, then any other available value
+ * @param {Array} values - Array of value objects with str and optional lang properties
+ * @returns {string} - Best available string value
+ */
+function extractBestLanguageValue(values) {
+  if (!values || !Array.isArray(values) || values.length === 0) {
+    return '';
+  }
+
+  // First, try to find English value
+  const englishValue = values.find(value => value.lang === 'en');
+  if (englishValue && englishValue.str) {
+    return englishValue.str;
+  }
+
+  // If no English, try to find any value with a string
+  const anyValue = values.find(value => value.str);
+  if (anyValue && anyValue.str) {
+    return anyValue.str;
+  }
+
+  // Fallback to first value's str or id
+  const firstValue = values[0];
+  return firstValue.str || firstValue.id || '';
+}
+
+/**
  * Get available properties for a given entity type using the extend/propose API
  * Uses caching to avoid multiple API calls for the same entity type
  * @param {string} entityType - Entity type (Place, Organization, Event, Person)
@@ -83,37 +111,121 @@ export function filterTargetProperties(properties, entityType, config = {}) {
   properties.forEach(property => {
     const id = property.id ? property.id.toLowerCase() : '';
     const name = property.name ? property.name.toLowerCase() : '';
-    
-    
-    // Check for sameAs property (contains ISNI and Wikidata)
-    if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
-      targetProperties.push({
-        ...property,
-        type: 'sameAs' // Use sameAs type for processing
-      });
+
+    // Entity-specific property filtering
+    if (entityType === 'Event') {
+      // Event-specific properties only
+      // Start Date
+      if (id === 'startdate' || name === 'startdate' || id === 'startDate' || name === 'startDate') {
+        targetProperties.push({
+          ...property,
+          type: 'startDate'
+        });
+      }
+      // End Date
+      else if (id === 'enddate' || name === 'enddate' || id === 'endDate' || name === 'endDate') {
+        targetProperties.push({
+          ...property,
+          type: 'endDate'
+        });
+      }
+      // Location
+      else if (id === 'location' || name === 'location') {
+        targetProperties.push({
+          ...property,
+          type: 'location'
+        });
+      }
+      // Event Status
+      else if (id === 'eventstatus' || name === 'eventstatus' || id === 'eventStatus' || name === 'eventStatus') {
+        targetProperties.push({
+          ...property,
+          type: 'eventStatus'
+        });
+      }
+      // Event Attendance Mode
+      else if (id === 'eventattendancemode' || name === 'eventattendancemode' || id === 'eventAttendanceMode' || name === 'eventAttendanceMode') {
+        targetProperties.push({
+          ...property,
+          type: 'eventAttendanceMode'
+        });
+      }
+      // Offers
+      else if (id === 'offers' || name === 'offers') {
+        targetProperties.push({
+          ...property,
+          type: 'offers'
+        });
+      }
+      // Performer
+      else if (id === 'performer' || name === 'performer') {
+        targetProperties.push({
+          ...property,
+          type: 'performer'
+        });
+      }
+      // Organizer
+      else if (id === 'organizer' || name === 'organizer') {
+        targetProperties.push({
+          ...property,
+          type: 'organizer'
+        });
+      }
+      // URL property for Events
+      else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
+        targetProperties.push({
+          ...property,
+          type: 'url'
+        });
+      }
+      // SameAs property for Events
+      else if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+        targetProperties.push({
+          ...property,
+          type: 'sameAs'
+        });
+      }
     }
-    // Check for URL property
-    else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
-      targetProperties.push({
-        ...property,
-        type: 'url'
-      });
-    }
-    // Check for address property (contains postal code for Place entities only)
-    else if (id === 'address' || name === 'address') {
-      if (entityType === 'Place') {
+    // Place-specific properties
+    else if (entityType === 'Place') {
+      // Address property (Place only)
+      if (id === 'address' || name === 'address') {
         targetProperties.push({
           ...property,
           type: 'address'
         });
       }
+      // URL property for Places
+      else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
+        targetProperties.push({
+          ...property,
+          type: 'url'
+        });
+      }
+      // SameAs property for Places
+      else if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+        targetProperties.push({
+          ...property,
+          type: 'sameAs'
+        });
+      }
     }
-    // Check for startDate property (for Event entities only)
-    else if ((id === 'startdate' || name === 'startdate' || id === 'startDate' || name === 'startDate') && entityType === 'Event') {
-      targetProperties.push({
-        ...property,
-        type: 'startDate'
-      });
+    // Other entity types (Person, Organization, Agent, etc.)
+    else {
+      // SameAs property (contains ISNI and Wikidata)
+      if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+        targetProperties.push({
+          ...property,
+          type: 'sameAs'
+        });
+      }
+      // URL property
+      else if (id.includes('url') || name.includes('url') || id === 'url' || id === 'http://schema.org/url') {
+        targetProperties.push({
+          ...property,
+          type: 'url'
+        });
+      }
     }
   });
   
@@ -136,10 +248,14 @@ export async function extendEntities(entityIds, properties, config = {}) {
   try {
     const extendQuery = {
       ids: entityIds,
-      properties: properties.map(prop => ({ 
-        id: prop.id,
-        expand: prop.type === 'address' // Only expand address property for nested structure
-      }))
+      properties: properties.map(prop => {
+        const propertyObj = { id: prop.id };
+        // Only add expand property if the property is marked as expandable from the propose API
+        if (prop.expandable === true) {
+          propertyObj.expand = true;
+        }
+        return propertyObj;
+      })
     };
     
     
@@ -177,8 +293,7 @@ export async function extendEntities(entityIds, properties, config = {}) {
  */
 export function processExtendedData(extendedData, properties) {
   const processedData = {};
-  
-  
+
   if (!extendedData || !extendedData.rows || !Array.isArray(extendedData.rows)) {
     return processedData;
   }
@@ -187,19 +302,30 @@ export function processExtendedData(extendedData, properties) {
   extendedData.rows.forEach(entityRow => {
     const entityId = entityRow.id;
     const processed = {
+      name: null,
       isni: null,
       wikidata: null,
       url: null,
       postalCode: null,
       addressLocality: null,
-      addressRegion: null
+      addressRegion: null,
+      startDate: null,
+      endDate: null,
+      locationName: null,
+      locationArtsdataUri: null,
+      eventStatus: null,
+      eventAttendanceMode: null,
+      offerUrl: null,
+      performerName: null,
+      performerId: null,
+      organizerName: null
     };
     
     
     if (entityRow.properties && Array.isArray(entityRow.properties)) {
       entityRow.properties.forEach(propertyData => {
         const propertyId = propertyData.id;
-        
+
         // Find the matching property configuration to get the type
         const propertyConfig = properties.find(p => p.id === propertyId);
         if (!propertyConfig) {
@@ -208,8 +334,14 @@ export function processExtendedData(extendedData, properties) {
         
         
         if (propertyData.values && Array.isArray(propertyData.values) && propertyData.values.length > 0) {
-          
-          if (propertyConfig.type === 'url') {
+
+          if (propertyConfig.type === 'name' || propertyId === 'name') {
+            // For name, extract the best language value (prioritize 'en')
+            const stringValue = extractBestLanguageValue(propertyData.values);
+            if (stringValue) {
+              processed.name = stringValue;
+            }
+          } else if (propertyConfig.type === 'url') {
             // For URL, take the first value
             const value = propertyData.values[0];
             const stringValue = value.str || value.id || '';
@@ -271,11 +403,120 @@ export function processExtendedData(extendedData, properties) {
                 }
               }
             });
+          } else if (propertyConfig.type === 'endDate' && propertyId === 'endDate') {
+            // For endDate, extract date value
+            propertyData.values.forEach(dateValue => {
+              if (dateValue.str) {
+                const endDateValue = dateValue.str;
+                if (endDateValue) {
+                  processed.endDate = endDateValue;
+                }
+              }
+            });
+          } else if (propertyConfig.type === 'location' && propertyId === 'location') {
+            // For location (not expanded), extract the location entity reference
+            propertyData.values.forEach(locationValue => {
+              // Since location is not expanded, we get the location entity ID/URI directly
+              const locationRef = locationValue.str || locationValue.id || '';
+              if (locationRef) {
+                // Handle both full URIs and K-numbers
+                if (locationRef.includes('kg.artsdata.ca')) {
+                  processed.locationArtsdataUri = locationRef;
+                } else if (locationRef.match(/^K\d+-\d+$/)) {
+                  // Convert K-number to full URI
+                  processed.locationArtsdataUri = `http://kg.artsdata.ca/resource/${locationRef}`;
+                }
+              }
+              // If there's a name property directly on the location value
+              if (locationValue.name) {
+                processed.locationName = locationValue.name;
+              }
+            });
+          } else if (propertyConfig.type === 'eventStatus' && propertyId === 'eventStatus') {
+            // For eventStatus, extract status value
+            propertyData.values.forEach(statusValue => {
+              const status = statusValue.str || statusValue.id || '';
+              if (status) {
+                processed.eventStatus = status;
+              }
+            });
+          } else if (propertyConfig.type === 'eventAttendanceMode' && propertyId === 'eventAttendanceMode') {
+            // For eventAttendanceMode, extract attendance mode value
+            propertyData.values.forEach(attendanceValue => {
+              const attendance = attendanceValue.str || attendanceValue.id || '';
+              if (attendance) {
+                processed.eventAttendanceMode = attendance;
+              }
+            });
+          } else if (propertyConfig.type === 'offers' && propertyId === 'offers') {
+            // For offers, extract URL from nested structure
+            propertyData.values.forEach(offerValue => {
+              if (offerValue.properties && Array.isArray(offerValue.properties)) {
+                offerValue.properties.forEach(offerProperty => {
+                  // Extract offer URL
+                  if (offerProperty.id === 'url' && offerProperty.values && offerProperty.values.length > 0) {
+                    const urlValue = offerProperty.values[0].str || offerProperty.values[0].id || '';
+                    if (urlValue) {
+                      processed.offerUrl = urlValue;
+                    }
+                  }
+                });
+              }
+            });
+          } else if (propertyConfig.type === 'performer' && propertyId === 'performer') {
+            // For performer, extract name and ID from nested structure (if expanded) or direct value
+            propertyData.values.forEach(performerValue => {
+              if (performerValue.properties && Array.isArray(performerValue.properties)) {
+                // Expanded performer - extract name from nested structure and capture ID
+                if (performerValue.id) {
+                  processed.performerId = performerValue.id;
+                }
+                performerValue.properties.forEach(performerProperty => {
+                  if (performerProperty.id === 'name' && performerProperty.values && performerProperty.values.length > 0) {
+                    const nameValue = extractBestLanguageValue(performerProperty.values);
+                    if (nameValue) {
+                      processed.performerName = nameValue;
+                    }
+                  }
+                });
+              } else {
+                // Non-expanded performer - extract direct value or name
+                const performerName = performerValue.str || performerValue.id || performerValue.name || '';
+                if (performerName) {
+                  processed.performerName = performerName;
+                }
+                // If we have an ID, capture it
+                if (performerValue.id) {
+                  processed.performerId = performerValue.id;
+                }
+              }
+            });
+          } else if (propertyConfig.type === 'organizer' && propertyId === 'organizer') {
+            // For organizer, extract name from nested structure (if expanded) or direct value
+            propertyData.values.forEach(organizerValue => {
+              if (organizerValue.properties && Array.isArray(organizerValue.properties)) {
+                // Expanded organizer - extract name from nested structure
+                organizerValue.properties.forEach(organizerProperty => {
+                  if (organizerProperty.id === 'name' && organizerProperty.values && organizerProperty.values.length > 0) {
+                    const nameValue = extractBestLanguageValue(organizerProperty.values);
+                    if (nameValue) {
+                      processed.organizerName = nameValue;
+                    }
+                  }
+                });
+              } else {
+                // Non-expanded organizer - extract direct value or name
+                const organizerName = organizerValue.str || organizerValue.id || organizerValue.name || '';
+                if (organizerName) {
+                  processed.organizerName = organizerName;
+                }
+              }
+            });
           }
         }
       });
     }
-    
+
     processedData[entityId] = processed;
   });
   
@@ -489,23 +730,17 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
       return candidates;
     }
     
-    // Preload properties for all entity types
-    const allProperties = await preloadAllEntityTypeProperties(config);
-    
-    // Collect all unique target properties across all entity types
-    const allTargetProperties = [];
-    const seenPropertyIds = new Set();
-    
-    Object.values(allProperties).forEach(properties => {
-      properties.forEach(property => {
-        if (!seenPropertyIds.has(property.id)) {
-          allTargetProperties.push(property);
-          seenPropertyIds.add(property.id);
-        }
-      });
-    });
-    
-    if (allTargetProperties.length === 0) {
+    // Get properties specific to the entity type being processed
+    const availableProperties = await getAvailableProperties(entityType, config);
+
+    // Handle the response format - it might be {type: "Event", properties: [...]}
+    const propertiesArray = Array.isArray(availableProperties) ?
+      availableProperties :
+      (availableProperties.properties || availableProperties);
+
+    const targetProperties = filterTargetProperties(propertiesArray, entityType, config);
+
+    if (targetProperties.length === 0) {
       return candidates;
     }
     
@@ -520,12 +755,12 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     
     
     // Extend entities with target properties using deduplicated IDs
-    const extendedData = await extendEntities(uniqueEntityIds, allTargetProperties, config);
-    const processedExtension = processExtendedData(extendedData, allTargetProperties);
+    const extendedData = await extendEntities(uniqueEntityIds, targetProperties, config);
+    const processedExtension = processExtendedData(extendedData, targetProperties);
     
     
     // Merge extended data with candidates
-    const enrichedCandidates = candidates.map(candidate => {
+    let enrichedCandidates = candidates.map(candidate => {
       const extendedInfo = processedExtension[candidate.id] || {};
       const enriched = {
         ...candidate,
@@ -536,16 +771,101 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         postalCode: extendedInfo.postalCode || candidate.postalCode || '',
         addressLocality: extendedInfo.addressLocality || candidate.addressLocality || '',
         addressRegion: extendedInfo.addressRegion || candidate.addressRegion || '',
-        startDate: extendedInfo.startDate || candidate.startDate || ''
+        startDate: extendedInfo.startDate || candidate.startDate || '',
+        endDate: extendedInfo.endDate || candidate.endDate || '',
+        locationName: extendedInfo.locationName || candidate.locationName || '',
+        locationArtsdataUri: extendedInfo.locationArtsdataUri || candidate.locationArtsdataUri || '',
+        eventStatus: extendedInfo.eventStatus || candidate.eventStatus || '',
+        eventAttendanceMode: extendedInfo.eventAttendanceMode || candidate.eventAttendanceMode || '',
+        offerUrl: extendedInfo.offerUrl || candidate.offerUrl || '',
+        performerName: extendedInfo.performerName || candidate.performerName || '',
+        performerId: extendedInfo.performerId || candidate.performerId || '',
+        organizerName: extendedInfo.organizerName || candidate.organizerName || ''
       };
       return enriched;
     });
-    
+
+    // For Event entities, make a second extend call to get location details
+    if (entityType === 'Event') {
+      enrichedCandidates = await enrichEventLocations(enrichedCandidates, config);
+    }
+
     return enrichedCandidates;
     
   } catch (error) {
     console.error('Error enriching match candidates:', error);
     // Return original candidates if enrichment fails
     return candidates;
+  }
+}
+
+/**
+ * Enrich Event candidates with location details by making a second extend API call
+ * @param {Array} candidates - Event candidates with locationArtsdataUri
+ * @param {Object} config - Configuration object with endpoints
+ * @returns {Promise<Array>} - Event candidates enriched with location names
+ */
+async function enrichEventLocations(candidates, config = {}) {
+  try {
+    // Collect all unique location IDs from Event candidates
+    const locationIds = [];
+    candidates.forEach(candidate => {
+      if (candidate.locationArtsdataUri) {
+        // Extract K-number from URI (e.g., "http://kg.artsdata.ca/resource/K2-197" -> "K2-197")
+        const kNumber = candidate.locationArtsdataUri.split('/').pop();
+        if (kNumber && kNumber.match(/^K\d+-\d+$/)) {
+          locationIds.push(kNumber);
+        }
+      }
+    });
+
+    // Remove duplicates
+    const uniqueLocationIds = [...new Set(locationIds)];
+
+    if (uniqueLocationIds.length === 0) {
+      return candidates; // No locations to enrich
+    }
+
+    // Get Place properties for location details
+    const placeProperties = await getAvailableProperties('Place', config);
+    const placePropertiesArray = Array.isArray(placeProperties) ?
+      placeProperties :
+      (placeProperties.properties || placeProperties);
+
+    // Filter for basic Place properties we need (name)
+    const targetPlaceProperties = placePropertiesArray.filter(property => {
+      const id = property.id ? property.id.toLowerCase() : '';
+      const name = property.name ? property.name.toLowerCase() : '';
+      return id === 'name' || name === 'name';
+    });
+
+    if (targetPlaceProperties.length === 0) {
+      return candidates; // No name property available for Places
+    }
+
+    // Make extend API call for location details
+    const locationExtendedData = await extendEntities(uniqueLocationIds, targetPlaceProperties, config);
+    const processedLocationData = processExtendedData(locationExtendedData, targetPlaceProperties);
+
+    // Merge location names back into Event candidates
+    const enrichedCandidates = candidates.map(candidate => {
+      if (candidate.locationArtsdataUri) {
+        const kNumber = candidate.locationArtsdataUri.split('/').pop();
+        const locationInfo = processedLocationData[kNumber];
+        if (locationInfo && locationInfo.name) {
+          return {
+            ...candidate,
+            locationName: locationInfo.name
+          };
+        }
+      }
+      return candidate;
+    });
+
+    return enrichedCandidates;
+
+  } catch (error) {
+    console.error('Error enriching Event locations:', error);
+    return candidates; // Return original candidates if location enrichment fails
   }
 }

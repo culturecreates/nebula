@@ -612,7 +612,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       {/* Show Performer column for Event entities */}
                       {item.type?.toLowerCase().includes('event') && (
                         <td className="text-nowrap">
-                          {match.performerName || ''}
+                          {match.performerName && match.performerId ? (
+                            <a href={getArtsdataEntityUrl(`http://kg.artsdata.ca/resource/${match.performerId}`, config)} target="_blank" rel="noopener noreferrer">
+                              {match.performerName}
+                            </a>
+                          ) : (
+                            match.performerName || ''
+                          )}
                         </td>
                       )}
                       {/* Only show ISNI column for non-Place and non-Event entities */}

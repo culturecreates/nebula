@@ -172,6 +172,8 @@ function filterItems(items, filterText, globalJudgments) {
           match.type,
           match.score?.toString(),
           // Event-specific match fields
+          match.startDate,
+          match.endDate,
           match.locationName,
           match.locationArtsdataUri,
           match.eventStatus,
@@ -510,14 +512,23 @@ const App = ({ config }) => {
         if (itemsToReconcile.length > 0) {
           // Batch reconcile new items
           const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length, config);
-          
+
           // Update reconciledItems with the new reconciled data
           // Don't merge with previous state - replace the current items
           setReconciledItems(prev => {
             // Only update items that exist in the current data set
             return prev.map(item => {
               const reconciledItem = reconciled.find(r => r.id === item.id);
-              return reconciledItem || item;
+              if (reconciledItem) {
+                // Ensure enriched match candidates are properly merged
+                return {
+                  ...item,
+                  ...reconciledItem,
+                  // Make sure matches array contains the enriched candidates
+                  matches: reconciledItem.matches || item.matches || []
+                };
+              }
+              return item;
             });
           });
         }
