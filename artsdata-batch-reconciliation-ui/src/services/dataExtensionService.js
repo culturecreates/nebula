@@ -850,11 +850,21 @@ async function enrichEventLocations(candidates, config = {}) {
       placeProperties :
       (placeProperties.properties || placeProperties);
 
-    // Filter for basic Place properties we need (name)
+    // Filter for Place properties we need (name and address for postal code)
     const targetPlaceProperties = placePropertiesArray.filter(property => {
       const id = property.id ? property.id.toLowerCase() : '';
       const name = property.name ? property.name.toLowerCase() : '';
-      return id === 'name' || name === 'name';
+      return id === 'name' || name === 'name' || id === 'address' || name === 'address';
+    }).map(property => {
+      // Add expand: true and type for address property to get postal code details
+      if (property.id === 'address' || property.name === 'address') {
+        return {
+          ...property,
+          type: 'address',
+          expandable: true
+        };
+      }
+      return property;
     });
 
     if (targetPlaceProperties.length === 0) {
@@ -865,15 +875,16 @@ async function enrichEventLocations(candidates, config = {}) {
     const locationExtendedData = await extendEntities(uniqueLocationIds, targetPlaceProperties, config);
     const processedLocationData = processExtendedData(locationExtendedData, targetPlaceProperties);
 
-    // Merge location names back into Event candidates
+    // Merge location names and postal codes back into Event candidates
     const enrichedCandidates = candidates.map(candidate => {
       if (candidate.locationArtsdataUri) {
         const kNumber = candidate.locationArtsdataUri.split('/').pop();
         const locationInfo = processedLocationData[kNumber];
-        if (locationInfo && locationInfo.name) {
+        if (locationInfo) {
           return {
             ...candidate,
-            locationName: locationInfo.name
+            locationName: locationInfo.name || candidate.locationName || '',
+            postalCode: locationInfo.postalCode || candidate.postalCode || ''
           };
         }
       }
