@@ -260,7 +260,8 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 eventAttendanceMode: enrichedCandidate.eventAttendanceMode || originalCandidate.eventAttendanceMode || '',
                 offerUrl: enrichedCandidate.offerUrl || originalCandidate.offerUrl || '',
                 performerName: enrichedCandidate.performerName || originalCandidate.performerName || '',
-                performerId: enrichedCandidate.performerId || originalCandidate.performerId || ''
+                performerId: enrichedCandidate.performerId || originalCandidate.performerId || '',
+                performers: enrichedCandidate.performers || originalCandidate.performers || []
               };
 
               data.results[position.resultIndex].candidates[position.candidateIndex] = mergedCandidate;

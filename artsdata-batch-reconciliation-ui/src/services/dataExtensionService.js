@@ -464,18 +464,22 @@ export function processExtendedData(extendedData, properties) {
               }
             });
           } else if (propertyConfig.type === 'performer' && propertyId === 'performer') {
-            // For performer, extract name and ID from nested structure (if expanded) or direct value
+            // For performer, extract name-ID pairs from all values (can be multiple performers)
+            const performers = [];
+
             propertyData.values.forEach(performerValue => {
+              const performer = { name: '', id: '' };
+
               if (performerValue.properties && Array.isArray(performerValue.properties)) {
                 // Expanded performer - extract name from nested structure and capture ID
                 if (performerValue.id) {
-                  processed.performerId = performerValue.id;
+                  performer.id = performerValue.id;
                 }
                 performerValue.properties.forEach(performerProperty => {
                   if (performerProperty.id === 'name' && performerProperty.values && performerProperty.values.length > 0) {
                     const nameValue = extractBestLanguageValue(performerProperty.values);
                     if (nameValue) {
-                      processed.performerName = nameValue;
+                      performer.name = nameValue;
                     }
                   }
                 });
@@ -483,14 +487,28 @@ export function processExtendedData(extendedData, properties) {
                 // Non-expanded performer - extract direct value or name
                 const performerName = performerValue.str || performerValue.id || performerValue.name || '';
                 if (performerName) {
-                  processed.performerName = performerName;
+                  performer.name = performerName;
                 }
                 // If we have an ID, capture it
                 if (performerValue.id) {
-                  processed.performerId = performerValue.id;
+                  performer.id = performerValue.id;
                 }
               }
+
+              // Only add performer if we have at least a name or ID
+              if (performer.name || performer.id) {
+                performers.push(performer);
+              }
             });
+
+            // Store performers array for proper name-ID pairing
+            if (performers.length > 0) {
+              processed.performers = performers;
+              // Also keep the comma-separated names for backward compatibility
+              processed.performerName = performers.map(p => p.name || p.id).join(', ');
+              // Keep first performer ID for backward compatibility
+              processed.performerId = performers[0].id || '';
+            }
           } else if (propertyConfig.type === 'organizer' && propertyId === 'organizer') {
             // For organizer, extract name from nested structure (if expanded) or direct value
             propertyData.values.forEach(organizerValue => {
