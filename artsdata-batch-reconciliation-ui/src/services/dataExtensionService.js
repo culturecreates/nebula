@@ -265,8 +265,7 @@ export async function extendEntities(entityIds, properties, config = {}) {
  */
 export function processExtendedData(extendedData, properties) {
   const processedData = {};
-  
-  
+
   if (!extendedData || !extendedData.rows || !Array.isArray(extendedData.rows)) {
     return processedData;
   }
@@ -296,7 +295,7 @@ export function processExtendedData(extendedData, properties) {
     if (entityRow.properties && Array.isArray(entityRow.properties)) {
       entityRow.properties.forEach(propertyData => {
         const propertyId = propertyData.id;
-        
+
         // Find the matching property configuration to get the type
         const propertyConfig = properties.find(p => p.id === propertyId);
         if (!propertyConfig) {
@@ -383,8 +382,14 @@ export function processExtendedData(extendedData, properties) {
             propertyData.values.forEach(locationValue => {
               // Since location is not expanded, we get the location entity ID/URI directly
               const locationRef = locationValue.str || locationValue.id || '';
-              if (locationRef && locationRef.includes('kg.artsdata.ca')) {
-                processed.locationArtsdataUri = locationRef;
+              if (locationRef) {
+                // Handle both full URIs and K-numbers
+                if (locationRef.includes('kg.artsdata.ca')) {
+                  processed.locationArtsdataUri = locationRef;
+                } else if (locationRef.match(/^K\d+-\d+$/)) {
+                  // Convert K-number to full URI
+                  processed.locationArtsdataUri = `http://kg.artsdata.ca/resource/${locationRef}`;
+                }
               }
               // If there's a name property directly on the location value
               if (locationValue.name) {
@@ -468,7 +473,7 @@ export function processExtendedData(extendedData, properties) {
         }
       });
     }
-    
+
     processedData[entityId] = processed;
   });
   
@@ -735,7 +740,7 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
       };
       return enriched;
     });
-    
+
     return enrichedCandidates;
     
   } catch (error) {
