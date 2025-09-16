@@ -13,6 +13,34 @@ const propertiesCache = new Map();
 const targetPropertiesCache = new Map();
 
 /**
+ * Extract the best language value from property values array
+ * Prioritizes 'en' (English) first, then any other available value
+ * @param {Array} values - Array of value objects with str and optional lang properties
+ * @returns {string} - Best available string value
+ */
+function extractBestLanguageValue(values) {
+  if (!values || !Array.isArray(values) || values.length === 0) {
+    return '';
+  }
+
+  // First, try to find English value
+  const englishValue = values.find(value => value.lang === 'en');
+  if (englishValue && englishValue.str) {
+    return englishValue.str;
+  }
+
+  // If no English, try to find any value with a string
+  const anyValue = values.find(value => value.str);
+  if (anyValue && anyValue.str) {
+    return anyValue.str;
+  }
+
+  // Fallback to first value's str or id
+  const firstValue = values[0];
+  return firstValue.str || firstValue.id || '';
+}
+
+/**
  * Get available properties for a given entity type using the extend/propose API
  * Uses caching to avoid multiple API calls for the same entity type
  * @param {string} entityType - Entity type (Place, Organization, Event, Person)
@@ -274,6 +302,7 @@ export function processExtendedData(extendedData, properties) {
   extendedData.rows.forEach(entityRow => {
     const entityId = entityRow.id;
     const processed = {
+      name: null,
       isni: null,
       wikidata: null,
       url: null,
@@ -288,6 +317,7 @@ export function processExtendedData(extendedData, properties) {
       eventAttendanceMode: null,
       offerUrl: null,
       performerName: null,
+      performerId: null,
       organizerName: null
     };
     
@@ -304,8 +334,14 @@ export function processExtendedData(extendedData, properties) {
         
         
         if (propertyData.values && Array.isArray(propertyData.values) && propertyData.values.length > 0) {
-          
-          if (propertyConfig.type === 'url') {
+
+          if (propertyConfig.type === 'name' || propertyId === 'name') {
+            // For name, extract the best language value (prioritize 'en')
+            const stringValue = extractBestLanguageValue(propertyData.values);
+            if (stringValue) {
+              processed.name = stringValue;
+            }
+          } else if (propertyConfig.type === 'url') {
             // For URL, take the first value
             const value = propertyData.values[0];
             const stringValue = value.str || value.id || '';
@@ -428,13 +464,16 @@ export function processExtendedData(extendedData, properties) {
               }
             });
           } else if (propertyConfig.type === 'performer' && propertyId === 'performer') {
-            // For performer, extract name from nested structure (if expanded) or direct value
+            // For performer, extract name and ID from nested structure (if expanded) or direct value
             propertyData.values.forEach(performerValue => {
               if (performerValue.properties && Array.isArray(performerValue.properties)) {
-                // Expanded performer - extract name from nested structure
+                // Expanded performer - extract name from nested structure and capture ID
+                if (performerValue.id) {
+                  processed.performerId = performerValue.id;
+                }
                 performerValue.properties.forEach(performerProperty => {
                   if (performerProperty.id === 'name' && performerProperty.values && performerProperty.values.length > 0) {
-                    const nameValue = performerProperty.values[0].str || performerProperty.values[0].id || '';
+                    const nameValue = extractBestLanguageValue(performerProperty.values);
                     if (nameValue) {
                       processed.performerName = nameValue;
                     }
@@ -446,6 +485,10 @@ export function processExtendedData(extendedData, properties) {
                 if (performerName) {
                   processed.performerName = performerName;
                 }
+                // If we have an ID, capture it
+                if (performerValue.id) {
+                  processed.performerId = performerValue.id;
+                }
               }
             });
           } else if (propertyConfig.type === 'organizer' && propertyId === 'organizer') {
@@ -455,7 +498,7 @@ export function processExtendedData(extendedData, properties) {
                 // Expanded organizer - extract name from nested structure
                 organizerValue.properties.forEach(organizerProperty => {
                   if (organizerProperty.id === 'name' && organizerProperty.values && organizerProperty.values.length > 0) {
-                    const nameValue = organizerProperty.values[0].str || organizerProperty.values[0].id || '';
+                    const nameValue = extractBestLanguageValue(organizerProperty.values);
                     if (nameValue) {
                       processed.organizerName = nameValue;
                     }
@@ -717,7 +760,7 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     
     
     // Merge extended data with candidates
-    const enrichedCandidates = candidates.map(candidate => {
+    let enrichedCandidates = candidates.map(candidate => {
       const extendedInfo = processedExtension[candidate.id] || {};
       const enriched = {
         ...candidate,
@@ -736,10 +779,16 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         eventAttendanceMode: extendedInfo.eventAttendanceMode || candidate.eventAttendanceMode || '',
         offerUrl: extendedInfo.offerUrl || candidate.offerUrl || '',
         performerName: extendedInfo.performerName || candidate.performerName || '',
+        performerId: extendedInfo.performerId || candidate.performerId || '',
         organizerName: extendedInfo.organizerName || candidate.organizerName || ''
       };
       return enriched;
     });
+
+    // For Event entities, make a second extend call to get location details
+    if (entityType === 'Event') {
+      enrichedCandidates = await enrichEventLocations(enrichedCandidates, config);
+    }
 
     return enrichedCandidates;
     
@@ -747,5 +796,76 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     console.error('Error enriching match candidates:', error);
     // Return original candidates if enrichment fails
     return candidates;
+  }
+}
+
+/**
+ * Enrich Event candidates with location details by making a second extend API call
+ * @param {Array} candidates - Event candidates with locationArtsdataUri
+ * @param {Object} config - Configuration object with endpoints
+ * @returns {Promise<Array>} - Event candidates enriched with location names
+ */
+async function enrichEventLocations(candidates, config = {}) {
+  try {
+    // Collect all unique location IDs from Event candidates
+    const locationIds = [];
+    candidates.forEach(candidate => {
+      if (candidate.locationArtsdataUri) {
+        // Extract K-number from URI (e.g., "http://kg.artsdata.ca/resource/K2-197" -> "K2-197")
+        const kNumber = candidate.locationArtsdataUri.split('/').pop();
+        if (kNumber && kNumber.match(/^K\d+-\d+$/)) {
+          locationIds.push(kNumber);
+        }
+      }
+    });
+
+    // Remove duplicates
+    const uniqueLocationIds = [...new Set(locationIds)];
+
+    if (uniqueLocationIds.length === 0) {
+      return candidates; // No locations to enrich
+    }
+
+    // Get Place properties for location details
+    const placeProperties = await getAvailableProperties('Place', config);
+    const placePropertiesArray = Array.isArray(placeProperties) ?
+      placeProperties :
+      (placeProperties.properties || placeProperties);
+
+    // Filter for basic Place properties we need (name)
+    const targetPlaceProperties = placePropertiesArray.filter(property => {
+      const id = property.id ? property.id.toLowerCase() : '';
+      const name = property.name ? property.name.toLowerCase() : '';
+      return id === 'name' || name === 'name';
+    });
+
+    if (targetPlaceProperties.length === 0) {
+      return candidates; // No name property available for Places
+    }
+
+    // Make extend API call for location details
+    const locationExtendedData = await extendEntities(uniqueLocationIds, targetPlaceProperties, config);
+    const processedLocationData = processExtendedData(locationExtendedData, targetPlaceProperties);
+
+    // Merge location names back into Event candidates
+    const enrichedCandidates = candidates.map(candidate => {
+      if (candidate.locationArtsdataUri) {
+        const kNumber = candidate.locationArtsdataUri.split('/').pop();
+        const locationInfo = processedLocationData[kNumber];
+        if (locationInfo && locationInfo.name) {
+          return {
+            ...candidate,
+            locationName: locationInfo.name
+          };
+        }
+      }
+      return candidate;
+    });
+
+    return enrichedCandidates;
+
+  } catch (error) {
+    console.error('Error enriching Event locations:', error);
+    return candidates; // Return original candidates if location enrichment fails
   }
 }

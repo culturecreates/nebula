@@ -259,7 +259,8 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 eventStatus: enrichedCandidate.eventStatus || originalCandidate.eventStatus || '',
                 eventAttendanceMode: enrichedCandidate.eventAttendanceMode || originalCandidate.eventAttendanceMode || '',
                 offerUrl: enrichedCandidate.offerUrl || originalCandidate.offerUrl || '',
-                performerName: enrichedCandidate.performerName || originalCandidate.performerName || ''
+                performerName: enrichedCandidate.performerName || originalCandidate.performerName || '',
+                performerId: enrichedCandidate.performerId || originalCandidate.performerId || ''
               };
 
               data.results[position.resultIndex].candidates[position.candidateIndex] = mergedCandidate;
@@ -508,6 +509,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         eventAttendanceMode: candidate.eventAttendanceMode || '',
         offerUrl: candidate.offerUrl || '',
         performerName: candidate.performerName || '',
+        performerId: candidate.performerId || '',
         organizerName: candidate.organizerName || ''
       };
     });
