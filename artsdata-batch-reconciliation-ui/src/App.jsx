@@ -19,6 +19,7 @@ import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity, getRef
 import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper function to sort entities by priority: auto-selected first, then needs-judgment, then reconciled
+// Secondary sort: alphabetical by name within each priority group
 function sortEntitiesByPriority(entities, globalJudgments) {
   return entities.slice().sort((a, b) => {
     const statusA = getCurrentItemStatus(a, globalJudgments);
@@ -47,9 +48,24 @@ function sortEntitiesByPriority(entities, globalJudgments) {
       // Auto-selected entities come before manually selected ones
       if (isAutoSelectedA && !isAutoSelectedB) return -1;
       if (!isAutoSelectedA && isAutoSelectedB) return 1;
+
+      // If both have same auto-selection status, sort alphabetically by name
+      if (isAutoSelectedA === isAutoSelectedB) {
+        const nameA = (a.name || '').toLowerCase();
+        const nameB = (b.name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      }
     }
 
-    return priorityA - priorityB;
+    // If priorities are different, use priority order
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+
+    // If same priority but different statuses, sort alphabetically by name
+    const nameA = (a.name || '').toLowerCase();
+    const nameB = (b.name || '').toLowerCase();
+    return nameA.localeCompare(nameB);
   });
 }
 
