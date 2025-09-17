@@ -231,7 +231,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         
         if (allCandidates.length > 0) {
           const enrichedCandidates = await enrichMatchCandidates(allCandidates, extensionEntityType, config);
-          
+
           // Map enriched candidates back to ALL their positions (handles duplicates)
           enrichedCandidates.forEach((enrichedCandidate, enrichedIndex) => {
             // Find ALL positions where this entity ID appears
@@ -259,8 +259,6 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 eventStatus: enrichedCandidate.eventStatus || originalCandidate.eventStatus || '',
                 eventAttendanceMode: enrichedCandidate.eventAttendanceMode || originalCandidate.eventAttendanceMode || '',
                 offerUrl: enrichedCandidate.offerUrl || originalCandidate.offerUrl || '',
-                performerName: enrichedCandidate.performerName || originalCandidate.performerName || '',
-                performerId: enrichedCandidate.performerId || originalCandidate.performerId || '',
                 performers: enrichedCandidate.performers || originalCandidate.performers || []
               };
 
@@ -509,8 +507,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         eventStatus: candidate.eventStatus || '',
         eventAttendanceMode: candidate.eventAttendanceMode || '',
         offerUrl: candidate.offerUrl || '',
-        performerName: candidate.performerName || '',
-        performerId: candidate.performerId || '',
+        performers: candidate.performers || [],
         organizerName: candidate.organizerName || ''
       };
     });

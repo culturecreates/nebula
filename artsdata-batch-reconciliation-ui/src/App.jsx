@@ -140,7 +140,10 @@ function filterItems(items, filterText, globalJudgments) {
       item.eventStatus,
       item.eventAttendanceMode,
       item.offerUrl,
-      item.performerName
+      item.performerName, // Legacy field for backward compatibility
+      // Performers array - search through performer names and IDs
+      ...(item.performers && Array.isArray(item.performers) ?
+          item.performers.map(p => p.name || p.id).filter(Boolean) : [])
     ];
     
     // Check parent entity fields
@@ -179,7 +182,10 @@ function filterItems(items, filterText, globalJudgments) {
           match.eventStatus,
           match.eventAttendanceMode,
           match.offerUrl,
-          match.performerName,
+          match.performerName, // Legacy field for backward compatibility
+          // Performers array - search through performer names and IDs
+          ...(match.performers && Array.isArray(match.performers) ?
+              match.performers.map(p => p.name || p.id).filter(Boolean) : []),
           // Handle type arrays and objects
           Array.isArray(match.type) ? 
             match.type.map(t => typeof t === 'object' ? (t.id || t.name) : t).join(' ') :

@@ -316,8 +316,7 @@ export function processExtendedData(extendedData, properties) {
       eventStatus: null,
       eventAttendanceMode: null,
       offerUrl: null,
-      performerName: null,
-      performerId: null,
+      performers: [],
       organizerName: null
     };
     
@@ -484,30 +483,23 @@ export function processExtendedData(extendedData, properties) {
                   }
                 });
               } else {
-                // Non-expanded performer - extract direct value or name
-                const performerName = performerValue.str || performerValue.id || performerValue.name || '';
-                if (performerName) {
-                  performer.name = performerName;
-                }
-                // If we have an ID, capture it
+                // Non-expanded performer - use ID as both identifier and fallback name
                 if (performerValue.id) {
                   performer.id = performerValue.id;
+                  // Use name if available, otherwise use ID as name
+                  performer.name = performerValue.str || performerValue.name || performerValue.id;
                 }
               }
 
-              // Only add performer if we have at least a name or ID
-              if (performer.name || performer.id) {
+              // Only add performer if we have an ID (required)
+              if (performer.id) {
                 performers.push(performer);
               }
             });
 
-            // Store performers array for proper name-ID pairing
+            // Store performers array - ID is always required
             if (performers.length > 0) {
               processed.performers = performers;
-              // Also keep the comma-separated names for backward compatibility
-              processed.performerName = performers.map(p => p.name || p.id).join(', ');
-              // Keep first performer ID for backward compatibility
-              processed.performerId = performers[0].id || '';
             }
           } else if (propertyConfig.type === 'organizer' && propertyId === 'organizer') {
             // For organizer, extract name from nested structure (if expanded) or direct value
@@ -796,8 +788,7 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         eventStatus: extendedInfo.eventStatus || candidate.eventStatus || '',
         eventAttendanceMode: extendedInfo.eventAttendanceMode || candidate.eventAttendanceMode || '',
         offerUrl: extendedInfo.offerUrl || candidate.offerUrl || '',
-        performerName: extendedInfo.performerName || candidate.performerName || '',
-        performerId: extendedInfo.performerId || candidate.performerId || '',
+        performers: extendedInfo.performers || candidate.performers || [],
         organizerName: extendedInfo.organizerName || candidate.organizerName || ''
       };
       return enriched;
