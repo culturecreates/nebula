@@ -18,6 +18,41 @@ import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity, getReferenceUri } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
+// Helper function to sort entities by priority: auto-selected first, then needs-judgment, then reconciled
+function sortEntitiesByPriority(entities, globalJudgments) {
+  return entities.slice().sort((a, b) => {
+    const statusA = getCurrentItemStatus(a, globalJudgments);
+    const statusB = getCurrentItemStatus(b, globalJudgments);
+
+    // Define priority order (lower number = higher priority)
+    const priorityOrder = {
+      'judgment-ready': 1,    // Auto-selected entities (highest priority)
+      'needs-judgment': 2,    // Entities needing user decision
+      'reconciled': 3,        // Already reconciled entities (lowest priority when showAll is true)
+      'mint-ready': 2,        // Treat mint-ready same as needs-judgment
+      'flagged': 2,           // Treat flagged same as needs-judgment
+      'flagged-complete': 2,  // Treat flagged-complete same as needs-judgment
+      'mint-error': 2,        // Treat errors same as needs-judgment
+      'link-error': 2         // Treat errors same as needs-judgment
+    };
+
+    const priorityA = priorityOrder[statusA] || 999;
+    const priorityB = priorityOrder[statusB] || 999;
+
+    // For items with same priority, check if judgment-ready is auto-selected vs manual
+    if (priorityA === priorityB && statusA === 'judgment-ready' && statusB === 'judgment-ready') {
+      const isAutoSelectedA = a.hasAutoMatch && !globalJudgments.has(a.id);
+      const isAutoSelectedB = b.hasAutoMatch && !globalJudgments.has(b.id);
+
+      // Auto-selected entities come before manually selected ones
+      if (isAutoSelectedA && !isAutoSelectedB) return -1;
+      if (!isAutoSelectedA && isAutoSelectedB) return 1;
+    }
+
+    return priorityA - priorityB;
+  });
+}
+
 // Helper function to calculate current item status (matches TableRow.jsx logic exactly)
 function getCurrentItemStatus(item, globalJudgments) {
   if (item.status === 'reconciled' || item.status === 'flagged') {
@@ -266,6 +301,9 @@ const App = ({ config }) => {
   // Global judgment storage across all pages
   const [globalJudgments, setGlobalJudgments] = useState(new Map());
 
+  // Flag to track if this is initial load (for sorting) vs user interaction (preserve order)
+  const [isInitialSort, setIsInitialSort] = useState(true);
+
   // Add request sequence tracking to prevent race conditions
   const [requestSequence, setRequestSequence] = useState(0);
   const [abortController, setAbortController] = useState(null);
@@ -374,6 +412,9 @@ const App = ({ config }) => {
     setLoading(true);
     setError(null);
     setReconciliationStatus('idle');
+
+    // Reset sorting flag for new data load - enables initial sorting after reconciliation
+    setIsInitialSort(true);
     
     try {
       // Determine API limit based on showAll toggle
@@ -523,7 +564,7 @@ const App = ({ config }) => {
           // Don't merge with previous state - replace the current items
           setReconciledItems(prev => {
             // Only update items that exist in the current data set
-            return prev.map(item => {
+            let updatedItems = prev.map(item => {
               const reconciledItem = reconciled.find(r => r.id === item.id);
               if (reconciledItem) {
                 // Ensure enriched match candidates are properly merged
@@ -536,6 +577,14 @@ const App = ({ config }) => {
               }
               return item;
             });
+
+            // Apply initial sorting only if this is the first reconciliation after data load
+            if (isInitialSort) {
+              updatedItems = sortEntitiesByPriority(updatedItems, globalJudgments);
+              setIsInitialSort(false); // Disable sorting for subsequent updates
+            }
+
+            return updatedItems;
           });
         }
         
@@ -866,6 +915,9 @@ const App = ({ config }) => {
   const handleAction = async (itemId, action, matchCandidate = null, selectedType = null) => {
     const item = reconciledItems.find(item => item.id === itemId);
     if (!item) return;
+
+    // Disable sorting for subsequent updates - user is making manual interactions
+    setIsInitialSort(false);
 
     try {
       let updateData = {};
