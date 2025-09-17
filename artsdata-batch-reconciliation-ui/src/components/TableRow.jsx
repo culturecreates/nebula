@@ -619,29 +619,12 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       {item.type?.toLowerCase().includes('event') && (
                         <td className="text-nowrap">
                           {match.performers && match.performers.length > 0 ? (
-                            // Use performers array when available (from extend API)
+                            // Use performers array - always link with ID, display name or fallback to ID
                             match.performers.map((performer, index) => (
                               <div key={index}>
-                                {performer.id ? (
-                                  <a href={getArtsdataEntityUrl(`http://kg.artsdata.ca/resource/${performer.id}`, config)} target="_blank" rel="noopener noreferrer">
-                                    {performer.name || performer.id}
-                                  </a>
-                                ) : (
-                                  performer.name || performer.id
-                                )}
-                              </div>
-                            ))
-                          ) : match.performerName ? (
-                            // Fallback to comma-separated string format
-                            match.performerName.split(',').map((performer, index) => (
-                              <div key={index}>
-                                {match.performerId && index === 0 ? (
-                                  <a href={getArtsdataEntityUrl(`http://kg.artsdata.ca/resource/${match.performerId}`, config)} target="_blank" rel="noopener noreferrer">
-                                    {performer.trim()}
-                                  </a>
-                                ) : (
-                                  performer.trim()
-                                )}
+                                <a href={getArtsdataEntityUrl(`http://kg.artsdata.ca/resource/${performer.id}`, config)} target="_blank" rel="noopener noreferrer">
+                                  {performer.name || performer.id}
+                                </a>
                               </div>
                             ))
                           ) : ''}
