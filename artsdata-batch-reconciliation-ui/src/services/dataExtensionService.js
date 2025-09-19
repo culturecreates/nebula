@@ -51,15 +51,15 @@ export async function getAvailableProperties(entityType, config = {}) {
   // Create cache key including endpoint to handle different configs
   const reconciliationBaseUrl = config.reconciliationEndpoint || DEFAULT_RECONCILIATION_BASE_URL;
   const cacheKey = `${reconciliationBaseUrl}:${entityType}`;
-  
+
   // Return cached result if available
   if (propertiesCache.has(cacheKey)) {
     return propertiesCache.get(cacheKey);
   }
-  
+
   try {
     const url = `${reconciliationBaseUrl}/extend/propose?type=${entityType}`;
-    
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -68,17 +68,41 @@ export async function getAvailableProperties(entityType, config = {}) {
     });
 
     if (!response.ok) {
+      // Handle HTTP 400 "Invalid entity type" specifically
+      if (response.status === 400) {
+        console.warn(`Invalid entity type "${entityType}" - API returned 400. Attempting fallback to parent type.`);
+
+        // Try fallback to parent entity type
+        const fallbackType = getFallbackEntityType(entityType);
+        if (fallbackType && fallbackType !== entityType) {
+          console.info(`Falling back from "${entityType}" to "${fallbackType}" for property discovery.`);
+          return await getAvailableProperties(fallbackType, config);
+        } else {
+          // No fallback available, cache empty result to avoid repeated API calls
+          console.warn(`No fallback available for entity type "${entityType}". Caching empty result.`);
+          propertiesCache.set(cacheKey, []);
+          return [];
+        }
+      }
+
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    
+
     // Cache the result
     propertiesCache.set(cacheKey, data);
-    
+
     return data;
   } catch (error) {
-    console.error('Error getting available properties:', error);
+    // For non-400 errors, log and cache empty result to prevent blocking other types
+    if (error.message && !error.message.includes('status: 400')) {
+      console.error(`Error getting available properties for type "${entityType}":`, error);
+      console.warn(`Caching empty result for "${entityType}" to prevent blocking other entity types.`);
+      propertiesCache.set(cacheKey, []);
+      return [];
+    }
+
     throw error;
   }
 }
@@ -646,6 +670,83 @@ export function getEntityTypeFromUrl(typeUrl) {
   );
 
   return found || '';
+}
+
+/**
+ * Get fallback entity type for unknown types (attempts to find parent type)
+ * @param {string} entityType - The entity type that failed
+ * @returns {string} - Fallback entity type or empty string if no fallback available
+ */
+export function getFallbackEntityType(entityType) {
+  if (!entityType) return '';
+
+  const typeLower = entityType.toLowerCase();
+
+  // Map unknown subtypes to known parent types
+  const fallbackMapping = {
+    // Organization subtypes
+    'performinggroup': 'Organization',
+    'musicgroup': 'Organization',
+    'corporation': 'Organization',
+    'educationalorganization': 'Organization',
+    'governmentorganization': 'Organization',
+    'nonprofit': 'Organization',
+    'company': 'Organization',
+    'business': 'Organization',
+
+    // Person subtypes
+    'artist': 'Person',
+    'musician': 'Person',
+    'actor': 'Person',
+    'author': 'Person',
+
+    // Event subtypes
+    'musicalevent': 'Event',
+    'theaterevent': 'Event',
+    'visualartsevent': 'Event',
+    'educationevent': 'Event',
+    'festival': 'Event',
+    'concert': 'Event',
+    'performance': 'Event',
+
+    // Place subtypes
+    'culturalsite': 'Place',
+    'museum': 'Place',
+    'theater': 'Place',
+    'musicvenue': 'Place',
+    'venue': 'Place',
+    'building': 'Place',
+
+    // Agent subtypes
+    'softwareagent': 'Agent',
+    'bot': 'Agent'
+  };
+
+  // Check direct mapping first
+  const directFallback = fallbackMapping[typeLower];
+  if (directFallback) {
+    return directFallback;
+  }
+
+  // Try pattern matching for types containing known keywords
+  if (typeLower.includes('organization') || typeLower.includes('group') || typeLower.includes('company')) {
+    return 'Organization';
+  }
+  if (typeLower.includes('person') || typeLower.includes('artist') || typeLower.includes('musician')) {
+    return 'Person';
+  }
+  if (typeLower.includes('event') || typeLower.includes('festival') || typeLower.includes('concert')) {
+    return 'Event';
+  }
+  if (typeLower.includes('place') || typeLower.includes('venue') || typeLower.includes('site')) {
+    return 'Place';
+  }
+  if (typeLower.includes('agent')) {
+    return 'Agent';
+  }
+
+  // No fallback available
+  return '';
 }
 
 /**
