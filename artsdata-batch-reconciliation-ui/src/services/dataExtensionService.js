@@ -618,20 +618,33 @@ function extractWikidataId(uri) {
  */
 export function getEntityTypeFromUrl(typeUrl) {
   if (!typeUrl) return '';
-  
+
   const typeMatch = typeUrl.match(/schema\.org\/(\w+)$/i);
   if (typeMatch) {
     const typeName = typeMatch[1];
     // Capitalize first letter
-    return typeName.charAt(0).toUpperCase() + typeName.slice(1);
+    const capitalizedType = typeName.charAt(0).toUpperCase() + typeName.slice(1);
+
+    // Handle PerformingGroup as Organization subtype
+    if (capitalizedType === 'PerformingGroup') {
+      return 'Organization';
+    }
+
+    return capitalizedType;
   }
-  
+
   // Handle direct type names
   const directTypes = ['Event', 'Person', 'Organization', 'Place', 'Agent'];
-  const found = directTypes.find(type => 
+
+  // Check for PerformingGroup specifically
+  if (typeUrl.toLowerCase().includes('performinggroup')) {
+    return 'Organization';
+  }
+
+  const found = directTypes.find(type =>
     typeUrl.toLowerCase().includes(type.toLowerCase())
   );
-  
+
   return found || '';
 }
 
@@ -739,39 +752,85 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     if (!candidates || candidates.length === 0) {
       return candidates;
     }
-    
-    // Get properties specific to the entity type being processed
-    const availableProperties = await getAvailableProperties(entityType, config);
 
-    // Handle the response format - it might be {type: "Event", properties: [...]}
-    const propertiesArray = Array.isArray(availableProperties) ?
-      availableProperties :
-      (availableProperties.properties || availableProperties);
+    // Group candidates by their individual types
+    const candidatesByType = new Map();
+    const candidatePositions = [];
 
-    const targetProperties = filterTargetProperties(propertiesArray, entityType, config);
+    candidates.forEach((candidate, index) => {
+      // Determine candidate's specific type
+      let candidateEntityType = '';
 
-    if (targetProperties.length === 0) {
-      return candidates;
+      if (candidate.type) {
+        if (Array.isArray(candidate.type)) {
+          // Handle array of types - use first one
+          const firstType = candidate.type[0];
+          candidateEntityType = getEntityTypeFromUrl(typeof firstType === 'string' ? firstType : firstType.id);
+        } else if (typeof candidate.type === 'string') {
+          candidateEntityType = getEntityTypeFromUrl(candidate.type);
+        } else if (candidate.type.id) {
+          candidateEntityType = getEntityTypeFromUrl(candidate.type.id);
+        }
+      }
+
+      // Fallback to the main entity type if we can't determine candidate type
+      if (!candidateEntityType) {
+        candidateEntityType = entityType;
+      }
+
+      // Track candidate positions for mapping enriched data back
+      candidatePositions.push({
+        index: index,
+        entityId: candidate.id,
+        entityType: candidateEntityType
+      });
+
+      // Group candidates by type
+      if (!candidatesByType.has(candidateEntityType)) {
+        candidatesByType.set(candidateEntityType, []);
+      }
+      candidatesByType.get(candidateEntityType).push(candidate.id);
+    });
+
+    // Process each type group separately
+    const enrichedDataByType = new Map();
+
+    for (const [candidateType, entityIds] of candidatesByType) {
+      try {
+        // Get properties specific to this candidate type
+        const availableProperties = await getAvailableProperties(candidateType, config);
+
+        // Handle the response format - it might be {type: "Event", properties: [...]}
+        const propertiesArray = Array.isArray(availableProperties) ?
+          availableProperties :
+          (availableProperties.properties || availableProperties);
+
+        const targetProperties = filterTargetProperties(propertiesArray, candidateType, config);
+
+        if (targetProperties.length > 0) {
+          // Remove duplicates for this type group
+          const uniqueEntityIds = deduplicateEntityIds(entityIds);
+
+          if (uniqueEntityIds.length > 0) {
+            // Extend entities with type-specific properties
+            const extendedData = await extendEntities(uniqueEntityIds, targetProperties, config);
+            const processedExtension = processExtendedData(extendedData, targetProperties);
+
+            enrichedDataByType.set(candidateType, processedExtension);
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing type ${candidateType}:`, error);
+        // Continue with other types even if one fails
+      }
     }
-    
-    
-    // Extract entity IDs from candidates and remove duplicates
-    const entityIds = candidates.map(candidate => candidate.id).filter(id => id);
-    const uniqueEntityIds = deduplicateEntityIds(entityIds);
-    
-    if (uniqueEntityIds.length === 0) {
-      return candidates;
-    }
-    
-    
-    // Extend entities with target properties using deduplicated IDs
-    const extendedData = await extendEntities(uniqueEntityIds, targetProperties, config);
-    const processedExtension = processExtendedData(extendedData, targetProperties);
-    
-    
-    // Merge extended data with candidates
-    let enrichedCandidates = candidates.map(candidate => {
-      const extendedInfo = processedExtension[candidate.id] || {};
+
+    // Merge enriched data back to candidates based on their positions
+    let enrichedCandidates = candidates.map((candidate, index) => {
+      const position = candidatePositions[index];
+      const enrichedData = enrichedDataByType.get(position.entityType);
+      const extendedInfo = enrichedData?.[position.entityId] || {};
+
       const enriched = {
         ...candidate,
         // Add extended properties while preserving existing ones
@@ -795,12 +854,12 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
     });
 
     // For Event entities, make a second extend call to get location details
-    if (entityType === 'Event') {
+    if (entityType === 'Event' || candidatesByType.has('Event')) {
       enrichedCandidates = await enrichEventLocations(enrichedCandidates, config);
     }
 
     return enrichedCandidates;
-    
+
   } catch (error) {
     console.error('Error enriching match candidates:', error);
     // Return original candidates if enrichment fails
