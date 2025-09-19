@@ -35,16 +35,23 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     
     const reconciliationType = getReconciliationType(entityType);
     
-    // Build queries for batch reconciliation
-    const queries = entities.map(entity => {
-      const conditions = [
-        {
+    // Build queries for batch reconciliation, tracking which entities have valid conditions
+    const entityToQueryMap = new Map(); // Maps entity index to query index
+    const queries = [];
+
+    entities.forEach((entity, entityIndex) => {
+      const conditions = [];
+
+      // Only add name condition if there's a valid name or artsdataUri
+      const nameValue = entity.artsdataUri && entity.artsdataUri.trim() !== '' ? entity.artsdataUri : entity.name;
+      if (nameValue && nameValue.trim() !== '') {
+        conditions.push({
           matchType: "name",
-          propertyValue: entity.artsdataUri && entity.artsdataUri.trim() !== '' ? entity.artsdataUri : entity.name,
+          propertyValue: nameValue,
           required: true,
           matchQuantifier: "any"
-        }
-      ];
+        });
+      }
       
       // Add URL as separate property
       if (entity.url && entity.url.trim() !== '') {
@@ -185,12 +192,16 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
           });
         }
       }
-      
-      return {
-        conditions,
-        type: reconciliationType,
-        limit: 10 // Limit candidates per entity
-      };
+
+      // Only add query if there are valid conditions
+      if (conditions.length > 0) {
+        entityToQueryMap.set(entityIndex, queries.length);
+        queries.push({
+          conditions,
+          type: reconciliationType,
+          limit: 10 // Limit candidates per entity
+        });
+      }
     });
 
 
@@ -273,7 +284,11 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
       }
     }
 
-    return data;
+    // Return data with mapping information for proper result processing
+    return {
+      ...data,
+      entityToQueryMap // Include mapping for processReconciliationResults
+    };
   } catch (error) {
     console.error('Error getting match candidates:', error);
     throw error;
@@ -442,10 +457,11 @@ export async function flagEntity(uri, config = {}) {
  * @returns {Array} - Transformed entities with match candidates
  */
 export function processReconciliationResults(reconciliationResults, originalEntities) {
-  
+
   // Handle the actual API response format
   const results = reconciliationResults?.results || [];
-  
+  const entityToQueryMap = reconciliationResults?.entityToQueryMap || new Map();
+
   if (!results || !Array.isArray(results)) {
     return originalEntities.map(entity => ({
       ...entity,
@@ -455,8 +471,10 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     }));
   }
 
-  return originalEntities.map((entity, index) => {
-    const result = results[index] || {};
+  return originalEntities.map((entity, entityIndex) => {
+    // Use mapping to get correct result index, or default to empty if no query was sent
+    const queryIndex = entityToQueryMap.get(entityIndex);
+    const result = queryIndex !== undefined ? (results[queryIndex] || {}) : {};
     const candidates = result.candidates || [];
     
     
