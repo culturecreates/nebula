@@ -90,38 +90,39 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
     if (item.status === 'reconciled' || item.status === 'flagged') {
       return item.status;
     }
-    
+
     if (item.mintError) {
       return 'mint-error';
     }
-    
+
     if (item.linkError) {
       return 'link-error';
     }
-    
+
     if (selectedMatch) {
       return 'judgment-ready';
     }
-    
+
     if (item.mintReady) {
       return 'mint-ready';
     }
-    
-    if (item.status === 'flagged-complete') {
-      return item.status;
+
+    // Priority: Check flagged status BEFORE checking for auto-matches
+    if (item.status === 'flagged-complete' || item.isFlaggedForReview) {
+      return 'flagged-complete';
     }
-    
+
     // Check if there's a single true match (and it hasn't been reset)
     const trueMatches = item.matches?.filter(match => match.match === true) || [];
     if (trueMatches.length === 1 && item.hasAutoMatch !== false) {
       return 'judgment-ready';
     }
-    
+
     // Check if there are multiple matches requiring judgment
     if (item.matches && item.matches.length > 0) {
       return 'needs-judgment';
     }
-    
+
     return 'needs-judgment';
   };
 

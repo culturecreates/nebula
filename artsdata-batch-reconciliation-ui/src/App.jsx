@@ -74,35 +74,36 @@ function getCurrentItemStatus(item, globalJudgments) {
   if (item.status === 'reconciled' || item.status === 'flagged') {
     return item.status;
   }
-  
+
   if (item.mintError) {
     return 'mint-error';
   }
-  
+
   if (item.linkError) {
     return 'link-error';
   }
-  
+
   // Check if there's a selected match in global judgments
   const judgment = globalJudgments.get(item.id);
   if (judgment && judgment.selectedMatch) {
     return 'judgment-ready';
   }
-  
+
   if (item.mintReady) {
     return 'mint-ready';
   }
-  
-  if (item.status === 'flagged-complete') {
-    return item.status;
+
+  // Priority: Check flagged status BEFORE checking for auto-matches
+  if (item.status === 'flagged-complete' || item.isFlaggedForReview) {
+    return 'flagged-complete';
   }
-  
+
   // Check if there's a single true match (and it hasn't been reset)
   const trueMatches = item.matches?.filter(match => match.match === true) || [];
   if (trueMatches.length === 1 && item.hasAutoMatch !== false) {
     return 'judgment-ready';
   }
-  
+
   // Default to needs-judgment
   return 'needs-judgment';
 }
@@ -1396,12 +1397,17 @@ const App = ({ config }) => {
       if (globalJudgments.has(item.id)) {
         return true;
       }
-      
+
       // Hide pre-reconciled entities (entities that were already reconciled when loaded)
       if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) {
         return false;
       }
-      
+
+      // Hide flagged entities (entities flagged for review) when show all is unchecked
+      if (item.status === 'flagged-complete') {
+        return false;
+      }
+
       // Show all other non-reconciled entities
       return true;
     });
