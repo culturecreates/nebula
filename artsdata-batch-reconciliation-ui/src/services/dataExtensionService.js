@@ -627,7 +627,7 @@ export function getEntityTypeFromUrl(typeUrl) {
   }
   
   // Handle direct type names
-  const directTypes = ['Event', 'Person', 'Organization', 'Place'];
+  const directTypes = ['Event', 'Person', 'Organization', 'Place', 'Agent'];
   const found = directTypes.find(type => 
     typeUrl.toLowerCase().includes(type.toLowerCase())
   );
@@ -641,7 +641,7 @@ export function getEntityTypeFromUrl(typeUrl) {
  * @returns {Promise<Object>} - Object with properties for all entity types
  */
 export async function preloadAllEntityTypeProperties(config = {}) {
-  const entityTypes = ['Event', 'Person', 'Organization', 'Place'];
+  const entityTypes = ['Event', 'Person', 'Organization', 'Place', 'Agent'];
   const allProperties = {};
   
   
