@@ -11,9 +11,11 @@ const DEFAULT_API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
  * @param {number} page - Page number (default: 1)
  * @param {number} limit - Number of items per page (default: 20)
  * @param {Object} config - Configuration object with endpoints
+ * @param {AbortSignal} signal - Abort signal for canceling requests
+ * @param {string} region - Optional region filter (2-letter Canadian province/territory code)
  * @returns {Promise<Array>} - Array of transformed data
  */
-export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}, signal = null) {
+export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}, signal = null, region = '') {
   // Use config endpoint or fall back to default
   const apiBaseUrl = config.reconciliationEndpoint ? `${config.reconciliationEndpoint}/extend` : DEFAULT_API_BASE_URL;
   
@@ -24,7 +26,12 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
     }
     
     const encodedGraphUrl = encodeURIComponent(graphUrl);
-    const apiUrl = `${apiBaseUrl}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
+    let apiUrl = `${apiBaseUrl}/${encodedGraphUrl}/${type}?page=${page}&limit=${limit}`;
+
+    // Add region parameter if provided
+    if (region && region.trim() !== '') {
+      apiUrl += `&region=${encodeURIComponent(region)}`;
+    }
     
     
     const response = await fetch(apiUrl, {

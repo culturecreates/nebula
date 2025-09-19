@@ -1,14 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { validateGraphUrl } from '../utils/urlValidation';
 
-const FilterControls = ({ 
-  dataFeed, setDataFeed, type, setType, minScore, setMinScore, showAll, setShowAll,
+// Canadian provinces and territories with 2-letter codes
+const CANADIAN_REGIONS = [
+  { code: '', name: 'All Regions' },
+  { code: 'AB', name: 'Alberta' },
+  { code: 'BC', name: 'British Columbia' },
+  { code: 'MB', name: 'Manitoba' },
+  { code: 'NB', name: 'New Brunswick' },
+  { code: 'NL', name: 'Newfoundland and Labrador' },
+  { code: 'NS', name: 'Nova Scotia' },
+  { code: 'ON', name: 'Ontario' },
+  { code: 'PE', name: 'Prince Edward Island' },
+  { code: 'QC', name: 'Quebec' },
+  { code: 'SK', name: 'Saskatchewan' },
+  { code: 'NT', name: 'Northwest Territories' },
+  { code: 'NU', name: 'Nunavut' },
+  { code: 'YT', name: 'Yukon' }
+];
+
+const FilterControls = ({
+  dataFeed, setDataFeed, type, setType, region, setRegion, minScore, setMinScore, showAll, setShowAll,
   filterText, setFilterText, pageSize, setPageSize, loading, error,
   onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch, onShowAllToggle
 }) => {
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
   const [typeInputValue, setTypeInputValue] = useState(type || '');
+  const [regionInputValue, setRegionInputValue] = useState(region || '');
   const [validationTimeout, setValidationTimeout] = useState(null);
 
   // Update input value when dataFeed prop changes
@@ -30,6 +49,13 @@ const FilterControls = ({
       setTypeInputValue(type || '');
     }
   }, [type]);
+
+  // Update region input value when region prop changes
+  useEffect(() => {
+    if (region !== regionInputValue) {
+      setRegionInputValue(region || '');
+    }
+  }, [region]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -77,15 +103,23 @@ const FilterControls = ({
     setTypeInputValue(value);
   };
 
+  // Handle region dropdown change
+  const handleRegionChange = (e) => {
+    const value = e.target.value;
+    setRegionInputValue(value);
+    // Immediately update the parent App component's region state
+    setRegion(value);
+  };
+
   // Handle search button click
   const handleSearchClick = () => {
     // Validate inputs before searching
     const urlValidation = validateGraphUrl(inputValue);
     setValidationWithTimeout(urlValidation);
-    
+
     if (urlValidation.isValid && !urlValidation.isWarning && typeInputValue.trim() !== '') {
       // Call the parent's search handler with current input values
-      onSearch(inputValue.trim(), typeInputValue.trim());
+      onSearch(inputValue.trim(), typeInputValue.trim(), regionInputValue);
     }
   };
 
@@ -148,6 +182,21 @@ const FilterControls = ({
           placeholder="e.g., Event, Person, Organization"
           disabled={loading}
         />
+      </div>
+      <div className="form-group">
+        <label className="form-label">Region</label>
+        <select
+          value={regionInputValue}
+          onChange={handleRegionChange}
+          className="form-input"
+          disabled={loading}
+        >
+          {CANADIAN_REGIONS.map((region) => (
+            <option key={region.code} value={region.code}>
+              {region.code ? `${region.code} - ${region.name}` : region.name}
+            </option>
+          ))}
+        </select>
       </div>
       <div className="search-button-container">
         <button 

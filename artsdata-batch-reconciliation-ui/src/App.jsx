@@ -267,6 +267,7 @@ function filterItems(items, filterText, globalJudgments) {
 const App = ({ config }) => {
   const [dataFeed, setDataFeed] = useState('');
   const [type, setType] = useState("");
+  const [region, setRegion] = useState("");
   const [minScore, setMinScore] = useState(50);
   const [showAll, setShowAll] = useState(false); // Default to false (hide reconciled)
   const [filterText, setFilterText] = useState("");
@@ -331,23 +332,30 @@ const App = ({ config }) => {
     return {
       feedUrl: urlParams.get('feedUrl') || '',
       type: urlParams.get('type') || '',
+      region: urlParams.get('region') || '',
       showAll: urlParams.get('showAll') === 'true', // Convert string to boolean
       filterText: urlParams.get('filterText') || ''
     };
   };
 
-  const updateUrlParams = (feedUrl, type, showAll, filterText) => {
+  const updateUrlParams = (feedUrl, type, region, showAll, filterText) => {
     const url = new URL(window.location);
     if (feedUrl) {
       url.searchParams.set('feedUrl', feedUrl);
     } else {
       url.searchParams.delete('feedUrl');
     }
-    
+
     if (type) {
       url.searchParams.set('type', type);
     } else {
       url.searchParams.delete('type');
+    }
+
+    if (region) {
+      url.searchParams.set('region', region);
+    } else {
+      url.searchParams.delete('region');
     }
     
     if (showAll) {
@@ -370,13 +378,16 @@ const App = ({ config }) => {
   const initializeFromUrlParams = () => {
     const urlParams = getUrlParams();
     
-    if (urlParams.feedUrl || urlParams.type || urlParams.showAll || urlParams.filterText) {
+    if (urlParams.feedUrl || urlParams.type || urlParams.region || urlParams.showAll || urlParams.filterText) {
       // Set the state from URL parameters to populate input fields and controls
       if (urlParams.feedUrl) {
         setDataFeed(urlParams.feedUrl);
       }
       if (urlParams.type) {
         setType(urlParams.type);
+      }
+      if (urlParams.region) {
+        setRegion(urlParams.region);
       }
       if (urlParams.showAll) {
         setShowAll(urlParams.showAll);
@@ -406,13 +417,13 @@ const App = ({ config }) => {
   // Update URL parameters when filterText changes
   useEffect(() => {
     // Only update URL if other parameters are set (avoid updating URL on initial empty state)
-    if (dataFeed || type || showAll || filterText) {
-      updateUrlParams(dataFeed, type, showAll, filterText);
+    if (dataFeed || type || region || showAll || filterText) {
+      updateUrlParams(dataFeed, type, region, showAll, filterText);
     }
   }, [filterText]);
 
   // Internal load function that does the actual API call
-  const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize, currentShowAll) => {
+  const loadDataInternal = async (currentType, currentDataFeed, currentPage, currentPageSize, currentShowAll, currentRegion = '') => {
     // Cancel previous request if it exists
     if (abortController) {
       abortController.abort();
@@ -441,7 +452,7 @@ const App = ({ config }) => {
         apiLimit = 2000;
       }
       
-      const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, apiLimit, config, controller.signal);
+      const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, apiLimit, config, controller.signal, currentRegion);
       
       // Sort API results when showAll is unchecked - non-reconciled first, then reconciled
       let sortedData = data;
@@ -493,7 +504,7 @@ const App = ({ config }) => {
     if (type && type.trim() !== '' && dataFeed && dataFeed.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
-        loadDataInternal(type, dataFeed, currentPage, pageSize, showAll);
+        loadDataInternal(type, dataFeed, currentPage, pageSize, showAll, region);
       }
     }
 
@@ -784,50 +795,51 @@ const App = ({ config }) => {
   };
 
   // Handle search request
-  const handleSearch = (newDataFeed, newType) => {
+  const handleSearch = (newDataFeed, newType, newRegion = '') => {
     const unsavedCount = getUnsavedJudgmentCount();
-    
+
     if (unsavedCount > 0) {
-      setPendingSearch({ dataFeed: newDataFeed, type: newType });
+      setPendingSearch({ dataFeed: newDataFeed, type: newType, region: newRegion });
       setShowSearchConfirm(true);
     } else {
       // No unsaved work, search directly
-      performSearch(newDataFeed, newType);
+      performSearch(newDataFeed, newType, newRegion);
     }
   };
 
-  const performSearch = (newDataFeed, newType) => {
+  const performSearch = (newDataFeed, newType, newRegion = '') => {
     // Clear previous results when performing new search
     setItems([]);
     setReconciledItems([]);
     setGlobalJudgments(new Map());
     setReconciliationStatus('idle');
     setError(null);
-    
+
     // Update URL parameters first
-    updateUrlParams(newDataFeed, newType, showAll, filterText);
-    
+    updateUrlParams(newDataFeed, newType, newRegion, showAll, filterText);
+
     // Update the state variables
     setDataFeed(newDataFeed);
     setType(newType);
+    setRegion(newRegion);
     setCurrentPage(1); // Reset to first page
-    
+
     // Force API call even if values haven't changed (for manual search)
     const validation = validateGraphUrl(newDataFeed);
     if (validation.isValid && !validation.isWarning) {
-      loadDataInternal(newType, newDataFeed, 1, pageSize, showAll);
+      loadDataInternal(newType, newDataFeed, 1, pageSize, showAll, newRegion);
     }
   };
 
   const handleSearchAcceptAll = () => {
     // Accept all current judgments first
     handleAcceptAll();
-    
+
     // Then perform search
     if (pendingSearch) {
-      performSearch(pendingSearch.dataFeed, pendingSearch.type);
+      performSearch(pendingSearch.dataFeed, pendingSearch.type, pendingSearch.region);
     }
-    
+
     // Close confirmation
     setShowSearchConfirm(false);
     setPendingSearch(null);
@@ -836,9 +848,9 @@ const App = ({ config }) => {
   const handleSearchContinue = () => {
     // Search and lose work
     if (pendingSearch) {
-      performSearch(pendingSearch.dataFeed, pendingSearch.type);
+      performSearch(pendingSearch.dataFeed, pendingSearch.type, pendingSearch.region);
     }
-    
+
     // Close confirmation
     setShowSearchConfirm(false);
     setPendingSearch(null);
@@ -876,12 +888,12 @@ const App = ({ config }) => {
     setCurrentPage(1); // Reset to first page
     
     // Update URL parameters to reflect the new showAll state
-    updateUrlParams(dataFeed, type, newShowAllValue, filterText);
+    updateUrlParams(dataFeed, type, region, newShowAllValue, filterText);
     
     // Reload data with new show all setting
     const validation = validateGraphUrl(dataFeed);
     if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && validation.isValid && !validation.isWarning) {
-      loadDataInternal(type, dataFeed, 1, pageSize, newShowAllValue);
+      loadDataInternal(type, dataFeed, 1, pageSize, newShowAllValue, region);
     }
   };
 
@@ -1324,7 +1336,7 @@ const App = ({ config }) => {
     if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
       if (validation.isValid && !validation.isWarning) {
-        loadDataInternal(type, dataFeed, 1, pageSize, showAll);
+        loadDataInternal(type, dataFeed, 1, pageSize, showAll, region);
       }
     }
   };
@@ -1477,6 +1489,8 @@ const App = ({ config }) => {
         setDataFeed={handleDataFeedSwitch}
         type={type}
         setType={handleTypeSwitch}
+        region={region}
+        setRegion={setRegion}
         minScore={minScore}
         setMinScore={setMinScore}
         showAll={showAll}
