@@ -137,7 +137,7 @@ class MintController < ApplicationController
           "externalReference" => externalReference,
           "classToLink" => classToLink,
           "adUri" => adUri,
-          "user" => helpers.user_uri
+          "user" => user_uri
       })
       req_options = {
         use_ssl: uri.scheme == "https",

@@ -48,6 +48,12 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  def user_uri
+    if session[:handle].present?
+      "https://github.com/#{session[:handle]}#this"
+    end
+  end
+
   # Ensure user is signed in, otherwise notify and redirect
   def user_signed_in!
     unless user_signed_in?

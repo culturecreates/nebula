@@ -107,12 +107,6 @@ module ApplicationHelper
     @url = o.to_s if p.to_s == "http://schema.org/urlTemplate"
   end
 
-  def user_uri
-    if session[:handle].present?
-      "https://github.com/#{session[:handle]}#this"
-    end
-  end
-
   def generate_action_div
     if @url
       escaped_http_body = CGI.escapeHTML(@httpBody&.gsub('{{PublisherWebID}}', user_uri))
