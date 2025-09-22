@@ -453,26 +453,27 @@ const App = ({ config }) => {
       }
       
       const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, apiLimit, config, controller.signal, currentRegion);
-      
-      // Sort API results when showAll is unchecked - non-reconciled first, then reconciled
-      let sortedData = data;
+
+      // Filter and limit data when showAll is unchecked
+      let processedData = data;
       if (!currentShowAll) {
-        sortedData = data.sort((a, b) => {
-          const aIsReconciled = a.status === 'reconciled' || a.isPreReconciled || a.linkedTo || a.mintedAs;
-          const bIsReconciled = b.status === 'reconciled' || b.isPreReconciled || b.linkedTo || b.mintedAs;
-          
-          // Non-reconciled entities first (aIsReconciled = false comes before bIsReconciled = true)
-          if (!aIsReconciled && bIsReconciled) return -1;
-          if (aIsReconciled && !bIsReconciled) return 1;
-          return 0; // Keep original order within each group
+        // First, filter to get only non-reconciled entities
+        const nonReconciledEntities = data.filter(item => {
+          return !(item.status === 'reconciled' || item.isPreReconciled || item.linkedTo || item.mintedAs);
         });
+
+        // Then take only the first 100 non-reconciled entities (these will get match API calls)
+        const first100NonReconciled = nonReconciledEntities.slice(0, currentPageSize);
+
+        // This becomes our processed data - only entities that will get match API calls
+        processedData = first100NonReconciled;
       }
-      
+
       // Only update state if this is still the latest request
       setRequestSequence(prev => {
         if (currentSequence >= prev) {
-          setItems(sortedData);
-          setReconciledItems(sortedData); // Initialize with sorted data
+          setItems(processedData);
+          setReconciledItems(processedData); // Initialize with processed data
         }
         return prev;
       });
@@ -564,25 +565,9 @@ const App = ({ config }) => {
         // Get current globalJudgments to filter items
         const currentGlobalJudgments = globalJudgments;
         
-        // Determine which items to reconcile based on showAll setting
-        let itemsToReconcile;
-        
-        if (!showAll) {
-          // When showAll is unchecked, only reconcile first 100 non-reconciled entities
-          // Items are already sorted with non-reconciled first from loadDataInternal
-          const nonReconciledItems = items.filter(item => 
-            item.status !== 'reconciled' && 
-            !item.linkedTo && 
-            !item.mintedAs &&
-            !currentGlobalJudgments.has(item.id) // Exclude items with saved judgments
-          );
-          
-          // Limit to first 100 for performance
-          itemsToReconcile = nonReconciledItems.slice(0, pageSize);
-        } else {
-          // When showAll is checked, reconcile all entities (already limited to 100 by API call)
-          itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
-        }
+        // Determine which items to reconcile - items array now only contains entities that should get match API calls
+        // Filter out items that already have saved judgments
+        const itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
         
         if (itemsToReconcile.length > 0) {
           // Batch reconcile new items
@@ -607,6 +592,7 @@ const App = ({ config }) => {
             });
 
             // Apply initial sorting only if this is the first reconciliation after data load
+            // Now we only sort entities that actually received match API calls
             if (isInitialSort) {
               updatedItems = sortEntitiesByPriority(updatedItems, globalJudgments);
               setIsInitialSort(false); // Disable sorting for subsequent updates
