@@ -547,20 +547,35 @@ export function getReferenceUri(feed) {
  * @param {Array} entities - Entities to reconcile
  * @param {string} entityType - Entity type
  * @param {number} batchSize - Number of entities per batch
+ * @param {Object} config - Configuration object
+ * @param {Function} onProgress - Progress callback function
  * @returns {Promise<Array>} - Reconciled entities
  */
-export async function batchReconcile(entities, entityType, batchSize = 20, config = {}) {
+export async function batchReconcile(entities, entityType, batchSize = 100, config = {}, onProgress = null) {
   const results = [];
-  
+  const totalBatches = Math.ceil(entities.length / batchSize);
+
   for (let i = 0; i < entities.length; i += batchSize) {
     const batch = entities.slice(i, i + batchSize);
-    
+    const batchNumber = Math.floor(i / batchSize) + 1;
+
+    // Call progress callback if provided
+    if (onProgress) {
+      onProgress({
+        currentBatch: batchNumber,
+        totalBatches: totalBatches,
+        isProcessing: true,
+        entitiesProcessed: i,
+        totalEntities: entities.length
+      });
+    }
+
     try {
       const reconciliationResults = await getMatchCandidates(batch, entityType, config);
       const processedBatch = processReconciliationResults(reconciliationResults, batch);
       results.push(...processedBatch);
     } catch (error) {
-      console.error(`Error reconciling batch ${i / batchSize + 1}:`, error);
+      console.error(`Error reconciling batch ${batchNumber}:`, error);
       // Add batch without matches on error
       results.push(...batch.map(entity => ({
         ...entity,
@@ -571,6 +586,17 @@ export async function batchReconcile(entities, entityType, batchSize = 20, confi
       })));
     }
   }
-  
+
+  // Final progress callback
+  if (onProgress) {
+    onProgress({
+      currentBatch: totalBatches,
+      totalBatches: totalBatches,
+      isProcessing: false,
+      entitiesProcessed: entities.length,
+      totalEntities: entities.length
+    });
+  }
+
   return results;
 }

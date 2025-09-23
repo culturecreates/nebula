@@ -326,6 +326,20 @@ const App = ({ config }) => {
   const [requestSequence, setRequestSequence] = useState(0);
   const [abortController, setAbortController] = useState(null);
 
+  // Frontend pagination state for processed results
+  const [frontendCurrentPage, setFrontendCurrentPage] = useState(1);
+  const [frontendPageSize, setFrontendPageSize] = useState(100);
+
+  // Batch processing state
+  const [batchProgress, setBatchProgress] = useState({
+    currentBatch: 0,
+    totalBatches: 0,
+    isProcessing: false
+  });
+
+  // Track visited pages for dynamic Accept All count calculation
+  const [visitedPages, setVisitedPages] = useState(new Set([1]));
+
   // URL parameter utilities
   const getUrlParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -445,13 +459,9 @@ const App = ({ config }) => {
     setIsInitialSort(true);
     
     try {
-      // Determine API limit based on showAll toggle
-      let apiLimit = currentPageSize;
-      if (!currentShowAll) {
-        // When showAll is unchecked, fetch more entities to ensure we have enough non-reconciled ones
-        apiLimit = 2000;
-      }
-      
+      // Always fetch high limit to process complete dataset through batched reconciliation
+      const apiLimit = 2000;
+
       const data = await fetchDynamicData(currentType, currentDataFeed, currentPage, apiLimit, config, controller.signal, currentRegion);
       
       // Sort API results when showAll is unchecked - non-reconciled first, then reconciled
@@ -557,41 +567,31 @@ const App = ({ config }) => {
 
     const performBatchReconciliation = async () => {
       setReconciliationStatus('loading');
+      setBatchProgress({ currentBatch: 0, totalBatches: 0, isProcessing: true });
+
       try {
         // Add schema: prefix for reconciliation API
         const schemaType = `schema:${type}`;
-        
+
         // Get current globalJudgments to filter items
         const currentGlobalJudgments = globalJudgments;
-        
-        // Determine which items to reconcile based on showAll setting
-        let itemsToReconcile;
-        
-        if (!showAll) {
-          // When showAll is unchecked, only reconcile first 100 non-reconciled entities
-          // Items are already sorted with non-reconciled first from loadDataInternal
-          const nonReconciledItems = items.filter(item => 
-            item.status !== 'reconciled' && 
-            !item.linkedTo && 
-            !item.mintedAs &&
-            !currentGlobalJudgments.has(item.id) // Exclude items with saved judgments
-          );
-          
-          // Limit to first 100 for performance
-          itemsToReconcile = nonReconciledItems.slice(0, pageSize);
-        } else {
-          // When showAll is checked, reconcile all entities (already limited to 100 by API call)
-          itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
-        }
-        
+
+        // Process ALL entities through batched reconciliation - no filtering by showAll
+        // This ensures we have complete data for pagination and search
+        const itemsToReconcile = items.filter(item => !currentGlobalJudgments.has(item.id));
+
         if (itemsToReconcile.length > 0) {
-          // Batch reconcile new items
-          const reconciled = await batchReconcile(itemsToReconcile, schemaType, itemsToReconcile.length, config);
+          // Progress callback for batch processing
+          const onProgress = (progress) => {
+            setBatchProgress(progress);
+          };
+
+          // Batch reconcile ALL items with 100-entity payloads
+          const reconciled = await batchReconcile(itemsToReconcile, schemaType, 100, config, onProgress);
 
           // Update reconciledItems with the new reconciled data
-          // Don't merge with previous state - replace the current items
           setReconciledItems(prev => {
-            // Only update items that exist in the current data set
+            // Update all items that exist in the current data set
             let updatedItems = prev.map(item => {
               const reconciledItem = reconciled.find(r => r.id === item.id);
               if (reconciledItem) {
@@ -614,12 +614,24 @@ const App = ({ config }) => {
 
             return updatedItems;
           });
+        } else {
+          // No items to reconcile, but still apply sorting if needed
+          setReconciledItems(prev => {
+            if (isInitialSort) {
+              const updatedItems = sortEntitiesByPriority(prev, globalJudgments);
+              setIsInitialSort(false);
+              return updatedItems;
+            }
+            return prev;
+          });
         }
-        
+
         setReconciliationStatus('complete');
+        setBatchProgress({ currentBatch: 0, totalBatches: 0, isProcessing: false });
       } catch (err) {
         console.error('Error during batch reconciliation:', err);
         setReconciliationStatus('error');
+        setBatchProgress({ currentBatch: 0, totalBatches: 0, isProcessing: false });
       }
     };
 
@@ -814,6 +826,9 @@ const App = ({ config }) => {
     setGlobalJudgments(new Map());
     setReconciliationStatus('idle');
     setError(null);
+    // Reset pagination and visited pages for new search
+    setFrontendCurrentPage(1);
+    setVisitedPages(new Set([1]));
 
     // Update URL parameters first
     updateUrlParams(newDataFeed, newType, newRegion, showAll, filterText);
@@ -1145,30 +1160,15 @@ const App = ({ config }) => {
   }, [showAll]);
 
   const handleAcceptAll = () => {
-    // Get items ready to accept from current page
-    const currentPageReadyItems = reconciledItems.filter(item => {
-      // Exclude pre-reconciled entities from accept all
-      if (item.isPreReconciled) return false;
-      
-      const currentStatus = getCurrentItemStatus(item, globalJudgments);
-      
-      // Exclude already processed entities
-      if (currentStatus === 'reconciled') return false; // Already matched/minted
-      if (currentStatus === 'flagged-complete') return false; // Already flagged via API
-      
-      // Only include entities that have action buttons ready (not already processed)
-      return currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged';
-    });
-    
     if (currentPageReadyItems.length === 0) {
       return;
     }
-    
+
     // Count entities by action type
     let matchCount = 0;
     let mintCount = 0;
     let flagCount = 0;
-    
+
     currentPageReadyItems.forEach(item => {
       const currentStatus = getCurrentItemStatus(item, globalJudgments);
       if (currentStatus === 'judgment-ready') {
@@ -1179,11 +1179,11 @@ const App = ({ config }) => {
         flagCount++;
       }
     });
-    
+
     // Show confirmation popup with counts
     setAcceptAllResults({
       matchCount,
-      mintCount, 
+      mintCount,
       flagCount,
       totalCount: currentPageReadyItems.length
     });
@@ -1193,19 +1193,8 @@ const App = ({ config }) => {
   const handleAcceptAllConfirm = async () => {
     setShowAcceptAllConfirm(false);
     
-    // Get items ready to process
-    const itemsToProcess = reconciledItems.filter(item => {
-      if (item.isPreReconciled) return false;
-      
-      const currentStatus = getCurrentItemStatus(item, globalJudgments);
-      
-      // Exclude already processed entities
-      if (currentStatus === 'reconciled') return false; // Already matched/minted
-      if (currentStatus === 'flagged-complete') return false; // Already flagged via API
-      
-      // Only process entities that have action buttons ready (not already processed)
-      return currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged';
-    });
+    // Use the same items that were counted for Accept All
+    const itemsToProcess = currentPageReadyItems;
     
     // Initialize progress
     setAcceptAllProgress({
@@ -1401,7 +1390,7 @@ const App = ({ config }) => {
 
   // Filtering and sorting
   let filtered = filterItems(reconciledItems, filterText, globalJudgments);
-  
+
   // Apply "Show All" filter
   if (!showAll) {
     filtered = filtered.filter(item => {
@@ -1423,62 +1412,90 @@ const App = ({ config }) => {
       // Show all other non-reconciled entities
       return true;
     });
-    
-    // Limit to pageSize (100) when showAll is unchecked to maintain UI performance
-    // Preserve original order - don't reorder entities based on judgment status
-    const entitiesWithJudgments = filtered.filter(item => globalJudgments.has(item.id));
-    const judgmentCount = entitiesWithJudgments.length;
-    
-    // If we have too many entities, prioritize keeping entities with judgments
-    // but maintain their original positions in the array
-    if (filtered.length > pageSize) {
-      const kept = [];
-      let nonJudgmentCount = 0;
-      const maxNonJudgment = pageSize - judgmentCount;
-      
-      for (const item of filtered) {
-        if (globalJudgments.has(item.id)) {
-          // Always keep entities with judgments in their original position
-          kept.push(item);
-        } else if (nonJudgmentCount < maxNonJudgment) {
-          // Keep non-judgment entities up to the limit, in original order
-          kept.push(item);
-          nonJudgmentCount++;
-        }
-        // Skip entities that would exceed the page limit
-      }
-      
-      filtered = kept;
-    }
   }
-  
-  const sorted = filtered;
-  
-  // Since API handles pagination, we display all items from current API call
-  const currentPageItems = sorted;
 
-  // Count items ready to accept across ALL visited pages from global storage
-  const globalReadyItems = Array.from(globalJudgments.values()).filter(item => 
-    // Exclude pre-reconciled entities from accept all count
-    !item.isPreReconciled &&
-    (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
-    (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
-  );
-  
-  // Count current page items that are ready but not yet in global storage
-  const currentPageReadyItems = reconciledItems.filter(item => {
-    // Skip if already in global storage
-    if (globalJudgments.has(item.id)) return false;
-    // Exclude pre-reconciled entities from accept all count
+  // Apply frontend pagination to complete filtered dataset
+  const totalFilteredItems = filtered.length;
+  const totalPages = Math.ceil(totalFilteredItems / frontendPageSize);
+  const startIndex = (frontendCurrentPage - 1) * frontendPageSize;
+  const endIndex = startIndex + frontendPageSize;
+  const currentPageItems = filtered.slice(startIndex, endIndex);
+
+  // Reset to page 1 if current page is beyond available pages
+  useEffect(() => {
+    if (frontendCurrentPage > totalPages && totalPages > 0) {
+      setFrontendCurrentPage(1);
+    }
+  }, [totalPages, frontendCurrentPage]);
+
+  // Track visited pages for dynamic Accept All count
+  useEffect(() => {
+    if (totalPages > 0) {
+      setVisitedPages(prev => new Set([...prev, frontendCurrentPage]));
+    }
+  }, [frontendCurrentPage, totalPages]);
+
+  // Calculate dynamic Accept All count based on user interactions across visited pages
+  const calculateDynamicAcceptCount = () => {
+    // Count items from global judgments (user has acted upon these)
+    const globalReadyItems = Array.from(globalJudgments.values()).filter(item =>
+      // Exclude pre-reconciled entities from accept all count
+      !item.isPreReconciled &&
+      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
+      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
+    );
+
+    // Count items from visited pages that user has seen and are ready
+    let visitedPageReadyItems = 0;
+
+    // Get all filtered items to work with
+    const allFilteredItems = !showAll ? filtered.filter(item => {
+      if (globalJudgments.has(item.id)) return true;
+      if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) return false;
+      if (item.status === 'flagged-complete') return false;
+      return true;
+    }) : filtered;
+
+    // Only count items from pages the user has actually visited
+    visitedPages.forEach(pageNum => {
+      const pageStartIndex = (pageNum - 1) * frontendPageSize;
+      const pageEndIndex = pageStartIndex + frontendPageSize;
+      const pageItems = allFilteredItems.slice(pageStartIndex, pageEndIndex);
+
+      pageItems.forEach(item => {
+        // Skip if already in global storage or pre-reconciled
+        if (globalJudgments.has(item.id) || item.isPreReconciled) return;
+
+        // Check if item is ready to accept
+        const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' ||
+                       item.status === 'judgment-ready' || item.status === 'flagged' ||
+                       (item.hasAutoMatch && item.autoMatchCandidate) ||
+                       (item.selectedMatch && !item.linkedTo);
+        if (isReady) {
+          visitedPageReadyItems++;
+        }
+      });
+    });
+
+    return globalReadyItems.length + visitedPageReadyItems;
+  };
+
+  const itemsReadyToAccept = calculateDynamicAcceptCount();
+
+  // Get items ready to accept from current page only (used by Accept All)
+  const currentPageReadyItems = currentPageItems.filter(item => {
+    // Exclude pre-reconciled entities from accept all
     if (item.isPreReconciled) return false;
-    
-    // Check if item is ready to accept
-    const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' || 
-                   (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo);
-    return isReady;
+
+    const currentStatus = getCurrentItemStatus(item, globalJudgments);
+
+    // Exclude already processed entities
+    if (currentStatus === 'reconciled') return false; // Already matched/minted
+    if (currentStatus === 'flagged-complete') return false; // Already flagged via API
+
+    // Only include entities that have action buttons ready (not already processed)
+    return currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged';
   });
-  
-  const itemsReadyToAccept = globalReadyItems.length + currentPageReadyItems.length;
 
   return (
     <StickyHeadersProvider>
@@ -1508,6 +1525,13 @@ const App = ({ config }) => {
         hasResults={currentPageItems.length > 0}
         onSearch={handleSearch}
         onShowAllToggle={handleShowAllToggle}
+        // Frontend pagination props
+        frontendCurrentPage={frontendCurrentPage}
+        setFrontendCurrentPage={setFrontendCurrentPage}
+        frontendPageSize={frontendPageSize}
+        setFrontendPageSize={setFrontendPageSize}
+        totalFilteredItems={totalFilteredItems}
+        totalPages={totalPages}
       />
 
       <div className={`table-container ${currentPageItems.length === 0 ? 'empty-state' : ''}`}>
@@ -1528,8 +1552,27 @@ const App = ({ config }) => {
               <div className="spinner-border spinner-border-sm me-2" role="status">
                 <span className="visually-hidden">Loading...</span>
               </div>
-              Running batch reconciliation...
+              {batchProgress.isProcessing && batchProgress.totalBatches > 0 ? (
+                <span>
+                  Processing batch {batchProgress.currentBatch} of {batchProgress.totalBatches}
+                  ({batchProgress.entitiesProcessed || 0} / {batchProgress.totalEntities || 0} entities)...
+                </span>
+              ) : (
+                <span>Running batch reconciliation...</span>
+              )}
             </div>
+            {batchProgress.isProcessing && batchProgress.totalBatches > 0 && (
+              <div className="progress mt-2" style={{ height: '4px' }}>
+                <div
+                  className="progress-bar"
+                  role="progressbar"
+                  style={{ width: `${(batchProgress.currentBatch / batchProgress.totalBatches) * 100}%` }}
+                  aria-valuenow={batchProgress.currentBatch}
+                  aria-valuemin="0"
+                  aria-valuemax={batchProgress.totalBatches}
+                ></div>
+              </div>
+            )}
           </div>
         )}
         
@@ -1545,7 +1588,7 @@ const App = ({ config }) => {
           </div>
         )}
         
-        {!loading && !error && reconciliationStatus !== 'loading' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
+        {!loading && !error && reconciliationStatus !== 'loading' && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
           <div className="alert alert-info" role="alert">
             {items.length === 0 
               ? "No entities found for the selected data feed and type."
@@ -1557,7 +1600,7 @@ const App = ({ config }) => {
           </div>
         )}
         
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
+        {!loading && !error && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="table-scroll-container">
             <table className="table">
               <thead>
@@ -1587,7 +1630,7 @@ const App = ({ config }) => {
           </div>
         )}
 
-        {!loading && !error && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
+        {!loading && !error && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
           <div className="bottom-accept-all">
             <button 
               onClick={handleAcceptAll} 
@@ -1600,7 +1643,39 @@ const App = ({ config }) => {
         )}
 
       </div>
-      
+
+      {/* Bottom pagination controls */}
+      {!loading && !error && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && totalPages > 1 && (
+        <div className="bottom-pagination">
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span className="text-muted">
+                {totalFilteredItems} items, page {frontendCurrentPage} of {totalPages}
+              </span>
+            </div>
+            <div className="pagination-controls">
+              <button
+                onClick={() => setFrontendCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={frontendCurrentPage === 1 || loading}
+                className="btn btn-outline-secondary btn-sm"
+              >
+                Previous
+              </button>
+              <span className="pagination-current">
+                Page {frontendCurrentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={frontendCurrentPage === totalPages || loading}
+                className="btn btn-outline-secondary btn-sm"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <NavigationConfirmation 
         isOpen={showNavigationConfirm}
         onConfirm={handleConfirmNavigation}
