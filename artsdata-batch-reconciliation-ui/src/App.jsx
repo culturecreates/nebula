@@ -1388,17 +1388,10 @@ const App = ({ config }) => {
     }
   };
 
-  // Filtering and sorting
-  let filtered = filterItems(reconciledItems, filterText, globalJudgments);
-
-  // Apply "Show All" filter
+  // Apply "Show All" filter BEFORE search filtering
+  let itemsAfterShowAllFilter = reconciledItems;
   if (!showAll) {
-    filtered = filtered.filter(item => {
-      // Always show entities that have judgments in current session (user reconciled them)
-      if (globalJudgments.has(item.id)) {
-        return true;
-      }
-
+    itemsAfterShowAllFilter = reconciledItems.filter(item => {
       // Hide pre-reconciled entities (entities that were already reconciled when loaded)
       if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) {
         return false;
@@ -1413,6 +1406,9 @@ const App = ({ config }) => {
       return true;
     });
   }
+
+  // Then apply search filtering to the show-all-filtered items
+  let filtered = filterItems(itemsAfterShowAllFilter, filterText, globalJudgments);
 
   // Apply frontend pagination to complete filtered dataset
   const totalFilteredItems = filtered.length;
@@ -1448,13 +1444,8 @@ const App = ({ config }) => {
     // Count items from visited pages that user has seen and are ready
     let visitedPageReadyItems = 0;
 
-    // Get all filtered items to work with
-    const allFilteredItems = !showAll ? filtered.filter(item => {
-      if (globalJudgments.has(item.id)) return true;
-      if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) return false;
-      if (item.status === 'flagged-complete') return false;
-      return true;
-    }) : filtered;
+    // Use the properly filtered items (already filtered by showAll above)
+    const allFilteredItems = filtered;
 
     // Only count items from pages the user has actually visited
     visitedPages.forEach(pageNum => {
@@ -1532,6 +1523,7 @@ const App = ({ config }) => {
         setFrontendPageSize={setFrontendPageSize}
         totalFilteredItems={totalFilteredItems}
         totalPages={totalPages}
+        reconciliationStatus={reconciliationStatus}
       />
 
       <div className={`table-container ${currentPageItems.length === 0 ? 'empty-state' : ''}`}>

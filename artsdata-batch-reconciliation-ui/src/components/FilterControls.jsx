@@ -25,7 +25,7 @@ const FilterControls = ({
   onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch, onShowAllToggle,
   // Frontend pagination props
   frontendCurrentPage, setFrontendCurrentPage, frontendPageSize, setFrontendPageSize,
-  totalFilteredItems, totalPages
+  totalFilteredItems, totalPages, reconciliationStatus
 }) => {
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
@@ -267,7 +267,7 @@ const FilterControls = ({
           <span className="checkbox-label">Show all</span>
         </label>
       </div>
-      {hasResults && totalPages > 1 && (
+      {hasResults && totalPages > 1 && !loading && reconciliationStatus === 'complete' && (
         <div className="pagination-container">
           <div className="pagination-info">
             <span className="text-muted">
