@@ -1077,6 +1077,9 @@ const App = ({ config }) => {
             isFlaggedForReview: true, // Mark as flagged for review
             actionError: null
           };
+
+          // Add to recently reconciled set to keep row visible when Show All is unchecked
+          setRecentlyReconciled(prev => new Set([...prev, itemId]));
         } catch (error) {
           console.error(`Failed to flag entity: ${item.name} (${item.uri})`, error);
           updateData = {
