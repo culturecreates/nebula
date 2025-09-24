@@ -283,7 +283,7 @@ const FilterControls = ({
               Previous
             </button>
             <span className="pagination-current">
-              Page {frontendCurrentPage} of {totalPages}
+              Page {frontendCurrentPage}
             </span>
             <button
               onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}

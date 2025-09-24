@@ -21,7 +21,7 @@ import { validateGraphUrl } from "./utils/urlValidation";
 // Helper function to sort entities by priority: auto-selected first, then needs-judgment, then reconciled
 // Secondary sort: alphabetical by name within each priority group
 function sortEntitiesByPriority(entities, globalJudgments) {
-  return entities.slice().sort((a, b) => {
+  const sortedEntities = entities.slice().sort((a, b) => {
     const statusA = getCurrentItemStatus(a, globalJudgments);
     const statusB = getCurrentItemStatus(b, globalJudgments);
 
@@ -67,6 +67,12 @@ function sortEntitiesByPriority(entities, globalJudgments) {
     const nameB = (b.name || '').toLowerCase();
     return nameA.localeCompare(nameB);
   });
+
+  // Reassign originalIndex after priority sorting to maintain correct display order
+  return sortedEntities.map((item, index) => ({
+    ...item,
+    originalIndex: index + 1
+  }));
 }
 
 // Helper function to calculate current item status (matches TableRow.jsx logic exactly)
@@ -470,7 +476,7 @@ const App = ({ config }) => {
         sortedData = data.sort((a, b) => {
           const aIsReconciled = a.status === 'reconciled' || a.isPreReconciled || a.linkedTo || a.mintedAs;
           const bIsReconciled = b.status === 'reconciled' || b.isPreReconciled || b.linkedTo || b.mintedAs;
-          
+
           // Non-reconciled entities first (aIsReconciled = false comes before bIsReconciled = true)
           if (!aIsReconciled && bIsReconciled) return -1;
           if (aIsReconciled && !bIsReconciled) return 1;
@@ -483,6 +489,11 @@ const App = ({ config }) => {
         if (currentSequence >= prev) {
           setItems(sortedData);
           setReconciledItems(sortedData); // Initialize with sorted data
+
+          // If there are no items, set reconciliation status to complete immediately
+          if (sortedData.length === 0) {
+            setReconciliationStatus('complete');
+          }
         }
         return prev;
       });
@@ -712,10 +723,11 @@ const App = ({ config }) => {
     setGlobalJudgments(new Map());
     setReconciliationStatus('idle');
     setError(null);
-    
+
     // Set the new type
     setType(newType);
     setCurrentPage(1); // Reset to first page
+    setFrontendCurrentPage(1); // Reset frontend pagination
   };
 
   const handleTypeSwitchAcceptAll = () => {
@@ -769,10 +781,11 @@ const App = ({ config }) => {
     setGlobalJudgments(new Map());
     setReconciliationStatus('idle');
     setError(null);
-    
+
     // Set the new data feed
     setDataFeed(newDataFeed);
     setCurrentPage(1); // Reset to first page
+    setFrontendCurrentPage(1); // Reset frontend pagination
   };
 
   const handleDataFeedSwitchAcceptAll = () => {
@@ -897,10 +910,11 @@ const App = ({ config }) => {
     setGlobalJudgments(new Map());
     setReconciliationStatus('idle');
     setError(null);
-    
+
     // Set the new show all value
     setShowAll(newShowAllValue);
     setCurrentPage(1); // Reset to first page
+    setFrontendCurrentPage(1); // Reset frontend pagination
     
     // Update URL parameters to reflect the new showAll state
     updateUrlParams(dataFeed, type, region, newShowAllValue, filterText);
@@ -1317,10 +1331,13 @@ const App = ({ config }) => {
   
   const handleAcceptAllSummaryClose = () => {
     setShowAcceptAllSummary(false);
-    
+
     // Clear all saved judgments for fresh start
     setGlobalJudgments(new Map());
-    
+
+    // Reset frontend pagination to page 1
+    setFrontendCurrentPage(1);
+
     // Reload data with existing filters
     if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
@@ -1546,7 +1563,7 @@ const App = ({ config }) => {
               </div>
               {batchProgress.isProcessing && batchProgress.totalBatches > 0 ? (
                 <span>
-                  Processing batch {batchProgress.currentBatch} of {batchProgress.totalBatches}
+                  Processing batch {batchProgress.currentBatch} of {batchProgress.totalBatches}{' '}
                   ({batchProgress.entitiesProcessed || 0} / {batchProgress.totalEntities || 0} entities)...
                 </span>
               ) : (
@@ -1571,6 +1588,33 @@ const App = ({ config }) => {
         {error && (
           <div className="alert alert-danger" role="alert">
             <strong>Error loading data:</strong> {error}
+            {error.includes('404') && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  • Verify the data feed URL is correct and accessible<br/>
+                  • Check if the graph URL exists in the knowledge base<br/>
+                  • Ensure you have permission to access this data feed
+                </small>
+              </div>
+            )}
+            {error.includes('400') && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  • Check that the entity type matches available types (Event, Person, Organization, Place, Agent)<br/>
+                  • Verify the data feed URL format is correct<br/>
+                  • Ensure the region code is valid (if specified)
+                </small>
+              </div>
+            )}
+            {(error.includes('500') || error.includes('503')) && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  • The data feed service is experiencing issues<br/>
+                  • Please wait a few moments and try again<br/>
+                  • Contact support if the issue persists
+                </small>
+              </div>
+            )}
           </div>
         )}
         
@@ -1579,16 +1623,30 @@ const App = ({ config }) => {
             Please enter both a data feed URL and entity type to load entities for reconciliation.
           </div>
         )}
-        
+
+        {!loading && !error && reconciliationStatus === 'error' && (
+          <div className="alert alert-warning" role="alert">
+            <strong>Reconciliation Error:</strong> There was a problem during the reconciliation process.
+            <div className="mt-2">
+              <small className="text-muted">
+                • The entities were loaded successfully but matching failed<br/>
+                • Try refreshing individual rows or searching again<br/>
+                • Check your network connection and try again<br/>
+                • Contact support if the issue persists
+              </small>
+            </div>
+          </div>
+        )}
+
         {!loading && !error && reconciliationStatus !== 'loading' && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length === 0 && (
           <div className="alert alert-info" role="alert">
-            {items.length === 0 
-              ? "No entities found for the selected data feed and type."
-              : (items.every(item => item.isPreReconciled || item.linkedTo || item.mintedAs || item.status === 'reconciled')
-                  ? "All entities have been reconciled! Toggle 'Show All' to see reconciled entities or search for different data."
-                  : "No entities match the current filters."
-                )
-            }
+            {items.length === 0 ? (
+              <strong>No entities found for the selected data feed and type.</strong>
+            ) : (items.every(item => item.isPreReconciled || item.linkedTo || item.mintedAs || item.status === 'reconciled') ? (
+              <strong>All entities have been reconciled!</strong>
+            ) : (
+              <strong>No entities match the current filters.</strong>
+            ))}
           </div>
         )}
         
@@ -1610,7 +1668,7 @@ const App = ({ config }) => {
                   <TableRow
                     key={item.id}
                     item={item}
-                    displayIndex={index + 1}
+                    displayIndex={item.originalIndex}
                     parentRowIndex={index}
                     onAction={handleAction}
                     onRefresh={handleRefreshRow}
@@ -1623,50 +1681,53 @@ const App = ({ config }) => {
         )}
 
         {!loading && !error && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && (
-          <div className="bottom-accept-all">
-            <button 
-              onClick={handleAcceptAll} 
-              className="btn btn-primary"
-              disabled={itemsReadyToAccept === 0 || loading}
-            >
-              Accept All ({itemsReadyToAccept})
-            </button>
+          <div className="bottom-controls">
+            {/* Centered pagination controls */}
+            {totalPages > 1 && (
+              <div className="bottom-pagination-center">
+                <div className="pagination-container">
+                  <div className="pagination-info">
+                    <span className="text-muted">
+                      {totalFilteredItems} items, page {frontendCurrentPage} of {totalPages}
+                    </span>
+                  </div>
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => setFrontendCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={frontendCurrentPage === 1 || loading}
+                      className="btn btn-outline-secondary btn-sm"
+                    >
+                      Previous
+                    </button>
+                    <span className="pagination-current">
+                      Page {frontendCurrentPage}
+                    </span>
+                    <button
+                      onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={frontendCurrentPage === totalPages || loading}
+                      className="btn btn-outline-secondary btn-sm"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Accept All button on the right */}
+            <div className="bottom-accept-all">
+              <button
+                onClick={handleAcceptAll}
+                className="btn btn-primary"
+                disabled={itemsReadyToAccept === 0 || loading}
+              >
+                Accept All ({itemsReadyToAccept})
+              </button>
+            </div>
           </div>
         )}
 
       </div>
-
-      {/* Bottom pagination controls */}
-      {!loading && !error && reconciliationStatus === 'complete' && dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '' && currentPageItems.length > 0 && totalPages > 1 && (
-        <div className="bottom-pagination">
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="text-muted">
-                {totalFilteredItems} items, page {frontendCurrentPage} of {totalPages}
-              </span>
-            </div>
-            <div className="pagination-controls">
-              <button
-                onClick={() => setFrontendCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={frontendCurrentPage === 1 || loading}
-                className="btn btn-outline-secondary btn-sm"
-              >
-                Previous
-              </button>
-              <span className="pagination-current">
-                Page {frontendCurrentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={frontendCurrentPage === totalPages || loading}
-                className="btn btn-outline-secondary btn-sm"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <NavigationConfirmation 
         isOpen={showNavigationConfirm}
