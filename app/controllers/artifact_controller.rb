@@ -7,7 +7,12 @@ class ArtifactController < ApplicationController
 
     # Placeholders in SPARQL query
     @query =  SparqlLoader.load(sparql_file, [ "DATABUS_ACCOUNT", @databus_account.downcase])
-    @artifacts = ArtsdataApi::SparqlService.client.query(@query).limit(1000) # TODO: fix limit
+    @artifacts =  begin
+                    ArtsdataApi::SparqlService.client.query(@query).limit(1000)  # TODO: fix limit
+                  rescue StandardError => e # SPARQL::Client::ClientError and SPARQL::Client::ServerError
+                    flash.alert = e.message[0..100] + (e.message.length > 100 ? "..." : "")
+                    return redirect_to root_path,  data: { turbo: false }
+                  end
   end
 
   def show
