@@ -305,11 +305,6 @@ const FilterControls = ({
       </div>
     )}
     
-    {error && (
-      <div className="error-indicator">
-        <span>Error: {error}</span>
-      </div>
-    )}
   </div>
   );
 };

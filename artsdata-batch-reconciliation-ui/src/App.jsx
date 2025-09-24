@@ -1613,7 +1613,7 @@ const App = ({ config }) => {
         
         {error && (
           <div className="alert alert-danger" role="alert">
-            <strong>Error loading data:</strong> {error}
+            <strong>{error}</strong>
             {error.includes('404') && (
               <div className="mt-2">
                 <small className="text-muted">
