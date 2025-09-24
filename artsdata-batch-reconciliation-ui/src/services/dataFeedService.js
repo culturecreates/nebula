@@ -43,6 +43,26 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
     });
 
     if (!response.ok) {
+      // Try to parse the API error response first
+      let apiErrorMessage = null;
+      try {
+        const errorData = await response.json();
+        console.log('API error response:', errorData); // Debug log to see actual response
+        if (errorData && errorData.message) {
+          apiErrorMessage = errorData.message;
+        } else if (errorData && errorData.error && typeof errorData.error === 'string') {
+          apiErrorMessage = errorData.error;
+        }
+      } catch (parseError) {
+        console.log('Failed to parse error response JSON:', parseError); // Debug log
+        // If JSON parsing fails, apiErrorMessage remains null and we'll fall back to status-based messages
+      }
+
+      // Use API error message if available, otherwise fall back to status-based messages
+      if (apiErrorMessage) {
+        throw new Error(apiErrorMessage);
+      }
+
       // Provide more specific error messages based on HTTP status
       if (response.status === 404) {
         throw new Error(`Data feed not found (404). Please check the graph URL.`);
