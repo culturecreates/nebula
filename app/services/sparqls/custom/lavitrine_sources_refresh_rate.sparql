@@ -6,18 +6,8 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 select ?name (sample(?groups) as ?group) ?latest (sample(?entities) as ?events) (count(?date) as ?uploads_last_30_days) ((xsd:float(?uploads_last_30_days)/xsd:float("30")) * 7 AS ?average_uploads_per_week)  { 
    
 
-   { <http://kg.artsdata.ca/resource/dia-logGraphs>  schema:hasPart ?graph . }
-   UNION 
-     { values ?graph {
-      <http://kg.artsdata.ca/culture-creates/footlight/placedesarts-com> 
-      <http://kg.artsdata.ca/culture-creates/huginn/derived-grandtheatre-qc-ca>
-      <http://kg.artsdata.ca/culture-creates/footlight/hector-charland-com>
-      <http://kg.artsdata.ca/culture-creates/footlight/theatredumarais-com>
-      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/tout-culture>
-      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/signe-laval>
-      <http://kg.artsdata.ca/culture-creates/artsdata-planet-footlight/culture-mauricie>
-      } 
-     }
+  <http://kg.artsdata.ca/resource/LaVitrineSources>  schema:hasPart ?graph . 
+  
 	?graph prov:wasDerivedFrom ?dataid ; schema:name ?name ; prov:generatedAtTime  ?latest .
     ?dataid a <http://dataid.dbpedia.org/ns/core#DataId> ;
     <http://xmlns.com/foaf/0.1/primaryTopic> ?dataset .

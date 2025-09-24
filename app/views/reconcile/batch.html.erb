@@ -7,11 +7,11 @@
   <link rel="stylesheet" crossorigin href="<%= vite_asset_path('index.css') %>">
 
   <div id="root"
-       <% if defined?(user_uri) && user_uri %>data-user-uri="<%= user_uri %>"<% end %>
-       <% if defined?(reconciliation_service_endpoint) && reconciliation_service_endpoint %>data-reconciliation-endpoint="<%= reconciliation_service_endpoint %>"<% end %>
-       <% if defined?(mint_service_endpoint) && mint_service_endpoint %>data-mint-endpoint="<%= mint_service_endpoint %>"<% end %>
-       <% if defined?(link_service_endpoint) && link_service_endpoint %>data-link-endpoint="<%= link_service_endpoint %>"<% end %>>
-  </div>
+    data-user-uri="<%= @user_uri %>"
+    data-reconciliation-endpoint="<%= @reconciliation_service_endpoint %>"
+    data-mint-endpoint="<%= @mint_service_endpoint %>"
+    data-link-endpoint="<%= @link_service_endpoint %>"
+  ></div>
 </div>
 <!-- TODO: Figure out why this is needed for the bootstrap hamburger menu sub-menus to open (like Reports and Batch Reconcile). -->
 <script

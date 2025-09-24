@@ -5,7 +5,7 @@ Rails.application.configure do
   
   # External API endpoints for Artsdata services
   config.graph_api_endpoint = "http://db.artsdata.ca" 
-  config.artsdata_recon_endpoint = "https://api.artsdata.ca/recon" 
+  config.artsdata_recon_endpoint = "https://recon.artsdata.ca" 
   config.artsdata_mint_endpoint = "https://api.artsdata.ca/mint" 
   config.artsdata_link_endpoint = "https://api.artsdata.ca/link"
   config.artsdata_databus_endpoint = "https://api.artsdata.ca/databus" 

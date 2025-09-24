@@ -57,7 +57,7 @@ class ArtifactController < ApplicationController
   # POST /artifact/push_latest
   def push_latest
     @artifact_uri = params[:artifactUri]
-    databus_service = DatabusService.new(@artifact_uri, helpers.user_uri)
+    databus_service = DatabusService.new(@artifact_uri, user_uri)
     if databus_service.push_lastest_artifact(@artifact_uri) 
       flash.notice = "Pushed latest artifact '#{databus_service.latest_version}' to Artsdata."
     else
@@ -69,7 +69,7 @@ class ArtifactController < ApplicationController
   # DELETE /artifact?artifactUri=
   def destroy
     @artifact_uri = params[:artifactUri]
-    databus_service = DatabusService.new(@artifact_uri, helpers.user_uri)
+    databus_service = DatabusService.new(@artifact_uri, user_uri)
     if databus_service.delete_artifact
       flash.notice = "Deleted all versions of artifact '#{@artifact_uri}' in Databus."
       redirect_to artifact_index_path
@@ -88,7 +88,7 @@ class ArtifactController < ApplicationController
   # POST /artifact
   def create
 
-    @artifact = Artifact.new(artifact_params, helpers.user_uri)
+    @artifact = Artifact.new(artifact_params, user_uri)
     if @artifact.save
       flash.notice = "Created artifact '#{@artifact.name}'. You may now create versions of the artifact."
       redirect_to artifact_index_path

@@ -19,6 +19,7 @@ class MintController < ApplicationController
 
       @label = params[:label]
       @reference =  params[:reference]
+      @user_uri = user_uri
 
       # get extra data about the entity when only externalUri is provided
       # Need: 
@@ -137,7 +138,7 @@ class MintController < ApplicationController
           "externalReference" => externalReference,
           "classToLink" => classToLink,
           "adUri" => adUri,
-          "user" => helpers.user_uri
+          "user" => user_uri
       })
       req_options = {
         use_ssl: uri.scheme == "https",
@@ -220,6 +221,7 @@ class MintController < ApplicationController
       @language = "en"
       @reference = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
+      @user_uri = user_uri
     end
 
 

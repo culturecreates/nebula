@@ -4,7 +4,12 @@ require 'uri'
 class ReconcileController < ApplicationController
   before_action :check_minting_access, only: [:batch] # ensure user has permissions
 
-  def batch; end
+  def batch
+    @user_uri = user_uri
+    @reconciliation_service_endpoint = Rails.application.config.artsdata_recon_endpoint
+    @mint_service_endpoint = Rails.application.config.artsdata_mint_endpoint
+    @link_service_endpoint = Rails.application.config.artsdata_link_endpoint
+  end
 
   # Reconcile - returns only Artsdata URIs
   # GET /reconcile/query?query=&type=&postalCode=
