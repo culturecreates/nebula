@@ -336,6 +336,9 @@ const App = ({ config }) => {
   const [frontendCurrentPage, setFrontendCurrentPage] = useState(1);
   const [frontendPageSize, setFrontendPageSize] = useState(100);
 
+  // Track recently reconciled items to prevent immediate hiding when showAll is false
+  const [recentlyReconciled, setRecentlyReconciled] = useState(new Set());
+
   // Batch processing state
   const [batchProgress, setBatchProgress] = useState({
     currentBatch: 0,
@@ -843,6 +846,9 @@ const App = ({ config }) => {
     setFrontendCurrentPage(1);
     setVisitedPages(new Set([1]));
 
+    // Clear recently reconciled items on new search
+    setRecentlyReconciled(new Set());
+
     // Update URL parameters first
     updateUrlParams(newDataFeed, newType, newRegion, showAll, filterText);
 
@@ -915,6 +921,9 @@ const App = ({ config }) => {
     setShowAll(newShowAllValue);
     setCurrentPage(1); // Reset to first page
     setFrontendCurrentPage(1); // Reset frontend pagination
+
+    // Clear recently reconciled items when toggling Show All
+    setRecentlyReconciled(new Set());
     
     // Update URL parameters to reflect the new showAll state
     updateUrlParams(dataFeed, type, region, newShowAllValue, filterText);
@@ -1006,6 +1015,9 @@ const App = ({ config }) => {
           mintedAs: `${entityType.toLowerCase()}`,
           actionError: null
         };
+
+        // Add to recently reconciled set to keep row visible when Show All is unchecked
+        setRecentlyReconciled(prev => new Set([...prev, itemId]));
         
         // Auto-refresh match results to find the newly minted entity
         // Extract the Artsdata ID from the mint response
@@ -1047,6 +1059,9 @@ const App = ({ config }) => {
           linkError: null,
           actionError: null
         };
+
+        // Add to recently reconciled set to keep row visible when Show All is unchecked
+        setRecentlyReconciled(prev => new Set([...prev, itemId]));
       } else if (action === "flag") {
         // Just set flagged status when flag link is clicked (no API call yet)
         updateData = {
@@ -1338,6 +1353,9 @@ const App = ({ config }) => {
     // Reset frontend pagination to page 1
     setFrontendCurrentPage(1);
 
+    // Clear recently reconciled items on Accept All
+    setRecentlyReconciled(new Set());
+
     // Reload data with existing filters
     if (dataFeed && dataFeed.trim() !== '' && type && type.trim() !== '') {
       const validation = validateGraphUrl(dataFeed);
@@ -1409,6 +1427,11 @@ const App = ({ config }) => {
   let itemsAfterShowAllFilter = reconciledItems;
   if (!showAll) {
     itemsAfterShowAllFilter = reconciledItems.filter(item => {
+      // Keep recently reconciled items visible to show user the result of their action
+      if (recentlyReconciled.has(item.id)) {
+        return true;
+      }
+
       // Hide pre-reconciled entities (entities that were already reconciled when loaded)
       if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) {
         return false;
