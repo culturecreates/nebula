@@ -212,7 +212,7 @@ class MintController < ApplicationController
             <http://www.wikidata.org/entity/#{params[:uri]}> schema:description ?desc . 
             filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
           }
-          filter (lang(?label) = 'en' || lang(?label) = 'fr') 
+          filter (lang(?label) = 'en' || lang(?label) = 'fr' || lang(?label) = 'mul' )
         }
       SPARQL
       solutions = sparql.query(select_query)

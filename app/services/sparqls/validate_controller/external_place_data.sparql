@@ -20,7 +20,7 @@ WHERE {
 
   OPTIONAL {
     <EXTERNAL_URI> <http://www.w3.org/2000/01/rdf-schema#label> ?name . 
-    filter (lang(?name) = 'en' || lang(?name) = 'fr' )
+    filter (lang(?name) = 'en' || lang(?name) = 'fr' || lang(?name) = 'mul')
   }
 
   OPTIONAL {
