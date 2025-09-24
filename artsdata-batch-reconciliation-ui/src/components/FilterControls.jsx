@@ -22,7 +22,10 @@ const CANADIAN_REGIONS = [
 const FilterControls = ({
   dataFeed, setDataFeed, type, setType, region, setRegion, minScore, setMinScore, showAll, setShowAll,
   filterText, setFilterText, pageSize, setPageSize, loading, error,
-  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch, onShowAllToggle
+  onAcceptAll, totalItems, currentPage, setCurrentPage, hasResults, onSearch, onShowAllToggle,
+  // Frontend pagination props
+  frontendCurrentPage, setFrontendCurrentPage, frontendPageSize, setFrontendPageSize,
+  totalFilteredItems, totalPages, reconciliationStatus
 }) => {
   const [validation, setValidation] = useState({ isValid: true, message: '' });
   const [inputValue, setInputValue] = useState(dataFeed || '');
@@ -229,7 +232,7 @@ const FilterControls = ({
       )}
     </div>
     
-    {/* Second row: Filter results, Minimum Score, Show All, Page Size, Pagination */}
+    {/* Second row: Filter results, Show All, Page Size, Pagination */}
     <div className="filter-row-2">
       <div className="form-group">
         <div className="input-wrapper">
@@ -264,6 +267,36 @@ const FilterControls = ({
           <span className="checkbox-label">Show all</span>
         </label>
       </div>
+      {hasResults && totalPages > 1 && !loading && reconciliationStatus === 'complete' && (
+        <div className="pagination-container">
+          <div className="pagination-info">
+            <span className="text-muted">
+              {totalFilteredItems} items, page {frontendCurrentPage} of {totalPages}
+            </span>
+          </div>
+          <div className="pagination-controls">
+            <button
+              type="button"
+              onClick={() => setFrontendCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={frontendCurrentPage === 1 || loading}
+              className="btn btn-outline-secondary btn-sm"
+            >
+              Previous
+            </button>
+            <span className="pagination-current">
+              Page {frontendCurrentPage}
+            </span>
+            <button
+              type="button"
+              onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={frontendCurrentPage === totalPages || loading}
+              className="btn btn-outline-secondary btn-sm"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
     
     {loading && (

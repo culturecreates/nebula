@@ -43,13 +43,25 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Provide more specific error messages based on HTTP status
+      if (response.status === 404) {
+        throw new Error(`Data feed not found (404). Please check the graph URL.`);
+      } else if (response.status === 400) {
+        throw new Error(`Invalid request (400). Please verify the data feed URL and entity type.`);
+      } else if (response.status === 500) {
+        throw new Error(`Server error (500). The data feed service is temporarily unavailable.`);
+      } else if (response.status === 503) {
+        throw new Error(`Service unavailable (503). Please try again later.`);
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     }
 
     const data = await response.json();
-    
-    // Handle empty API results
+
+    // Handle empty API results - provide additional context
     if (!data || (Array.isArray(data) && data.length === 0)) {
+      console.info(`No entities found for type "${type}" in graph "${graphUrl}"${region ? ` for region "${region}"` : ''}`);
       return [];
     }
     
@@ -60,6 +72,16 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
       console.log('Request aborted:', error);
       throw error;
     }
+
+    // Provide more specific error messages for common network issues
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to the data feed service. Please check your internet connection.');
+    } else if (error.name === 'TypeError' && error.message.includes('NetworkError')) {
+      throw new Error('Network error: The data feed service is unreachable. Please try again later.');
+    } else if (error.message.includes('timeout')) {
+      throw new Error('Request timeout: The data feed service is taking too long to respond. Please try again.');
+    }
+
     console.error('Error fetching dynamic data:', error);
     throw error;
   }
