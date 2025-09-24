@@ -63,6 +63,9 @@ class EntityController < ApplicationController
       # render in entity view
       format.all { 
         @entity.load_graph
+        if @entity.errors.any?
+          flash.alert = @entity.errors.join(", ")
+        end
         @show_expand_button = true if user_signed_in?
         @show_add_sameas_button = true if user_signed_in?
         @target_types = [

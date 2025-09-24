@@ -1,11 +1,12 @@
 
 class Entity
-  attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri
+  attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
     @graph = h[:graph]
     @card = {}
+    @errors = []
   end
 
   # Try to get a label of name property
@@ -223,6 +224,7 @@ class Entity
           RDF::Turtle::Reader.new(response[:message], rdfstar: true) {|reader| graph << reader}
         end
       else
+        @errors << "Failed to construct graph: #{response[:message]}"
         RDF::Graph.new
       end
     end
