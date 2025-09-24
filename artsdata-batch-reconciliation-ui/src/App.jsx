@@ -1693,7 +1693,17 @@ const App = ({ config }) => {
                   </div>
                   <div className="pagination-controls">
                     <button
-                      onClick={() => setFrontendCurrentPage(prev => Math.max(1, prev - 1))}
+                      type="button"
+                      onClick={() => {
+                        setFrontendCurrentPage(prev => Math.max(1, prev - 1));
+                        // Scroll to first item of the new page after content updates
+                        setTimeout(() => {
+                          const firstRow = document.querySelector('tbody tr');
+                          if (firstRow) {
+                            firstRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 0);
+                      }}
                       disabled={frontendCurrentPage === 1 || loading}
                       className="btn btn-outline-secondary btn-sm"
                     >
@@ -1703,7 +1713,17 @@ const App = ({ config }) => {
                       Page {frontendCurrentPage}
                     </span>
                     <button
-                      onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      type="button"
+                      onClick={() => {
+                        setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1));
+                        // Scroll to first item of the new page after content updates
+                        setTimeout(() => {
+                          const firstRow = document.querySelector('tbody tr');
+                          if (firstRow) {
+                            firstRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 0);
+                      }}
                       disabled={frontendCurrentPage === totalPages || loading}
                       className="btn btn-outline-secondary btn-sm"
                     >

@@ -276,6 +276,7 @@ const FilterControls = ({
           </div>
           <div className="pagination-controls">
             <button
+              type="button"
               onClick={() => setFrontendCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={frontendCurrentPage === 1 || loading}
               className="btn btn-outline-secondary btn-sm"
@@ -286,6 +287,7 @@ const FilterControls = ({
               Page {frontendCurrentPage}
             </span>
             <button
+              type="button"
               onClick={() => setFrontendCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={frontendCurrentPage === totalPages || loading}
               className="btn btn-outline-secondary btn-sm"
