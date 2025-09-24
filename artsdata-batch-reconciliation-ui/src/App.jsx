@@ -1760,16 +1760,18 @@ const App = ({ config }) => {
               </div>
             )}
 
-            {/* Accept All button on the right */}
-            <div className="bottom-accept-all">
-              <button
-                onClick={handleAcceptAll}
-                className="btn btn-primary"
-                disabled={itemsReadyToAccept === 0 || loading}
-              >
-                Accept All ({itemsReadyToAccept})
-              </button>
-            </div>
+            {/* Accept All button on the right - only show when there are more than 5 items */}
+            {totalFilteredItems > 5 && (
+              <div className="bottom-accept-all">
+                <button
+                  onClick={handleAcceptAll}
+                  className="btn btn-primary"
+                  disabled={itemsReadyToAccept === 0 || loading}
+                >
+                  Accept All ({itemsReadyToAccept})
+                </button>
+              </div>
+            )}
           </div>
         )}
 
