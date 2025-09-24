@@ -25,8 +25,8 @@ class QueryController < ApplicationController
     solutions = if !construct_files
                   begin
                     ArtsdataApi::SparqlService.client.query(@query).limit(1000)
-                  rescue SPARQL::Client::ServerError => e
-                    flash.alert = e.message[0..100]
+                  rescue StandardError => e # SPARQL::Client::ClientError and SPARQL::Client::ServerError
+                    flash.alert = e.message[0..100] + (e.message.length > 100 ? "..." : "")
                     return redirect_to root_path,  data: { turbo: false }
                   end
                 else
