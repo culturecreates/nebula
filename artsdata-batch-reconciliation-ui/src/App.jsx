@@ -1153,6 +1153,10 @@ const App = ({ config }) => {
       let errorData = { actionError: error.message };
       if (action === "mint_preview" || action === "mint_final") {
         errorData.mintError = error.message;
+        // Preserve selectedMintType for mint errors so UI shows correct type
+        if (action === "mint_preview" && selectedType) {
+          errorData.selectedMintType = selectedType;
+        }
       } else if (action === "link") {
         errorData.linkError = error.message;
         // Keep the item in judgment-ready state so user can change selection

@@ -288,6 +288,32 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
  * @param {string} facts - Optional graph of facts
  * @returns {Promise<Object>} - Preview results
  */
+// Helper function to construct mint URLs correctly, avoiding duplicate /mint paths
+function buildMintUrl(baseEndpoint, path) {
+  // Remove trailing slash from base endpoint
+  const cleanBase = baseEndpoint.replace(/\/$/, '');
+
+  // Check if base endpoint already ends with /mint
+  if (cleanBase.endsWith('/mint')) {
+    return `${cleanBase}${path}`;
+  } else {
+    return `${cleanBase}/mint${path}`;
+  }
+}
+
+// Helper function to construct link URLs correctly, avoiding duplicate /link paths
+function buildLinkUrl(baseEndpoint, path) {
+  // Remove trailing slash from base endpoint
+  const cleanBase = baseEndpoint.replace(/\/$/, '');
+
+  // Check if base endpoint already ends with /link
+  if (cleanBase.endsWith('/link')) {
+    return `${cleanBase}${path}`;
+  } else {
+    return `${cleanBase}/link${path}`;
+  }
+}
+
 export async function previewMint(uri, classToMint, config = {}, facts = null) {
   // Use config endpoints or fall back to defaults
   const mintEndpoint = config.mintEndpoint || DEFAULT_STAGING_API_BASE;
@@ -302,7 +328,7 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
       params.append('facts', facts);
     }
 
-    const response = await fetch(`${mintEndpoint}/mint/preview?${params}`, {
+    const response = await fetch(`${buildMintUrl(mintEndpoint, '/preview')}?${params}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
@@ -335,7 +361,7 @@ export async function mintEntity(uri, classToMint, reference, config = {}) {
   const publisherUri = config.userUri || DEFAULT_PUBLISHER_URI;
   
   try {
-    const response = await fetch(`${mintEndpoint}/mint`, {
+    const response = await fetch(`${buildMintUrl(mintEndpoint, '')}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -380,7 +406,7 @@ export async function linkEntity(externalUri, classToLink, adUri, config = {}) {
       adUri
     });
     
-    const response = await fetch(`${linkEndpoint}/link?${params}`, {
+    const response = await fetch(`${buildLinkUrl(linkEndpoint, '')}?${params}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json'
@@ -406,8 +432,10 @@ export async function linkEntity(externalUri, classToLink, adUri, config = {}) {
  * @returns {Promise<Object>} - Flag results
  */
 export async function flagEntity(uri, config = {}) {
-  // Use config endpoints or fall back to defaults
+  // Use base API endpoint for maintenance operations, not linkEndpoint
   const flagEndpoint = config.linkEndpoint || DEFAULT_STAGING_API_BASE;
+  // Remove /link suffix if present since flag endpoint is at base level
+  const baseEndpoint = flagEndpoint.replace(/\/link$/, '');
   const publisherUri = config.userUri || DEFAULT_PUBLISHER_URI;
   
   try {
@@ -416,7 +444,7 @@ export async function flagEntity(uri, config = {}) {
       publisher: publisherUri
     });
     
-    const response = await fetch(`${flagEndpoint}/maintenance/flag_for_review?${params}`, {
+    const response = await fetch(`${baseEndpoint}/maintenance/flag_for_review?${params}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json'
