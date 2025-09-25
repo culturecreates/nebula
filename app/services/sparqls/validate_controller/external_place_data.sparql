@@ -47,7 +47,7 @@ WHERE {
     filter (lang(?territoryLabel) = 'en' || lang(?territoryLabel) = 'fr' )
     OPTIONAL { # Province
       ?territory wdt:P131* ?prov .
-      ?prov wdt:P31 wd:Q11828004 .
+      ?prov  wdt:P31/^wdt:P527 wd:Q2879 .
       ?prov wdt:P300 ?code .
       bind(strafter(?code,"-") as ?prov_code )
     }
