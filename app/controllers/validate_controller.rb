@@ -8,19 +8,22 @@ class ValidateController < ApplicationController
     url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
     begin
       response = HTTParty.get(url)
-      raise "Mint API #{response.code}: #{response.message}" if response.code != 200
+      raise "Mint API #{response.code}: #{response.message}" if response['status'] != 'success'
     rescue => e
-      flash.now.alert = "Error: #{e.message}"
-      return
+      flash.now.alert = "Error calling Mint Preview API: #{e.message.truncate(100)}"
     end
+   
     body = JSON.parse(response.body)
-    @report = body['message']
     @entity = Entity.new(entity_uri: "http://new.uri")
     if body['status'] == "success"
+      @report = body['message']
       jsonld_data = body['data']
       @entity.graph = RDF::Graph.new do |graph|
         RDF::Reader.for(:jsonld).new(jsonld_data.to_json, rdfstar: true)  {|reader| graph << reader}
       end
+    else
+      @entity.graph = RDF::Graph.new
+      flash.now.alert = "Data Error: #{body['message'].truncate(100)}"
     end
   end
 
