@@ -91,8 +91,15 @@ module EntityHelper
     link = entity_path(uri: uri)
     char_max = 60
     display_uri = use_prefix(uri)
-    display_uri = display_uri.truncate(char_max) if display_uri.length > char_max
+    display_uri = remove_protocol(display_uri)
+    if display_uri.length > char_max
+      display_uri = display_uri[0..char_max/2] + "..." + display_uri[-(char_max/2)..-1] 
+    end
     "<a href='#{link}' rel='nofollow' target='_top'>#{display_uri}</a>".html_safe
+  end
+
+  def remove_protocol(uri)
+    uri.to_s.gsub(%r{^https?://}, '')
   end
 
   def display_reference(uri)
