@@ -50,8 +50,8 @@ module ApplicationHelper
 
     uri = uri.value if uri.class != String
     uri_compact = uri.gsub("http://schema.org/","schema:")
-      .gsub("https://schema.org/","schemas:")
-      .gsub("http://kg.artsdata.ca/resource/","ad:")
+      .gsub("https://schema.org/","schema-https:")
+      .gsub("http://kg.artsdata.ca/resource/","adr:")
       .gsub("http://kg.artsdata.ca/ontology/","ado:")
       .gsub("http://kg.artsdata.ca/databus/","databus:")
       .gsub("http://kg.footlight.io/resource/","footlight-console:")
