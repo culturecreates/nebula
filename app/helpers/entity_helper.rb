@@ -59,7 +59,7 @@ module EntityHelper
     elsif obj.value.starts_with?("<a href='/")
       "<span><a href='/#{ I18n.locale }/#{obj.value.split("<a href='/").last}<span>".html_safe
     else
-      word_max = 50
+      word_max = 30
       if obj.value.split.length > word_max
         <<-HTML.html_safe
           <div data-controller='read-more' data-read-more-more-text-value='Read more ↓' data-read-more-less-text-value='Read less ↑'>
