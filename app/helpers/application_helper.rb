@@ -109,7 +109,7 @@ module ApplicationHelper
 
   def generate_action_div
     if @url
-      escaped_http_body = CGI.escapeHTML(@httpBody&.gsub('{{PublisherWebID}}', user_uri))
+      escaped_http_body = CGI.escapeHTML(@httpBody&.gsub('{{PublisherWebID}}', controller.user_uri))
       <<-HTML.html_safe
         <div
           data-controller="githubapi"
