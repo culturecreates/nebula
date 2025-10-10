@@ -1,7 +1,10 @@
-# Module for Artsdata.ca API
-module ArtsdataApi
+# Module for Artsdata Graph API v2
+require 'faraday'
+require 'oj'
+require 'ostruct'
+module ArtsdataGraph
   module V2
-    # Main Client for Artsdata.ca
+    # Main Client for Artsdata Graph
     # Returns Hash { code: 200|204|... , message: error string or hash }
     # code: 200 is success for SPARQL queries
     # code: 204 is success for SPARQL updates
@@ -145,6 +148,8 @@ module ArtsdataApi
           client.request :url_encoded
           client.adapter Faraday.default_adapter
           client.headers['Authorization'] = "Basic #{@oauth_token}" if @oauth_token.present?
+          default_agent = Faraday::VERSION ? "Faraday v#{Faraday::VERSION}" : "Faraday"
+          client.headers['User-Agent'] = "#{default_agent} (compatible; ArtsdataGraph::V2::Client; +https://artsdata.ca)"
           client.options.timeout = 300 # seconds or about 5 minutes for long updates of 10 MB of data
         end
       end

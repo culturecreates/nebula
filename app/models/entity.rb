@@ -332,12 +332,12 @@ class Entity
   private
 
   def artsdata_client
-    @@artsdata_client ||= ArtsdataApi::V2::Client.new(
+    @@artsdata_client ||= ArtsdataGraph::V2::Client.new(
         graph_repository: Rails.application.credentials.graph_repository, 
         api_endpoint: Rails.application.config.graph_api_endpoint)
   end
 
   def artsdata_update_client
-    @@artsdata_update_client ||= ArtsdataApi::SparqlService.update_client
+    @@artsdata_update_client ||= ArtsdataGraph::SparqlService.update_client
   end
 end

@@ -4,7 +4,7 @@ class SparqlManagerController < ApplicationController
   def index
   
     query =  SparqlLoader.load("sparql_controller/list_sparqls")
-    @sparqls = ArtsdataApi::SparqlService.client.query(query).limit(1000) # TODO: fix limit
+    @sparqls = ArtsdataGraph::SparqlService.client.query(query).limit(1000) # TODO: fix limit
   end
 
   def new

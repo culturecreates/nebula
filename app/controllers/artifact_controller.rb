@@ -8,7 +8,7 @@ class ArtifactController < ApplicationController
     # Placeholders in SPARQL query
     @query =  SparqlLoader.load(sparql_file, [ "DATABUS_ACCOUNT", @databus_account.downcase])
     @artifacts =  begin
-                    ArtsdataApi::SparqlService.client.query(@query).limit(1000)  # TODO: fix limit
+                    ArtsdataGraph::SparqlService.client.query(@query).limit(1000)  # TODO: fix limit
                   rescue StandardError => e # SPARQL::Client::ClientError and SPARQL::Client::ServerError
                     flash.alert = e.message[0..100] + (e.message.length > 100 ? "..." : "")
                     return redirect_to root_path,  data: { turbo: false }
@@ -23,7 +23,7 @@ class ArtifactController < ApplicationController
   def get_automint_status(graph)
     subject = RDF::URI(graph)
     automint = RDF::URI("http://kg.artsdata.ca/ontology/automint")
-    response = ArtsdataApi::SparqlService.client.select.where([subject, automint, :o]).execute
+    response = ArtsdataGraph::SparqlService.client.select.where([subject, automint, :o]).execute
 
     return response.first&.o&.value == "true"
   end
@@ -51,7 +51,7 @@ class ArtifactController < ApplicationController
     SPARQL
 
     begin
-      ArtsdataApi::SparqlService.update_client.update(query)
+      ArtsdataGraph::SparqlService.update_client.update(query)
       flash.notice = "Auto-Minting has been #{new_boolean == "true" ? 'enabled' : 'disabled'}."
     rescue StandardError => e
       flash.alert = "Failed to toggle Auto-Minting: #{e.message}"

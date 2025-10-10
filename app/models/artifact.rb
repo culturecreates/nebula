@@ -45,11 +45,11 @@ class Artifact
     # Load the artifact from the databus
     artifact = RDF::URI(@uri)
     @graph = RDF::Graph.new
-    response = ArtsdataApi::SparqlService.client.construct([artifact, :p, :o]).where([[artifact, :p, :o]])
+    response = ArtsdataGraph::SparqlService.client.construct([artifact, :p, :o]).where([[artifact, :p, :o]])
     response.each_statement do |statement|
       @graph << statement
     end
-    response = ArtsdataApi::SparqlService.client.construct([:s, :p, artifact]).where([:s, :p, artifact])
+    response = ArtsdataGraph::SparqlService.client.construct([:s, :p, artifact]).where([:s, :p, artifact])
     response.each_statement do |statement|
       @graph << statement
     end
