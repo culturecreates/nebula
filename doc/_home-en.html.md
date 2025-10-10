@@ -16,6 +16,7 @@ Welcome to the Artsdata knowledge graph. To discover the advantages of linked op
 - [List of data sources](/query/show?sparql=feeds_all&title=Data+Feeds)
 - [List of data consumers](/en/doc/data-consumers)
 - [Image policy](/en/doc/image-policy)
+- [Artsdata crawler](/en/doc/artsdata-crawler)
 
 ---
 
