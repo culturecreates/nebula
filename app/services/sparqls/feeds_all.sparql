@@ -64,8 +64,13 @@ where
         }
         bind(COALESCE(?group_label, ?group_id) as ?groups)
     }
+    OPTIONAL {
+        ?graphs schema:additionalType ado:FlaggedForReview .
+        <<  ?graphs schema:additionalType ado:FlaggedForReview >> prov:wasgeneratedBy [ schema:description ?github_issue ; ] .
+        bind(CONCAT(" <a style='color:red' href='",str(?github_issue),"'><i class=\"fa fa-flag\"></i></a>") as ?issue_link)
+    }
     bind(ENCODE_FOR_URI(str(?datasets)) as ?dataset_escaped)
-    bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graphs),"'>",str(?event_count),"</a>") as ?event)
+    bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graphs),"'>",str(?event_count),"</a>",IF(BOUND(?issue_link),str(?issue_link),"")) as ?event)
     bind(CONCAT("<a href='/query/show?title=Place entities in ",str(?dataset_escaped),"&sparql=list_places&graph=",str(?graphs),"'>",str(?place_count),"</a>") as ?place)
     bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graphs),"'>",str(?person_count),"</a>") as ?person)
     bind(CONCAT("<a href='/query/show?title=Organization entities in ",str(?dataset_escaped),"&sparql=list_organizations&graph=",str(?graphs),"'>",str(?organization_count),"</a>") as ?organization)
