@@ -14,9 +14,9 @@
     </a>
     <% if user_has_access?("cms_links") %>
       |
-      <%= link_to "CMS v2", footlight_export_path(uri: @entity.entity_uri, version: "v2") %>
-      |
       <%= link_to "CMS v3", footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+      |
+      <%= link_to "CMS v4", footlight_export_path(uri: @entity.entity_uri, version: "v4") %>
     <% end %>
     |
   <% else %>
