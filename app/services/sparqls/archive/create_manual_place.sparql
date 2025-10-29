@@ -32,7 +32,7 @@ insert {
             <<   <http://kg.artsdata.ca/resource/K2-4993#PostalAddress>  schema:streetAddress "245 Rue Ontario E"@fr  >> prov:wasDerivedFrom <http://www.wikidata.org/entity/Q3279028> .
             ?activity1 
             prov:wasInformedBy adr:K1-102  ;
-            prov:wasAssociatedWith <https://github.com/saumier> ;
+            prov:wasAssociatedWith <https://github.com/saumier#this> ;
             prov:endedAtTime  ?now .
     }
     } where {
