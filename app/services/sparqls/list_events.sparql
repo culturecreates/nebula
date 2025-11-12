@@ -5,6 +5,7 @@ PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
 SELECT 
   ?uri 
   (sample(?name_language) as ?name)  
+  (sample(?parents) as ?parent) 
   (sample(?location_name) as ?location) 
   (sample(?additionalType) as ?type)  
   ?startDate 
@@ -19,6 +20,17 @@ WHERE {
              schema:startDate ?startDate . 
         OPTIONAL {  ?uri schema:endDate ?endDate . 
           BIND(IF(datatype(?endDate) = xsd:date, xsd:dateTime(CONCAT(STR(?endDate), "T00:00:00")), ?endDate) AS ?normalizedEndDate)
+        }
+        OPTIONAL {
+          ?parent_entitys ?link  ?uri .
+          filter(isblank(?uri))
+          OPTIONAL {
+            ?super_parent_entitys ?parent_link ?parent_entitys
+            filter(isblank(?parent_entitys))
+            filter(!isblank(?super_parent_entitys))
+          }
+          BIND (COALESCE(?super_parent_entitys, ?parent_entitys) as ?parents)
+          filter(!isblank(?parents))
         }
         BIND(IF(datatype(?startDate) = xsd:date, xsd:dateTime(CONCAT(STR(?startDate), "T00:00:00")), ?startDate) AS ?normalizedStartDate)
         OPTIONAL {
