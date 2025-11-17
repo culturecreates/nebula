@@ -39,6 +39,10 @@ Rails.application.routes.draw do
     
   end
 
+  # Host a key directory for Cloudflare verification
+  # https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/#2-host-a-key-directory 
+  get '/.well-known/http-message-signatures-directory', to: 'bot_verification#http_message_signatures_directory'
+
   # Support legacy urls to Zazuko YASGUI SPARQL UI
   get 'sparql', to: redirect('http://artsdata-trifid-production.herokuapp.com/sparql/', status: 307)
 
