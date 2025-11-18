@@ -31,6 +31,36 @@ function extractSchemaStatus(uri) {
   return parts[parts.length - 1] || uri;
 }
 
+function extractTypeInfo(type) {
+  if (!type) return { name: '', url: '' };
+
+  if (Array.isArray(type)) {
+    const firstType = type[0];
+    if (typeof firstType === 'object') {
+      return {
+        name: firstType.name || '',
+        url: firstType.id || ''
+      };
+    }
+    return {
+      name: firstType?.split('/').pop() || firstType || '',
+      url: firstType || ''
+    };
+  }
+
+  if (typeof type === 'object') {
+    return {
+      name: type.name || '',
+      url: type.id || ''
+    };
+  }
+
+  return {
+    name: type.split('/').pop() || type,
+    url: type
+  };
+}
+
 // Helper to generate Artsdata entity URL based on environment
 function getArtsdataEntityUrl(uri, config = {}) {
   let artsdataBaseUrl = 'https://staging.kg.artsdata.ca'; // Default to staging
@@ -657,10 +687,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                       {item.type?.toLowerCase().includes('place') && <td>{match.addressLocality || ''}</td>}
                       {item.type?.toLowerCase().includes('place') && <td>{match.addressRegion || ''}</td>}
                       <td>
-                        {Array.isArray(match.type) 
-                          ? (typeof match.type[0] === 'object' ? match.type[0].id || match.type[0].name : match.type[0])
-                          : (typeof match.type === 'object' ? match.type.id || match.type.name : match.type)
-                        }
+                        {extractTypeInfo(match.type).name}
                       </td>
                     </tr>
                   );
