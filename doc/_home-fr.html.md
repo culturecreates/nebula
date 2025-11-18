@@ -14,6 +14,7 @@ Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des
 - [Liste des sources de données](https://kg.artsdata.ca/fr/query/show?sparql=feeds_all&title=Data+Feeds)
 - [Liste des consommateurs de données](https://kg.artsdata.ca/en/doc/data-consumers)
 - [Politique d’images](https://kg.artsdata.ca/fr/doc/image-policy)
+- [Conditions pour les fournisseurs de données](https://kg.artsdata.ca/fr/doc/contributor-conditions)
 
 ---
 ## Explorer le graphe de connaissances
