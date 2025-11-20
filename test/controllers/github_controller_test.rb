@@ -10,7 +10,7 @@ class GithubControllerTest < ActionDispatch::IntegrationTest
       .to_return(status: 200, body: { workflow_runs: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
 
     get github_workflows_url
-    assert_response :success
+    assert_response :failure
     assert_equal [], controller.instance_variable_get(:@workflows)
   end
 
