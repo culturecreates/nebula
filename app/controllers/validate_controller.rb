@@ -3,9 +3,12 @@ class ValidateController < ApplicationController
   def show
     uri = params[:uri]
     class_to_mint = params[:classToMint]
-    # Call Artsdata API to get the RDF graph for the entity
     mint_endpoint = Rails.application.config.artsdata_mint_endpoint
+
+    # Call Artsdata API to get the RDF graph for the entity
     url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
+    
+    # COMMON CODE
     begin
       response = HTTParty.get(url)
       raise "Mint API #{response.code}: #{response.message}" if response['status'] != 'success'
@@ -29,22 +32,36 @@ class ValidateController < ApplicationController
 
   def wikidata
     uri = params[:uri] 
-    @entity = Entity.new(entity_uri: uri)
     @class_to_mint = params[:class_to_mint] # i.e. schema:Person
+    mint_endpoint = Rails.application.config.artsdata_mint_endpoint
+
+
+    
     begin
+      
       ## Build graph from Wikidata
+      #
+      #### Move to Artsdata API
       wikidata_sparql_endpoint= "https://query.wikidata.org/sparql"
       wikidata_sparql = SPARQL::Client.new(wikidata_sparql_endpoint)
       response = wikidata_sparql.query(sparql_by_class_to_mint(@class_to_mint, uri))
-      @entity.graph = RDF::Graph.new << response 
+      entity = Entity.new(entity_uri: uri)
+      entity.graph = RDF::Graph.new << response 
+      facts = CGI.escape(entity.graph.dump(:jsonld).squish)
+      #######
+      # end move
+      #########
 
       ## Call Artsdata Preview with facts (JSON-LD) from Wikidata
-      mint_endpoint = Rails.application.config.artsdata_mint_endpoint
-      facts = CGI.escape(@entity.graph.dump(:jsonld).squish)
-      
       url = "#{mint_endpoint}/preview?classToMint=#{@class_to_mint}&facts=#{facts}"
+      
+      # COMMON CODE
       response = HTTParty.get(url)
       raise "Mint API Error: #{response.code} - #{response.message}" if response.code != 200
+      
+      
+      
+      
       body = JSON.parse(response.body)
       @report = body['message']
       @entity = Entity.new(entity_uri: "http://new.uri")
@@ -60,6 +77,7 @@ class ValidateController < ApplicationController
     render :show
   end
 
+  # TODO: Remove because this was moved to Artsdata API
   def sparql_by_class_to_mint(class_to_mint, uri)
     case class_to_mint
     when "schema:Person"
