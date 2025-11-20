@@ -317,13 +317,13 @@ function buildLinkUrl(baseEndpoint, path) {
 export async function previewMint(uri, classToMint, config = {}, facts = null) {
   // Use config endpoints or fall back to defaults
   const mintEndpoint = config.mintEndpoint || DEFAULT_STAGING_API_BASE;
-  
+
   try {
     const params = new URLSearchParams({
       uri,
       classToMint
     });
-    
+
     if (facts) {
       params.append('facts', facts);
     }
@@ -340,7 +340,73 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
     }
 
     const data = await response.json();
-    return data;
+
+    // Parse SHACL ValidationReport from the response
+    // The API returns a data array containing JSON-LD objects
+    // We need to find the ValidationReport object and check sh:conforms
+    const validationReport = data.data?.find(item =>
+      item['@type']?.includes('http://www.w3.org/ns/shacl#ValidationReport')
+    );
+
+    if (!validationReport) {
+      // If no validation report found, treat as error
+      return {
+        status: 'error',
+        message: 'No validation report found in preview response',
+        rawResponse: data
+      };
+    }
+
+    // Extract the conforms boolean value
+    const conformsArray = validationReport['http://www.w3.org/ns/shacl#conforms'];
+    const conforms = conformsArray?.[0]?.['@value'] === 'true';
+
+    if (conforms) {
+      // Validation passed - entity can be minted
+      return {
+        status: 'success',
+        message: data.message || 'Validation passed',
+        validationReport,
+        rawResponse: data
+      };
+    } else {
+      // Validation failed - extract error messages from sh:result
+      const resultRefs = validationReport['http://www.w3.org/ns/shacl#result'] || [];
+      const errorMessages = [];
+
+      // Find the actual ValidationResult objects in the data array
+      resultRefs.forEach(resultRef => {
+        const resultId = resultRef['@id'];
+        const validationResult = data.data?.find(item => item['@id'] === resultId);
+
+        if (validationResult) {
+          const resultMessage = validationResult['http://www.w3.org/ns/shacl#resultMessage'];
+          const message = resultMessage?.[0]?.['@value'];
+
+          const resultPath = validationResult['http://www.w3.org/ns/shacl#resultPath'];
+          const path = resultPath?.[0]?.['@id'];
+
+          if (message) {
+            // Create a user-friendly error message
+            const pathName = path ? path.split('/').pop() : 'Unknown field';
+            errorMessages.push(`${pathName}: ${message}`);
+          }
+        }
+      });
+
+      // Build a comprehensive error message
+      const errorMessage = errorMessages.length > 0
+        ? `Validation failed:\n${errorMessages.join('\n')}`
+        : (data.message || 'Validation failed - entity cannot be minted');
+
+      return {
+        status: 'error',
+        message: errorMessage,
+        validationReport,
+        errors: errorMessages,
+        rawResponse: data
+      };
+    }
   } catch (error) {
     console.error('Error previewing mint:', error);
     throw error;
