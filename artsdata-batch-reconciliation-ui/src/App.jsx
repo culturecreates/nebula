@@ -17,7 +17,7 @@ import { StickyHeadersProvider } from "./components/StickyHeadersProvider";
 import { fetchDynamicData } from "./services/dataFeedService";
 import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity, getReferenceUri } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
-//Test workflow
+//Test workflow - No.2
 // Helper function to sort entities by priority: auto-selected first, then needs-judgment, then reconciled
 // Secondary sort: alphabetical by name within each priority group
 function sortEntitiesByPriority(entities, globalJudgments) {
