@@ -1,0 +1,59 @@
+name: "Build Batch Reconciliation UI"
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "artsdata-batch-reconciliation-ui/**"
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "artsdata-batch-reconciliation-ui/package-lock.json"
+
+      - name: Install dependencies
+        working-directory: ./artsdata-batch-reconciliation-ui
+        run: npm ci
+
+      - name: Build production bundle
+        working-directory: ./artsdata-batch-reconciliation-ui
+        run: npm run build
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push build artifacts
+        run: |
+          git add public/batch-reconciliation-ui/
+
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "No changes to build artifacts"
+          else
+            git commit -m "build: update batch reconciliation UI production assets
+
+          - Automated build from workflow run
+          - Source commit: ${{ github.sha }}
+          - Triggered by: ${{ github.event_name }}
+          - Updated files in public/batch-reconciliation-ui/"
+
+            git push
+          fi
