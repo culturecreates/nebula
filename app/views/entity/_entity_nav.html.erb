@@ -30,9 +30,9 @@
         rel: "nofollow" %>
         |
       <% end %>
-      <% if cms_ranked_link(@entity) %>
-        <%= link_to "CMS view",
-        dereference_external_path(uri: cms_ranked_link(@entity)),
+      <% if query_ranked_link(@entity) %>
+        <%= link_to "Ranked (properties)",
+        dereference_external_path(uri: query_ranked_link(@entity)),
         class: "text-decoration-none ms-2 me-2",
         rel: "nofollow" %>
         |

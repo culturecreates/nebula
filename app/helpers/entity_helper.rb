@@ -133,18 +133,18 @@ module EntityHelper
   end
 
   def ranked_link(entity)
-    if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization" 
+    if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization"  || entity.type == "http://schema.org/Event" 
       return "http://api.artsdata.ca/ranked/#{entity.k_number}?format=jsonld"
     end
   end
 
-  def cms_ranked_link(entity)
+  def query_ranked_link(entity)
       if entity.type == "http://schema.org/Person" || entity.type == "http://schema.org/Organization"
         return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_org_person_footlight&sparql=ranked_org_person_footlight"
       elsif entity.type == "http://schema.org/Place"
         return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=ranked_place_footlight"
       elsif entity.type == "http://schema.org/Event"
-        return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&frame=ranked_event_footlight&sparql=ranked_event_footlight"
+        return "http://api.artsdata.ca/query?adid=#{entity.k_number}&format=jsonld&sparql=ranked_event_footlight"
       end
   end
 
