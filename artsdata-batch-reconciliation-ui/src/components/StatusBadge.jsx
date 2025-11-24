@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AlertCircle, Flag } from 'lucide-react';
+import { Tooltip } from 'bootstrap';
 
 const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, entityType, isFlaggedForReview }) => {
+  const tooltipRef = useRef(null);
+  const tooltipInstanceRef = useRef(null);
   const getStatusClass = () => {
     switch (status) {
       case 'needs-judgment': return 'status-badge status-needs-judgment';
@@ -35,15 +38,76 @@ const StatusBadge = ({ status, hasError, autoMatched, mintError, linkError, enti
     }
   };
 
+  // Format error message as HTML bullet list for tooltip
+  const formatErrorMessageHTML = (errorMsg) => {
+    if (!errorMsg) return '';
+
+    // Check if error message contains newlines (indicating multiple errors)
+    if (errorMsg.includes('\n')) {
+      // Split by newlines and format as HTML bullet list
+      const lines = errorMsg.split('\n').filter(line => line.trim());
+
+      // If first line is a header (e.g., "Validation failed:"), keep it separate
+      if (lines.length > 1 && lines[0].toLowerCase().includes('validation failed')) {
+        const header = lines[0];
+        const bullets = lines.slice(1)
+          .map(line => `<li style="text-align: left; margin-bottom: 4px;">${line}</li>`)
+          .join('');
+        return `<div style="text-align: left;"><strong>${header}</strong><ul style="margin: 8px 0 0 0; padding-left: 20px;">${bullets}</ul></div>`;
+      } else {
+        // All lines are errors, add as bullet list
+        const bullets = lines
+          .map(line => `<li style="text-align: left; margin-bottom: 4px;">${line}</li>`)
+          .join('');
+        return `<ul style="margin: 0; padding-left: 20px; text-align: left;">${bullets}</ul>`;
+      }
+    }
+
+    // Single line error, return as-is
+    return errorMsg;
+  };
+
+  const errorMessage = linkError || mintError || "Error occurred";
+  const formattedErrorMessageHTML = formatErrorMessageHTML(errorMessage);
+
+  // Initialize Bootstrap tooltip when error message changes
+  useEffect(() => {
+    if (tooltipRef.current && (hasError || mintError || linkError)) {
+      // Dispose of existing tooltip if it exists
+      if (tooltipInstanceRef.current) {
+        tooltipInstanceRef.current.dispose();
+      }
+
+      // Create new tooltip with HTML content
+      tooltipInstanceRef.current = new Tooltip(tooltipRef.current, {
+        title: formattedErrorMessageHTML,
+        html: true,
+        placement: 'top',
+        trigger: 'hover focus',
+        container: 'body',
+        customClass: 'validation-error-tooltip'
+      });
+
+      // Cleanup function
+      return () => {
+        if (tooltipInstanceRef.current) {
+          tooltipInstanceRef.current.dispose();
+          tooltipInstanceRef.current = null;
+        }
+      };
+    }
+  }, [hasError, mintError, linkError, formattedErrorMessageHTML]);
+
   return (
     <div className="status-container">
       <span className={getStatusClass()}>
         {autoMatched && status === 'Auto-matched' ? '✓ Auto-matched' : getStatusText()}
       </span>
       {(hasError || mintError || linkError) && (
-        <AlertCircle 
-          className="error-icon" 
-          title={linkError || mintError || "Error occurred"}
+        <AlertCircle
+          ref={tooltipRef}
+          className="error-icon"
+          style={{ cursor: 'pointer' }}
         />
       )}
     </div>
