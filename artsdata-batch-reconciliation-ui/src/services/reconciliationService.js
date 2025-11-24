@@ -328,7 +328,10 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
       params.append('facts', facts);
     }
 
-    const response = await fetch(`${buildMintUrl(mintEndpoint, '/preview')}?${params}`, {
+    const url = `${buildMintUrl(mintEndpoint, '/preview')}?${params}`;
+    console.log('Calling mint preview API:', url);
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
@@ -336,10 +339,17 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Mint preview API error:', response.status, errorText);
+      return {
+        status: 'error',
+        message: `API error (${response.status}): ${errorText || 'Unknown error'}`,
+        rawResponse: null
+      };
     }
 
     const data = await response.json();
+    console.log('Mint preview API response:', data);
 
     // Parse SHACL ValidationReport from the response
     // The API returns a data array containing JSON-LD objects
@@ -374,10 +384,14 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
       const resultRefs = validationReport['http://www.w3.org/ns/shacl#result'] || [];
       const errorMessages = [];
 
+      console.log('Validation failed. Processing', resultRefs.length, 'error results');
+
       // Find the actual ValidationResult objects in the data array
-      resultRefs.forEach(resultRef => {
+      resultRefs.forEach((resultRef, index) => {
         const resultId = resultRef['@id'];
         const validationResult = data.data?.find(item => item['@id'] === resultId);
+
+        console.log(`Processing error ${index + 1}:`, resultId, validationResult);
 
         if (validationResult) {
           const resultMessage = validationResult['http://www.w3.org/ns/shacl#resultMessage'];
@@ -385,6 +399,8 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
 
           const resultPath = validationResult['http://www.w3.org/ns/shacl#resultPath'];
           const path = resultPath?.[0]?.['@id'];
+
+          console.log(`  Path: ${path}, Message: ${message}`);
 
           if (message) {
             // Create a user-friendly error message
@@ -394,10 +410,14 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
         }
       });
 
+      console.log('Extracted error messages:', errorMessages);
+
       // Build a comprehensive error message
       const errorMessage = errorMessages.length > 0
         ? `Validation failed:\n${errorMessages.join('\n')}`
         : (data.message || 'Validation failed - entity cannot be minted');
+
+      console.log('Final error message:', errorMessage);
 
       return {
         status: 'error',
@@ -409,7 +429,13 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
     }
   } catch (error) {
     console.error('Error previewing mint:', error);
-    throw error;
+
+    // Return error response instead of throwing, so the detailed message is preserved
+    return {
+      status: 'error',
+      message: error.message || 'Network error: Failed to connect to mint preview API',
+      rawResponse: null
+    };
   }
 }
 
