@@ -26,7 +26,7 @@ class ValidateController < ApplicationController
       end
     else
       @entity.graph = RDF::Graph.new
-      flash.now.alert = "Data Error: #{body['message'].truncate(100)}"
+      flash.now.alert = "Data Error: #{body['message'].truncate(300)}"
     end
   end
 
