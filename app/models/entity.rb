@@ -54,7 +54,8 @@ class Entity
           "http://schema.org/EventSeries",
           "http://schema.org/Place",
           "http://schema.org/Person",
-          "http://schema.org/Organization"].include?(s.object.value)
+          "http://schema.org/Organization",
+          "http://kg.artsdata.ca/ontology/LivePerformanceWork"].include?(s.object.value)
           top_type = s.object
         break
       end
