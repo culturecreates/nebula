@@ -94,7 +94,7 @@
                   } %>
     <% end %>
     |
-    <%= form_with url: maintenance_refresh_entity_path, method: :post, local: true do |form| %>
+    <%= form_with url: maintenance_refresh_entity_path, method: :post, data: { turbo: false }, local: true do |form| %>
       <%= form.hidden_field :uri, value: @entity.entity_uri %>
       <%= form.hidden_field :dryrun, value: true%>
       <%= form.submit "Refresh Dry Run",

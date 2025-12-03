@@ -16,13 +16,11 @@ class MaintenanceController < ApplicationController
       headers: { 'Content-Type' => 'application/json' }
     )
     if response.code != 200
-      flash[:alert] = "Failed to request entity refresh for #{artsdata_uri} from publisher #{publisher}. Error: #{response.body.truncate(100)}"
-      redirect_to entity_path(uri: artsdata_uri) 
+      flash[:alert] = "Failed.  Error: #{response.body.truncate(1000)}"   
     else
-      redirect_to entity_path(uri: artsdata_uri), notice: "#{dryrun ? "Dry run." : "Success."} logs: #{JSON.parse(response.body)['logs'].to_s.truncate(1000)}"
-    end 
-  
-    
+      flash[:notice] = "#{dryrun ? "Dry run." : "Success."} Logs: #{JSON.parse(response.body)['logs'].to_s.truncate(1000)}"
+    end
+    redirect_to entity_path(uri: artsdata_uri)
   end
 
     private
