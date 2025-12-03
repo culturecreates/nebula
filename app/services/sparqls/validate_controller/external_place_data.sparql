@@ -4,7 +4,7 @@ CONSTRUCT {
       schema:name ?name ; 
       schema:url ?url ;
       schema:sameAs ?aduri, ?isni, ?music_brainz, <EXTERNAL_URI>;
-      schema:description ?desc ;
+      schema:disambiguatingDescription ?disambiguating_desc ;
       schema:address ?bn .
       ?bn a schema:PostalAddress ;
         schema:streetAddress ?address ;
@@ -24,8 +24,8 @@ WHERE {
   }
 
   OPTIONAL {
-    <EXTERNAL_URI> schema:description ?desc . 
-    filter (lang(?desc) = 'en' || lang(?desc) = 'fr')
+    <EXTERNAL_URI> schema:description ?disambiguating_desc . 
+    filter (lang(?disambiguating_desc) = 'en' || lang(?disambiguating_desc) = 'fr')
   }
     
   OPTIONAL { 
