@@ -37,14 +37,23 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     
     // Build queries for batch reconciliation
     const queries = entities.map(entity => {
-      const conditions = [
-        {
-          matchType: "name",
-          propertyValue: entity.artsdataUri && entity.artsdataUri.trim() !== '' ? entity.artsdataUri : entity.name,
+      const conditions = [];
+
+      if (entity.artsdataUri && entity.artsdataUri.trim() !== '') {
+        conditions.push({
+          matchType: "id",
+          propertyValue: entity.artsdataUri,
           required: true,
           matchQuantifier: "any"
-        }
-      ];
+        });
+      } else {
+        conditions.push({
+          matchType: "name",
+          propertyValue: entity.name,
+          required: true,
+          matchQuantifier: "any"
+        });
+      }
       
       // Add URL as separate property
       if (entity.url && entity.url.trim() !== '') {
