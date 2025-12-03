@@ -63,4 +63,7 @@ Rails.application.routes.draw do
   match "culture-creates/*path", to: "resource#show", via: :get ## TODO: Move towards a prefix graph/*path
   match "core/*path", to: "resource#show", via: :get ## TODO: Should use graph/core and remove this line? 
 
+  # Maintenance routes
+  match "maintenance/refresh_entity", to: "maintenance#refresh_entity", via: :post
+
 end

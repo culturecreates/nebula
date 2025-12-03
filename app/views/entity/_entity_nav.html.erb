@@ -83,4 +83,25 @@
                   } %>
     <% end %>
   <% end %>
+  <% if user_has_access?("refresh_entity") %>
+    |
+    <%= form_with url: maintenance_refresh_entity_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Request a refresh of the entity data?" } } do |form| %>
+      <%= form.hidden_field :uri, value: @entity.entity_uri %>
+      <%= form.submit "Refresh",
+                  class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
+                  data: {
+                    disable_with: "Refreshing...",
+                  } %>
+    <% end %>
+    |
+    <%= form_with url: maintenance_refresh_entity_path, method: :post, local: true do |form| %>
+      <%= form.hidden_field :uri, value: @entity.entity_uri %>
+      <%= form.hidden_field :dryrun, value: true%>
+      <%= form.submit "Refresh Dry Run",
+                  class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
+                  data: {
+                    disable_with: "Refreshing...",
+                  } %>
+    <% end %>
+  <% end %>
 </div>

@@ -9,12 +9,13 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   
   # External API endpoints for Artsdata services
-  config.graph_api_endpoint = "http://db.artsdata.ca" 
-  config.artsdata_recon_endpoint = "https://recon.artsdata.ca" 
-  config.artsdata_recon_endpoint_v0 = "https://api.artsdata.ca/recon"
-  config.artsdata_mint_endpoint = "https://api.artsdata.ca/mint" 
-  config.artsdata_link_endpoint = "https://api.artsdata.ca/link"
-  config.artsdata_databus_endpoint = "https://api.artsdata.ca/databus" 
+  config.graph_api_endpoint = "http://staging.db.artsdata.ca" 
+  config.artsdata_recon_endpoint = "https://staging.recon.artsdata.ca" 
+  config.artsdata_recon_endpoint_v0 = "https://staging.api.artsdata.ca/recon"
+  config.artsdata_mint_endpoint = "https://staging.api.artsdata.ca/mint" 
+  config.artsdata_link_endpoint = "https://staging.api.artsdata.ca/link"
+  config.artsdata_databus_endpoint = "https://staging.api.artsdata.ca/databus" 
+  config.artsdata_maintenance_endpoint = "https://staging.api.artsdata.ca/maintenance"
 
   # Turn false under Spring and add config.action_view.cache_template_loading = true.
   config.cache_classes = true

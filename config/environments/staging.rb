@@ -16,6 +16,7 @@ Rails.application.configure do
   config.artsdata_mint_endpoint = "https://staging.api.artsdata.ca/mint" 
   config.artsdata_link_endpoint = "https://staging.api.artsdata.ca/link"
   config.artsdata_databus_endpoint = "https://staging.api.artsdata.ca/databus" 
+  config.artsdata_maintenance_endpoint = "https://staging.api.artsdata.ca/maintenance"
 
   # Code is not reloaded between requests.
   config.cache_classes = true
