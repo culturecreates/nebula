@@ -109,6 +109,9 @@ class ApplicationController < ActionController::Base
   end
 
   # Role-Based Access Control (RBAC) pattern
+  # Github Team IDs:
+  #     Level 2: 10808270 (Artsdata Admins)
+  #     Level 1: 10808293 (Artsdata Editors)
   def user_has_access?(feature)
     return false unless session[:teams].present?
 
