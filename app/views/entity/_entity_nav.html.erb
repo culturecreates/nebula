@@ -73,6 +73,15 @@
     mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
     class: "ms-2 me-2",
     rel: "nofollow" %>
+     <% if user_has_access?("refresh_entity") %>
+      |
+      <a 
+        id="refresh-entity-btn"  
+        rel="nofollow" 
+        class="text-decoration-none ms-2 me-2" 
+        data-uri="<%= @entity.entity_uri %>"
+      >Refresh</a>
+    <% end %>
     |
     <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete all triples in subject and object positions?" } } do |form| %>
       <%= form.hidden_field :uri, value: @entity.entity_uri %>
@@ -83,25 +92,28 @@
                   } %>
     <% end %>
   <% end %>
-  <% if user_has_access?("refresh_entity") %>
-    |
-    <%= form_with url: maintenance_refresh_entity_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Request a refresh of the entity data?" } } do |form| %>
-      <%= form.hidden_field :uri, value: @entity.entity_uri %>
-      <%= form.submit "Refresh",
-                  class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
-                  data: {
-                    disable_with: "Refreshing...",
-                  } %>
-    <% end %>
-    |
-    <%= form_with url: maintenance_refresh_entity_path, method: :post, data: { turbo: false }, local: true do |form| %>
-      <%= form.hidden_field :uri, value: @entity.entity_uri %>
-      <%= form.hidden_field :dryrun, value: true%>
-      <%= form.submit "Refresh Dry Run",
-                  class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
-                  data: {
-                    disable_with: "Refreshing...",
-                  } %>
-    <% end %>
-  <% end %>
+ 
+</div>
+<!-- Refresh Modal -->
+<div class="modal fade" id="dryrunModal" tabindex="-1" aria-labelledby="dryrunModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div id="flash-data"
+        data-flash-notice="<%= j(flash[:notice]) if flash[:notice] %>"
+        data-flash-alert="<%= j(flash[:alert]) if flash[:alert] %>">
+      </div>
+      <div class="modal-header">
+        <h5 class="modal-title" id="dryrunModalLabel">Refresh Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="dryrunModalBody">
+        <!-- Dryrun response will be inserted here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="dryrunModalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
 </div>

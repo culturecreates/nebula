@@ -3,7 +3,7 @@ class MaintenanceController < ApplicationController
 
   def refresh_entity
     artsdata_uri = params[:uri]
-    dryrun = params[:dryrun] ||= false
+    dryrun = ActiveModel::Type::Boolean.new.cast(params[:dryrun])
     publisher = user_uri
     # Call Artsdata API to refresh entity data
     api_endpoint = Rails.application.config.artsdata_maintenance_endpoint + "/refresh_entity"
@@ -15,12 +15,26 @@ class MaintenanceController < ApplicationController
       }.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )
-    if response.code != 200
-      flash[:alert] = "Failed.  Error: #{response.body.truncate(1000)}"   
+    if dryrun
+      message = if response.code != 200
+        "Failed. Error: #{response.body.truncate(1000)}"
+      else
+        items = JSON.parse(response.body)['logs']
+        formated_items = "<h4> Updates</h4><ul>"
+        items.each do |item|
+          formated_items << "<li>#{item.to_s}</li>"
+        end
+        formated_items << "</ul>"
+      end
+      render json: { message: message }
     else
-      flash[:notice] = "#{dryrun ? "Dry run." : "Success."} Logs: #{JSON.parse(response.body)['logs'].to_s.truncate(1000)}"
+      if response.code != 200
+        flash[:alert] = "Failed. Error: #{response.body.truncate(1000)}"
+      else
+        flash[:notice] = "Successfully refreshed #{artsdata_uri}."
+      end
+      render json: { redirect_url: entity_path(uri: artsdata_uri) }
     end
-    redirect_to entity_path(uri: artsdata_uri)
   end
 
     private
