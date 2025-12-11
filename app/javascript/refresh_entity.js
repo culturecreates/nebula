@@ -7,21 +7,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const modal = new bootstrap.Modal(document.getElementById("dryrunModal"));
     const modalBody = document.getElementById("dryrunModalBody");
     const okBtn = document.getElementById("dryrunModalOk");
-    const flashData = document.getElementById("flash-data");
-
-    if (flashData) {
-        const notice = flashData.dataset.flashNotice;
-        const alert = flashData.dataset.flashAlert;
-        if (notice || alert) {
-            modalBody.innerHTML = notice
-                ? `<div class="alert alert-success">${notice}</div>`
-                : `<div class="alert alert-danger">${alert}</div>`;
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        }
-    }
 
     btn.addEventListener("click", function () {
+         // Show modal immediately with "Calculating..." message
+        modalBody.innerHTML = "<div class='text-center'><span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Calculating...</div>";
+        modal.show();
+
+        // Now call the controller
         fetch("/maintenance/refresh_entity", {
             method: "POST",
             headers: {
@@ -32,8 +24,12 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => response.json())
             .then(data => {
+                if (typeof data.message === "undefined") {
+                    modal.hide();
+                    window.location.reload();
+                    return;
+                }
                 modalBody.innerHTML = data.message;
-                modal.show();
 
                 okBtn.onclick = function () {
                     modal.hide();
