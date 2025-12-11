@@ -5,7 +5,9 @@ require 'digest'
 
 class BotVerificationController < ApplicationController
   # Load Private Ed25519 Key once
-  PRIVATE_KEY_PEM = Base64.decode64(ENV['ED25519_PRIVATE_KEY'])
+  PRIVATE_KEY_ENCODED = ENV['ED25519_PRIVATE_KEY']
+  raise "ED25519_PRIVATE_KEY is not set" if PRIVATE_KEY_ENCODED.nil?
+  PRIVATE_KEY_PEM = Base64.decode64(PRIVATE_KEY_ENCODED)
   PRIVATE_KEY = OpenSSL::PKey.read(PRIVATE_KEY_PEM)
 
   # Extract Ed25519 Public 'x' coordinate for JWK
