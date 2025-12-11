@@ -5,7 +5,7 @@ require 'digest'
 
 class BotVerificationController < ApplicationController
   # Load Private Ed25519 Key once
-  PRIVATE_KEY_PEM = ENV['ED25519_PRIVATE_KEY'] ? Base64.decode64(ENV['ED25519_PRIVATE_KEY']) : File.read(Rails.root.join("config/private-key.pem"))
+  PRIVATE_KEY_PEM = Base64.decode64(Rails.application.credentials.ed25519_private_key)
   PRIVATE_KEY = OpenSSL::PKey.read(PRIVATE_KEY_PEM)
 
   # Extract Ed25519 Public 'x' coordinate for JWK
