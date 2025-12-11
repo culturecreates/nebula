@@ -76,10 +76,11 @@
      <% if user_has_access?("refresh_entity") %>
       |
       <a 
-        id="refresh-entity-btn"  
-        rel="nofollow" 
-        class="text-decoration-none ms-2 me-2" 
-        data-uri="<%= @entity.entity_uri %>"
+        rel="nofollow"
+        class="text-decoration-none ms-2 me-2"
+        data-controller="refresh-entity"
+        data-action="click->refresh-entity#refresh"
+        data-refresh-entity-uri-value="<%= @entity.entity_uri %>"
       >Refresh</a>
     <% end %>
     |
