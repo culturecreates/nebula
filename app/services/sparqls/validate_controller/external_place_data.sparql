@@ -9,7 +9,7 @@ CONSTRUCT {
       ?bn a schema:PostalAddress ;
         schema:streetAddress ?address ;
         schema:addressLocality ?territoryLabel ;
-        schema:addressCountry ?countryLabel ;
+        schema:addressCountry ?country_code ;
         schema:addressRegion ?prov_code ;
         schema:postalCode ?postalCode .
 } 
@@ -36,8 +36,7 @@ WHERE {
   # Country
   OPTIONAL { 
     <EXTERNAL_URI>  <http://www.wikidata.org/prop/direct/P17> ?country . 
-    ?country <http://www.w3.org/2000/01/rdf-schema#label> ?countryLabel .
-    filter (lang(?countryLabel) = 'en' || lang(?countryLabel) = 'fr' )
+    ?country wdt:P297 ?country_code .
   }
   
   # located in the administrative territorial entity (P131)
