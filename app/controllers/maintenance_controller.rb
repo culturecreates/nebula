@@ -17,15 +17,31 @@ class MaintenanceController < ApplicationController
     )
     if dryrun
       message = if response.code != 200
-        "Failed. Error: #{response.body.truncate(1000)}"
-      else
-        items = JSON.parse(response.body)['logs']
-        formated_items = "<h4> Updates</h4><ul>"
-        items.each do |item|
-          formated_items << "<li>#{item.to_s}</li>"
-        end
-        formated_items << "</ul>"
-      end
+                  "Failed. Error: #{response.body.truncate(1000)}"
+                else
+                  items = JSON.parse(response.body)['logs']
+                  formated_items = ""
+                  add_list = items.select{ |item| item["action"] == "add" }
+                  unless add_list.empty?
+                  formated_items << "<h4>Updates</h4> <ul>"
+                    items.select{ |item| item["action"] == "add" }.each do |item|
+                      formated_items << format_display(item) 
+                    end
+                    formated_items << "</ul>"
+                  end
+                  delete_list = items.select{ |item| item["action"] == "delete" }
+                  unless delete_list.empty?
+                    formated_items << "<h4>Deletes</h4> <ul>"
+                    delete_list.each do |item|
+                      formated_items << format_display(item) 
+                    end
+                    formated_items << "</ul>"
+                  end
+                  if items.empty?
+                    formated_items << "<p>Nothing to update from Wikidata.</p>"
+                  end
+                  formated_items
+                end
       render json: { message: message }
     else
       if response.code != 200
@@ -43,4 +59,17 @@ class MaintenanceController < ApplicationController
   def check_refresh_access
     ensure_access("refresh_entity")
   end
+
+  def format_display(item)
+    if item["object"].to_s.start_with?("_") || item["object"].to_s.include?("#")
+      "<li>#{item["predicate"].to_s.split("/").last} #{"(hidden)" if item["claim"] == "derived" }:</li>"
+    else
+      if item["subject"].to_s.start_with?("_") || item["subject"].to_s.include?("#")
+        "<li class='ms-4'>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{"(hidden)" if item["claim"] == "derived" }</li>"
+      else
+        "<li>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{"(hidden)" if item["claim"] == "derived" }</li>"
+      end
+    end
+  end
+
 end
