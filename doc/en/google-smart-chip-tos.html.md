@@ -1,6 +1,6 @@
-Google Smart-Chip™ Terms of Service
+Artsdata Google Smart Chips Terms of Service
 -----------------
-By using the Artsdata Google Smart-Chip™ add-on, you agree to the following terms:
+By using the Artsdata Google Smart Chips add-on, you agree to the following terms:
 
 1. **Usage**: The add-on is provided as-is and is intended for detecting Artsdata URIs in Google Sheets™ documents, and displaying previews. Any misuse or unauthorized modification of the add-on is prohibited.
 2. **Data Handling**: The add-on reads URLs within your Google Sheets™ documents for the sole purpose of detecting and processing those that match the Artsdata URI format. No other data is ever transmitted outside of your Google Workspace™ environment.

@@ -1,7 +1,7 @@
 
-Google Smart-Chip™ Privacy Policy
+Artsdata Google Smart Chips Privacy Policy
 --------------
-The Artsdata Google Smart-Chip™ add-on respects your privacy and is designed to handle your data securely. By using this add-on, you agree to the following privacy practices:
+The Artsdata Google Smart Chips add-on respects your privacy and is designed to handle your data securely. By using this add-on, you agree to the following privacy practices:
 
 1. **Data Processing**: The add-on processes URLs within your Google Sheets™ documents to provide additional information about events, people, places, and organizations. This processing occurs entirely within your Google Workspace™ environment.
 2. **Data Storage**: No data is stored outside of your Google Workspace™ environment. The add-on does not retain or share any information processed during its use.
