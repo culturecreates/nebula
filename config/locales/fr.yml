@@ -12,7 +12,7 @@ fr:
       <p>Please manage Artifacts with the <a href='https://culturecreates.github.io/artsdata-data-model/architecture/graph-store-api.html'>Artsdata Databus API</a>. 
       To create a new version use the <a href='https://documenter.getpostman.com/view/3157443/TVep7mv3#f12d3dc0-5c37-496b-985f-95388660b984'>POST /databus</a> endpoint with <code>publisher=</code> set to your Databus Account URI. 
       To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.  
-      An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google speadsheet.</p>
+      An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google Sheets speadsheet.</p>
   ical:
     ical_feeds: "Flux iCal"
     description: |
@@ -28,22 +28,22 @@ fr:
   artifact:
     title: "Databus Artifact"
     description: |
-      <p>Le Databus Artsdata entrepose les métadonnées à propos de vos jeux de données. Il n'entrepose pas les données elles mêmes. Avant d'utiliser le databus, vous devez d'abord publier vos données quelque part sur le Web. Le databus organise les jeux de données selon le type d'artéfact, le nom de l'artéfact et sa version (<code><< group >> << artifact >> << version >></code>). 
-      Chaque version d'un artéfact a une URL de téléchargement qui ne doit en aucun cas changer. Le graphe de connaissances Artsdata peut s'abonner à votre jeu de données et charger des artéfacts au fur et à mesure que de nouvelles versions sont mises à disposition.</p> 
+      <p>Le Databus Artsdata entrepose les métadonnées à propos de vos jeux de données. Il n'entrepose pas les données elles-mêmes. Avant d'utiliser le databus, vous devez d'abord publier vos données quelque part sur le Web. Le databus organise les jeux de données selon le type d'artéfact, le nom de l'artéfact et sa version (<code><< group >> << artifact >> << version >></code>). 
+      Chaque version d'un artéfact a un URL de téléchargement qui ne doit en aucun cas changer. Le graphe de connaissances Artsdata peut s'abonner à votre jeu de données et charger des artéfacts au fur et à mesure que de nouvelles versions sont mises à disposition.</p> 
       <p>Pour gérer des artéfacts, veuillez utiliser le <a href='https://culturecreates.github.io/artsdata-data-model/architecture/graph-store-api.html'>Artsdata Databus API</a>. 
       Pour créer une nouvelle version, utilisez le terminal <a href='https://documenter.getpostman.com/view/3157443/TVep7mv3#f12d3dc0-5c37-496b-985f-95388660b984'>POST /databus</a> et renseignez l'URI de votre compte Databus sous le paramètre <code>publisher=</code>.
-      Pour gérer les comptes, renvez vous sur la page de <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">gestion des équipes du databus</a>.</p> 
-      <p>Un artéfact peut aussi être créé à partir de cette interface à l'aide du bouton « create artifact » si le jeu de données est un site Web avec des données structurées ou s'il s'agit d'un chiffrier Google Sheet.</p>
+      Pour gérer les comptes, rendez vous sur la page de <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">gestion des équipes du databus</a>.</p> 
+      <p>Un artéfact peut aussi être créé à partir de cette interface à l'aide du bouton « create artifact » si le jeu de données est un site Web avec des données structurées ou s'il s'agit d'un chiffrier Google Sheets.</p>
     new:
       orion_name: "Orion JSON-LD Website"
-      a10s_name: "Google Sheet vers Artsdata (A10s)"
+      a10s_name: "Google Sheets vers Artsdata (A10s)"
       a10s_instructions: |
-        <h4>Instructions pour Google Sheet vers Artsdata</h4> <p>Saisissez l'URL du chiffrier Google Sheet qui contient les données pour cet artéfact. Veillez à sélectionner l'URL de l'onglet JSON-LD (appelé « LD+JSON » dans le chiffrier). Le nom de la cellule A1 doit être <code>jsonld</code>. </p> 
+        <h4>Instructions pour Google Sheets vers Artsdata</h4> <p>Saisissez l'URL du chiffrier Google Sheets qui contient les données pour cet artéfact. Veillez sélectionner l'URL de l'onglet JSON-LD (appelé « LD+JSON » dans le chiffrier). Le nom de la cellule A1 doit être <code>jsonld</code>. </p> 
       format_url: |
-        <p>Transformez l'URL d'édition en URL de téléchargement en replaçant <code>/edit?</code> par <code>/export?format=csv&</code>. Vous pouvez tester cette URL dans votre navigateur pour vous assurez qu'elle fonctionne bien : si l'URL a la bonne syntaxe, un fichier CSV sera téléchargé sur votre ordinateur. </p>
+        <p>Transformez l'URL d'édition en URL de téléchargement en replaçant <code>/edit?</code> par <code>/export?format=csv&</code>. Vous pouvez tester cet URL dans votre navigateur pour vous assurez qu'il fonctionne bien : si sa syntaxe est bonne, un fichier CSV sera téléchargé sur votre ordinateur. </p>
       smart_chip_name: "Smart-Chip Spreadsheet"
       smart_chip_instructions: |
-        <h4>Smart-Chip Instructions</h4><p> Enter the URL of the Google Sheet that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>         
+        <h4>Smart-Chip Instructions</h4><p> Enter the URL of the Google Sheets document that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>         
   entity:
     download:
       jsonld_for_schema_org: "JSON-LD utilisant le @context de Schema.org. Il peut être copié-collé dans des pages Web HTML."

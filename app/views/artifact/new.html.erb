@@ -67,11 +67,11 @@
 
     <div class="mb-3" id="sheet-url-field" style="display: none;">
       <hr>
-      <%= form.label :sheet_url, "Google Sheet URL", class: "form-label" %>
+      <%= form.label :sheet_url, "Google Sheets document URL", class: "form-label" %>
       <%= form.text_field :sheet_url,
                       class: "form-control",
                       value: @artifact.sheet_url,
-                      placeholder: "Enter Google sheet URL" %>
+                      placeholder: "Enter Google Sheets document URL" %>
 
       <br>
       <%= t("artifact.new.smart_chip_instructions").html_safe %>
@@ -80,11 +80,11 @@
 
     <div class="mb-3" id="a10s-sheet-url-field" style="display: none;">
       <hr>
-      <%= form.label :sheet_url, "Google Sheet URL", class: "form-label" %>
+      <%= form.label :sheet_url, "Google Sheets document URL", class: "form-label" %>
       <%= form.text_field :sheet_url,
                       class: "form-control",
                       value: @artifact.sheet_url,
-                      placeholder: "Enter Google sheet URL for JSON-LD tab" %>
+                      placeholder: "Enter Google Sheets document URL for JSON-LD tab" %>
       <br>
       <%= t("artifact.new.a10s_instructions").html_safe %>
       <%= t("artifact.new.format_url").html_safe %>
