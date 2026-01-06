@@ -1,0 +1,50 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+SELECT 
+  ?uri 
+  (SAMPLE(?name_en) as ?name_english) 
+  (SAMPLE(?name_fr) as ?name_french) 
+  ?startDate 
+  (SAMPLE(?location_name) as ?location) 
+  (SAMPLE(?locality) as ?location_locality) 
+  (SAMPLE(?region) as ?location_region)
+WHERE {
+    ?uri a schema:Event ;
+         schema:startDate ?startDate .
+    
+    # Get event name in English or French
+    OPTIONAL {
+        ?uri schema:name ?name_en .
+        FILTER(lang(?name_en) = "en")
+    }
+    OPTIONAL {
+        ?uri schema:name ?name_fr .
+        FILTER(lang(?name_fr) = "fr")
+    }
+    
+    # Get location details
+    OPTIONAL {
+        ?uri schema:location ?location_entity .
+        ?location_entity schema:name ?location_name .
+        
+        # Get locality (city)
+        OPTIONAL {
+            ?location_entity schema:address ?address .
+            ?address schema:addressLocality ?locality .
+        }
+        
+        # Get region (province/state)
+        OPTIONAL {
+            ?location_entity schema:address ?address .
+            ?address schema:addressRegion ?region .
+        }
+    }
+    
+    # Filter for upcoming events only
+    FILTER(?startDate > NOW())
+    
+} 
+GROUP BY ?uri ?startDate
+ORDER BY ?startDate
+LIMIT 500
