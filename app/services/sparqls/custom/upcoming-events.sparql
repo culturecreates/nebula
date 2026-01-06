@@ -1,0 +1,44 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+SELECT 
+  ?uri 
+  (SAMPLE(?name_lang) as ?name) 
+  ?startDate 
+  (SAMPLE(?location_name) as ?location) 
+  (SAMPLE(?locality) as ?location_locality) 
+  (SAMPLE(?region) as ?location_region)
+WHERE {
+    graph <http://kg.artsdata.ca/core> {
+        ?uri a schema:Event ;
+             schema:name ?name_lang ;
+             schema:startDate ?startDate .
+        
+        # Filter for English or French names (or names without language tags)
+        FILTER(lang(?name_lang) = "en" || lang(?name_lang) = "fr" || lang(?name_lang) = "")
+        
+        # Filter for upcoming events only
+        FILTER(?startDate > NOW())
+    }
+    
+    # Get location details
+    OPTIONAL {
+        ?uri schema:location ?location_entity .
+        ?location_entity schema:name ?location_name .
+        
+        # Get locality and region from address
+        OPTIONAL {
+            ?location_entity schema:address ?address .
+            OPTIONAL {
+                ?address schema:addressLocality ?locality .
+            }
+            OPTIONAL {
+                ?address schema:addressRegion ?region .
+            }
+        }
+    }
+    
+} 
+GROUP BY ?uri ?startDate
+ORDER BY ?startDate
+LIMIT 500
