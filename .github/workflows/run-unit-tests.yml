@@ -2,13 +2,10 @@ name: "Run unit tests"
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened]
     
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.owner.login != 'culturecreates'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
