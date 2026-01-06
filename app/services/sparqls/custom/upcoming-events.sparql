@@ -9,12 +9,17 @@ SELECT
   (SAMPLE(?locality) as ?location_locality) 
   (SAMPLE(?region) as ?location_region)
 WHERE {
-    ?uri a schema:Event ;
-         schema:name ?name_lang ;
-         schema:startDate ?startDate .
-    
-    # Filter for English or French names (or names without language tags)
-    FILTER(lang(?name_lang) = "en" || lang(?name_lang) = "fr" || lang(?name_lang) = "")
+    graph <http://kg.artsdata.ca/core> {
+        ?uri a schema:Event ;
+             schema:name ?name_lang ;
+             schema:startDate ?startDate .
+        
+        # Filter for English or French names (or names without language tags)
+        FILTER(lang(?name_lang) = "en" || lang(?name_lang) = "fr" || lang(?name_lang) = "")
+        
+        # Filter for upcoming events only
+        FILTER(?startDate > NOW())
+    }
     
     # Get location details
     OPTIONAL {
@@ -32,9 +37,6 @@ WHERE {
             }
         }
     }
-    
-    # Filter for upcoming events only
-    FILTER(?startDate > NOW())
     
 } 
 GROUP BY ?uri ?startDate
