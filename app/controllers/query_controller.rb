@@ -12,9 +12,10 @@ class QueryController < ApplicationController
   #   &title=ScenePro
   def show
     params.required(:sparql)
-    permitted_params = params.permit(:sparql, :title, :graph, :constructs, :format, :locale)
+    permitted_params = params.permit(:sparql, :title, :description, :graph, :constructs, :format, :locale)
     sparql_file = params[:sparql] 
     title =  params[:title] ||=  params[:sparql].split("/").last&.humanize&.gsub(".sparql", "")
+    description = params[:description]
 
     # Placeholders in SPARQL query
     graph = params[:graph]
@@ -35,7 +36,7 @@ class QueryController < ApplicationController
 
     respond_to do |format|
       format.html {
-        render :show, locals: {title: title, solutions: solutions, permitted_params: permitted_params}
+        render :show, locals: {title: title, description: description, solutions: solutions, permitted_params: permitted_params}
       }
       format.csv {
         send_data csv_data(solutions), type: 'text/csv; charset=utf-8; header=present', disposition: "attachment; filename=#{sparql_file}.csv"
