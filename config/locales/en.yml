@@ -121,4 +121,5 @@ en:
       description: "This reports lists unique Person records that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. Person records come from multiple sources, including industry sources (e.g. industry platforms, member directories) and Wikidata."
     organizations_with_artsdata_ids:
       title: "Organizations with Artsdata IDs"
-      description: "This reports lists unique organizations that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. By \"<a href='http://kg.artsdata.ca/resource/Organization'>Organization</a>\", we mean any structured group of people, united by a common purpose. This includes formal organizations (e.g., a not-for-profit corporation) as well as music bands and other performing groups."
+      description: |
+        This reports lists unique organizations that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. By "<a href='http://kg.artsdata.ca/resource/Organization'>Organization</a>", we mean any structured group of people, united by a common purpose. This includes formal organizations (e.g., a not-for-profit corporation) as well as music bands and other performing groups.

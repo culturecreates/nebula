@@ -3,10 +3,10 @@
   <div class="container">
     <h1>
       <%= solutions.count %>
-      <%= I18n.exists?(title) ? t(title) : title %>
+      <%= I18n.exists?(title) ? t(title).html_safe : title %>
     </h1>
     <% if description.present? %>
-      <p class="text-muted"><%= t(description) %></p>
+      <p class="text-muted"><%= t(description).html_safe %></p>
     <% end %>
     <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
   </div>
