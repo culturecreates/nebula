@@ -3,25 +3,18 @@ PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 SELECT 
   ?uri 
-  (SAMPLE(?name_en) as ?name_english) 
-  (SAMPLE(?name_fr) as ?name_french) 
+  (SAMPLE(?name_lang) as ?name) 
   ?startDate 
   (SAMPLE(?location_name) as ?location) 
   (SAMPLE(?locality) as ?location_locality) 
   (SAMPLE(?region) as ?location_region)
 WHERE {
     ?uri a schema:Event ;
+         schema:name ?name_lang ;
          schema:startDate ?startDate .
     
-    # Get event name in English or French
-    OPTIONAL {
-        ?uri schema:name ?name_en .
-        FILTER(lang(?name_en) = "en")
-    }
-    OPTIONAL {
-        ?uri schema:name ?name_fr .
-        FILTER(lang(?name_fr) = "fr")
-    }
+    # Filter for English or French names only
+    FILTER(lang(?name_lang) = "en" || lang(?name_lang) = "fr" || lang(?name_lang) = "")
     
     # Get location details
     OPTIONAL {
