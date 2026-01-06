@@ -27,7 +27,7 @@ WHERE {
         }
         BIND(COALESCE(?disambiguatingDescriptionEn, ?disambiguatingDescriptionAnyLanguage) as ?disambiguatingDescriptions)
         OPTIONAL {
-            ?ArtsdataID schema:address/schema:addressRegion ?regions .
+            ?ArtsdataID schema:location/schema:address/schema:addressRegion ?regions .
         }
         OPTIONAL {
             ?ArtsdataID schema:name ?labelMul .
