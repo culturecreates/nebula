@@ -49,3 +49,6 @@ fr:
       jsonld_for_schema_org: "JSON-LD utilisant le @context de Schema.org. Il peut être copié-collé dans des pages Web HTML."
       copy_button: "Copier"
       copy_completed: "JSON-LD copié"
+  reports:
+    upcoming_events:
+      description: "Ce rapport liste les événements uniques qui ont été rapprochés et auxquels un identifiant Artsdata a été attribué (c'est-à-dire \"minté\"). Il y a des milliers d'autres événements à venir chargés dans Artsdata qui doivent encore être rapprochés et mintés. Pour avoir plus d'informations sur un événement donné, cliquez sur son ID Artsdata, dans la colonne \"uri\"."

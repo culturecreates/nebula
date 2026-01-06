@@ -84,3 +84,6 @@ en:
       jsonld_for_schema_org: "JSON-LD using Schema.org @context. It can be copy/pasted into HTML Webpages."
       copy_button: "Copy"
       copy_completed: "JSON-LD copied"
+  reports:
+    upcoming_events:
+      description: "This report lists unique events that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. There are thousands more upcoming events loaded to Artsdata that yet have to be reconciled and minted. To have more information about a given event, click on its Artsdata ID, in the \"uri\" column."

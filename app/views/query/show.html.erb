@@ -5,6 +5,9 @@
       <%= solutions.count %>
       <%= title %>
     </h1>
+    <% if description.present? %>
+      <p class="text-muted"><%= t(description) %></p>
+    <% end %>
     <%= render partial: "query_nav", locals: { permitted_params: permitted_params } %>
   </div>
   <%= render partial: "query_table", locals: { solutions: solutions } %>
