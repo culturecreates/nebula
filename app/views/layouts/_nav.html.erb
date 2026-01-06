@@ -179,17 +179,23 @@
               query_show_path(
                 sparql: "custom/recent_event_mints",
                 title: "reports.recently_minted_events.title",
+                description: "reports.recently_minted_events.description",
               ),
               class: "dropdown-item" %>
             </li>
             <li><%= link_to t("reports.places_with_events.title"),
-              query_show_path(sparql: "custom/places", title: "reports.places_with_events.title"),
+              query_show_path(
+                sparql: "custom/places", 
+                title: "reports.places_with_events.title", 
+                description: "reports.places_with_events.description"
+              ),
               class: "dropdown-item" %>
             </li>
             <li><%= link_to t("reports.people_with_artsdata_ids.title"),
               query_show_path(
                 sparql: "custom/people_with_artsdata_ids",
                 title: "reports.people_with_artsdata_ids.title",
+                description: "reports.people_with_artsdata_ids.description",
               ),
               class: "dropdown-item" %>
             </li>
@@ -197,6 +203,7 @@
               query_show_path(
                 sparql: "custom/organizations_with_artsdata_ids",
                 title: "reports.organizations_with_artsdata_ids.title",
+                description: "reports.organizations_with_artsdata_ids.description",
               ),
               class: "dropdown-item" %>
             </li>
