@@ -75,7 +75,7 @@ fr:
   reports:
     upcoming_events:
       title: "Événements à venir"
-      description: "Ce rapport liste les événements uniques qui ont été rapprochés et auxquels un identifiant Artsdata a été attribué (c'est-à-dire \"minté\"). Il y a des milliers d'autres événements à venir chargés dans Artsdata qui doivent encore être rapprochés et mintés. Pour avoir plus d'informations sur un événement donné, cliquez sur son ID Artsdata, dans la colonne \"uri\"."
+      description: "Ce rapport liste les événements uniques qui ont un identifiant Artsdata attribué (c'est-à-dire \"minté\"). Il y a des milliers d'autres événements à venir chargés dans Artsdata qui doivent encore être rapprochés et mintés. Pour avoir plus d'informations sur un événement donné, cliquez sur son ID Artsdata, dans la colonne \"uri\"."
     recently_minted_events:
       title: "Événements récemment créés"
     places_with_events:
