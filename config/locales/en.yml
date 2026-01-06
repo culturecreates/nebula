@@ -113,7 +113,7 @@ en:
       description: "This report lists unique events that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. There are thousands more upcoming events loaded to Artsdata that yet have to be reconciled and minted. To have more information about a given event, click on its Artsdata ID, in the \"uri\" column."
     recently_minted_events:
       title: "Recently Minted Events"
-      description: "This report lists events that have recently been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. Reconciliation and minting activities are either performed automotically, as new events are loaded to Artsdata, or manually. To learn more about minimal requirements for minting Artsdata IDs to events, visit the <a href='https://docs.artsdata.ca/classes/event.html'>Event</a> documentation page. 
+      description: "This report lists events that have recently been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. Reconciliation and minting activities are either performed automotically, as new events are loaded to Artsdata, or manually. To learn more about minimal requirements for minting Artsdata IDs to events, visit the <a href='https://docs.artsdata.ca/classes/event.html'>Event</a> documentation page."
     places_with_events:
       title: "Places with Events"
     people_with_artsdata_ids:

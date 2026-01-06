@@ -78,12 +78,12 @@ fr:
       description: "Ce rapport énumère les événements uniques qui se sont vu créer et attribuer (c'est-à-dire \"minter\") un identifiant Artsdata. Il y a des milliers d'autres événements à venir chargés dans Artsdata qui doivent encore être réconciliés et mintés. Pour avoir plus d'informations à propos d'un événement donné, cliquez sur son identifiant Artsdata, dans la colonne \"uri\"."
     recently_minted_events:
       title: "Événements récemment créés"
-      description: "Ce rapport énumère les événements qui ont récemment été reconciliés et pour lesquels un identifiant Artsdata a été créé (c'est-à-dire \"minté\"). Les activités de réconciliation et d'attribution d'identifiants sont réalisées soit automatiquement, lorsque des événements sont chargés dans Artsdata, ou manuellement. Pour en apprendre davantage sur les processus de réconciliation et de création d'identifiants d'événements, consultez la page <a href='https://docs.artsdata.ca/classes/event.fr.html'>Event</a>.
+      description: "Ce rapport énumère les événements qui ont récemment été reconciliés et pour lesquels un identifiant Artsdata a été créé (c'est-à-dire \"minté\"). Les activités de réconciliation et d'attribution d'identifiants sont réalisées soit automatiquement, lorsque des événements sont chargés dans Artsdata, ou manuellement. Pour en apprendre davantage sur les processus de réconciliation et de création d'identifiants d'événements, consultez la page <a href='https://docs.artsdata.ca/classes/event.fr.html'>Event</a>."
     places_with_events:
       title: "Lieux avec événements"
     people_with_artsdata_ids:
       title: "Personnes avec identifiants Artsdata"
-      description: "Ce rapport énumère les organisations pour lesquels un identifiant Artsdata a été créé et assigné (c'est-à-dire \"minté\"). Les données à propos de personnes proviennent d'une multitude de sources, notamment des sources du secteur du spectacle (e.g. des plateformes ou des répertoires) et Wikidata come from multiple "
+      description: "Ce rapport énumère les personnes pour lesquelles un identifiant Artsdata a été créé et assigné (c'est-à-dire \"minté\"). Les données à propos de personnes proviennent d'une multitude de sources, notamment des sources du secteur du spectacle (e.g. des plateformes ou des répertoires) et Wikidata."
     organizations_with_artsdata_ids:
       title: "Organisations avec identifiants Artsdata"
       description: "Ce rapport énumère les organisations pour lesquels un identifiant Artsdata a été créé et assigné (c'est-à-dire \"minté\"). Par \"<a href='http://kg.artsdata.ca/resource/Organization'>Organisation</a>\", nous entendons tout groupe structuré de personnes, unies par un objectif commun. Il peut s'agir d'organisation formelles (e.g., une société à but non lucratif) ou de groupes informels, comme des groupes de musique."
