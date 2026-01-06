@@ -16,13 +16,6 @@
         <%= link_to "All Data Feeds",
         query_show_path(sparql: "feeds_all", title: "Data Feeds") %>
       </li>
-      <li>
-        <%= link_to "Recently Minted Events",
-        query_show_path(
-          sparql: "custom/recent_event_mints",
-          title: "Recently Minted Events",
-        ) %>
-      </li>
     </ul>
     <turbo-frame
       id='sparqls'

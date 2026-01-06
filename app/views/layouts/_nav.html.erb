@@ -185,29 +185,18 @@
               query_show_path(sparql: "custom/places", title: "Places with Events"),
               class: "dropdown-item" %>
             </li>
-            <li><%= link_to "Recently added People/Organizations",
+            <li><%= link_to "People with Artsdata IDs",
               query_show_path(
-                sparql: "custom/people_organizations",
-                title: "Recently added People/Organizations",
+                sparql: "custom/people_with_artsdata_ids",
+                title: "People with Artsdata IDs",
               ),
               class: "dropdown-item" %>
             </li>
-            <li><%= link_to "LaVitrine Pipeline",
+             <li><%= link_to "Organizations with Artsdata IDs",
               query_show_path(
-                sparql: "custom/lavitrine_sources_refresh_rate",
-                title: "LaVitrine Pipeline",
+                sparql: "custom/organizations_with_artsdata_ids",
+                title: "Organizations with Artsdata IDs",
               ),
-              class: "dropdown-item" %>
-            </li>
-            <li><%= link_to "Misaligned Wikidata Links",
-              query_show_path(
-                sparql: "custom/report-misaligned-wikidata-links",
-                title: "Misaligned Bidirectional Wikidata Links",
-              ),
-              class: "dropdown-item" %>
-            </li>
-            <li><%= link_to "CAPACOA Members",
-              query_show_path(sparql: "custom/capacoa-members", title: "CAPACOA Members"),
               class: "dropdown-item" %>
             </li>
           </ul>

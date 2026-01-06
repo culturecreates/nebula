@@ -1,0 +1,49 @@
+# People with ArtsdataID
+PREFIX schema: <http://schema.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT  
+?ArtsdataID 
+?WikidataID 
+?name  
+(SAMPLE(?disambiguatingDescriptions) as ?disambiguatingDescription)
+WHERE {
+    GRAPH <http://kg.artsdata.ca/core> {
+        ?ArtsdataID a schema:Organization .
+    
+        OPTIONAL {
+            ?ArtsdataID schema:sameAs ?WikidataID .
+            FILTER (regex(str(?WikidataID), "wikidata.org/entity")) 
+        }
+        OPTIONAL {
+            ?ArtsdataID schema:disambiguatingDescription ?disambiguatingDescriptionEn .
+            FILTER(lang(?disambiguatingDescriptionEn) = "en")
+        }
+        OPTIONAL {
+            ?ArtsdataID schema:disambiguatingDescription ?disambiguatingDescriptionAnyLanguage .
+            FILTER(lang(?disambiguatingDescriptionAnyLanguage) != "en")
+        }
+        BIND(COALESCE(?disambiguatingDescriptionEn, ?disambiguatingDescriptionAnyLanguage) as ?disambiguatingDescriptions)
+        OPTIONAL {
+            ?ArtsdataID schema:name ?labelMul .
+            FILTER(LANG(?labelMul) = "mul") 
+        }
+        OPTIONAL {
+            ?ArtsdataID schema:name ?labelEn .
+            FILTER(LANG(?labelEn) = "en") 
+        }
+        OPTIONAL {
+            ?ArtsdataID schema:name ?labelFr .
+            FILTER(LANG(?labelFr) = "fr") 
+        }
+        OPTIONAL {
+            ?ArtsdataID schema:name ?labelNone .
+            FILTER(LANG(?labelNone) = "") 
+        }
+        BIND(COALESCE(?labelMul, ?labelEn, ?labelFr, ?labelNone) AS ?name)
+    }
+} 
+GROUP BY ?ArtsdataID ?WikidataID ?name 
+ORDER BY ?name
+LIMIT 10000 OFFSET 0
