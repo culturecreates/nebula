@@ -3,7 +3,7 @@
   <div class="container">
     <h1>
       <%= solutions.count %>
-      <%= title %>
+      <%= I18n.exists?(title) ? t(title) : title %>
     </h1>
     <% if description.present? %>
       <p class="text-muted"><%= t(description) %></p>

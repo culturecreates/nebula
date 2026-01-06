@@ -4,6 +4,29 @@ fr:
   search_results: "Résultats de recherche"
   dashboard_title: Tableau de bord pour
   favourite_reports: "Rapports favoris"
+  nav:
+    home: "Accueil"
+    all_data_feeds: "Tous les flux de données"
+    data_feeds: "Flux de données"
+    databus: "Databus"
+    ical_feeds: "Flux iCal"
+    mint_using_wikidata: "Créer à partir de Wikidata"
+    batch_reconcile: "Rapprochement par lot"
+    introduction: "Introduction"
+    graphs_with_people_organizations: "Graphes avec personnes, organisations"
+    graphs_with_places: "Graphes avec lieux"
+    graphs_with_events: "Graphes avec événements"
+    controlled_vocabularies: "Vocabulaires contrôlés"
+    event_types: "Types d'événements"
+    organization_types: "Types d'organisations"
+    reports: "Rapports"
+    login_to_view_reports: "Connectez-vous pour voir vos rapports favoris"
+    external_links: "Liens externes"
+    sparql_query_service: "Service de requête SPARQL"
+    artsdata_data_model_documentation: "Documentation du modèle de données Artsdata"
+    login_using_github: "Connexion avec Github"
+    login: "Connexion"
+    logout: "Déconnexion"
   artifact:
     title: "Databus Artifact"
     description: |
@@ -51,4 +74,13 @@ fr:
       copy_completed: "JSON-LD copié"
   reports:
     upcoming_events:
+      title: "Événements à venir"
       description: "Ce rapport liste les événements uniques qui ont un identifiant Artsdata attribué (c'est-à-dire \"minté\"). Il y a des milliers d'autres événements à venir chargés dans Artsdata qui doivent encore être rapprochés et mintés. Pour avoir plus d'informations sur un événement donné, cliquez sur son ID Artsdata, dans la colonne \"uri\"."
+    recently_minted_events:
+      title: "Événements récemment créés"
+    places_with_events:
+      title: "Lieux avec événements"
+    people_with_artsdata_ids:
+      title: "Personnes avec identifiants Artsdata"
+    organizations_with_artsdata_ids:
+      title: "Organisations avec identifiants Artsdata"

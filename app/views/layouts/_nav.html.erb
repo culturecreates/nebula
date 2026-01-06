@@ -50,7 +50,7 @@
         <% if session[:handle] %>
           <a class="nav-link" href="<%= github_url %>"><%= session[:handle] %></a>
         <% else %>
-          <a class="nav-link" href="<%= github_url %>">Login using Github</a>
+          <a class="nav-link" href="<%= github_url %>"><%= t("nav.login_using_github") %></a>
         <% end %>
       </h5>
       <button
@@ -63,21 +63,21 @@
     <div class="offcanvas-body">
       <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
         <li class="nav-item">
-          <%= link_to "Home", root_path, class: "nav-link" %>
+          <%= link_to t("nav.home"), root_path, class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "All Data Feeds",
-          query_show_path(sparql: "feeds_all", title: "Data Feeds"),
+          <%= link_to t("nav.all_data_feeds"),
+          query_show_path(sparql: "feeds_all", title: "nav.data_feeds"),
           class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "Databus", artifact_index_path, class: "nav-link" %>
+          <%= link_to t("nav.databus"), artifact_index_path, class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "iCal Feeds", ical_index_path, class: "nav-link" %>
+          <%= link_to t("nav.ical_feeds"), ical_index_path, class: "nav-link" %>
         </li>
         <li class="nav-item">
-          <%= link_to "Mint using Wikidata",
+          <%= link_to t("nav.mint_using_wikidata"),
           mint_wikidata_path,
           class: "nav-link",
           data: {
@@ -93,28 +93,28 @@
             aria-expanded="true"
             data-turbo="false"
           >
-            Batch Reconcile
+            <%= t("nav.batch_reconcile") %>
           </a>
           <ul class="dropdown-menu">
             <li>
-              <a class="dropdown-item disabled" href="#" data-turbo="false">Introduction</a>
+              <a class="dropdown-item disabled" href="#" data-turbo="false"><%= t("nav.introduction") %></a>
             </li>
             <li>
               <a
                 class="dropdown-item"
                 href="/query/show?sparql=reconcile_controller/graphs_with_agents_to_reconcile"
                 data-turbo="false"
-              >Graphs with People, Organizations</a>
+              ><%= t("nav.graphs_with_people_organizations") %></a>
             </li>
             <li>
               <a
                 class="dropdown-item"
                 href="/query/show?sparql=reconcile_controller/graphs_with_places_to_reconcile"
                 data-turbo="false"
-              >Graphs with Places</a>
+              ><%= t("nav.graphs_with_places") %></a>
             </li>
             <li>
-              <a class="dropdown-item disabled" href="#">Graphs with Events</a>
+              <a class="dropdown-item disabled" href="#"><%= t("nav.graphs_with_events") %></a>
             </li>
 
           </ul>
@@ -128,7 +128,7 @@
             data-bs-toggle="dropdown"
             aria-expanded="true"
           >
-            Controlled Vocabularies
+            <%= t("nav.controlled_vocabularies") %>
           </a>
           <ul class="dropdown-menu">
            
@@ -137,13 +137,13 @@
               <a
                 class="dropdown-item"
                 href="/entity?uri=http%3A%2F%2Fkg.artsdata.ca%2Fresource%2FArtsdataEventTypes"
-              >Event Types</a>
+              ><%= t("nav.event_types") %></a>
             </li>
            <li>
               <a
                 class="dropdown-item"
                 href="/entity?uri=http%3A%2F%2Fkg.artsdata.ca%2Fresource%2FArtsdataOrganizationTypes"
-              >Organization Types</a>
+              ><%= t("nav.organization_types") %></a>
             </li>
            
           </ul>
@@ -156,47 +156,47 @@
             data-bs-toggle="dropdown"
             aria-expanded="true"
           >
-            Reports
+            <%= t("nav.reports") %>
           </a>
           <ul class="dropdown-menu">
             <% if !session[:handle] %>
               <li>
-                <a class="dropdown-item disabled" aria-disabled="true">Login to view your favourite reports</a>
+                <a class="dropdown-item disabled" aria-disabled="true"><%= t("nav.login_to_view_reports") %></a>
               </li>
               <li>
                 <hr class="dropdown-divider">
               </li>
             <% end %>
-            <li><%= link_to "Upcoming Events",
+            <li><%= link_to t("reports.upcoming_events.title"),
               query_show_path(
                 sparql: "custom/upcoming-events",
-                title: "Upcoming Events",
+                title: "reports.upcoming_events.title",
                 description: "reports.upcoming_events.description",
               ),
               class: "dropdown-item" %>
             </li>
-            <li><%= link_to "Recently Minted Events",
+            <li><%= link_to t("reports.recently_minted_events.title"),
               query_show_path(
                 sparql: "custom/recent_event_mints",
-                title: "Recently Minted Events",
+                title: "reports.recently_minted_events.title",
               ),
               class: "dropdown-item" %>
             </li>
-            <li><%= link_to "Places with Events",
-              query_show_path(sparql: "custom/places", title: "Places with Events"),
+            <li><%= link_to t("reports.places_with_events.title"),
+              query_show_path(sparql: "custom/places", title: "reports.places_with_events.title"),
               class: "dropdown-item" %>
             </li>
-            <li><%= link_to "People with Artsdata IDs",
+            <li><%= link_to t("reports.people_with_artsdata_ids.title"),
               query_show_path(
                 sparql: "custom/people_with_artsdata_ids",
-                title: "People with Artsdata IDs",
+                title: "reports.people_with_artsdata_ids.title",
               ),
               class: "dropdown-item" %>
             </li>
-             <li><%= link_to "Organizations with Artsdata IDs",
+             <li><%= link_to t("reports.organizations_with_artsdata_ids.title"),
               query_show_path(
                 sparql: "custom/organizations_with_artsdata_ids",
-                title: "Organizations with Artsdata IDs",
+                title: "reports.organizations_with_artsdata_ids.title",
               ),
               class: "dropdown-item" %>
             </li>
@@ -210,17 +210,17 @@
             data-bs-toggle="dropdown"
             aria-expanded="true"
           >
-            External Links
+            <%= t("nav.external_links") %>
           </a>
           <ul class="dropdown-menu">
             <li>
-              <%= link_to "SPARQL Query Service", sparql_path, class: "dropdown-item" %>
+              <%= link_to t("nav.sparql_query_service"), sparql_path, class: "dropdown-item" %>
             </li>
             <li>
               <a
                 class="dropdown-item"
                 href="https://culturecreates.github.io/artsdata-data-model/"
-              >Artsdata Data Model Documentation</a>
+              ><%= t("nav.artsdata_data_model_documentation") %></a>
             </li>
 
           </ul>
@@ -235,9 +235,9 @@
 
         <li class="nav-item">
           <% if session[:handle] %>
-            <a class="nav-link" href="<%= logout_url %>">Logout</a>
+            <a class="nav-link" href="<%= logout_url %>"><%= t("nav.logout") %></a>
           <% else %>
-            <a class="nav-link" href="<%= github_url %>">Login</a>
+            <a class="nav-link" href="<%= github_url %>"><%= t("nav.login") %></a>
           <% end %>
 
         </li>
