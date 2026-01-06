@@ -8,6 +8,7 @@ SELECT
 ?WikidataID 
 ?name  
 (SAMPLE(?disambiguatingDescriptions) as ?disambiguatingDescription)
+(SAMPLE(?regions) as ?region)
 WHERE {
     GRAPH <http://kg.artsdata.ca/core> {
         ?ArtsdataID a schema:Organization .
@@ -25,6 +26,9 @@ WHERE {
             FILTER(lang(?disambiguatingDescriptionAnyLanguage) != "en")
         }
         BIND(COALESCE(?disambiguatingDescriptionEn, ?disambiguatingDescriptionAnyLanguage) as ?disambiguatingDescriptions)
+        OPTIONAL {
+            ?ArtsdataID schema:address/schema:addressRegion ?regions .
+        }
         OPTIONAL {
             ?ArtsdataID schema:name ?labelMul .
             FILTER(LANG(?labelMul) = "mul") 
