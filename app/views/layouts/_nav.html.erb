@@ -167,10 +167,10 @@
                 <hr class="dropdown-divider">
               </li>
             <% end %>
-            <li><%= link_to "Upcoming Events",
+            <li><%= link_to t("reports.upcoming_events.title"),
               query_show_path(
                 sparql: "custom/upcoming-events",
-                title: "Upcoming Events",
+                title: "reports.upcoming_events.title",
                 description: "reports.upcoming_events.description",
               ),
               class: "dropdown-item" %>

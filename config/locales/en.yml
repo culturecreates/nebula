@@ -86,4 +86,5 @@ en:
       copy_completed: "JSON-LD copied"
   reports:
     upcoming_events:
+      title: "Upcoming Events"
       description: "This report lists unique events that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. There are thousands more upcoming events loaded to Artsdata that yet have to be reconciled and minted. To have more information about a given event, click on its Artsdata ID, in the \"uri\" column."
