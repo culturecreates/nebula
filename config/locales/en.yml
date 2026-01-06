@@ -35,6 +35,29 @@ en:
   search_results: "Search Results"
   dashboard_title: "Dashboard for "
   favourite_reports: "Favourite Reports"
+  nav:
+    home: "Home"
+    all_data_feeds: "All Data Feeds"
+    data_feeds: "Data Feeds"
+    databus: "Databus"
+    ical_feeds: "iCal Feeds"
+    mint_using_wikidata: "Mint using Wikidata"
+    batch_reconcile: "Batch Reconcile"
+    introduction: "Introduction"
+    graphs_with_people_organizations: "Graphs with People, Organizations"
+    graphs_with_places: "Graphs with Places"
+    graphs_with_events: "Graphs with Events"
+    controlled_vocabularies: "Controlled Vocabularies"
+    event_types: "Event Types"
+    organization_types: "Organization Types"
+    reports: "Reports"
+    login_to_view_reports: "Login to view your favourite reports"
+    external_links: "External Links"
+    sparql_query_service: "SPARQL Query Service"
+    artsdata_data_model_documentation: "Artsdata Data Model Documentation"
+    login_using_github: "Login using Github"
+    login: "Login"
+    logout: "Logout"
   minting_wikidata:
     title: "Mint using Wikidata"
     sub_title: "Add Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to mint an Artsdata Identifier."
@@ -88,3 +111,11 @@ en:
     upcoming_events:
       title: "Upcoming Events"
       description: "This report lists unique events that have been reconciled and assigned (i.e. \"minted\") an Artsdata identifier. There are thousands more upcoming events loaded to Artsdata that yet have to be reconciled and minted. To have more information about a given event, click on its Artsdata ID, in the \"uri\" column."
+    recently_minted_events:
+      title: "Recently Minted Events"
+    places_with_events:
+      title: "Places with Events"
+    people_with_artsdata_ids:
+      title: "People with Artsdata IDs"
+    organizations_with_artsdata_ids:
+      title: "Organizations with Artsdata IDs"
