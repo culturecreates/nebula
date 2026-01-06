@@ -13,7 +13,7 @@ WHERE {
          schema:name ?name_lang ;
          schema:startDate ?startDate .
     
-    # Filter for English or French names only
+    # Filter for English or French names (or names without language tags)
     FILTER(lang(?name_lang) = "en" || lang(?name_lang) = "fr" || lang(?name_lang) = "")
     
     # Get location details
@@ -21,16 +21,15 @@ WHERE {
         ?uri schema:location ?location_entity .
         ?location_entity schema:name ?location_name .
         
-        # Get locality (city)
+        # Get locality and region from address
         OPTIONAL {
             ?location_entity schema:address ?address .
-            ?address schema:addressLocality ?locality .
-        }
-        
-        # Get region (province/state)
-        OPTIONAL {
-            ?location_entity schema:address ?address .
-            ?address schema:addressRegion ?region .
+            OPTIONAL {
+                ?address schema:addressLocality ?locality .
+            }
+            OPTIONAL {
+                ?address schema:addressRegion ?region .
+            }
         }
     }
     
