@@ -19,6 +19,7 @@ fr:
     controlled_vocabularies: "Vocabulaires contrôlés"
     event_types: "Types d'événements"
     organization_types: "Types d'organisations"
+    genres: "Genres"
     reports: "Rapports"
     login_to_view_reports: "Connectez-vous pour voir vos rapports favoris"
     external_links: "Liens externes"
