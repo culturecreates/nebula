@@ -50,6 +50,7 @@ en:
     controlled_vocabularies: "Controlled Vocabularies"
     event_types: "Event Types"
     organization_types: "Organization Types"
+    genres: "Genres"
     reports: "Reports"
     login_to_view_reports: "Login to view your favourite reports"
     external_links: "External Links"
