@@ -25,24 +25,17 @@ export default class extends Controller {
       },
       body: JSON.stringify({ uri: this.uriValue, dryrun: true })
     })
-      .then(async response => {
-        let data = null;
-        try {
-          data = await response.json();
-        } catch (e) {}
-        if (!response.ok) {
-          let msg = data && data.message ? `${data.message}` : '';
-          this.modalBody.innerHTML = `Failed to preview. ${msg ? msg : 'Please try again later.'}`;
-          this.okBtn.disabled = true;
-          return null;
-        }
-        return data;
-      })
+      .then(response => response.json())
       .then(data => {
         if (!data) return;
         if (typeof data.message === "undefined") {
           this.modal.hide();
           window.location.reload();
+          return;
+        }
+        if (data.message.trim() === "") {
+          this.modalBody.innerHTML = "<p>Nothing to update.</p>";
+          this.okBtn.disabled = true;
           return;
         }
         this.modalBody.innerHTML = data.message;

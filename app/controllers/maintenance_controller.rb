@@ -35,34 +35,28 @@ class MaintenanceController < ApplicationController
     if dryrun
       if response.code != 200
         message =  "#{CGI.escapeHTML(response["message"])}"
-        render json: { message: message }, status: :internal_server_error
+        render json: { message: message }, status: :service_unavailable
       else
         items = JSON.parse(response.body)['logs']
         formated_items = ""
-        if items.empty?
-          formated_items << "<p>Nothing to update from Wikidata.</p>"
-          render json: { message: formated_items }, status: :no_content
-        else 
-          add_list = items.select{ |item| item["action"] == "add" }
-          unless add_list.empty?
+        add_list = items.select{ |item| item["action"] == "add" }
+        unless add_list.empty?
           formated_items << "<h4>Updates</h4> <ul>"
-            items.select{ |item| item["action"] == "add" }.each do |item|
-              formated_items << format_display(item) 
-            end
-            formated_items << "</ul>"
+          items.select{ |item| item["action"] == "add" }.each do |item|
+            formated_items << format_display(item) 
           end
-          delete_list = items.select{ |item| item["action"] == "delete" }
-          unless delete_list.empty?
-            formated_items << "<h4>Deletes</h4> <ul>"
-            delete_list.each do |item|
-              formated_items << format_display(item) 
-            end
-            formated_items << "</ul>"
-          end
-          render json: { message: formated_items }, status: :ok
+          formated_items << "</ul>"
         end
+        delete_list = items.select{ |item| item["action"] == "delete" }
+        unless delete_list.empty?
+          formated_items << "<h4>Deletes</h4> <ul>"
+          delete_list.each do |item|
+            formated_items << format_display(item) 
+          end
+          formated_items << "</ul>"
+        end
+        render json: { message: formated_items }, status: :ok
       end
-      
     else
       if response.code != 200
         flash[:alert] = "Failed. Error: #{response.body.truncate(1000)}"
