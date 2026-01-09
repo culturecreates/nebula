@@ -52,7 +52,7 @@ Ensure your Github repo has [granted access](https://github.com/organizations/cu
   ./bin/importmap pin bootstrap@5.3.2
   ./bin/importmap pin @popperjs/core@2.11.8
 
-  Check [blog](https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-importmap-rails-with-bootstrap-stimulus-turbo-long-tutorial/) for troubleshooting 
+  Check [blog](https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-importmap-rails-with-bootstrap-stimulus-turbo-long-tutorial/) for troubleshooting
 
   ```
 
