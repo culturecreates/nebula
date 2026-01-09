@@ -8,11 +8,13 @@ export default class extends Controller {
     this.modal = new bootstrap.Modal(document.getElementById("dryrunModal"))
     this.modalBody = document.getElementById("dryrunModalBody")
     this.okBtn = document.getElementById("dryrunModalOk")
+    this.okBtn.disabled = true // Disable the update button at first
   }
 
   refresh(event) {
     event.preventDefault()
     this.modalBody.innerHTML = "<div class='text-center'><span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Calculating...</div>"
+    this.okBtn.disabled = true // Ensure button is disabled on each refresh
     this.modal.show()
 
     fetch("/maintenance/refresh_entity", {
@@ -23,16 +25,30 @@ export default class extends Controller {
       },
       body: JSON.stringify({ uri: this.uriValue, dryrun: true })
     })
-      .then(response => response.json())
-      .then(data => {
-        if (typeof data.message === "undefined") {
-          this.modal.hide()
-          window.location.reload()
-          return
+      .then(async response => {
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (e) {}
+        if (!response.ok) {
+          let msg = data && data.message ? `${data.message}` : '';
+          this.modalBody.innerHTML = `Failed to preview. ${msg ? msg : 'Please try again later.'}`;
+          this.okBtn.disabled = true;
+          return null;
         }
-        this.modalBody.innerHTML = data.message
+        return data;
+      })
+      .then(data => {
+        if (!data) return;
+        if (typeof data.message === "undefined") {
+          this.modal.hide();
+          window.location.reload();
+          return;
+        }
+        this.modalBody.innerHTML = data.message;
+        this.okBtn.disabled = false; // Enable the update button if fetch is successful
         this.okBtn.onclick = () => {
-          this.modal.hide()
+          this.modal.hide();
           fetch("/maintenance/refresh_entity", {
             method: "POST",
             headers: {
@@ -43,9 +59,9 @@ export default class extends Controller {
           })
             .then(response => response.json())
             .then(result => {
-              window.location.href = result.redirect_url
-            })
-        }
-      })
+              window.location.href = result.redirect_url;
+            });
+        };
+      });
   }
 }
