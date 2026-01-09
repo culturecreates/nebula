@@ -6,7 +6,7 @@ Nebula is built ontop of the Artsdata API Plaform. It includes a generic RDF vie
 
 This is a 'low code' website with all business logic and data validation rules managed in external data files using [SPARQL](https://www.ontotext.com/knowledgehub/fundamentals/what-is-sparql/) and [SHACL](<https://www.ontotext.com/knowledgehub/fundamentals/what-is-shacl/#:~:text=The%20Shapes%20Constraint%20Language%20(SHACL,data%20instead%20of%20enabling%20inferencing.>).  All tablular views and graph views are generated using SPARQL. All data validation reports and conditions required for minting are generated using SHACL. User athentication is managed with Github.
 
-This website does [content negoitation](https://en.wikipedia.org/wiki/Content_negotiation) and will dereference Artsdata URIs following [linked data](https://en.wikipedia.org/wiki/Linked_data) principles.
+This website does [content negotiation](https://en.wikipedia.org/wiki/Content_negotiation) and will dereference Artsdata URIs following [linked data](https://en.wikipedia.org/wiki/Linked_data) principles.
 
 This is a work in progress...
 
