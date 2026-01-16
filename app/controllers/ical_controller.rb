@@ -4,6 +4,7 @@ class IcalController < ApplicationController
   def index
     uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/ical")
     @icals = GithubService.info(nil, uri)
+    @icals.select! { |ical| ical["download_url"].present?} # skip directories
     @icals.each do |ical|
       ical[:jsonld_url] = "https://api.artsdata.ca/query?format=jsonld&sparql=#{ical["download_url"]}"
       ical[:dereference_url] = dereference_external_url(uri: ical[:jsonld_url])

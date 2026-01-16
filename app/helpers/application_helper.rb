@@ -10,6 +10,7 @@ module ApplicationHelper
   end
 
   def humanize_url(url)
+    return if url.blank?
     url.split("/").last.split(".").first.humanize
   end
 

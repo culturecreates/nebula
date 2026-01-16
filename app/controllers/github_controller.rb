@@ -55,6 +55,7 @@ class GithubController < ApplicationController
   def sparqls
       uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
       @sparqls = GithubService.info(nil, uri)
+      @sparqls.select! { |sparql| sparql["download_url"].present?} # skip directories
   end
 
   def logout!
