@@ -13,5 +13,7 @@
     skos:prefLabel "Genres"@en ;
     skos:prefLabel "Genres"@fr .
 
+<http://kg.artsdata.ca/resource/ArtsdataTestVocabularyWithoutLabel> a skos:ConceptScheme .
+
 <http://example.com/other/vocabulary> a skos:ConceptScheme ;
     skos:prefLabel "Other Vocabulary (should not be returned)"@en .

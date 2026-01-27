@@ -17,6 +17,7 @@ class ListControlledVocabulariesTest < ActiveSupport::TestCase
     assert @sparql_query.is_a?(String)
     assert @sparql_query.include?("skos:ConceptScheme")
     assert @sparql_query.include?("skos:prefLabel")
+    assert @sparql_query.include?("OPTIONAL")
   end
 
   test "should return only Artsdata controlled vocabularies with labels" do
@@ -26,35 +27,47 @@ class ListControlledVocabulariesTest < ActiveSupport::TestCase
     # Convert solutions to array of URIs
     vocabularies = solutions.map { |solution| solution[:cv].to_s }.uniq
     
-    # Should return exactly 3 Artsdata vocabularies
-    assert_equal 3, vocabularies.length
+    # Should return exactly 4 Artsdata vocabularies (3 with labels + 1 without)
+    assert_equal 4, vocabularies.length
     
-    # Should include the three Artsdata vocabularies
+    # Should include the three Artsdata vocabularies with labels
     assert_includes vocabularies, "http://kg.artsdata.ca/resource/ArtsdataEventTypes"
     assert_includes vocabularies, "http://kg.artsdata.ca/resource/ArtsdataOrganizationTypes"
     assert_includes vocabularies, "http://kg.artsdata.ca/resource/ArtsdataGenres"
+    # Should also include vocabulary without label (tests OPTIONAL)
+    assert_includes vocabularies, "http://kg.artsdata.ca/resource/ArtsdataTestVocabularyWithoutLabel"
     
     # Should NOT include the non-Artsdata vocabulary
     assert_not_includes vocabularies, "http://example.com/other/vocabulary"
-    
-    # Verify labels are returned
-    solutions.each do |solution|
-      assert solution[:label].present?, "Expected label to be present for #{solution[:cv]}"
-    end
   end
 
-  test "should return labels with language tags" do
+  test "should return multiple language labels per vocabulary" do
     solutions = SPARQL.execute(@sparql_query, @graph)
     
-    # Find English and French labels for Event Types
+    # Find all solutions for Event Types
     event_types_solutions = solutions.select { |s| s[:cv].to_s.include?("ArtsdataEventTypes") }
     
-    # Should have both English and French labels
-    assert event_types_solutions.length >= 2, "Expected at least 2 labels (en and fr)"
+    # Should have at least 2 entries (English and French)
+    assert event_types_solutions.length >= 2, "Expected at least 2 labels (en and fr) for Event Types"
     
-    # Check that labels have language information
-    labels_with_lang = event_types_solutions.select { |s| s[:label].respond_to?(:language) && s[:label].language }
+    # Verify at least one has a language tag
+    labels_with_lang = event_types_solutions.select { |s| s[:label]&.respond_to?(:language) && s[:label].language }
     assert labels_with_lang.length >= 2, "Expected labels with language tags"
+  end
+
+  test "should handle vocabularies without labels" do
+    solutions = SPARQL.execute(@sparql_query, @graph)
+    
+    # Find the vocabulary without a label
+    no_label_solutions = solutions.select { |s| s[:cv].to_s.include?("TestVocabularyWithoutLabel") }
+    
+    # Should return at least one result for this vocabulary
+    assert no_label_solutions.length >= 1, "Expected vocabulary without label to be included"
+    
+    # The label should be nil or blank
+    no_label_solution = no_label_solutions.first
+    assert no_label_solution[:label].blank? || no_label_solution[:label].nil?,
+           "Expected label to be blank for vocabulary without prefLabel"
   end
 
   test "should filter by artsdata.ca/resource domain" do

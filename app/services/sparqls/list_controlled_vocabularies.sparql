@@ -2,7 +2,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT ?cv ?label WHERE {
     ?cv a skos:ConceptScheme .
-    ?cv skos:prefLabel ?label .
+    OPTIONAL { ?cv skos:prefLabel ?label . }
     FILTER(CONTAINS(STR(?cv), "artsdata.ca/resource"))
 }
 ORDER BY ?cv
