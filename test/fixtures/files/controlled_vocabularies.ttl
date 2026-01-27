@@ -2,13 +2,16 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <http://kg.artsdata.ca/resource/ArtsdataEventTypes> a skos:ConceptScheme ;
-    rdfs:label "Artsdata Event Types" .
+    skos:prefLabel "Event Types"@en ;
+    skos:prefLabel "Types d'événements"@fr .
 
 <http://kg.artsdata.ca/resource/ArtsdataOrganizationTypes> a skos:ConceptScheme ;
-    rdfs:label "Artsdata Organization Types" .
+    skos:prefLabel "Organization Types"@en ;
+    skos:prefLabel "Types d'organisations"@fr .
 
 <http://kg.artsdata.ca/resource/ArtsdataGenres> a skos:ConceptScheme ;
-    rdfs:label "Artsdata Genres" .
+    skos:prefLabel "Genres"@en ;
+    skos:prefLabel "Genres"@fr .
 
 <http://example.com/other/vocabulary> a skos:ConceptScheme ;
-    rdfs:label "Other Vocabulary (should not be returned)" .
+    skos:prefLabel "Other Vocabulary (should not be returned)"@en .

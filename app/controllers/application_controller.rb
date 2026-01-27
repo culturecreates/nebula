@@ -147,34 +147,48 @@ class ApplicationController < ActionController::Base
       query = SparqlLoader.load("list_controlled_vocabularies")
       solutions = ArtsdataGraph::SparqlService.client.query(query).limit(100)
       
-      # Mapping of URI patterns to translation keys
-      label_mapping = {
-        "ArtsdataEventTypes" => "nav.event_types",
-        "ArtsdataOrganizationTypes" => "nav.organization_types",
-        "ArtsdataGenres" => "nav.genres"
-      }
+      # Get current locale (en or fr)
+      current_locale = I18n.locale.to_s
       
-      @controlled_vocabularies = solutions.map do |solution|
+      # Group solutions by URI to collect all labels
+      vocabularies_by_uri = {}
+      solutions.each do |solution|
         uri = solution[:cv].to_s
-        # Extract the resource name from URI (e.g., "ArtsdataEventTypes")
-        resource_name = uri.split('/').last
+        label = solution[:label]
         
-        # Use translation if available, otherwise use humanized resource name
-        label_key = label_mapping[resource_name] || resource_name.humanize
-        label = label_key.start_with?("nav.") ? I18n.t(label_key) : label_key
+        vocabularies_by_uri[uri] ||= { uri: uri, labels: {} }
+        
+        # Store label with its language tag
+        if label.respond_to?(:language) && label.language
+          vocabularies_by_uri[uri][:labels][label.language.to_s] = label.to_s
+        elsif label.respond_to?(:to_s)
+          # If no language tag, use as fallback
+          vocabularies_by_uri[uri][:labels]["default"] = label.to_s
+        end
+      end
+      
+      # Build final list with locale-specific labels
+      @controlled_vocabularies = vocabularies_by_uri.map do |uri, data|
+        # Try to get label in current locale, fallback to English, then any available label
+        label = data[:labels][current_locale] || 
+                data[:labels]["en"] || 
+                data[:labels]["default"] ||
+                data[:labels].values.first ||
+                uri.split('/').last.humanize
         
         {
           uri: uri,
           label: label
         }
-      end
+      end.sort_by { |v| v[:uri] }
+      
     rescue StandardError => e
       Rails.logger.error "Failed to fetch controlled vocabularies: #{e.message}"
-      # Return hardcoded list as fallback
+      # Return minimal fallback - just the URIs
       @controlled_vocabularies = [
-        { uri: "http://kg.artsdata.ca/resource/ArtsdataEventTypes", label: I18n.t("nav.event_types") },
-        { uri: "http://kg.artsdata.ca/resource/ArtsdataOrganizationTypes", label: I18n.t("nav.organization_types") },
-        { uri: "http://kg.artsdata.ca/resource/ArtsdataGenres", label: I18n.t("nav.genres") }
+        { uri: "http://kg.artsdata.ca/resource/ArtsdataEventTypes", label: "Event Types" },
+        { uri: "http://kg.artsdata.ca/resource/ArtsdataOrganizationTypes", label: "Organization Types" },
+        { uri: "http://kg.artsdata.ca/resource/ArtsdataGenres", label: "Genres" }
       ]
     end
 
