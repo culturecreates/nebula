@@ -3,11 +3,7 @@ class ControlledVocabulariesController < ApplicationController
   # Returns the list of controlled vocabularies for lazy loading in the navigation menu
   def index
     @controlled_vocabularies = fetch_controlled_vocabularies
-    
-    respond_to do |format|
-      format.turbo_stream
-      format.html { render partial: "list", locals: { controlled_vocabularies: @controlled_vocabularies } }
-    end
+    render partial: "list", locals: { controlled_vocabularies: @controlled_vocabularies }
   end
 
   private
