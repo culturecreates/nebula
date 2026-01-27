@@ -44,7 +44,7 @@ class ListControlledVocabulariesTest < ActiveSupport::TestCase
   test "should return multiple language labels per vocabulary" do
     solutions = SPARQL.execute(@sparql_query, @graph)
     
-    # Find all solutions for Event Types]
+    # Find all solutions for Event Types
     event_types_solutions = []
     solutions.each do |s|
       event_types_solutions << s if s[:cv].to_s.include?("ArtsdataEventTypes")
