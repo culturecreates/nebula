@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  helper_method :ensure_access, :user_has_access?
+  helper_method :ensure_access, :user_has_access?, :controlled_vocabularies
   before_action :set_locale, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
 
@@ -137,6 +137,48 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
+  end
+
+  # Fetch controlled vocabularies dynamically from Artsdata
+  def controlled_vocabularies
+    return @controlled_vocabularies if @controlled_vocabularies
+
+    begin
+      query = SparqlLoader.load("list_controlled_vocabularies")
+      solutions = ArtsdataGraph::SparqlService.client.query(query).limit(100)
+      
+      # Mapping of URI patterns to translation keys
+      label_mapping = {
+        "ArtsdataEventTypes" => "nav.event_types",
+        "ArtsdataOrganizationTypes" => "nav.organization_types",
+        "ArtsdataGenres" => "nav.genres"
+      }
+      
+      @controlled_vocabularies = solutions.map do |solution|
+        uri = solution[:cv].to_s
+        # Extract the resource name from URI (e.g., "ArtsdataEventTypes")
+        resource_name = uri.split('/').last
+        
+        # Use translation if available, otherwise use humanized resource name
+        label_key = label_mapping[resource_name] || resource_name.humanize
+        label = label_key.start_with?("nav.") ? I18n.t(label_key) : label_key
+        
+        {
+          uri: uri,
+          label: label
+        }
+      end
+    rescue StandardError => e
+      Rails.logger.error "Failed to fetch controlled vocabularies: #{e.message}"
+      # Return hardcoded list as fallback
+      @controlled_vocabularies = [
+        { uri: "http://kg.artsdata.ca/resource/ArtsdataEventTypes", label: I18n.t("nav.event_types") },
+        { uri: "http://kg.artsdata.ca/resource/ArtsdataOrganizationTypes", label: I18n.t("nav.organization_types") },
+        { uri: "http://kg.artsdata.ca/resource/ArtsdataGenres", label: I18n.t("nav.genres") }
+      ]
+    end
+
+    @controlled_vocabularies
   end
 
   # TODO: Figure out if this is needed
