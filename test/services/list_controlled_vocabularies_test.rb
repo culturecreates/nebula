@@ -44,8 +44,11 @@ class ListControlledVocabulariesTest < ActiveSupport::TestCase
   test "should return multiple language labels per vocabulary" do
     solutions = SPARQL.execute(@sparql_query, @graph)
     
-    # Find all solutions for Event Types
-    event_types_solutions = solutions.select { |s| s[:cv].to_s.include?("ArtsdataEventTypes") }
+    # Find all solutions for Event Types]
+    event_types_solutions = []
+    solutions.each do |s|
+      event_types_solutions << s if s[:cv].to_s.include?("ArtsdataEventTypes")
+    end 
     
     # Should have at least 2 entries (English and French)
     assert event_types_solutions.length >= 2, "Expected at least 2 labels (en and fr) for Event Types"
@@ -59,7 +62,11 @@ class ListControlledVocabulariesTest < ActiveSupport::TestCase
     solutions = SPARQL.execute(@sparql_query, @graph)
     
     # Find the vocabulary without a label
-    no_label_solutions = solutions.select { |s| s[:cv].to_s.include?("TestVocabularyWithoutLabel") }
+    no_label_solutions = []
+    solutions.each do |s|
+      no_label_solutions << s if s[:cv].to_s.include?("TestVocabularyWithoutLabel")
+    end 
+   
     
     # Should return at least one result for this vocabulary
     assert no_label_solutions.length >= 1, "Expected vocabulary without label to be included"
