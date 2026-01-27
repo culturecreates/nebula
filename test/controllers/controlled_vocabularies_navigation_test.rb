@@ -9,7 +9,11 @@ class ControlledVocabulariesNavigationTest < ActionDispatch::IntegrationTest
       { cv: RDF::URI.new("http://kg.artsdata.ca/resource/ArtsdataGenres") }
     ]
     
-    ArtsdataGraph::SparqlService.client.stubs(:query).returns(mock_solutions)
+    # Create a mock query result that responds to limit
+    mock_result = mock('query_result')
+    mock_result.stubs(:limit).returns(mock_solutions)
+    
+    ArtsdataGraph::SparqlService.client.stubs(:query).returns(mock_result)
     
     get root_path
     
