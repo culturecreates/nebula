@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     get "reconcile/batch", to: "reconcile#batch"
     get "validate/wikidata", to: "validate#wikidata"
     get "validate", to: "validate#show"
+    get "controlled_vocabularies", to: "controlled_vocabularies#index"
 
 
     resources :artifact do 

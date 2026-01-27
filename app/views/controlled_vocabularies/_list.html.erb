@@ -1,0 +1,10 @@
+<turbo-frame id="controlled-vocabularies-list">
+  <% controlled_vocabularies.each do |vocabulary| %>
+    <li>
+      <a
+        class="dropdown-item"
+        href="/entity?uri=<%= CGI.escape(vocabulary[:uri]) %>"
+      ><%= vocabulary[:label] %></a>
+    </li>
+  <% end %>
+</turbo-frame>
