@@ -34,4 +34,4 @@
 /config/private-key.pem
 
 # Coverage tests
-/coverage
+/coveragevendor/bundle
