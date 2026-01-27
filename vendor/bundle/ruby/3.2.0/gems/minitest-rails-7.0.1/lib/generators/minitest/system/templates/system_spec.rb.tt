@@ -1,8 +1,0 @@
-require "application_system_test_case"
-
-describe <%= class_name.pluralize %>, :system do
-  # it "visits the index" do
-  #   visit <%= plural_table_name %>_url
-  #   assert_selector "h1", text: "<%= human_name.pluralize %>"
-  # end
-end
