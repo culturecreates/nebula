@@ -131,27 +131,14 @@
             <%= t("nav.controlled_vocabularies") %>
           </a>
           <ul class="dropdown-menu">
-           
-       
-           <li>
-              <a
-                class="dropdown-item"
-                href="/entity?uri=http%3A%2F%2Fkg.artsdata.ca%2Fresource%2FArtsdataEventTypes"
-              ><%= t("nav.event_types") %></a>
-            </li>
-           <li>
-              <a
-                class="dropdown-item"
-                href="/entity?uri=http%3A%2F%2Fkg.artsdata.ca%2Fresource%2FArtsdataOrganizationTypes"
-              ><%= t("nav.organization_types") %></a>
-            </li>
-           <li>
-              <a
-                class="dropdown-item"
-                href="/entity?uri=http%3A%2F%2Fkg.artsdata.ca%2Fresource%2FArtsdataGenres"
-              ><%= t("nav.genres") %></a>
-            </li>
-           
+            <% controlled_vocabularies.each do |vocabulary| %>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/entity?uri=<%= CGI.escape(vocabulary[:uri]) %>"
+                ><%= vocabulary[:label] %></a>
+              </li>
+            <% end %>
           </ul>
         </li>
         <li class="nav-item dropdown">
