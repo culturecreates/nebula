@@ -84,6 +84,8 @@
             turbo: false,
           } %>
         </li>
+
+        <!-------------------------- BATCH RECONCILE DROPDOWN -------------------------->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -96,30 +98,32 @@
             <%= t("nav.batch_reconcile") %>
           </a>
           <ul class="dropdown-menu">
-            <li>
-              <a class="dropdown-item disabled" href="#" data-turbo="false"><%= t("nav.introduction") %></a>
+             <li><%= link_to t("nav.batch_reconcile_menu.tool"),
+              reconcile_batch_path,
+              class: "dropdown-item" %>
+            </li>
+            <li><%= link_to t("nav.batch_reconcile_menu.graphs_with_people_organizations"),
+              query_show_path(
+                sparql: "reconcile_controller/graphs_with_agents_to_reconcile"
+              ),
+              data: { turbo: false },
+              class: "dropdown-item" %>
+            </li>
+            <li><%= link_to t("nav.batch_reconcile_menu.graphs_with_places"),
+              query_show_path(
+                sparql: "reconcile_controller/graphs_with_places_to_reconcile"
+              ),
+              data: { turbo: false },
+              class: "dropdown-item" %>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="/query/show?sparql=reconcile_controller/graphs_with_agents_to_reconcile"
-                data-turbo="false"
-              ><%= t("nav.graphs_with_people_organizations") %></a>
-            </li>
-            <li>
-              <a
-                class="dropdown-item"
-                href="/query/show?sparql=reconcile_controller/graphs_with_places_to_reconcile"
-                data-turbo="false"
-              ><%= t("nav.graphs_with_places") %></a>
-            </li>
-            <li>
-              <a class="dropdown-item disabled" href="#"><%= t("nav.graphs_with_events") %></a>
+              <a class="dropdown-item disabled" href="#"><%= t("nav.batch_reconcile_menu.graphs_with_events") %></a>
             </li>
 
           </ul>
         </li>
       
+      <!------------------------ CONTROLLED VOCABULARIES DROPDOWN ----------------------->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -136,6 +140,8 @@
             </turbo-frame>
           </ul>
         </li>
+
+      <!----------------------------- REPORTS DROPDOWN ------------------------------>
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
