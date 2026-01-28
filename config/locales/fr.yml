@@ -30,15 +30,16 @@ fr:
     login_using_github: "Connexion avec Github"
     login: "Connexion"
     logout: "Déconnexion"
-  artifact:
-    title: "Databus Artifact"
-    description: |
-      <p>The Artsdata Databus stores metadata about your datasets. It does not store the data itself. Before using the databus you must first publish your data somewhere on the Web. Databus organizes datasets by <code><< group >> << artifact >> << version >></code>. 
-      Each versioned artifact has a download URL that must not change. The Artsdata knowledge graph may subscribe to your dataset and load artifacts in the background as new versions become available.</p> 
-      <p>Please manage Artifacts with the <a href='https://culturecreates.github.io/artsdata-data-model/architecture/graph-store-api.html'>Artsdata Databus API</a>. 
-      To create a new version use the <a href='https://documenter.getpostman.com/view/3157443/TVep7mv3#f12d3dc0-5c37-496b-985f-95388660b984'>POST /databus</a> endpoint with <code>publisher=</code> set to your Databus Account URI. 
-      To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.  
-      An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google Sheets spreadsheet.</p>
+  minting_wikidata:
+    title: "Mint using Wikidata"
+    sub_title: "Ajoutez des personnes, des lieux et des organisations de Wikidata à Artsdata. Commencez par sélectionner le type et saisir le nom ou l’identifiant Wikidata. Il vous sera demandé de confirmer l’entité Wikidata avant de procéder à la création d’un identifiant Artsdata."
+    person_tab: "Person"
+    person_description: "Wikidata entities that are instances of human (Q5)."
+    organization_tab: "Organization"
+    organization_description: "Wikidata entities that are instances of organization (Q43229). This includes groups of performers and presenting organizations."
+    place_tab: "Place"
+    place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
+    search_placeholder: "Name or Wikidata ID"
   ical:
     ical_feeds: "Flux iCal"
     description: |
