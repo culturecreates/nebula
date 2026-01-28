@@ -2,6 +2,7 @@ fr:
   search_for: "Nom, URI ou page Web"
   search: "Rechercher"
   search_results: "Résultats de recherche"
+  loading: "Chargement..."
   dashboard_title: Tableau de bord pour
   favourite_reports: "Rapports favoris"
   nav:
