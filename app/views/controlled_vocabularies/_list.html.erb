@@ -2,7 +2,8 @@
   <% controlled_vocabularies.each do |vocabulary| %>
     <li>
       <a
-        class="dropdown-item"
+        class="dropdown-item text-wrap w-100"
+        style="white-space: normal;"
         href="/entity?uri=<%= CGI.escape(vocabulary[:uri]) %>"
       ><%= vocabulary[:label] %></a>
     </li>

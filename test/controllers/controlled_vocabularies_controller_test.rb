@@ -15,8 +15,8 @@ class ControlledVocabulariesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should use fallback vocabularies on error" do
-    # Mock the SPARQL service to raise an error
-    ArtsdataGraph::SparqlService.client.stubs(:query).raises(StandardError.new("Connection failed"))
+    # Mock the SPARQL client to raise an error
+    SPARQL::Client.any_instance.stubs(:query).raises(StandardError.new("Connection failed"))
     
     get controlled_vocabularies_path
     assert_response :success
