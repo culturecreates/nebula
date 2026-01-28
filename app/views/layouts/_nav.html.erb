@@ -100,21 +100,21 @@
           <ul class="dropdown-menu">
              <li><%= link_to t("nav.batch_reconcile_menu.tool"),
               reconcile_batch_path,
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
             <li><%= link_to t("nav.batch_reconcile_menu.graphs_with_people_organizations"),
               query_show_path(
                 sparql: "reconcile_controller/graphs_with_agents_to_reconcile"
               ),
               data: { turbo: false },
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
             <li><%= link_to t("nav.batch_reconcile_menu.graphs_with_places"),
               query_show_path(
                 sparql: "reconcile_controller/graphs_with_places_to_reconcile"
               ),
               data: { turbo: false },
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
             <li>
               <a class="dropdown-item disabled" href="#"><%= t("nav.batch_reconcile_menu.graphs_with_events") %></a>
@@ -167,7 +167,7 @@
                 title: "reports.upcoming_events.title",
                 description: "reports.upcoming_events.description",
               ),
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
             <li><%= link_to t("reports.recently_minted_events.title"),
               query_show_path(
@@ -175,14 +175,14 @@
                 title: "reports.recently_minted_events.title",
                 description: "reports.recently_minted_events.description",
               ),
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
             <li><%= link_to t("reports.places_with_events.title"),
               query_show_path(
                 sparql: "custom/places", 
                 title: "reports.places_with_events.title"
               ),
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
             <li><%= link_to t("reports.people_with_artsdata_ids.title"),
               query_show_path(
@@ -190,7 +190,7 @@
                 title: "reports.people_with_artsdata_ids.title",
                 description: "reports.people_with_artsdata_ids.description",
               ),
-              class: "dropdown-item" %>
+              class: "dropdown-item text-wrap" %>
             </li>
              <li><%= link_to t("reports.organizations_with_artsdata_ids.title"),
               query_show_path(
@@ -202,6 +202,8 @@
             </li>
           </ul>
         </li>
+
+        <!-- -------------------------- EXTERNAL LINKS DROPDOWN ------------------------- -->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -214,11 +216,11 @@
           </a>
           <ul class="dropdown-menu">
             <li>
-              <%= link_to t("nav.sparql_query_service"), sparql_path, class: "dropdown-item" %>
+              <%= link_to t("nav.sparql_query_service"), sparql_path, class: "dropdown-item text-wrap" %>
             </li>
             <li>
               <a
-                class="dropdown-item"
+                class="dropdown-item text-wrap"
                 href="https://culturecreates.github.io/artsdata-data-model/"
               ><%= t("nav.artsdata_data_model_documentation") %></a>
             </li>
