@@ -100,6 +100,7 @@
           <ul class="dropdown-menu">
              <li><%= link_to t("nav.batch_reconcile_menu.tool"),
               reconcile_batch_path,
+               data: { turbo: false },
               class: "dropdown-item text-wrap" %>
             </li>
             <li><%= link_to t("nav.batch_reconcile_menu.graphs_with_people_organizations"),
