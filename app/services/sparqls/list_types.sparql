@@ -1,0 +1,15 @@
+PREFIX schema: <http://schema.org/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+select ?type ?count where {
+    {
+        select ?type (count(?s) as ?count_integer) where {
+            graph <GRAPH_PLACEHOLDER> {
+                ?s a ?type
+            }
+        } 
+        group by ?type 
+        order by DESC(?count_integer)
+    }
+
+    bind(CONCAT("<a href='/query/show?title=Entities of type ",ENCODE_FOR_URI(str(?type)),"&sparql=list_generic_entity&template=",ENCODE_FOR_URI(str(?type)),"&graph=",ENCODE_FOR_URI("GRAPH_PLACEHOLDER"),"'>",str(?count_integer),"</a>") as ?count)
+}
