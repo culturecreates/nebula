@@ -15,10 +15,18 @@
     <div 
       data-controller="job-status" 
       data-job-status-should-poll-value="<%= Rails.env.production? || Rails.env.staging? %>"
+      data-job-status-loading-text-value="<%= t('job_status.data_feed_loading') %>"
       class="d-flex align-items-center ms-2 navbar-logo-height"
     >
       <!-- Processing Indicator -->
-      <div data-job-status-target="processingIcon" class="d-none me-2">
+      <div 
+        data-job-status-target="processingIcon" 
+        class="d-none me-2"
+        data-bs-toggle="popover"
+        data-bs-trigger="hover focus"
+        data-bs-placement="bottom"
+        tabindex="0"
+      >
         <div class="spinner-border spinner-border-sm text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
