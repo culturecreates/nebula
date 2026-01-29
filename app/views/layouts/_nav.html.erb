@@ -10,6 +10,34 @@
 
     <% end %>
 
+    <!-- Job Status Component -->
+    <div 
+      data-controller="job-status" 
+      data-job-status-should-poll-value="<%= Rails.env.production? || Rails.env.staging? %>"
+      class="d-flex align-items-center ms-2"
+      style="height: 40px;"
+    >
+      <!-- Processing Indicator -->
+      <div data-job-status-target="processingIcon" class="d-none me-2">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div data-job-status-target="processingText" class="d-none text-muted small me-3"></div>
+      
+      <!-- Queue Badge -->
+      <div 
+        data-job-status-target="queueBadge" 
+        class="d-none"
+        data-bs-toggle="popover"
+        tabindex="0"
+      >
+        <span class="badge bg-secondary">
+          Queue: <span data-job-status-target="queueCount">0</span>
+        </span>
+      </div>
+    </div>
+
     <div class="d-none d-md-block" style="margin-left: auto;">
       <form class="d-flex" role="search" action="<%= reconcile_query_path %>">
         <div class="input-group">
