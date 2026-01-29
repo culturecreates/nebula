@@ -95,3 +95,5 @@ fr:
       title: "Organisations avec identifiants Artsdata"
       description: |
         Ce rapport énumère les organisations pour lesquels un identifiant Artsdata a été créé et assigné (c'est-à-dire "minté"). Par "<a href='http://kg.artsdata.ca/resource/Organization'>Organisation</a>", nous entendons tout groupe structuré de personnes, unies par un objectif commun. Il peut s'agir d'organisation formelles (e.g., une société à but non lucratif) ou de groupes informels, comme des groupes de musique.
+  job_status:
+    data_feed_loading: "Chargement du flux de données"

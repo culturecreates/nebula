@@ -29,3 +29,6 @@ application.register('clipboard', CustomClipboardController)
 
 import ReadMore from '@stimulus-components/read-more'
 application.register('read-more', ReadMore)
+
+import JobStatusController from "controllers/job_status_controller"
+application.register('job-status', JobStatusController)

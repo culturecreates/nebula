@@ -146,3 +146,8 @@ a:hover {
   -webkit-line-clamp: var(--read-more-line-clamp, 3);
   line-clamp: var(--read-more-line-clamp, 3);
 }
+
+// Navbar logo and job status height
+.navbar-logo-height {
+  height: 40px;
+}
