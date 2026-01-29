@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import * as bootstrap from "bootstrap"
 
 export default class extends Controller {
-  static targets = ["container", "processingIcon", "processingText", "queueBadge", "queueCount"]
+  static targets = ["processingIcon", "processingText", "queueBadge", "queueCount"]
 
   connect() {
     // Only poll in production and staging environments
@@ -16,6 +17,14 @@ export default class extends Controller {
   disconnect() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval)
+    }
+    
+    // Clean up any active popovers
+    if (this.hasQueueBadgeTarget) {
+      const popover = bootstrap.Popover.getInstance(this.queueBadgeTarget)
+      if (popover) {
+        popover.dispose()
+      }
     }
   }
 
@@ -100,9 +109,13 @@ export default class extends Controller {
       this.queueBadgeTarget.classList.remove('d-none')
       this.queueCountTarget.textContent = count
       
-      // Update popover content with artifacts list
+      // Update popover content with artifacts list (sanitized)
       const content = artifacts.length > 0 
-        ? artifacts.map(a => `<div>${a}</div>`).join('')
+        ? artifacts.map(a => {
+            const div = document.createElement('div')
+            div.textContent = a // Uses textContent to prevent XSS
+            return div.outerHTML
+          }).join('')
         : '<div>No artifacts in queue</div>'
       
       // Initialize or update Bootstrap popover

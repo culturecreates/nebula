@@ -9,7 +9,7 @@ class JobStatusController < ApplicationController
         response = Net::HTTP.get_response(URI.parse(endpoint))
         
         if response.code.to_i == 200
-          render json: response.body, status: :ok
+          render json: JSON.parse(response.body), status: :ok
         else
           render json: { error: "Failed to fetch job status" }, status: :service_unavailable
         end

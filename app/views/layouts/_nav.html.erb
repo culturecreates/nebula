@@ -3,7 +3,8 @@
     <%= link_to root_path, class: "navbar-brand", style:"padding:0" do %>
       <%= image_tag "artsdata_logo_circle.png",
       alt: "Artsdata Logo",
-      style: "height: 40px; width: auto;" %>
+      class: "navbar-logo-height",
+      style: "width: auto;" %>
       <% if Rails.application.config.graph_api_endpoint != "http://db.artsdata.ca" %>
         <span class='badge bg-warning' style="font-size: 0.6em;"><%= Rails.application.config.graph_api_endpoint.split(".").first[7..-1] %> data</span>
       <% end %>
@@ -14,8 +15,7 @@
     <div 
       data-controller="job-status" 
       data-job-status-should-poll-value="<%= Rails.env.production? || Rails.env.staging? %>"
-      class="d-flex align-items-center ms-2"
-      style="height: 40px;"
+      class="d-flex align-items-center ms-2 navbar-logo-height"
     >
       <!-- Processing Indicator -->
       <div data-job-status-target="processingIcon" class="d-none me-2">
