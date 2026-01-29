@@ -12,4 +12,15 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, "Loading..."
   end
 
+  test "navigation should include job status component" do
+    get root_path
+    
+    assert_response :success
+    
+    # Should include the job status controller and targets
+    assert_includes @response.body, 'data-controller="job-status"'
+    assert_includes @response.body, 'data-job-status-target="processingIcon"'
+    assert_includes @response.body, 'data-job-status-target="queueBadge"'
+  end
+
 end
