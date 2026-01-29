@@ -1,3 +1,5 @@
+require 'net/http'
+
 class JobStatusController < ApplicationController
   def index
     # Only fetch job status in staging and production
