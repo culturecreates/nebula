@@ -38,6 +38,9 @@ Ensure your Github repo has [granted access](https://github.com/organizations/cu
     To edit credentials:
     `EDITOR="code --wait" rails credentials:edit`
 
+    To rebuild assets:
+    `rails assets:precompile`
+
 ## Rails 7 Setup
   Steps from scratch:
   ```
