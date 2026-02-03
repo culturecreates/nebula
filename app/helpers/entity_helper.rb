@@ -96,11 +96,16 @@ module EntityHelper
       display_uri = display_uri[0..char_max/2] + "..." + display_uri[-(char_max/2)..-1] 
     end
     
+    # Properly escape values for security
+    escaped_link = ERB::Util.html_escape(link)
+    escaped_display_uri = ERB::Util.html_escape(display_uri)
+    escaped_uri = ERB::Util.html_escape(uri)
+    
     # Wrap in a container with clipboard functionality
     <<-HTML.html_safe
       <span class="uri-link-container" data-controller="clipboard" data-clipboard-success-content-value="URI copied">
-        <a href='#{link}' rel='nofollow' target='_top'>#{display_uri}</a>
-        <span data-clipboard-target="source" style="display:none;">#{uri}</span>
+        <a href='#{escaped_link}' rel='nofollow' target='_top'>#{escaped_display_uri}</a>
+        <span data-clipboard-target="source" style="display:none;">#{escaped_uri}</span>
         <a class="copy-uri-icon" data-action="clipboard#copy" data-clipboard-target="button" title="Copy URI">
           #{render partial: 'shared/icon_copy'}
         </a>
