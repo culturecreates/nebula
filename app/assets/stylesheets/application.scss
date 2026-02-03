@@ -166,6 +166,11 @@ a:hover {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  
+  i {
+    color: gray;
+    font-size: 16px;
+  }
 }
 
 .uri-link-container:hover .copy-uri-icon {

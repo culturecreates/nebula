@@ -107,7 +107,7 @@ module EntityHelper
         <a href='#{escaped_link}' rel='nofollow' target='_top'>#{escaped_display_uri}</a>
         <span data-clipboard-target="source" style="display:none;">#{escaped_uri}</span>
         <a class="copy-uri-icon" data-action="clipboard#copy" data-clipboard-target="button" title="Copy URI">
-          #{render partial: 'shared/icon_copy'}
+          <i class="fa-regular fa-copy"></i>
         </a>
       </span>
     HTML
