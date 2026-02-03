@@ -95,7 +95,17 @@ module EntityHelper
     if display_uri.length > char_max
       display_uri = display_uri[0..char_max/2] + "..." + display_uri[-(char_max/2)..-1] 
     end
-    "<a href='#{link}' rel='nofollow' target='_top'>#{display_uri}</a>".html_safe
+    
+    # Wrap in a container with clipboard functionality
+    <<-HTML.html_safe
+      <span class="uri-link-container" data-controller="clipboard" data-clipboard-success-content-value="URI copied">
+        <a href='#{link}' rel='nofollow' target='_top'>#{display_uri}</a>
+        <span data-clipboard-target="source" style="display:none;">#{uri}</span>
+        <a class="copy-uri-icon" data-action="clipboard#copy" data-clipboard-target="button" title="Copy URI">
+          #{render partial: 'shared/icon_copy'}
+        </a>
+      </span>
+    HTML
   end
 
   def remove_protocol(uri)
