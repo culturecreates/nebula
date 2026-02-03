@@ -5,9 +5,9 @@
   <%= "<span class='badge bg-primary'>URI</span>".html_safe if is_authoritative(uri) %>
   <span data-clipboard-target="source"><%= uri %></span>
   <a
-    class="cursor-pointer"
+    class="copy-uri-icon"
     data-action="clipboard#copy"
     data-clipboard-target="button"
     title="Copy URI"
-  ><%= render partial: "shared/icon_copy" %></a>
+  ><i class="fa-regular fa-copy"></i></a>
 </div>

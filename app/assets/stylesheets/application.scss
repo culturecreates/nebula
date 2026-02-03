@@ -151,3 +151,29 @@ a:hover {
 .navbar-logo-height {
   height: 40px;
 }
+
+// URI link container with copy icon
+.uri-link-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.uri-link-container .copy-uri-icon {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.uri-link-container:hover .copy-uri-icon {
+  opacity: 1;
+}
+
+.copy-uri-icon i {
+  color: #808080;
+  font-size: 16px;
+}
+
