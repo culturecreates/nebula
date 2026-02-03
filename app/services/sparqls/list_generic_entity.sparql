@@ -2,7 +2,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 SELECT distinct 
 ?uri 
-(sample(?name_language) as ?name) 
+(sample(?label_language) as ?label) 
 (sample(?parents) as ?parent)  
 (sample(?adid) as ?sameAs) 
 (sample(?resultSeverity) as ?conforms)
@@ -12,6 +12,13 @@ WHERE {
         OPTIONAL {
          ?uri schema:name  ?name_language ;
         }
+        OPTIONAL {
+         ?uri skos:prefLabel  ?pref_label_language ;
+        }
+        OPTIONAL {
+         ?uri rdfs:label  ?rdfs_label_language ;
+        }
+        BIND(COALESCE(?name_language, ?pref_label_language, ?rdfs_label_language) as ?label_language)
         OPTIONAL {
           ?parent_entitys ?link  ?uri .
           filter(isblank(?uri))
