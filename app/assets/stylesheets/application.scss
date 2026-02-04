@@ -152,28 +152,35 @@ a:hover {
   height: 40px;
 }
 
-// URI link container with copy icon
-.uri-link-container {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  position: relative;
-}
 
-.uri-link-container .copy-uri-icon {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-}
-
-.uri-link-container:hover .copy-uri-icon {
-  opacity: 1;
-}
-
+// Copy URI icon style
 .copy-uri-icon i {
   color: #808080;
   font-size: 16px;
+}
+
+// URI link container with copy icon (nested)
+.uri-link-container--floating {
+  position: relative;
+  display: inline-block;
+
+  .copy-uri-icon--floating {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 2px 4px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 3px;
+    z-index: 2;
+  }
+
+  &:hover .copy-uri-icon--floating {
+    opacity: 1;
+  }
 }
 

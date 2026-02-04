@@ -103,10 +103,10 @@ module EntityHelper
     
     # Wrap in a container with clipboard functionality
     <<-HTML.html_safe
-      <span class="uri-link-container" data-controller="clipboard" data-clipboard-success-content-value="URI copied">
+      <span class="uri-link-container--floating" data-controller="clipboard" data-clipboard-success-content-value="URI copied">
         <a href='#{escaped_link}' rel='nofollow' target='_top'>#{escaped_display_uri}</a>
         <span data-clipboard-target="source" style="display:none;">#{escaped_uri}</span>
-        <a class="copy-uri-icon" data-action="clipboard#copy" data-clipboard-target="button" title="Copy URI">
+        <a class="copy-uri-icon--floating copy-uri-icon" data-action="clipboard#copy" data-clipboard-target="button" title="Copy URI">
           <i class="fa-regular fa-copy"></i>
         </a>
       </span>
