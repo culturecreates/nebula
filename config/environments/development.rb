@@ -4,15 +4,17 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # External API endpoints for Artsdata services
+  
   # prefix = "staging." # Set to "staging." for staging or "" for production
   # config.graph_api_endpoint = "http://#{prefix}db.artsdata.ca" 
-  # config.artsdata_recon_endpoint = "https://#{prefix}recon.artsdata.ca" 
   # config.artsdata_recon_endpoint_v0 = "https://#{prefix}api.artsdata.ca/recon"
   # config.artsdata_mint_endpoint = "https://#{prefix}api.artsdata.ca/mint" 
   # config.artsdata_link_endpoint = "https://#{prefix}api.artsdata.ca/link"
   # config.artsdata_databus_endpoint = "https://#{prefix}api.artsdata.ca/databus"
   # config.artsdata_maintenance_endpoint = "https://#{prefix}api.artsdata.ca/maintenance"
 
+  # config.artsdata_recon_endpoint = "https://staging-recon.artsdata.ca" 
+   
   config.graph_api_endpoint =   "http://localhost:7200" 
   config.artsdata_recon_endpoint = "http://localhost:3005/v1/recon" 
   config.artsdata_recon_endpoint_v0 = "http://localhost:3005/recon"
