@@ -7,7 +7,7 @@
 // Development fallback values
 const DEFAULT_CONFIG = {
   userUri: 'http://kg.artsdata.ca/resource/K1-1',
-  reconciliationEndpoint: 'https://staging.recon.artsdata.ca',
+  reconciliationEndpoint: 'https://staging-recon.artsdata.ca',
   mintEndpoint: 'https://staging.api.artsdata.ca',
   linkEndpoint: 'https://staging.api.artsdata.ca'
 };

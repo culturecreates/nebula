@@ -2,7 +2,7 @@
  * Service for fetching data feed results from Artsdata Reconciliation API
  */
 
-const DEFAULT_API_BASE_URL = 'https://staging.recon.artsdata.ca/extend';
+const DEFAULT_API_BASE_URL = 'https://staging-recon.artsdata.ca/extend';
 
 /**
  * Fetch dynamic data based on type, graph URL, page and limit using the recon extension API

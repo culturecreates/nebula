@@ -4,7 +4,7 @@
  */
 
 // Default endpoint for development
-const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
+const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging-recon.artsdata.ca';
 
 // Cache for available properties by entity type
 const propertiesCache = new Map();

@@ -30,7 +30,7 @@ export function getCacheStats() {
  * @param {Object} config - Configuration object
  */
 export function clearEntityTypeCache(entityType, config = {}) {
-  const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
+  const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging-recon.artsdata.ca';
   const reconciliationBaseUrl = config.reconciliationEndpoint || DEFAULT_RECONCILIATION_BASE_URL;
   const cacheKey = `${reconciliationBaseUrl}:${entityType}`;
   
