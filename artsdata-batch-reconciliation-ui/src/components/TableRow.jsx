@@ -67,7 +67,7 @@ function getArtsdataEntityUrl(uri, config = {}) {
   
   // Try to derive from reconciliation endpoint
   if (config.reconciliationEndpoint) {
-    // e.g., "https://staging.recon.artsdata.ca" -> "https://staging.kg.artsdata.ca"
+    // e.g., "https://staging-recon.artsdata.ca" -> "https://staging.kg.artsdata.ca"
     // or "https://recon.artsdata.ca" -> "https://kg.artsdata.ca"
     const url = new URL(config.reconciliationEndpoint);
     artsdataBaseUrl = `${url.protocol}//${url.hostname.replace('recon.', 'kg.')}`;

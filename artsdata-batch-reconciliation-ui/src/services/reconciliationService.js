@@ -7,7 +7,7 @@ import { enrichMatchCandidates, getEntityTypeFromUrl } from './dataExtensionServ
 
 // Default endpoints for development (when no config is passed)
 const DEFAULT_STAGING_API_BASE = 'https://staging.api.artsdata.ca';
-const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging.recon.artsdata.ca';
+const DEFAULT_RECONCILIATION_BASE_URL = 'https://staging-recon.artsdata.ca';
 const DEFAULT_PUBLISHER_URI = 'http://kg.artsdata.ca/resource/K1-1';
 
 const RECONCILIATION_ENDPOINT = '/match'; // Based on reconciliation API spec
