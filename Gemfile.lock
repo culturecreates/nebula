@@ -68,6 +68,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    ast (2.4.3)
     autoprefixer-rails (10.4.19.0)
       execjs (~> 2)
     base64 (0.2.0)
@@ -247,6 +248,9 @@ GEM
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     ostruct (0.6.1)
+    parser (3.3.10.1)
+      ast (~> 2.4.1)
+      racc
     popper_js (2.11.8)
     prettier_print (1.2.1)
     psych (5.2.1)
@@ -374,6 +378,8 @@ GEM
       sprockets-rails
       tilt
     scanf (1.0.0)
+    scout_apm (6.0.2)
+      parser
     selenium-webdriver (4.27.0)
       base64 (~> 0.2)
       logger (~> 1.4)
@@ -493,6 +499,7 @@ DEPENDENCIES
   redcarpet (~> 3.6.0)
   redis (~> 4.0)
   sassc-rails
+  scout_apm
   selenium-webdriver
   simplecov
   sprockets-rails
