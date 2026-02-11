@@ -1406,12 +1406,30 @@ const App = ({ config }) => {
       const reconciled = await batchReconcile([resetItem], schemaType, 1, config);
       
       if (reconciled.length > 0) {
+        const refreshedItem = reconciled[0];
+
         // Update with fresh reconciled data
-        setReconciledItems(prev => 
-          prev.map(prevItem => 
-            prevItem.id === id ? { ...reconciled[0], reconciliationStatus: 'complete' } : prevItem
+        setReconciledItems(prev =>
+          prev.map(prevItem =>
+            prevItem.id === id ? { ...refreshedItem, reconciliationStatus: 'complete' } : prevItem
           )
         );
+
+        if (refreshedItem.hasAutoMatch && refreshedItem.autoMatchCandidate) {
+          setGlobalJudgments(prev => {
+            const newMap = new Map(prev);
+
+            if (!newMap.has(refreshedItem.id)) {
+              newMap.set(refreshedItem.id, {
+                ...refreshedItem,
+                status: 'judgment-ready',
+                selectedMatch: refreshedItem.autoMatchCandidate
+              });
+            }
+
+            return newMap;
+          });
+        }
       }
     } catch (error) {
       console.error('Error refreshing row:', error);
