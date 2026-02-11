@@ -26,36 +26,42 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
   test "should include Google Analytics when GOOGLE_ANALYTICS_ID is set" do
     # Set the environment variable
     original_ga_id = ENV['GOOGLE_ANALYTICS_ID']
-    ENV['GOOGLE_ANALYTICS_ID'] = 'G-TEST123456'
     
-    get root_path
-    
-    assert_response :success
-    
-    # Should include the Google Analytics script
-    assert_includes @response.body, 'www.googletagmanager.com/gtag/js?id=G-TEST123456'
-    assert_includes @response.body, "gtag('config', 'G-TEST123456')"
-    assert_includes @response.body, 'window.dataLayer'
-    
-    # Restore original value
-    ENV['GOOGLE_ANALYTICS_ID'] = original_ga_id
+    begin
+      ENV['GOOGLE_ANALYTICS_ID'] = 'G-TEST123456'
+      
+      get root_path
+      
+      assert_response :success
+      
+      # Should include the Google Analytics script
+      assert_includes @response.body, 'www.googletagmanager.com/gtag/js?id=G-TEST123456'
+      assert_includes @response.body, "gtag('config', 'G-TEST123456')"
+      assert_includes @response.body, 'window.dataLayer'
+    ensure
+      # Restore original value
+      ENV['GOOGLE_ANALYTICS_ID'] = original_ga_id
+    end
   end
 
   test "should not include Google Analytics when GOOGLE_ANALYTICS_ID is not set" do
     # Ensure the environment variable is not set
     original_ga_id = ENV['GOOGLE_ANALYTICS_ID']
-    ENV['GOOGLE_ANALYTICS_ID'] = nil
     
-    get root_path
-    
-    assert_response :success
-    
-    # Should not include the Google Analytics script
-    assert_not_includes @response.body, 'www.googletagmanager.com/gtag/js'
-    assert_not_includes @response.body, "gtag('config'"
-    
-    # Restore original value
-    ENV['GOOGLE_ANALYTICS_ID'] = original_ga_id
+    begin
+      ENV['GOOGLE_ANALYTICS_ID'] = nil
+      
+      get root_path
+      
+      assert_response :success
+      
+      # Should not include the Google Analytics script
+      assert_not_includes @response.body, 'www.googletagmanager.com/gtag/js'
+      assert_not_includes @response.body, "gtag('config'"
+    ensure
+      # Restore original value
+      ENV['GOOGLE_ANALYTICS_ID'] = original_ga_id
+    end
   end
 
 end
