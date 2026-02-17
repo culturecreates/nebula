@@ -75,33 +75,83 @@ export default class extends Controller {
     // Show processing job
     if (hasProcessing) {
       const job = processing[0]
-      const artifact = this.extractArtifact(job)
+      const jobClass = this.extractJobClass(job)
+      const artifact = this.extractArtifact(job, jobClass)
+      const displayText = this.formatDisplayText(jobClass, artifact)
       const startTime = this.extractStartTime(job)
-      this.showProcessing(artifact, startTime)
+      this.showProcessing(displayText, startTime)
     } else {
       this.hideProcessing()
     }
 
     // Show queue badge - only if there are actually jobs in the queue
     if (hasQueued && queuedJobs.length > 0) {
-      const artifacts = queuedJobs.map(job => this.extractArtifact(job)).filter(a => a)
+      const artifacts = queuedJobs.map(job => {
+        const jobClass = this.extractJobClass(job)
+        return this.extractArtifact(job, jobClass)
+      }).filter(a => a)
       this.showQueue(queuedJobs.length, artifacts)
     } else {
       this.hideQueue()
     }
   }
 
-  extractArtifact(job) {
+  extractJobClass(job) {
+    try {
+      const args = job.args || []
+      if (args.length > 0 && args[0].job_class) {
+        return args[0].job_class
+      }
+    } catch (error) {
+      console.error('Error extracting job class:', error)
+    }
+    return null
+  }
+
+  extractArtifact(job, jobClass) {
     try {
       // Navigate through the job structure to find the artifact
       const args = job.args || []
       if (args.length > 0 && args[0].arguments && args[0].arguments.length > 0) {
-        return args[0].arguments[0].artifact
+        const jobArgs = args[0].arguments[0]
+        
+        // For AutoMintJob, extract artifact from named_graph URI
+        if (jobClass === 'AutoMintJob' && jobArgs.named_graph) {
+          return this.extractArtifactFromNamedGraph(jobArgs.named_graph)
+        }
+        
+        // For DatasetReportJob and others, use artifact field
+        if (jobArgs.artifact) {
+          return jobArgs.artifact
+        }
       }
     } catch (error) {
       console.error('Error extracting artifact:', error)
     }
     return null
+  }
+
+  extractArtifactFromNamedGraph(namedGraph) {
+    try {
+      // Extract artifact from URI like "http://kg.artsdata.ca/culture-creates/artsdata-planet-atc/tour-bookings"
+      const parts = namedGraph.split('/')
+      return parts[parts.length - 1] // Get the last segment
+    } catch (error) {
+      console.error('Error extracting artifact from named graph:', error)
+    }
+    return null
+  }
+
+  formatDisplayText(jobClass, artifact) {
+    if (jobClass === 'DatasetReportJob') {
+      return artifact || 'Processing...'
+    } else if (jobClass === 'AutoMintJob') {
+      return artifact ? `auto-minting ${artifact}` : 'auto-minting...'
+    } else if (jobClass) {
+      return `${jobClass} processing...`
+    } else {
+      return 'Processing...'
+    }
   }
 
   extractStartTime(job) {
@@ -130,11 +180,11 @@ export default class extends Controller {
     }
   }
 
-  showProcessing(artifact, startTime) {
+  showProcessing(displayText, startTime) {
     if (this.hasProcessingIconTarget && this.hasProcessingTextTarget) {
       this.processingIconTarget.classList.remove('d-none')
       this.processingTextTarget.classList.remove('d-none')
-      this.processingTextTarget.textContent = artifact || 'Processing...'
+      this.processingTextTarget.textContent = displayText || 'Processing...'
       
       // Update processing start time if new job
       if (startTime && this.processingStartTime !== startTime) {
