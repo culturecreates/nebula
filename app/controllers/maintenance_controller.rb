@@ -79,9 +79,9 @@ class MaintenanceController < ApplicationController
       "<li>#{item["predicate"].to_s.split("/").last} #{"(secondary derivation)" if item["claim"] == "derived" }:</li>"
     else
       if item["subject"].to_s.start_with?("_") || item["subject"].to_s.include?("#")
-        "<li class='ms-4'>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{"(secondary derivation)" if item["claim"] == "derived" }</li>"
+        "<li class='ms-4'>nested #{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{"(secondary derivation)" if item["claim"] == "derived" }</li>"
       else
-        "<li>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{"(secondary derivation)" if item["claim"] == "derived" }</li>"
+        "<li>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{ActionController::Base.helpers.strip_tags(item["object"].to_s).truncate(50)}</b> #{"(secondary derivation)" if item["claim"] == "derived" }</li>"
       end
     end
   end
