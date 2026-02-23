@@ -41,7 +41,7 @@ class MaintenanceController < ApplicationController
         formated_items = ""
         add_list = items.select{ |item| item["action"] == "add" }
         unless add_list.empty?
-          formated_items << "<h4>Updates</h4> <ul>"
+          formated_items << "<h4>Updates</h5> <ul>"
           items.select{ |item| item["action"] == "add" }.each do |item|
             formated_items << format_display(item) 
           end
@@ -49,7 +49,7 @@ class MaintenanceController < ApplicationController
         end
         delete_list = items.select{ |item| item["action"] == "delete" }
         unless delete_list.empty?
-          formated_items << "<h4>Deletes</h4> <ul>"
+          formated_items << "<h4>Deletes</h5> <ul>"
           delete_list.each do |item|
             formated_items << format_display(item) 
           end
@@ -75,13 +75,15 @@ class MaintenanceController < ApplicationController
   end
 
   def format_display(item)
+    id = item["source"].to_s.split("/").last
+    claim = item["claim"] == "derived" ? "(secondary #{id})" : "(#{id})"
     if item["object"].to_s.start_with?("_") || item["object"].to_s.include?("#")
-      "<li>#{item["predicate"].to_s.split("/").last} #{"(secondary derivation)" if item["claim"] == "derived" }:</li>"
+      "<li>#{item["predicate"].to_s.split("/").last} #{claim}:</li>"
     else
       if item["subject"].to_s.start_with?("_") || item["subject"].to_s.include?("#")
-        "<li class='ms-4'>nested #{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{"(secondary derivation)" if item["claim"] == "derived" }</li>"
+        "<li class='ms-4'>nested #{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{claim}</li>"
       else
-        "<li>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{ActionController::Base.helpers.strip_tags(item["object"].to_s).truncate(50)}</b> #{"(secondary derivation)" if item["claim"] == "derived" }</li>"
+        "<li>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{ActionController::Base.helpers.strip_tags(item["object"].to_s).truncate(50)}</b> #{claim}</li>"
       end
     end
   end
