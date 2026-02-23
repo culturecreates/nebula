@@ -32,6 +32,7 @@
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
       graph: @entity.graph,
     } %>
+    <br>
     <turbo-frame
       id='unsupported-claims'
       src="<%= entity_unsupported_claims_path(uri: @entity.entity_uri) %>"
