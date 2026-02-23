@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const okBtn = document.getElementById("dryrunModalOk");
 
     btn.addEventListener("click", function () {
-         // Show modal immediately with "Calculating..." message
+        // Show modal immediately with "Calculating..." message
         modalBody.innerHTML = "<div class='text-center'><span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Calculating...</div>";
         modal.show();
 
@@ -22,7 +22,13 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: JSON.stringify({ uri: btn.dataset.uri, dryrun: true })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    // Handle 500 or other errors
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (typeof data.message === "undefined") {
                     modal.hide();
@@ -46,6 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             window.location.href = result.redirect_url;
                         });
                 };
+            }) .catch(error => {
+                // Handle error here
+                modalBody.innerHTML = `<div class='text-danger'>${error.message}</div>`;
             });
     });
 });
