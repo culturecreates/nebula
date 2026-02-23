@@ -58,7 +58,7 @@ WHERE {
     # quoted triple
     <<?s ?p ?o>> ?a ?b .
 
-        FILTER NOT EXISTS {?s ?p ?anything }
+    FILTER NOT EXISTS {?s ?p ?o }
      
   
     # quoted triple labels
