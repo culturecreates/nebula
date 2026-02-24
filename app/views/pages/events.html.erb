@@ -1,0 +1,20 @@
+<% content_for(:title) { "Events across Canada" } %>
+<% content_for(:head) do %>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7" nonce="<%= content_security_policy_nonce %>"></script>
+<% end %>
+<div class="container d-flex justify-content-center">
+  <div class="events-page" data-controller="events">
+    <div class="text-center py-3">
+      <h1 class="h4">Events across Canada</h1>
+      <p class="text-muted small mb-0">Count of schema:Event in Artsdata by province and territory</p>
+    </div>
+    <div id="events-loading" class="text-center py-5" data-events-target="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2 text-muted">Fetching event data from Artsdata...</p>
+    </div>
+    <div id="events-map" data-events-target="map"></div>
+    <div id="events-tooltip" data-events-target="tooltip" class="events-tooltip"></div>
+  </div>
+</div>
