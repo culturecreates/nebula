@@ -6,6 +6,20 @@
 
   <div class="vocabularies-page" data-controller="vocabularies" data-vocabularies-lang-value="en">
     <div class="text-center py-3">
+      <div class="mb-2">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Language selection">
+          <button type="button" 
+                  class="btn btn-outline-primary active" 
+                  data-vocabularies-target="enBtn" 
+                  data-action="click->vocabularies#switchLang"
+                  data-lang="en">EN</button>
+          <button type="button" 
+                  class="btn btn-outline-primary" 
+                  data-vocabularies-target="frBtn" 
+                  data-action="click->vocabularies#switchLang"
+                  data-lang="fr">FR</button>
+        </div>
+      </div>
       <h1 class="h4" data-vocabularies-target="title">Artsdata SKOS Controlled Vocabularies</h1>
       <p class="text-muted small mb-0" data-vocabularies-target="subtitle">Click a circle to zoom in. Click outside to zoom out.</p>
     </div>
