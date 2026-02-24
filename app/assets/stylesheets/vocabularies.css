@@ -1,0 +1,54 @@
+.vocabularies-page {
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fafafa;
+}
+
+#chart {
+  width: 100%;
+  max-width: 960px;
+}
+
+#chart svg {
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+#chart svg text {
+  pointer-events: none;
+  user-select: none;
+}
+
+.vocab-tooltip {
+  position: fixed;
+  display: none;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 320px;
+  pointer-events: none;
+  z-index: 1000;
+  line-height: 1.4;
+}
+
+.vocab-tooltip .tooltip-label {
+  font-weight: 600;
+}
+
+.vocab-tooltip .tooltip-desc {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.vocab-tooltip .tooltip-uri {
+  font-size: 11px;
+  opacity: 0.8;
+  word-break: break-all;
+}
