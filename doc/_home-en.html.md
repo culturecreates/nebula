@@ -9,7 +9,8 @@ Welcome to the Artsdata knowledge graph. To discover the advantages of linked op
 ---
 
 ## Quick Links
-
+- [Map of event count per region](/events)
+- [Visualization of controlled vocabularies](/vocabularies)
 - [Data model documentation](https://culturecreates.github.io/artsdata-data-model/)
 - [Data flow architecture](https://culturecreates.github.io/artsdata-data-model/architecture/overview.html)
 - [Persistent identifiers guidelines](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.html)

@@ -25,6 +25,9 @@ Rails.application.routes.draw do
     get "controlled_vocabularies", to: "controlled_vocabularies#index"
     get "job_status", to: "job_status#index"
 
+    get "vocabularies", to: "pages#vocabularies"
+    get "events", to: "pages#events"
+
 
     resources :artifact do 
       collection do

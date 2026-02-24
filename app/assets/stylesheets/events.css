@@ -1,0 +1,42 @@
+.events-page {
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fafafa;
+}
+
+#events-map {
+  width: 100%;
+  max-width: 1100px;
+}
+
+#events-map svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.events-tooltip {
+  position: fixed;
+  display: none;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 280px;
+  pointer-events: none;
+  z-index: 1000;
+  line-height: 1.4;
+}
+
+.events-tooltip .tooltip-name {
+  font-weight: 600;
+}
+
+.events-tooltip .tooltip-count {
+  margin-top: 2px;
+  font-size: 12px;
+  opacity: 0.9;
+}

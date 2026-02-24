@@ -8,6 +8,8 @@ Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des
 
 ## Liens utiles
 
+- [Carte du nombre d'événements par région](/events)
+- [Visualisation des vocabulaires contrôlés](/vocabularies)
 - [Documentation sur le modèle de données](https://culturecreates.github.io/artsdata-data-model/index.fr.html)
 - [Architecture des flux de données](https://culturecreates.github.io/artsdata-data-model/architecture/overview.fr.html)
 - [Lignes directrices sur les identifiants pérennes](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.fr)
