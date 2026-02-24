@@ -33,21 +33,47 @@ export default class extends Controller {
   static values = { lang: { type: String, default: "en" } }
 
   connect() {
-    this.waitForD3().then(() => this.loadData())
+    this.waitForD3()
+      .then(() => this.loadData())
+      .catch((error) => this.showD3LoadError(error))
   }
 
   waitForD3() {
-    return new Promise((resolve) => {
+    const MAX_WAIT_MS = 10000
+    const POLL_INTERVAL_MS = 50
+
+    return new Promise((resolve, reject) => {
       if (typeof d3 !== "undefined") return resolve()
+
+      const start = Date.now()
       const check = setInterval(() => {
         if (typeof d3 !== "undefined") {
           clearInterval(check)
           resolve()
+        } else if (Date.now() - start >= MAX_WAIT_MS) {
+          clearInterval(check)
+          reject(new Error("D3 failed to load within the expected time"))
         }
-      }, 50)
+      }, POLL_INTERVAL_MS)
     })
   }
 
+  showD3LoadError(error) {
+    // Log the error for debugging purposes
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    }
+
+    if (this.loadingTarget) {
+      this.loadingTarget.style.display = "block"
+      this.loadingTarget.innerHTML = `
+        <div class="alert alert-danger mt-2" role="alert">
+          Failed to load visualization resources. Please try reloading the page.
+        </div>
+      `
+    }
+  }
   switchLang(event) {
     const lang = event.currentTarget.dataset.lang
     if (lang === this.langValue) return

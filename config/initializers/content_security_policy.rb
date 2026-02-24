@@ -10,14 +10,17 @@ Rails.application.configure do
     policy.font_src    :self, :https, :data
     policy.img_src     :self, :https, :data
     policy.object_src  :none
-    policy.script_src  :self, :https
-    policy.style_src   :self, :https
+    policy.script_src  :self,
+                       "https://cdn.jsdelivr.net",
+                       "https://ga.jspm.io",
+                       "https://www.googletagmanager.com"
+    policy.style_src   :self, :https, :unsafe_inline
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
   end
 
-  # Generate session nonces for permitted importmap and inline scripts
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
+  # Generate per-request nonces for permitted importmap and inline scripts
+  config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w(script-src)
 
   # Report violations without enforcing the policy.
