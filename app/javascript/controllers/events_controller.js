@@ -2,8 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 const SPARQL_ENDPOINT = "https://db.artsdata.ca/repositories/artsdata"
 
-const GEOJSON_URL =
-  "/assets/canada.geojson"
+const GEOJSON_URL = "/canada.geojson"
 
 // Map all known province/territory variants to canonical two-letter codes
 const PROVINCE_ALIASES = {
