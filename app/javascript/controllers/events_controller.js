@@ -230,10 +230,23 @@ export default class extends Controller {
     const name = code ? PROVINCE_NAMES[code] : geoName
     const count = code ? (counts[code] || 0) : 0
     const tooltip = this.tooltipTarget
-    tooltip.innerHTML = `
-      <div class="tooltip-name">${name}</div>
-      <div class="tooltip-count">${count.toLocaleString()} events</div>
-    `
+
+    // Clear any existing tooltip content
+    while (tooltip.firstChild) {
+      tooltip.removeChild(tooltip.firstChild)
+    }
+
+    // Build tooltip content safely using DOM APIs
+    const nameDiv = document.createElement("div")
+    nameDiv.className = "tooltip-name"
+    nameDiv.textContent = name
+
+    const countDiv = document.createElement("div")
+    countDiv.className = "tooltip-count"
+    countDiv.textContent = `${count.toLocaleString()} events`
+
+    tooltip.appendChild(nameDiv)
+    tooltip.appendChild(countDiv)
     tooltip.style.display = "block"
     this.moveTooltip(event)
   }
