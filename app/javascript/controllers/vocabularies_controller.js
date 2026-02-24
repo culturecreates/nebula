@@ -408,6 +408,7 @@ export default class extends Controller {
     uriDiv.className = "tooltip-uri"
     uriDiv.textContent = data.uri || ""
     tooltip.appendChild(uriDiv)
+
     tooltip.style.display = "block"
     this.moveTooltip(event)
   }

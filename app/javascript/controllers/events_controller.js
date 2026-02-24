@@ -247,6 +247,7 @@ export default class extends Controller {
 
     tooltip.appendChild(nameDiv)
     tooltip.appendChild(countDiv)
+
     tooltip.style.display = "block"
     this.moveTooltip(event)
   }
