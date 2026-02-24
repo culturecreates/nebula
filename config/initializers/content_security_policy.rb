@@ -15,6 +15,7 @@ Rails.application.configure do
                        "https://ga.jspm.io",
                        "https://www.googletagmanager.com"
     policy.style_src   :self, :https, :unsafe_inline
+    
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
   end
