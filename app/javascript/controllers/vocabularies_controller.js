@@ -357,14 +357,32 @@ export default class extends Controller {
 
   showTooltip(event, data) {
     const tooltip = this.tooltipTarget
-    const desc = data.definition
-      ? `<div class="tooltip-desc">${data.definition}</div>`
-      : ""
-    tooltip.innerHTML = `
-      <div class="tooltip-label">${data.name}</div>
-      ${desc}
-      <div class="tooltip-uri">${data.uri}</div>
-    `
+
+    // Clear any existing tooltip content safely
+    while (tooltip.firstChild) {
+      tooltip.removeChild(tooltip.firstChild)
+    }
+
+    // Label
+    const labelDiv = document.createElement("div")
+    labelDiv.className = "tooltip-label"
+    labelDiv.textContent = data.name || ""
+    tooltip.appendChild(labelDiv)
+
+    // Optional description
+    if (data.definition) {
+      const descDiv = document.createElement("div")
+      descDiv.className = "tooltip-desc"
+      descDiv.textContent = data.definition
+      tooltip.appendChild(descDiv)
+    }
+
+    // URI
+    const uriDiv = document.createElement("div")
+    uriDiv.className = "tooltip-uri"
+    uriDiv.textContent = data.uri || ""
+    tooltip.appendChild(uriDiv)
+
     tooltip.style.display = "block"
     this.moveTooltip(event)
   }
