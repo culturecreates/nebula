@@ -166,7 +166,7 @@ export default class extends Controller {
       .attr("viewBox", `0 0 ${width} ${height}`)
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#fafafa")
+      .style("background", "#fff")
 
     const g = svg.append("g")
 
