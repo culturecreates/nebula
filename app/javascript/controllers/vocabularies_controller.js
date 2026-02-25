@@ -291,7 +291,7 @@ export default class extends Controller {
       .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#fafafa")
+      .style("background", "#fff")
       .on("click", () => zoom(root))
 
     const node = svg.append("g")
