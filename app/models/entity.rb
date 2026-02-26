@@ -1,3 +1,4 @@
+require 'timeout'
 
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
@@ -213,12 +214,19 @@ class Entity
     if sparql_endpoint == "wikidata"
       begin
         @@wikidata_client ||= WikidataSparqlService.client
-        solutions = @@wikidata_client.query(sparql)
+        # Wrap the query in a Timeout to ensure it doesn't hang indefinitely
+        # even if Faraday's timeout doesn't fire as expected
+        solutions = Timeout.timeout(5) do
+          @@wikidata_client.query(sparql)
+        end
         graph = RDF::Graph.new
         solutions.each do |solution|
           graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
         end
         graph
+      rescue Timeout::Error => e
+        @errors << "Wikidata query timeout (exceeded 5 seconds): #{e.message}"
+        RDF::Graph.new
       rescue Faraday::TimeoutError => e
         @errors << "Wikidata query timeout: #{e.message}"
         RDF::Graph.new
