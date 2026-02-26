@@ -3,8 +3,8 @@ require 'timeout'
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
 
-  # Timeout for Wikidata SPARQL queries (in seconds)
-  WIKIDATA_QUERY_TIMEOUT = 5
+  # Timeout to expand Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
+  WIKIDATA_QUERY_TIMEOUT = 2 # seconds
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
@@ -177,7 +177,6 @@ class Entity
       'URI_PLACEHOLDER', self.entity_uri,
       'schema:name', "<#{predicate}>"
     ])
-    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -185,7 +184,6 @@ class Entity
     sparql =  SparqlLoader.load('load_rdfstar_claims_graph', [
       'entity_uri_placeholder', self.entity_uri
     ])
-    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -193,7 +191,6 @@ class Entity
     sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
       'entity_uri_placeholder', self.entity_uri
     ])
-    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -218,7 +215,6 @@ class Entity
       begin
         @@wikidata_client ||= WikidataSparqlService.client
         # Wrap the query in a Timeout to ensure it doesn't hang indefinitely
-        # even if Faraday's timeout doesn't fire as expected
         solutions = Timeout.timeout(WIKIDATA_QUERY_TIMEOUT) do
           @@wikidata_client.query(sparql)
         end
@@ -227,14 +223,8 @@ class Entity
           graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
         end
         graph
-      rescue Timeout::Error, Faraday::TimeoutError => e
+      rescue Timeout::Error => e
         @errors << "Wikidata query timeout: #{e.message}"
-        RDF::Graph.new
-      rescue Faraday::ConnectionFailed => e
-        @errors << "Wikidata connection failed: #{e.message}"
-        RDF::Graph.new
-      rescue Faraday::Error => e
-        @errors << "Wikidata HTTP error: #{e.message}"
         RDF::Graph.new
       rescue StandardError => e
         @errors << "Unexpected error querying Wikidata: #{e.message}"
