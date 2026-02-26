@@ -27,7 +27,7 @@
     <% if ENV['GOOGLE_ANALYTICS_ID'].present? %>
       <!-- Google tag (gtag.js) -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ENV['GOOGLE_ANALYTICS_ID'] %>"></script>
-      <script>
+      <script <%= content_security_policy_nonce %>>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
