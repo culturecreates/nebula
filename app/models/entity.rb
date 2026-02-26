@@ -226,10 +226,10 @@ class Entity
         @errors << "Wikidata connection failed: #{e.message}"
         RDF::Graph.new
       rescue Faraday::Error => e
-        @errors << "Wikidata query error: #{e.message}"
+        @errors << "Wikidata HTTP error: #{e.message}"
         RDF::Graph.new
       rescue StandardError => e
-        @errors << "Wikidata query error: #{e.message}"
+        @errors << "Unexpected error querying Wikidata: #{e.message}"
         RDF::Graph.new
       end
     else
