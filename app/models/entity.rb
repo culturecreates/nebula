@@ -211,13 +211,27 @@ class Entity
 
   def construct_turtle(sparql, sparql_endpoint = nil)
     if sparql_endpoint == "wikidata"
-      @@wikidata_client ||= WikidataSparqlService.client
-      solutions = @@wikidata_client.query(sparql)
-      graph = RDF::Graph.new
-      solutions.each do |solution|
-        graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
+      begin
+        @@wikidata_client ||= WikidataSparqlService.client
+        solutions = @@wikidata_client.query(sparql)
+        graph = RDF::Graph.new
+        solutions.each do |solution|
+          graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
+        end
+        graph
+      rescue Faraday::TimeoutError => e
+        @errors << "Wikidata query timeout: #{e.message}"
+        RDF::Graph.new
+      rescue Faraday::ConnectionFailed => e
+        @errors << "Wikidata connection failed: #{e.message}"
+        RDF::Graph.new
+      rescue Faraday::Error => e
+        @errors << "Wikidata query error: #{e.message}"
+        RDF::Graph.new
+      rescue StandardError => e
+        @errors << "Wikidata query error: #{e.message}"
+        RDF::Graph.new
       end
-      graph
     else
       response = artsdata_client.execute_construct_turtle_star_sparql(sparql)
       if response[:code] == 200
