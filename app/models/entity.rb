@@ -211,7 +211,7 @@ class Entity
 
   def construct_turtle(sparql, sparql_endpoint = nil)
     if sparql_endpoint == "wikidata"
-      @@wikidata_client ||= SPARQL::Client.new("https://query.wikidata.org/sparql")
+      @@wikidata_client ||= WikidataSparqlService.client
       solutions = @@wikidata_client.query(sparql)
       graph = RDF::Graph.new
       solutions.each do |solution|
