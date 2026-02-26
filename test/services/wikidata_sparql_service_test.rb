@@ -17,9 +17,15 @@ class WikidataSparqlServiceTest < ActiveSupport::TestCase
     })
 
     # The query should raise either Faraday::TimeoutError or Faraday::ConnectionFailed
-    assert_raises(Faraday::TimeoutError, Faraday::ConnectionFailed) do
+    exception_raised = false
+    begin
       client.query("SELECT * WHERE { ?s ?p ?o } LIMIT 1")
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed => e
+      exception_raised = true
+      assert true, "Expected timeout or connection failed exception was raised: #{e.class}"
     end
+    
+    assert exception_raised, "Expected Faraday::TimeoutError or Faraday::ConnectionFailed to be raised"
   end
 
   test "wikidata client is configured with timeout" do
