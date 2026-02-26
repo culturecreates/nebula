@@ -1,6 +1,10 @@
+require 'timeout'
 
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
+
+  # Timeout to expand Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
+  WIKIDATA_QUERY_TIMEOUT = 2 # seconds
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
@@ -173,7 +177,6 @@ class Entity
       'URI_PLACEHOLDER', self.entity_uri,
       'schema:name', "<#{predicate}>"
     ])
-    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -181,7 +184,6 @@ class Entity
     sparql =  SparqlLoader.load('load_rdfstar_claims_graph', [
       'entity_uri_placeholder', self.entity_uri
     ])
-    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -189,7 +191,6 @@ class Entity
     sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
       'entity_uri_placeholder', self.entity_uri
     ])
-    # puts "SPARQL: #{sparql}"
     @graph = construct_turtle(sparql)
   end
 
@@ -211,13 +212,24 @@ class Entity
 
   def construct_turtle(sparql, sparql_endpoint = nil)
     if sparql_endpoint == "wikidata"
-      @@wikidata_client ||= SPARQL::Client.new("https://query.wikidata.org/sparql")
-      solutions = @@wikidata_client.query(sparql)
-      graph = RDF::Graph.new
-      solutions.each do |solution|
-        graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
+      begin
+        @@wikidata_client ||= WikidataSparqlService.client
+        # Wrap the query in a Timeout to ensure it doesn't hang indefinitely
+        solutions = Timeout.timeout(WIKIDATA_QUERY_TIMEOUT) do
+          @@wikidata_client.query(sparql)
+        end
+        graph = RDF::Graph.new
+        solutions.each do |solution|
+          graph << RDF::Statement.new(solution.subject, solution.predicate, solution.object)
+        end
+        graph
+      rescue Timeout::Error => e
+        @errors << "Wikidata query timeout: #{e.message}"
+        RDF::Graph.new
+      rescue StandardError => e
+        @errors << "Unexpected error querying Wikidata: #{e.message}"
+        RDF::Graph.new
       end
-      graph
     else
       response = artsdata_client.execute_construct_turtle_star_sparql(sparql)
       if response[:code] == 200
