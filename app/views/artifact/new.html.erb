@@ -94,7 +94,7 @@
   <% end %>
 </div>
 
-<script <%= content_security_policy_nonce %>>
+<script nonce="<%= content_security_policy_nonce %>">
   document.addEventListener("DOMContentLoaded", function() {
     const typeSelect = document.getElementById("type-select");
     const websiteUrlField = document.getElementById("website-url-field");
