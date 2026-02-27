@@ -8,7 +8,6 @@ class ValidateController < ApplicationController
     # Call Artsdata API to get the RDF graph for the entity
     url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
     
-    # COMMON CODE
     begin
       response = HTTParty.get(url)
       raise "Mint API #{response.code}: #{response.message}" if response['status'] != 'success'
@@ -29,67 +28,5 @@ class ValidateController < ApplicationController
       flash.now.alert = "Data Error: #{body['message'].truncate(300)}"
     end
   end
-
-  # def wikidata
-  #   uri = params[:uri] 
-  #   @class_to_mint = params[:class_to_mint] # i.e. schema:Person
-  #   mint_endpoint = Rails.application.config.artsdata_mint_endpoint
-
-
-    
-  #   begin
-      
-  #     # ## Build graph from Wikidata
-  #     # #
-  #     # #### Move to Artsdata API
-  #     # wikidata_sparql_endpoint= "https://query.wikidata.org/sparql"
-  #     # wikidata_sparql = SPARQL::Client.new(wikidata_sparql_endpoint)
-  #     # response = wikidata_sparql.query(sparql_by_class_to_mint(@class_to_mint, uri))
-  #     # entity = Entity.new(entity_uri: uri)
-  #     # entity.graph = RDF::Graph.new << response 
-  #     # facts = CGI.escape(entity.graph.dump(:jsonld).squish)
-  #     # #######
-  #     # # end move
-  #     # #########
-
-  #     url = "#{mint_endpoint}/preview?uri=#{CGI.escape(uri)}&classToMint=#{class_to_mint}"
-      
-  #     # COMMON CODE
-  #     response = HTTParty.get(url)
-  #     raise "Mint API Error: #{response.code} - #{response.message}" if response.code != 200
-      
-      
-      
-      
-  #     body = JSON.parse(response.body)
-  #     @report = body['message']
-  #     @entity = Entity.new(entity_uri: "http://new.uri")
-  #     if body['status'] == "success"
-  #       jsonld_data = body['data']
-  #       @entity.graph = RDF::Graph.new do |graph|
-  #         RDF::Reader.for(:jsonld).new(jsonld_data.to_json, rdfstar: true)  {|reader| graph << reader}
-  #       end
-  #     end
-  #   rescue => e
-  #     flash.now.alert = "Error: #{e.message}"
-  #   end
-  #   render :show
-  # end
-
-
-
-  # def shacl_by_class_to_mint(class_to_mint)
-  #   case class_to_mint
-  #   when "schema:Person"
-  #     "app/services/shacls/mint_person.ttl"
-  #   when "schema:Organization"
-  #     "app/services/shacls/mint_organization.ttl"
-  #   when "schema:Place"
-  #     "app/services/shacls/mint_place.ttl"
-  #   end
-
-  # end
-
-
 
 end
