@@ -156,16 +156,32 @@ class EntityController < ApplicationController
     
     # Check if it's a literal (starts with quote)
     if term_string.start_with?('"')
-      # Parse literal with possible language or datatype
-      # Simple regex - may not handle all edge cases with escaped quotes
-      if term_string =~ /"([^"]*)"@(\w+)/
-        return RDF::Literal.new($1, language: $2)
-      elsif term_string =~ /"([^"]*)"\^\^<(.+)>/
-        return RDF::Literal.new($1, datatype: RDF::URI($2))
-      else
-        # Simple literal - strip surrounding quotes
-        return RDF::Literal.new(term_string.gsub(/^"|"$/, ''))
+      # Use string manipulation instead of regex to avoid ReDoS vulnerabilities
+      # Look for closing quote
+      closing_quote_idx = term_string.index('"', 1)
+      return RDF::Literal.new('') if closing_quote_idx.nil?
+      
+      value = term_string[1...closing_quote_idx]
+      remainder = term_string[(closing_quote_idx + 1)..-1]
+      
+      # Check for language tag
+      if remainder.start_with?('@')
+        lang_match = remainder.match(/^@(\w+)/)
+        return RDF::Literal.new(value, language: lang_match[1]) if lang_match
       end
+      
+      # Check for datatype
+      if remainder.start_with?('^^<')
+        # Find the closing >
+        end_idx = remainder.index('>')
+        if end_idx
+          datatype_uri = remainder[3...end_idx]
+          return RDF::Literal.new(value, datatype: RDF::URI(datatype_uri))
+        end
+      end
+      
+      # Simple literal without language or datatype
+      return RDF::Literal.new(value)
     end
     
     # Otherwise it's a URI
