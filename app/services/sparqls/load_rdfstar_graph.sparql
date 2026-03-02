@@ -7,7 +7,6 @@ PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 CONSTRUCT {
     ?s ?p ?o  .
-    <<?s ?p ?o>> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://kg.artsdata.ca/ontology/HasAnnotations> .
     ?p rdfs:label ?prop_label .
     ?o rdfs:label ?obj_label .
     ?s ?p ?bns .
@@ -18,6 +17,7 @@ CONSTRUCT {
     ?2bnp rdfs:label ?2bnp_label .
     ?2bns ?2bnp ?3bns .
     ?3bns ?3bnp ?3bno .
+    <<?s ?p ?o>> <http://kg.artsdata.ca/ontology/hasAnnotations> ?annotation_marker .
     ?shacl_bn sh:focusNode ?s ;
               ?shacl_pred ?shal_obj .
 }
@@ -38,10 +38,15 @@ WHERE {
         OPTIONAL {
             ?o schema:name ?obj_name .
         }
-        # Annotations are loaded lazily - just mark which triples have annotations without loading the details
-        OPTIONAL {
-            <<?s ?p ?o>> ?annotation_pred ?annotation_obj .
-        }
+        # Annotations are loaded lazily - mark triples that have annotations
+        # BIND a marker value only if annotations exist
+        BIND(
+            IF(
+                EXISTS { <<?s ?p ?o>> ?annotation_pred ?annotation_obj . },
+                "true",
+                ?unbound_var
+            ) AS ?annotation_marker
+        )
         # blank nodes
         OPTIONAL {
             ?s ?p ?bns .
