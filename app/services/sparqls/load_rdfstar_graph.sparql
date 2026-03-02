@@ -1,14 +1,13 @@
 # load_rdfstar_graph
 # TODO: Add SHACL triples for blank nodes. Currently removed for performance crash when over 10 subevents (ville-de-laval)
-# Modified to support lazy loading of annotations - only loads a marker that annotations exist, not the full annotation data
+# Modified to support lazy loading of annotations - does not load annotation details
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-PREFIX ado: <http://kg.artsdata.ca/ontology/>
 CONSTRUCT {
     ?s ?p ?o  .
-    <<?s ?p ?o>> ado:hasAnnotations ?annotation_count .
+    <<?s ?p ?o>> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://kg.artsdata.ca/ontology/HasAnnotations> .
     ?p rdfs:label ?prop_label .
     ?o rdfs:label ?obj_label .
     ?s ?p ?bns .
@@ -39,14 +38,9 @@ WHERE {
         OPTIONAL {
             ?o schema:name ?obj_name .
         }
-        # Annotations are loaded lazily - just count how many annotations exist per triple
-        # This creates a marker <<s p o>> ado:hasAnnotations "count" to indicate annotation presence
+        # Annotations are loaded lazily - just mark which triples have annotations without loading the details
         OPTIONAL {
-            SELECT ?s ?p ?o (COUNT(?a) as ?annotation_count)
-            WHERE {
-                <<?s ?p ?o>> ?a ?b .
-            }
-            GROUP BY ?s ?p ?o
+            <<?s ?p ?o>> ?annotation_pred ?annotation_obj .
         }
         # blank nodes
         OPTIONAL {
