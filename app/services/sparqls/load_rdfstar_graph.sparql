@@ -1,10 +1,11 @@
 # load_rdfstar_graph
 # TODO: Add SHACL triples for blank nodes. Currently removed for performance crash when over 10 subevents (ville-de-laval)
-# Modified to support lazy loading of annotations - does not load annotation details
+# Modified to support lazy loading of annotations - includes annotation count but not details
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX ado: <http://kg.artsdata.ca/ontology/>
 CONSTRUCT {
     ?s ?p ?o  .
     ?p rdfs:label ?prop_label .
@@ -17,7 +18,10 @@ CONSTRUCT {
     ?2bnp rdfs:label ?2bnp_label .
     ?2bns ?2bnp ?3bns .
     ?3bns ?3bnp ?3bno .
-    <<?s ?p ?o>> <http://kg.artsdata.ca/ontology/hasAnnotations> ?annotation_marker .
+    <<?s ?p ?o>> ado:annotationCount ?annotation_count .
+    <<?bns ?bnp ?bno>> ado:annotationCount ?bn_annotation_count .
+    <<?2bns ?2bnp ?2bno>> ado:annotationCount ?bn2_annotation_count .
+    <<?3bns ?3bnp ?3bno>> ado:annotationCount ?bn3_annotation_count .
     ?shacl_bn sh:focusNode ?s ;
               ?shacl_pred ?shal_obj .
 }
@@ -38,11 +42,16 @@ WHERE {
         OPTIONAL {
             ?o schema:name ?obj_name .
         }
-        # Annotations are loaded lazily - mark triples that have annotations
-        # Using OPTIONAL with BOUND check allows simpler application logic
+        # Annotations are loaded lazily - count annotations per triple without loading details
+        # This handles both main entity triples and nested blank node triples
         OPTIONAL {
-            FILTER(EXISTS { <<?s ?p ?o>> ?annotation_pred ?annotation_obj . })
-            BIND("true" AS ?annotation_marker)
+            {
+                SELECT ?s ?p ?o (COUNT(DISTINCT ?annotation_pred) as ?annotation_count)
+                WHERE {
+                    <<?s ?p ?o>> ?annotation_pred ?annotation_obj .
+                }
+                GROUP BY ?s ?p ?o
+            }
         }
         # blank nodes
         OPTIONAL {
@@ -52,6 +61,16 @@ WHERE {
             OPTIONAL {
                 ?bnp rdfs:label ?bnp_label .
             }
+            # Count annotations for first-level blank node triples
+            OPTIONAL {
+                {
+                    SELECT ?bns ?bnp ?bno (COUNT(DISTINCT ?bn_annotation_pred) as ?bn_annotation_count)
+                    WHERE {
+                        <<?bns ?bnp ?bno>> ?bn_annotation_pred ?bn_annotation_obj .
+                    }
+                    GROUP BY ?bns ?bnp ?bno
+                }
+            }
             # second level blank nodes
             OPTIONAL {
                 ?bns ?bnp ?2bns .
@@ -60,11 +79,31 @@ WHERE {
                 OPTIONAL {
                     ?2bnp rdfs:label ?2bnp_label .
                 }
+                # Count annotations for second-level blank node triples
+                OPTIONAL {
+                    {
+                        SELECT ?2bns ?2bnp ?2bno (COUNT(DISTINCT ?bn2_annotation_pred) as ?bn2_annotation_count)
+                        WHERE {
+                            <<?2bns ?2bnp ?2bno>> ?bn2_annotation_pred ?bn2_annotation_obj .
+                        }
+                        GROUP BY ?2bns ?2bnp ?2bno
+                    }
+                }
                 # third level blank nodes
                 OPTIONAL {
                     ?2bns ?2bnp ?3bns .
                     filter(isBLANK(?3bns))
                     ?3bns ?3bnp ?3bno .
+                    # Count annotations for third-level blank node triples
+                    OPTIONAL {
+                        {
+                            SELECT ?3bns ?3bnp ?3bno (COUNT(DISTINCT ?bn3_annotation_pred) as ?bn3_annotation_count)
+                            WHERE {
+                                <<?3bns ?3bnp ?3bno>> ?bn3_annotation_pred ?bn3_annotation_obj .
+                            }
+                            GROUP BY ?3bns ?3bnp ?3bno
+                        }
+                    }
                 } 
             }
         }

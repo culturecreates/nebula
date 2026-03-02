@@ -1,27 +1,6 @@
 <turbo-frame id="annotations-<%= @frame_id %>">
   <% annotations = @graph.query([@annotation_subject, nil, nil]) %>
   <% if annotations.count > 0 %>
-    <% # Prepare count text in Ruby to avoid XSS in JavaScript %>
-    <% count_text = "#{annotations.count} #{pluralize(annotations.count, 'annotation')}" %>
-    <!-- Update button text with count after loading -->
-    <script>
-      // Execute immediately since turbo:frame-load may have already fired
-      (function() {
-        const frame = document.getElementById('annotations-<%= @frame_id %>');
-        if (frame) {
-          const accordion = frame.closest('.accordion-item');
-          if (accordion) {
-            const button = accordion.querySelector('.accordion-button');
-            if (button) {
-              const span = button.querySelector('span');
-              if (span && span.textContent === 'Annotations') {
-                span.textContent = <%= count_text.to_json %>;
-              }
-            }
-          }
-        }
-      })();
-    </script>
     <% annotations.each do |a| %>
       <div class="accordion-body">
         <div class="statement">
