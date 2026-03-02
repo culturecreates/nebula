@@ -1,13 +1,13 @@
-<!-- Input: annotations (for checking if any exist), subject, predicate, object -->
+<!-- Input: annotations (for checking count marker), subject, predicate, object -->
 <div class="annotation">
 
-  <% # Check if this triple might have annotations by trying to query from the already-loaded graph
-     # If annotations exist in graph, show accordion; otherwise turbo-frame will check lazily
+  <% # Check if this triple has annotations by looking for the ado:hasAnnotations marker
      annotation_subject = RDF.Statement(subject, predicate, object)
-     has_annotations = annotations.count > 0 
+     has_annotations_marker = graph.query([annotation_subject, RDF::URI("http://kg.artsdata.ca/ontology/hasAnnotations"), nil])
+     annotation_count = has_annotations_marker.count > 0 ? has_annotations_marker.first.object.value.to_i : 0
   %>
   
-  <% if has_annotations %>
+  <% if annotation_count > 0 %>
     <% random = rand(10_000) %>
     <div
       class="reference accordion"
@@ -24,8 +24,8 @@
             aria-expanded="false"
             aria-controls="flush-collapseOne"
           >
-            <span><%= annotations.count %>
-              <%= "annotation".pluralize(annotations.count) %></span>
+            <span><%= annotation_count %>
+              <%= "annotation".pluralize(annotation_count) %></span>
           </button>
         </h6>
         <div
