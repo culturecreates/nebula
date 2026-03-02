@@ -144,6 +144,8 @@ class EntityController < ApplicationController
   private
 
   # Parse a triple term from URL params back into RDF term
+  # Note: This is a simplified parser. For complex literals with escaped quotes,
+  # consider using RDF.rb's built-in NTriples parser for more robust handling
   def parse_triple_term(term_string)
     return nil if term_string.blank?
     
@@ -155,12 +157,13 @@ class EntityController < ApplicationController
     # Check if it's a literal (starts with quote)
     if term_string.start_with?('"')
       # Parse literal with possible language or datatype
+      # Simple regex - may not handle all edge cases with escaped quotes
       if term_string =~ /"([^"]*)"@(\w+)/
         return RDF::Literal.new($1, language: $2)
       elsif term_string =~ /"([^"]*)"\^\^<(.+)>/
         return RDF::Literal.new($1, datatype: RDF::URI($2))
       else
-        # Simple literal
+        # Simple literal - strip surrounding quotes
         return RDF::Literal.new(term_string.gsub(/^"|"$/, ''))
       end
     end

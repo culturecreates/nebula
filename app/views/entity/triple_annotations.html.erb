@@ -3,8 +3,8 @@
   <% if annotations.count > 0 %>
     <!-- Update button text with count after loading -->
     <script>
-      // Find the accordion button for this frame and update its text with the count
-      document.addEventListener('DOMContentLoaded', function() {
+      // Execute immediately since turbo:frame-load may have already fired
+      (function() {
         const frame = document.getElementById('annotations-<%= @frame_id %>');
         if (frame) {
           const accordion = frame.closest('.accordion-item');
@@ -18,7 +18,7 @@
             }
           }
         }
-      });
+      })();
     </script>
     <% annotations.each do |a| %>
       <div class="accordion-body">

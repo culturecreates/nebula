@@ -43,7 +43,6 @@ frame id, graph = class RDF::Graph -->
           RDF.Statement(triple.subject, triple.predicate, triple.object) %>
         <%= render partial: "annotations",
         locals: {
-          annotations: graph.query([annotation_subject, nil, nil]),
           graph: graph,
           subject: triple.subject,
           predicate: triple.predicate,
