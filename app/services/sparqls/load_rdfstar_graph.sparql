@@ -39,16 +39,11 @@ WHERE {
             ?o schema:name ?obj_name .
         }
         # Annotations are loaded lazily - mark triples that have annotations
-        # BIND a marker value only if annotations exist
-        # Using empty string for false case instead of unbound variable to avoid SPARQL errors
-        BIND(
-            IF(
-                EXISTS { <<?s ?p ?o>> ?annotation_pred ?annotation_obj . },
-                "true",
-                ""
-            ) AS ?annotation_marker
-        )
-        FILTER(?annotation_marker != "")
+        # Using OPTIONAL with BOUND check allows simpler application logic
+        OPTIONAL {
+            FILTER(EXISTS { <<?s ?p ?o>> ?annotation_pred ?annotation_obj . })
+            BIND("true" AS ?annotation_marker)
+        }
         # blank nodes
         OPTIONAL {
             ?s ?p ?bns .

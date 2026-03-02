@@ -117,6 +117,8 @@ class EntityController < ApplicationController
     object = parse_triple_term(params[:object])
     @frame_id = params[:frame_id]
     
+    # Note: entity_uri is not used by load_triple_annotations, but required by Entity.new
+    # We use subject as a placeholder since annotations are loaded based on the triple, not the entity
     @entity = Entity.new(entity_uri: subject.to_s)
     @entity.load_triple_annotations(subject: subject, predicate: predicate, object: object)
     
@@ -144,8 +146,7 @@ class EntityController < ApplicationController
   private
 
   # Parse a triple term from URL params back into RDF term
-  # Note: This is a simplified parser. For complex literals with escaped quotes,
-  # consider using RDF.rb's built-in NTriples parser for more robust handling
+  # Note: For complex literals with escaped quotes, consider using RDF.rb's built-in NTriples parser
   def parse_triple_term(term_string)
     return nil if term_string.blank?
     
@@ -156,7 +157,7 @@ class EntityController < ApplicationController
     
     # Check if it's a literal (starts with quote)
     if term_string.start_with?('"')
-      # Use string manipulation instead of regex to avoid ReDoS vulnerabilities
+      # Use string manipulation to avoid ReDoS vulnerabilities
       # Look for closing quote
       closing_quote_idx = term_string.index('"', 1)
       return RDF::Literal.new('') if closing_quote_idx.nil?
@@ -164,10 +165,12 @@ class EntityController < ApplicationController
       value = term_string[1...closing_quote_idx]
       remainder = term_string[(closing_quote_idx + 1)..-1]
       
-      # Check for language tag
+      # Check for language tag using string manipulation (consistent with security approach)
       if remainder.start_with?('@')
-        lang_match = remainder.match(/^@(\w+)/)
-        return RDF::Literal.new(value, language: lang_match[1]) if lang_match
+        # Find end of language tag (alphanumeric only)
+        lang_end = remainder.index(/[^\w]/, 1) || remainder.length
+        language = remainder[1...lang_end]
+        return RDF::Literal.new(value, language: language) if language.length > 0
       end
       
       # Check for datatype

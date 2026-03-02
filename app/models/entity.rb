@@ -362,8 +362,16 @@ class Entity
       term.to_s  # blank nodes use _:id format
     elsif term.is_a?(RDF::Literal)
       # Format literals with proper escaping and datatype/language tags
-      # Note: gsub with double backslashes produces proper SPARQL escaping
-      value = term.value.to_s.gsub('\\', '\\\\').gsub('"', '\\"').gsub("\n", '\\n').gsub("\r", '\\r')
+      # Escape special characters for SPARQL in a single pass for efficiency
+      value = term.value.to_s
+      value = value.gsub(/([\\"\n\r])/) do |match|
+        case match
+        when '\\' then '\\\\'
+        when '"' then '\\"'
+        when "\n" then '\\n'
+        when "\r" then '\\r'
+        end
+      end
       result = "\"#{value}\""
       if term.language?
         result += "@#{term.language}"

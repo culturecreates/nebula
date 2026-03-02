@@ -1,5 +1,7 @@
 # load_triple_annotations
 # Load annotations (RDF-star quoted triple statements) for a specific triple
+# Placeholders (subject_placeholder, predicate_placeholder, object_placeholder) are replaced
+# by SparqlLoader with properly formatted RDF terms (URIs, blank nodes, or literals)
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX onto: <http://www.ontotext.com/>
 CONSTRUCT {

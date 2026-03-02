@@ -1,6 +1,8 @@
 <turbo-frame id="annotations-<%= @frame_id %>">
   <% annotations = @graph.query([@annotation_subject, nil, nil]) %>
   <% if annotations.count > 0 %>
+    <% # Prepare count text in Ruby to avoid XSS in JavaScript %>
+    <% count_text = "#{annotations.count} #{pluralize(annotations.count, 'annotation')}" %>
     <!-- Update button text with count after loading -->
     <script>
       // Execute immediately since turbo:frame-load may have already fired
@@ -13,7 +15,7 @@
             if (button) {
               const span = button.querySelector('span');
               if (span && span.textContent === 'Annotations') {
-                span.textContent = '<%= annotations.count %> <%= "annotation".pluralize(annotations.count) %>';
+                span.textContent = <%= count_text.to_json %>;
               }
             }
           }
