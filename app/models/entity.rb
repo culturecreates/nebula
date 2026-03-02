@@ -194,6 +194,32 @@ class Entity
     @graph = construct_turtle(sparql)
   end
 
+  def load_triple_annotations(subject:, predicate:, object:)
+    sparql =  SparqlLoader.load('load_triple_annotations', [
+      'subject_placeholder', format_triple_term(subject),
+      'predicate_placeholder', format_triple_term(predicate),
+      'object_placeholder', format_triple_term(object)
+    ])
+    @graph = construct_turtle(sparql)
+  end
+
+  def count_triple_annotations(subject:, predicate:, object:)
+    sparql =  SparqlLoader.load('count_triple_annotations', [
+      'subject_placeholder', format_triple_term(subject),
+      'predicate_placeholder', format_triple_term(predicate),
+      'object_placeholder', format_triple_term(object)
+    ])
+    response = artsdata_client.execute_sparql(sparql)
+    if response[:code] == 200 && response[:message].any?
+      response[:message].first["count"]["value"].to_i
+    else
+      0
+    end
+  rescue => e
+    puts "Error counting annotations: #{e.message}"
+    0
+  end
+
   def delete
     return false if @entity_uri.blank?
     sparql = SparqlLoader.load('delete_entity', [
@@ -343,6 +369,28 @@ class Entity
   end
 
   private
+
+  # Format a triple term (subject, predicate, or object) for use in SPARQL queries
+  # Wraps URIs with < >, leaves blank nodes as-is, and handles literals properly
+  def format_triple_term(term)
+    if term.is_a?(RDF::URI)
+      "<#{term}>"
+    elsif term.is_a?(RDF::Node)
+      term.to_s  # blank nodes use _:id format
+    elsif term.is_a?(RDF::Literal)
+      # Format literals with proper escaping and datatype/language tags
+      value = term.value.to_s.gsub('\\', '\\\\\\\\').gsub('"', '\\"').gsub("\n", '\\n').gsub("\r", '\\r')
+      result = "\"#{value}\""
+      if term.language?
+        result += "@#{term.language}"
+      elsif term.datatype? && term.datatype != RDF::XSD.string
+        result += "^^<#{term.datatype}>"
+      end
+      result
+    else
+      term.to_s
+    end
+  end
 
   def artsdata_client
     @@artsdata_client ||= ArtsdataGraph::V2::Client.new(

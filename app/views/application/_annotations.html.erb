@@ -1,7 +1,13 @@
-<!-- Input: annotations -->
+<!-- Input: annotations (for checking if any exist), subject, predicate, object -->
 <div class="annotation">
 
-  <% if annotations.count > 0 %>
+  <% # Check if this triple might have annotations by trying to query from the already-loaded graph
+     # If annotations exist in graph, show accordion; otherwise turbo-frame will check lazily
+     annotation_subject = RDF.Statement(subject, predicate, object)
+     has_annotations = annotations.count > 0 
+  %>
+  
+  <% if has_annotations %>
     <% random = rand(10_000) %>
     <div
       class="reference accordion"
@@ -27,30 +33,19 @@
           class="accordion-collapse collapse"
           data-bs-parent="#accordionFlushExample"
         >
-          <% annotations.each do |a| %>
-            <div class="accordion-body">
-
-              <div class="statement">
-                <div class="statement-predicate">
-                  <%= display_object(a.predicate) %>
-                </div>
-                <div class="statement-objects">
-                  <div class="statement-object">
-                    <% if a.object.node? %>
-                      <%= render partial: "statements_table",
-                      locals: {
-                        triples: graph.query([a.object, nil, nil]),
-                        graph: graph,
-                      } %>
-                    <% else %>
-                      <%= display_label(a.object) %>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          <% end %>
+          <turbo-frame
+            id='annotations-<%= random %>'
+            src="<%= entity_triple_annotations_path(
+              subject: subject.to_s,
+              predicate: predicate.to_s,
+              object: object.to_s,
+              frame_id: random
+            ) %>"
+            loading="lazy"
+            target="_top"
+          >
+            <div class="accordion-body">Loading annotations...</div>
+          </turbo-frame>
         </div>
       </div>
     </div>

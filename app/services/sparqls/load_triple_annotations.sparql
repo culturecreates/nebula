@@ -1,0 +1,33 @@
+# load_triple_annotations
+# Load annotations (RDF-star quoted triple statements) for a specific triple
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX onto: <http://www.ontotext.com/>
+CONSTRUCT {
+    <<subject_placeholder predicate_placeholder object_placeholder>> ?a ?b .
+    ?a rdfs:label ?a_label .
+    ?b rdfs:label ?b_label .
+    <<subject_placeholder predicate_placeholder object_placeholder>> ?a ?qbns .
+    ?qbns ?qbnp ?qbno .
+    ?qbnp rdfs:label ?qbnp_label .
+}
+FROM onto:explicit 
+WHERE {
+    <<subject_placeholder predicate_placeholder object_placeholder>> ?a ?b .
+    # annotation predicate labels
+    OPTIONAL {
+        ?a rdfs:label ?a_label .
+    }
+    # annotation object labels
+    OPTIONAL {
+        ?b rdfs:label ?b_label .
+    }
+    # annotation blank nodes
+    OPTIONAL {
+        <<subject_placeholder predicate_placeholder object_placeholder>> ?a ?qbns .
+        filter(isBLANK(?qbns))
+        ?qbns ?qbnp ?qbno .
+        OPTIONAL {
+            ?qbnp rdfs:label ?qbnp_label .
+        }
+    }
+}

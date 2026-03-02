@@ -1,0 +1,27 @@
+<turbo-frame id="annotations-<%= @frame_id %>">
+  <% annotations = @graph.query([@annotation_subject, nil, nil]) %>
+  <% if annotations.count > 0 %>
+    <% annotations.each do |a| %>
+      <div class="accordion-body">
+        <div class="statement">
+          <div class="statement-predicate">
+            <%= display_object(a.predicate) %>
+          </div>
+          <div class="statement-objects">
+            <div class="statement-object">
+              <% if a.object.node? %>
+                <%= render partial: "statements_table",
+                locals: {
+                  triples: @graph.query([a.object, nil, nil]),
+                  graph: @graph,
+                } %>
+              <% else %>
+                <%= display_label(a.object) %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</turbo-frame>

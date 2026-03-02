@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     delete "entity", to: "entity#destroy", as: :destroy_entity
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
+    get "entity/triple_annotations", to: "entity#triple_annotations"
     get "entity/expand", to: "entity#expand"
     get "dereference/card", to: "dereference#card"
     get "dereference/external", to: "dereference#external"

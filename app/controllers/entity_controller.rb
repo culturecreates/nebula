@@ -109,6 +109,22 @@ class EntityController < ApplicationController
     @entity.load_derived_statements
   end
 
+  # Load annotations for a specific triple
+  # /entity/triple_annotations?subject=[URI]&predicate=[URI]&object=[value]&frame_id=[unique_id]
+  def triple_annotations
+    subject = parse_triple_term(params[:subject])
+    predicate = parse_triple_term(params[:predicate])
+    object = parse_triple_term(params[:object])
+    @frame_id = params[:frame_id]
+    
+    @entity = Entity.new(entity_uri: subject.to_s)
+    @entity.load_triple_annotations(subject: subject, predicate: predicate, object: object)
+    
+    # Create the RDF statement to query annotations
+    @annotation_subject = RDF.Statement(subject, predicate, object)
+    @graph = @entity.graph
+  end
+
   # DELETE /entity
   # delete an entity by URI
   # this will delete all statements about the entity
@@ -126,6 +142,32 @@ class EntityController < ApplicationController
   end
 
   private
+
+  # Parse a triple term from URL params back into RDF term
+  def parse_triple_term(term_string)
+    return nil if term_string.blank?
+    
+    # Check if it's a blank node
+    if term_string.start_with?('_:')
+      return RDF::Node.new(term_string.sub('_:', ''))
+    end
+    
+    # Check if it's a literal (starts with quote)
+    if term_string.start_with?('"')
+      # Parse literal with possible language or datatype
+      if term_string =~ /"([^"]*)"@(\w+)/
+        return RDF::Literal.new($1, language: $2)
+      elsif term_string =~ /"([^"]*)"\^\^<(.+)>/
+        return RDF::Literal.new($1, datatype: RDF::URI($2))
+      else
+        # Simple literal
+        return RDF::Literal.new(term_string.gsub(/^"|"$/, ''))
+      end
+    end
+    
+    # Otherwise it's a URI
+    RDF::URI(term_string)
+  end
 
   def check_delete_entity_access
     ensure_access("delete_entity")

@@ -1,0 +1,8 @@
+# count_triple_annotations
+# Count annotations for a specific triple (used to display count in accordion without loading all data)
+PREFIX onto: <http://www.ontotext.com/>
+SELECT (COUNT(?a) as ?count)
+FROM onto:explicit 
+WHERE {
+    <<subject_placeholder predicate_placeholder object_placeholder>> ?a ?b .
+}

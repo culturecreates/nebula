@@ -45,6 +45,9 @@ frame id, graph = class RDF::Graph -->
         locals: {
           annotations: graph.query([annotation_subject, nil, nil]),
           graph: graph,
+          subject: triple.subject,
+          predicate: triple.predicate,
+          object: triple.object,
         } %>
       </div>
     <% end %>
