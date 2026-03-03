@@ -263,7 +263,7 @@ class Entity
     sparql = "select ?g where { graph ?g { <#{self.entity_uri}> a ?o } }"
     response = artsdata_client.execute_sparql(sparql)
     @graph_uri =  if response[:code] == 200
-                    response[:message].first["g"]["value"]
+                    response.dig(:message, 0, "g", "value")
                   else
                     nil
                   end
