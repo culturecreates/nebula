@@ -1,5 +1,5 @@
 class MaintenanceController < ApplicationController
-  before_action :check_refresh_access, only: [:refresh_entity] # ensure user has permissions
+  before_action :check_refresh_access, only: [:refresh_entity, :batch_refresh_entity] # ensure user has permissions
 
   def refresh_entity
     artsdata_uri = params[:uri]
@@ -67,10 +67,40 @@ class MaintenanceController < ApplicationController
     end
   end
 
+  def batch_refresh_entity
+    uris = params[:uris]
+    publisher = user_uri
+    redirect_url = params[:redirect_url] || root_path
+    timeout_seconds = 30
+    api_endpoint = Rails.application.config.artsdata_maintenance_endpoint + "/refresh_entity"
+    begin
+      response = HTTParty.post(api_endpoint,
+        body: {
+          uri: uris,
+          publisher: publisher,
+          dryrun: false
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' },
+        timeout: timeout_seconds
+      )
+    rescue Net::OpenTimeout, Net::ReadTimeout => e
+      error_message = "Timeout: Artsdata Maintenance API did not respond within #{timeout_seconds} seconds. Try again in a few minutes."
+    rescue StandardError => e
+      error_message = "Error connecting to Artsdata Maintenance API: #{e.message}"
+    end
+    if error_message
+      flash[:alert] = error_message
+    elsif response.code != 200
+      flash[:alert] = "Batch refresh failed. Error: #{response.body.truncate(1000)}"
+    else
+      flash[:notice] = "Successfully queued refresh for #{uris.length} #{"entity".pluralize(uris.length)}."
+    end
+    render json: { redirect_url: redirect_url }
+  end
+
     private
 
   # Check if the user has access the the minting feature
-  def check_refresh_access
     ensure_access("refresh_entity")
   end
 

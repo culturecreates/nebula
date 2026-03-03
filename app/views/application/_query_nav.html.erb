@@ -1,4 +1,4 @@
-<div class="alternate-name d-flex align-items-center mb-2">
+<div class="alternate-name d-flex align-items-center mb-2" data-controller="batch-refresh">
   <%= if permitted_params
     link_to "Download CSV |",
     query_show_path(params: permitted_params, format: :csv),
@@ -9,6 +9,14 @@
   "http://artsdata-trifid-production.herokuapp.com/sparql/#query=#{URI.encode_www_form_component(@query)}",
   class: "btn btn-outlined btn-sm " %>
   |
+  <% if user_has_access?("refresh_entity") %>
+    <a
+      href="#"
+      class="btn btn-outlined btn-sm"
+      data-action="click->batch-refresh#refresh"
+    >Refresh all</a>
+    |
+  <% end %>
   <form class="d-inline">
     <input
       type="search"
@@ -19,3 +27,22 @@
     >
   </form>
 </div>
+
+<% if user_has_access?("refresh_entity") %>
+  <div class="modal fade" id="batchRefreshModal" tabindex="-1" aria-labelledby="batchRefreshModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="batchRefreshModalLabel">Refresh All Artsdata Entities</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="batchRefreshModalBody">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="batchRefreshModalOk">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
