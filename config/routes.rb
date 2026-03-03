@@ -69,5 +69,6 @@ Rails.application.routes.draw do
 
   # Maintenance routes
   match "maintenance/refresh_entity", to: "maintenance#refresh_entity", via: :post
+  match "maintenance/batch_refresh_entity", to: "maintenance#batch_refresh_entity", via: :post
 
 end
