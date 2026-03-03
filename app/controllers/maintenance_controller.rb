@@ -90,7 +90,7 @@ class MaintenanceController < ApplicationController
     end
     if error_message
       flash[:alert] = error_message
-    elsif response.code != 200
+    elsif response.code != 202 && response.code != 200
       flash[:alert] = "Batch refresh failed. Error: #{response.body.truncate(1000)}"
     else
       flash[:notice] = "Successfully queued refresh for #{uris.length} #{"entity".pluralize(uris.length)}."
@@ -98,9 +98,10 @@ class MaintenanceController < ApplicationController
     render json: { redirect_url: redirect_url }
   end
 
-    private
+  private
 
   # Check if the user has access the the minting feature
+  def check_refresh_access
     ensure_access("refresh_entity")
   end
 
