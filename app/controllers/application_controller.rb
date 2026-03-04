@@ -129,6 +129,8 @@ class ApplicationController < ActionController::Base
     when "delete_entity"
       return session[:teams].any? { |team| team.key?("10808270") }
     when "refresh_entity"
+      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293")  }
+    when "batch_operations"
       return session[:teams].any? { |team| team.key?("10808270") }
     else
       false

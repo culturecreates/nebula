@@ -9,7 +9,7 @@
   "http://artsdata-trifid-production.herokuapp.com/sparql/#query=#{URI.encode_www_form_component(@query)}",
   class: "btn btn-outlined btn-sm " %>
   |
-  <% if user_has_access?("refresh_entity") %>
+  <% if user_has_access?("batch_operations") %>
     <a
       href="#"
       class="btn btn-outlined btn-sm"
