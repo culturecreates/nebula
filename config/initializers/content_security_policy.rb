@@ -16,11 +16,12 @@ Rails.application.configure do
                        "https://www.googletagmanager.com"
     policy.style_src   :self, :https, :unsafe_inline
     policy.connect_src :self, 
-                        "http://localhost:3005", 
-                        "https://staging.api.artsdata.ca",
-                        "https://api.artsdata.ca", 
-                        "https://staging-recon.artsdata.ca/",
-                        "https://recon.artsdata.ca/",
+                        config.artsdata_recon_endpoint,
+                        config.artsdata_recon_endpoint_v0,
+                        config.artsdata_mint_endpoint,
+                        config.artsdata_link_endpoint,
+                        config.artsdata_databus_endpoint,
+                        config.artsdata_maintenance_endpoint,
                         "https://www.google-analytics.com"
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
