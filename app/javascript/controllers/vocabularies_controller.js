@@ -1,6 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-const SPARQL_ENDPOINT = "https://db.artsdata.ca/repositories/artsdata"
 const ARTSDATA_PREFIX = "http://kg.artsdata.ca/resource"
 
 const SCHEME_COLORS = {
@@ -30,7 +29,7 @@ const I18N = {
 
 export default class extends Controller {
   static targets = ["chart", "loading", "tooltip", "title", "subtitle", "enBtn", "frBtn"]
-  static values = { lang: { type: String, default: "en" } }
+  static values = { lang: { type: String, default: "en" }, sparqlEndpoint: String }
 
   connect() {
     this.waitForD3()
@@ -116,7 +115,7 @@ export default class extends Controller {
   }
 
   async sparqlQuery(query) {
-    const url = `${SPARQL_ENDPOINT}?query=${encodeURIComponent(query)}`
+    const url = `${this.sparqlEndpointValue}/repositories/artsdata?query=${encodeURIComponent(query)}`
     const response = await fetch(url, {
       headers: { Accept: "application/sparql-results+json" }
     })

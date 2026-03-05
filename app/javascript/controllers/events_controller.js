@@ -1,7 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-const SPARQL_ENDPOINT = "https://db.artsdata.ca/repositories/artsdata"
-
 const GEOJSON_URL = "/canada.geojson"
 
 // Map all known province/territory variants to canonical two-letter codes
@@ -75,6 +73,8 @@ const PROVINCE_NAMES = {
 
 export default class extends Controller {
   static targets = ["map", "loading", "tooltip"]
+  static values = { sparqlEndpoint: String }
+  
 
   connect() {
     this.waitForD3().then(() => this.loadData())
@@ -125,7 +125,7 @@ export default class extends Controller {
       GROUP BY ?province
       ORDER BY DESC(?count)
     `
-    const url = `${SPARQL_ENDPOINT}?query=${encodeURIComponent(query)}`
+    const url = `${this.sparqlEndpointValue}/repositories/artsdata?query=${encodeURIComponent(query)}`
     const response = await fetch(url, {
       headers: { Accept: "application/sparql-results+json" }
     })

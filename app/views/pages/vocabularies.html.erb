@@ -4,7 +4,7 @@
 <% end %>
 
 
-  <div class="vocabularies-page" data-controller="vocabularies" data-vocabularies-lang-value="en">
+  <div class="vocabularies-page" data-controller="vocabularies" data-vocabularies-lang-value="en" data-vocabularies-sparql-endpoint-value="<%= Rails.configuration.graph_api_endpoint %>">
     <div class="text-center py-3">
       <div class="mb-2">
         <div class="btn-group btn-group-sm" role="group" aria-label="Language selection">
