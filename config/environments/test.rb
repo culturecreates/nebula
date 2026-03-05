@@ -9,7 +9,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   
   # External API endpoints for Artsdata services
-  config.graph_api_endpoint = "http://staging.db.artsdata.ca" 
+  config.graph_api_endpoint = "https://staging.db.artsdata.ca" 
   config.artsdata_recon_endpoint = "https://staging-recon.artsdata.ca" 
   config.artsdata_recon_endpoint_v0 = "https://staging.api.artsdata.ca/recon"
   config.artsdata_mint_endpoint = "https://staging.api.artsdata.ca/mint" 
