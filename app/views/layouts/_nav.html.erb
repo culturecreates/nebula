@@ -6,7 +6,7 @@
       class: "navbar-logo-height",
       style: "width: auto;" %>
       <% if Rails.application.config.graph_api_endpoint != "http://db.artsdata.ca" %>
-        <span class='badge bg-warning' style="font-size: 0.6em;"><%= Rails.application.config.graph_api_endpoint.split(".").first[7..-1] %> data</span>
+        <span class='badge bg-warning' style="font-size: 0.6em;"><%= URI.parse(Rails.application.config.graph_api_endpoint).host %> data</span>
       <% end %>
 
     <% end %>
