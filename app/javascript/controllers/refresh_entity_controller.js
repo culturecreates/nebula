@@ -34,11 +34,11 @@ export default class extends Controller {
           return;
         }
         if (data.message.trim() === "") {
-          this.modalBody.innerHTML = "<p>Nothing to update.</p>" + data.errors  ;
+          this.modalBody.innerHTML = "<p>Nothing to update.</p>" + (data.rescues ? data.rescues : "");
           this.okBtn.disabled = true;
           return;
         }
-        this.modalBody.innerHTML = data.message + data.errors;
+        this.modalBody.innerHTML = data.message + (data.rescues ? data.rescues : "");
         this.okBtn.disabled = false; // Enable the update button if fetch is successful
         this.okBtn.onclick = () => {
           this.modal.hide();

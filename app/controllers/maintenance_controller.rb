@@ -56,16 +56,16 @@ class MaintenanceController < ApplicationController
           formated_items << "</ul>"
         end
         # Display errors if there are any
-        errors = JSON.parse(response.body)['errors']
-        formated_errors = ""
-        unless errors.blank?
-          formated_errors << "<h4>Ignored sources</h5> <ul>"
-          errors.each do |error|
-            formated_errors << "<li>#{error}</li>"
+        rescues = JSON.parse(response.body)['rescues']
+        formated_rescues = ""
+        unless rescues.blank?
+          formated_rescues << "<h4>Ignored sources</h5> <ul>"
+          rescues.each do |rescue_item|
+            formated_rescues << "<li>#{rescue_item}</li>"
           end
-          formated_errors << "</ul>"
+          formated_rescues << "</ul>"
         end
-        render json: { message: formated_items, errors: formated_errors }, status: :ok
+        render json: { message: formated_items, rescues: formated_rescues }, status: :ok
       end
     else
       if response.code != 200
