@@ -44,22 +44,12 @@
         rel: "nofollow" %>
         |
       <% end %>
-      <% if capacoa_ranked_link(@entity) %>
-        <%= link_to "CAPACOA view",
-        dereference_external_path(uri: capacoa_ranked_link(@entity)),
-        class: "text-decoration-none ms-2 me-2",
-        rel: "nofollow" %>
-        |
-      <% end %>
     <% end %>
   <% end %>
-  <a
-    href="#"
-    onclick="alert('Wikidata style discussion coming soon.');"
-    id="aduriapi"
-    class="text-decoration-none ms-2 me-2"
-    rel="nofollow"
-  >Discussion</a>
+   <%= link_to "History",
+    history_show_path(uri: @entity.entity_uri),
+    class: "ms-2 me-2",
+    rel: "nofollow" %>
   |
   <a
     href="<%= graphdb_link(@entity.entity_uri) %>"

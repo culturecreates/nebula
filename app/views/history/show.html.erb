@@ -1,0 +1,18 @@
+
+<% provide(:uri, @entity.entity_uri) %>
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      
+      <%= render partial: "shared/clipboard", locals: { uri: @entity.entity_uri } %>
+    </div>
+  </div>
+
+  <% solutions = @history.query([nil, RDF::Vocab::SCHEMA.dateCreated, nil]) %>
+  <ul>
+  <% solutions.each do |solution| %>
+    <li><%= solution.object %></li>
+  <% end %>
+  </ul>
+</div>

@@ -291,9 +291,29 @@ class Entity
               end
   end
 
+  def history
+    sparql =  <<-SPARQL
+      PREFIX schema: <http://schema.org/>
+      PREFIX ado: <http://kg.artsdata.ca/ontology/>
+      CONSTRUCT {
+        ?logEntry schema:dateCreated ?dateCreated ;
+            schema:description ?description .
+      } 
+      WHERE {
+        GRAPH ?g {
+          ?dataset <http://schema.org/about> <#{self.entity_uri}> ;
+            ado:hasActivityLog ?log .
+          ?log schema:hasPart ?logEntry .
+          ?logEntry schema:dateCreated ?dateCreated ;
+            schema:description ?description .
+        }
+      }
+    SPARQL
 
+    construct_turtle(sparql)
+  end
 
- def load_event_nested_entities
+  def load_event_nested_entities
     location = @graph.query([RDF::URI(self.entity_uri), RDF::URI("http://schema.org/location"), nil])&.first&.object
     if location && location.uri?
       # load location graph
