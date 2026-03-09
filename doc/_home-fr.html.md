@@ -1,4 +1,4 @@
-# ARTSDATA.CA
+# Artsdata.CA
 
 Un graphe de connaissances pan-canadien pour les arts.
 
