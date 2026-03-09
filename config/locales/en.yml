@@ -88,7 +88,7 @@ en:
       <p>Please manage Artifacts with the <a href='https://culturecreates.github.io/artsdata-data-model/architecture/graph-store-api.html'>Artsdata Databus API</a>. 
       To create a new version use the <a href='https://documenter.getpostman.com/view/3157443/TVep7mv3#f12d3dc0-5c37-496b-985f-95388660b984'>POST /databus</a> endpoint with <code>publisher=</code> set to your Databus Account URI. 
       To manage accounts please visit artsdata-stewards <a href="https://github.com/orgs/artsdata-stewards/teams/databus/teams">databus teams</a>.</p>  
-      <p>An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google speadsheet. 
+      <p>An artifact may also be created directly using the "create artifact" button if the source is a website with structured data or Google spreadsheet. 
       Once an artifact is create you may manually create an artifact version within the Artsdata interface: 
       click on the URL of the databus artifact you just created, then, under <code>Potential actions</code>, select <code>Create an artifact version of [artifactname]</code>. 
       This will create an artifact version, upload the data to the knowledge graph and add the dataset to the list of data sources.</p>
@@ -115,7 +115,7 @@ en:
     recently_minted_events:
       title: "Recently Minted Events"
       description: | 
-        This report lists events that have recently been reconciled and assigned (i.e. "minted") an Artsdata identifier. Reconciliation and minting activities are either performed automotically, as new events are loaded to Artsdata, or manually. To learn more about minimal requirements for minting Artsdata IDs to events, visit the <a href='https://docs.artsdata.ca/classes/event.html'>Event</a> documentation page.
+        This report lists events that have recently been reconciled and assigned (i.e. "minted") an Artsdata identifier. Reconciliation and minting activities are either performed automatically, as new events are loaded to Artsdata, or manually. To learn more about minimal requirements for minting Artsdata IDs to events, visit the <a href='https://docs.artsdata.ca/classes/event.html'>Event</a> documentation page.
     places_with_events:
       title: "Places with Events"
     people_with_artsdata_ids:
