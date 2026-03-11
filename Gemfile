@@ -53,7 +53,6 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
 end
 
-
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
@@ -65,7 +64,6 @@ group :development do
   # gem "spring"
   
   gem 'htmlbeautifier'
-
   gem 'erb-formatter'
 end
 
@@ -81,19 +79,12 @@ group :test do
 end
 
 gem 'bootstrap', '~> 5.3.2'
-
 gem 'faraday'
 gem 'oj'
-
 gem 'nokogiri'
-
-
 gem 'redcarpet', '~>  3.6.0'
-
 gem 'httparty'
-
 gem 'rack-cors'
-
 gem 'linkeddata', '~> 3.3.1'
 # gem 'rdf', '~> 3.2'
 # gem 'json-ld', '~> 3.2.4'
@@ -104,4 +95,6 @@ gem 'linkeddata', '~> 3.3.1'
 
 gem "ffi", "< 1.17.0" # until Heroku upgrades to rubygems version 3.3.22.
 
+# For debugging and profiling
 gem "scout_apm"
+gem "scout-logging"
