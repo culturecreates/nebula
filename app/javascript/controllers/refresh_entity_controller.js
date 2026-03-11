@@ -55,6 +55,9 @@ export default class extends Controller {
               window.location.href = result.redirect_url;
             });
         };
+      })
+      .catch(error => {
+        alert("Error: " + error.message)
       });
   }
 }
