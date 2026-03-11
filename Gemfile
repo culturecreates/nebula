@@ -97,4 +97,4 @@ gem "ffi", "< 1.17.0" # until Heroku upgrades to rubygems version 3.3.22.
 
 # For debugging and profiling
 gem "scout_apm"
-gem "scout-logging"
+gem "scout_apm_logging"
