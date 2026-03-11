@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
 
   def maintenance_mode?
     if Rails.application.config.feature_maintenance_mode_enabled
-      flash.notice = "Artsdata is currently undergoing maintenance. Service is slower than usual."
+      flash.notice = "Artsdata is currently undergoing maintenance. Some features may be unavailable."
     end
   end
   
@@ -85,13 +85,13 @@ class ApplicationController < ActionController::Base
       return true
     else
       flash.alert = "Please request that #{session[:handle]} be added to an Artsdata Databus team."
-      redirect_back(fallback_location: root_path)
+      redirect_back(fallback_location: root_path) and return
     end
   end
 
   # Check if user is signed in and has permission to use the feature
   def ensure_access(feature)
-    return if Rails.env.test? 
+    return if Rails.env.test?
 
     user_signed_in!
     return unless user_signed_in?
@@ -100,11 +100,12 @@ class ApplicationController < ActionController::Base
       flash.alert = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin at artsdata-support@capacoa.ca."
       redirect_to root_path and return
     end
-    
-    # Check feature flag
-    if feature == "minting" && Rails.application.config.feature_minting_enabled == false
-      flash.alert = "This feature is temporarily disabled for maintenance. Try again later."
-      redirect_to root_path and return
+
+    # Dynamically check feature flag (e.g., feature_minting_enabled, feature_refresh_entity_enabled)
+    flag_name = "feature_#{feature}_enabled"
+    if Rails.application.config.respond_to?(flag_name) && Rails.application.config.public_send(flag_name) == false
+      flash.alert = "The '#{feature}' feature is temporarily disabled for maintenance. Try again later."
+      redirect_back(fallback_location: root_path) and return
     end
   end
 
