@@ -110,7 +110,6 @@ class MaintenanceController < ApplicationController
 
   private
 
-  # Check if the user has access the the minting feature
   def check_refresh_access
     ensure_access("refresh_entity")
   end

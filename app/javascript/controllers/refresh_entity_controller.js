@@ -30,7 +30,7 @@ export default class extends Controller {
         if (!data) return;
         if (typeof data.message === "undefined") {
           this.modal.hide();
-          window.location.reload();
+          window.location.href = data.redirect_url || window.location.href;
           return;
         }
         if (data.message.trim() === "") {
