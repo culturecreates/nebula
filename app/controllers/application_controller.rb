@@ -96,6 +96,7 @@ class ApplicationController < ActionController::Base
     return if Rails.env.test?
 
     user_signed_in!
+    return unless user_signed_in?
 
     unless user_has_access?(feature)
       flash[:alert] = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin at artsdata-support@capacoa.ca."
@@ -144,10 +145,10 @@ class ApplicationController < ActionController::Base
   def halt_and_redirect
     if request.content_type == "application/json"
       # For JSON requests (AJAX), responds with JSON redirect URL and flash instead of HTTP redirect.
-      render json: { redirect_url: request.referer || root_path }
+      render json: { redirect_url: request.referer || root_path, }, status: :unauthorized
     else 
       # fallback to normal redirect for non-JSON requests
-      redirect_back(fallback_location: root_path) 
+      redirect_back(fallback_location: root_path)
     end
   end
 
