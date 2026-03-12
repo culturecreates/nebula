@@ -111,34 +111,8 @@ class MaintenanceController < ApplicationController
   private
 
   # Check if the user has access to the refresh_entity feature.
-  # For JSON requests (AJAX), responds with JSON redirect URL and flash instead of HTTP redirect.
   def check_refresh_access
-    if request.content_type == "application/json"
-      return if Rails.env.test?
-
-      unless user_signed_in?
-        deny_json_access("You must be logged in to access this section. Artsdata uses GitHub.com accounts which can be created for free.", request.referer || root_path)
-        return
-      end
-
-      unless user_has_access?("refresh_entity")
-        deny_json_access("You do not have access to this feature. Please request access to the 'refresh_entity' feature from an Artsdata admin at artsdata-support@capacoa.ca.", root_path)
-        return
-      end
-
-      flag_name = "feature_refresh_entity_enabled"
-      if Rails.application.config.respond_to?(flag_name) && Rails.application.config.public_send(flag_name) == false
-        deny_json_access("The 'refresh_entity' feature is temporarily disabled for maintenance. Try again later.", request.referer || root_path)
-        return
-      end
-    else
-      ensure_access("refresh_entity")
-    end
-  end
-
-  def deny_json_access(message, redirect_url)
-    flash[:alert] = message
-    render json: { redirect_url: redirect_url }
+    ensure_access("refresh_entity")
   end
 
   def format_display(item)

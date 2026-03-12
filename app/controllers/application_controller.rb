@@ -58,8 +58,9 @@ class ApplicationController < ActionController::Base
   def user_signed_in!
     unless user_signed_in?
       logout
-      flash.alert = "You must be logged in to access this section. Artsdata uses GitHub.com accounts which can be created for free."
-      redirect_back(fallback_location: root_path) and return
+      flash[:alert] = "You must be logged in to access this section. Artsdata uses GitHub.com accounts which can be created for free."
+      halt_and_redirect
+      return
     end
   end
 
@@ -84,8 +85,9 @@ class ApplicationController < ActionController::Base
     if session[:accounts].present?
       return true
     else
-      flash.alert = "Please request that #{session[:handle]} be added to an Artsdata Databus team."
-      redirect_back(fallback_location: root_path) and return
+      flash[:alert] = "Please request that #{session[:handle]} be added to an Artsdata Databus team."
+      halt_and_redirect
+      return
     end
   end
 
@@ -94,18 +96,19 @@ class ApplicationController < ActionController::Base
     return if Rails.env.test?
 
     user_signed_in!
-    return unless user_signed_in?
 
     unless user_has_access?(feature)
-      flash.alert = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin at artsdata-support@capacoa.ca."
-      redirect_to root_path and return
+      flash[:alert] = "You do not have access to this feature. Please request access to the '#{feature}' feature from an Artsdata admin at artsdata-support@capacoa.ca."
+      halt_and_redirect
+      return
     end
 
     # Dynamically check feature flag (e.g., feature_minting_enabled, feature_refresh_entity_enabled)
     flag_name = "feature_#{feature}_enabled"
     if Rails.application.config.respond_to?(flag_name) && Rails.application.config.public_send(flag_name) == false
-      flash.alert = "The '#{feature}' feature is temporarily disabled for maintenance. Try again later."
-      redirect_back(fallback_location: root_path) and return
+      flash[:alert] = "The '#{feature}' feature is temporarily disabled for maintenance. Try again later."
+      halt_and_redirect
+      return
     end
   end
 
@@ -135,6 +138,16 @@ class ApplicationController < ActionController::Base
       return session[:teams].any? { |team| team.key?("10808270") }
     else
       false
+    end
+  end
+
+  def halt_and_redirect
+    if request.content_type == "application/json"
+      # For JSON requests (AJAX), responds with JSON redirect URL and flash instead of HTTP redirect.
+      render json: { redirect_url: request.referer || root_path }
+    else 
+      # fallback to normal redirect for non-JSON requests
+      redirect_back(fallback_location: root_path) 
     end
   end
 

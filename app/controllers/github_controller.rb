@@ -36,7 +36,7 @@ class GithubController < ApplicationController
     else
       flash.alert = "Authorized, but unable to exchange code #{code} for token."
     end
-    redirect_to root_path 
+    redirect_back(fallback_location: root_path) 
   end
 
   # List of workflows in the repository
@@ -61,7 +61,7 @@ class GithubController < ApplicationController
   def logout!
     flash.notice = "You have been logged out of GitHub."
     logout
-    redirect_to root_path
+    redirect_back(fallback_location: root_path) 
   end
 
   private  
