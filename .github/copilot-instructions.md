@@ -17,7 +17,18 @@
 
 ## Developer Workflows
 - **Setup**: `bundle install`, copy `config/master.key`, then `rails server` to run locally.
-- **Testing**: Run `rails test` for the test suite.
+- **Testing**: The CI environment requires a special setup because the system Ruby/Bundler versions differ from the project's. Use the following command to run tests:
+  ```bash
+  cd /home/runner/work/nebula/nebula
+  gem install bundler -v '~> 2.5' --user-install
+  export GEM_HOME=/tmp/nebula_gems
+  export PATH=$GEM_HOME/bin:$HOME/.local/share/gem/ruby/3.2.0/bin:$PATH
+  bundle install
+  bundle exec ruby bin/rails test <test_file>
+  ```
+  Example: `bundle exec ruby bin/rails test test/controllers/maintenance_controller_test.rb`
+  To run the full suite: `bundle exec ruby bin/rails test`
+  Note: The `ED25519_PRIVATE_KEY` env var may need to be set for credential-related tests; a throwaway key can be generated with `openssl genpkey -algorithm ed25519 | base64 -w0`.
 - **Credentials**: Edit with `EDITOR="code --wait" rails credentials:edit`.
 - **Feature Flags**: Edit `config/initializers/feature_flags.rb` to enable/disable features.
 - **GitHub App**: Ensure the Artsdata Nebula GitHub App is installed and has access to required repos for workflow integration.
