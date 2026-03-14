@@ -20,8 +20,9 @@ CONSTRUCT {
     ?qbnp rdfs:label ?qbnp_label .
     ?qbno rdfs:label ?qbno_label .
 
-    ?s ?p ?bns .
+     <<?s ?p ?bns>> ?abn ?bbn .
     ?bns ?bnp ?bno .
+    << ?bns ?bnp ?bno >> ?abn2 ?bbn2 .
     ?bnp rdfs:label ?bnp_label .
     ?bno rdfs:label ?bno_label .
 
@@ -88,7 +89,7 @@ WHERE {
 
     # blank nodes
      OPTIONAL {
-        ?s ?p ?bns .
+       <<?s ?p ?bns>> ?abn ?bbn .
         filter(isBLANK(?bns))
 
         OPTIONAL {
@@ -97,6 +98,9 @@ WHERE {
         }
 
         ?bns ?bnp ?bno .
+        OPTIONAL {
+             << ?bns ?bnp ?bno >> ?abn2 ?bbn2 .
+        }
         OPTIONAL {
             ?bnp rdfs:label ?bnp_label .
         }
