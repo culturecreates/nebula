@@ -352,7 +352,7 @@ class Entity
         graph << series.load_graph_without_triple_terms
       end
     end
- end
+  end
 
   def entity_jsonld
     if @graph.count > 0
