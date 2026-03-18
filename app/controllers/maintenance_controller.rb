@@ -117,8 +117,10 @@ class MaintenanceController < ApplicationController
   def format_display(item)
     id = item["source"].to_s.split("/").last
     claim = item["claim"] == "derived" ? "(secondary #{id})" : "(#{id})"
-    if item["object"].to_s.start_with?("_") || item["object"].to_s.include?("#")
+    if item["object"].to_s.start_with?("_") 
       "<li>#{item["predicate"].to_s.split("/").last} #{claim}:</li>"
+    elsif item["object"].to_s.include?("#")
+      "<li>#{item["predicate"].to_s.split("/").last}: <b>#{item["object"].to_s.split("#").last}</b>  #{claim}</li>"
     else
       if item["subject"].to_s.start_with?("_") || item["subject"].to_s.include?("#")
         "<li class='ms-4'>nested #{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{claim}</li>"
