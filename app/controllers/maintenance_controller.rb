@@ -61,7 +61,7 @@ class MaintenanceController < ApplicationController
         unless rescues.blank?
           formated_rescues << "<h4>Ignored sources</h5> <ul>"
           rescues.each do |rescue_item|
-            formated_rescues << "<li>#{rescue_item}</li>"
+            formated_rescues << "<li>#{ERB::Util.html_escape(rescue_item)}</li>"
           end
           formated_rescues << "</ul>"
         end
