@@ -12,7 +12,7 @@ class QueryController < ApplicationController
   #   &title=ScenePro
   def show
     params.required(:sparql)
-    permitted_params = params.permit(:sparql, :title, :description, :graph, :template, :constructs, :format, :locale)
+    permitted_params = params.permit(:sparql, :title, :description, :graph, :template, :constructs, :format, :locale, :uri)
     sparql_file = params[:sparql] 
     title =  params[:title] ||=  params[:sparql].split("/").last&.humanize&.gsub(".sparql", "")
     description = params[:description]
@@ -20,9 +20,10 @@ class QueryController < ApplicationController
     # Placeholders in SPARQL query
     graph = params[:graph]
     template = params[:template]
+    uri = params[:uri]
     construct_files = params[:constructs].split(",") if params[:constructs]
     
-    @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "TEMPLATE_PLACEHOLDER", template])
+    @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "TEMPLATE_PLACEHOLDER", template, "URI_PLACEHOLDER", uri])
 
     solutions = if !construct_files
                   begin
