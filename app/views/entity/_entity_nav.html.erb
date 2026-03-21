@@ -12,15 +12,22 @@
     >
       Visit
     </a>
+    |
     <% if user_has_access?("cms_links") %>
-      |
       <%= link_to "CMS v3", footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
       |
       <%= link_to "CMS v4", footlight_export_path(uri: @entity.entity_uri, version: "v4") %>
+      |
     <% end %>
-    |
+    <% if session[:name] %>
+      <%= link_to "Minter",
+      mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
+      class: "ms-2 me-2",
+      rel: "nofollow" %>
+      |
+    <% end %>
+    
   <% else %>
-
     <%= render partial: "entity/download_dropdown", locals: { entity: @entity } %>
     |
     <%= link_to t("entity.nav.history_logs"),
@@ -51,6 +58,17 @@
         |
       <% end %>
     <% end %>
+    <% if user_has_access?("refresh_entity") %>
+      <a 
+        rel="nofollow"
+        class="text-decoration-none ms-2 me-2"
+        data-controller="refresh-entity"
+        data-action="click->refresh-entity#refresh"
+        data-refresh-entity-uri-value="<%= @entity.entity_uri %>"
+      >Refresh</a>
+      |
+    <% end %>
+
   <% end %>
   <a
     href="<%= graphdb_link(@entity.entity_uri) %>"
@@ -59,21 +77,6 @@
     id="graphdb"
   >GraphDB</a>
   <% if session[:name] %>
-    |
-    <%= link_to "Minter",
-    mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
-    class: "ms-2 me-2",
-    rel: "nofollow" %>
-     <% if user_has_access?("refresh_entity") %>
-      |
-      <a 
-        rel="nofollow"
-        class="text-decoration-none ms-2 me-2"
-        data-controller="refresh-entity"
-        data-action="click->refresh-entity#refresh"
-        data-refresh-entity-uri-value="<%= @entity.entity_uri %>"
-      >Refresh</a>
-    <% end %>
     |
     <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete all triples in subject and object positions?" } } do |form| %>
       <%= form.hidden_field :uri, value: @entity.entity_uri %>
