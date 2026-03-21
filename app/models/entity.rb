@@ -70,7 +70,7 @@ class Entity
     elsif solution.count > 0
       return solution.first.object
     else
-      return RDF.URI("http://schema.org/Thing")
+      return RDF::URI("http://schema.org/Thing")
     end
   end
 
