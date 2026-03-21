@@ -46,10 +46,10 @@
       <% end %>
     <% end %>
   <% end %>
-   <%= link_to "History",
-    history_show_path(uri: @entity.entity_uri),
-    class: "ms-2 me-2",
-    rel: "nofollow" %>
+   <%= link_to t("entity.nav.history_logs"),
+          query_show_path(sparql: "query_controller/history_logs", title: t("entity.nav.history_log_title") + @entity.label&.value , params: { uri: @entity.entity_uri }),
+          class: "text-decoration-none ms-2 me-2",
+           rel: "nofollow" %>
   |
   <a
     href="<%= graphdb_link(@entity.entity_uri) %>"
