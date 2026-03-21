@@ -20,7 +20,13 @@
     <% end %>
     |
   <% else %>
+
     <%= render partial: "entity/download_dropdown", locals: { entity: @entity } %>
+    |
+    <%= link_to t("entity.nav.history_logs"),
+        query_show_path(sparql: "query_controller/history_logs", title: "#{t("entity.nav.history_log_title")} #{@entity.label&.value}", params: { uri: @entity.entity_uri }),
+        class: "text-decoration-none ms-2 me-2",
+        rel: "nofollow" %>
     |
     <% if user_has_access?("ranked_links") %>
       <% if ranked_link(@entity) %>
@@ -46,11 +52,6 @@
       <% end %>
     <% end %>
   <% end %>
-   <%= link_to t("entity.nav.history_logs"),
-          query_show_path(sparql: "query_controller/history_logs", title: t("entity.nav.history_log_title") + @entity.label&.value , params: { uri: @entity.entity_uri }),
-          class: "text-decoration-none ms-2 me-2",
-           rel: "nofollow" %>
-  |
   <a
     href="<%= graphdb_link(@entity.entity_uri) %>"
     class="text-decoration-none ms-2 me-2"

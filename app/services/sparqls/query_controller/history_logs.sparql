@@ -1,9 +1,15 @@
 PREFIX schema: <http://schema.org/>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 select ?log_date ?action ?source ?property ?value  where {
-    ?action_bn ado:refreshPredicate ?property ; ado:refreshObject ?value ; ado:refreshSource ?source .
+    ?action_bn ado:refreshPredicate ?property ;
+    ado:refreshObject ?value ;
+    ado:refreshSource ?subject .
+    OPTIONAL {
+        ?action_bn ado:refreshNestedSubject ?nested .
+    }
     ?log_entry ?action ?action_bn .
     ?log_entry schema:dateCreated ?log_date .
     ?log ado:hasActivityLog ?log_entry .
     ?log schema:about <URI_PLACEHOLDER> .
+    BIND(IF(BOUND(?nested), CONCAT( "Nested in ", REPLACE(STR(?subject), ".*/", "")), URI(?subject)) as ?source)
 } order by DESC(?log_date)  ?property
