@@ -82,8 +82,7 @@ class EntityController < ApplicationController
     end
   end
 
-  # show all statements from all sources
-  # including claimed statements from other sources that are not endorsed (quoted only)
+  # show all claims asserted or not
   # /entity/expand?subject=[canonical URI]&predicate=[canonical URI]&predicate_hash=[predicate.hash]
   def expand
     uri = params[:subject]
