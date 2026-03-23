@@ -187,6 +187,24 @@ class Entity
     @graph = construct_turtle(sparql)
   end
 
+  # Return: [{source_graph: graph_uri, graph_rank: rank, graph_name: name}]
+  def load_source_graph_info
+    sparql =  SparqlLoader.load('entity_model/load_source_graph_info', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    @graph = construct_turtle(sparql)
+    source_graphs = @graph.query([RDF::URI(self.entity_uri), RDF::Vocab::VOID.inDataset, nil]).objects
+    response = []
+    source_graphs.each do |g| 
+      graph = { source_graph: nil, graph_rank: nil, graph_name: nil }
+      graph[:source_graph] = g&.value
+      graph[:graph_rank] = @graph.query([g, RDF::Vocab::SCHEMA.ratingValue, nil]).objects.first&.value 
+      graph[:graph_name] = @graph.query([g, RDF::Vocab::SCHEMA.name, nil]).objects.first&.value
+      response << graph 
+    end
+    return response
+  end
+
   def load_derived_statements
     sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
       'entity_uri_placeholder', self.entity_uri

@@ -44,6 +44,14 @@
                       } %>
                     <% else %>
                       <%= display_label(a.object) %>
+                      <% if a.predicate == "http://www.w3.org/ns/prov#hadPrimarySource" || a.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"%>
+                      <turbo-frame
+                        id='source-graph-info'
+                        src="<%= source_graph_show_path(uri: a.object) %>"
+                        loading="lazy"
+                        target="_top"
+                      >
+                      <% end %>
                     <% end %>
                   </div>
                 </div>

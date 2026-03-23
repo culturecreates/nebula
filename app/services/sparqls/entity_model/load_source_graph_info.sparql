@@ -1,0 +1,19 @@
+PREFIX void: <http://rdfs.org/ns/void#>
+PREFIX schema: <http://schema.org/>
+
+construct {
+    ?id  void:inDataset ?source_graph .
+    ?source_graph schema:name ?name .
+    ?source_graph schema:ratingValue ?rank .
+}
+where {
+    values ?id {
+        <entity_uri_placeholder>
+    }
+    ?id void:inDataset ?source_graph .
+    ?source_graph schema:name ?name .
+    OPTIONAL {
+        ?source_graph schema:contentRating ?rating .
+        ?rating schema:ratingValue ?rank .
+    }
+}
