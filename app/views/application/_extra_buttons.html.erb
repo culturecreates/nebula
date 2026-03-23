@@ -2,14 +2,12 @@
 <% if subject.uri? && @show_expand_button %>
   <%= generate_action_div %>
   <div class="statement_buttons">
-
     <%= link_to entity_expand_path(subject: subject.to_s, predicate: predicate.to_s, predicate_hash: predicate_hash),  
                   data: {"turbo-frame" => "objects-frame-#{predicate_hash}"},  
                   title: "Show all datasets",
-                  id: predicate_hash, 
-                  onclick: "document.getElementById('#{predicate_hash}').firstElementChild.style.fill = 'red';" do %>
-      
-      <i class="fa-regular fa-layer-group"></i>
-    <% end %>
+                  id: predicate_hash,
+                  class: "change-on-click-link" do %>
+                    <i class="fa-regular fa-layer-group text-secondary"></i>
+                  <% end %>
   </div>
 <% end %>
