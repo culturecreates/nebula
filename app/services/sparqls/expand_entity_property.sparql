@@ -6,81 +6,47 @@ construct {
     ?event schema:name ?name .
     << ?event schema:name ?name >> ?a ?b .
      ?name ?name_pred ?name_obj .
-
-    << ?event schema:name ?name >> schema:id  ?sameAs  .
-
-    << ?event schema:name ?name >> schema:dataset ?graph .
-    ?graph rdfs:label ?graph_label .
-    
-   schema:dataset rdfs:label "Dataset"@en .
-
     ?a rdfs:label ?a_label . 
     ?b rdfs:label ?b_label . 
-
 } 
 where {
     values ?event {
         <URI_PLACEHOLDER>
     }
-    {
-        # assertions - endorsed claims
-        graph ?graph {
+     graph <http://kg.artsdata.ca/core> {
+        {
+            # assertions - endorsed claims
             ?event schema:name ?name .
             OPTIONAL {
                 ?name ?name_pred ?name_obj .
                  filter (isBLANK(?name))
             }
-        }
-        OPTIONAL {
+       
+            OPTIONAL {
+                <<?event schema:name ?name >> ?a ?b .
+                OPTIONAL {
+                    ?a rdfs:label ?a_label . 
+                }
+                OPTIONAL {
+                    ?b rdfs:label ?b_label . 
+                }
+            }
+        } UNION {
+            # claims - claims not endorsed
+        
              <<?event schema:name ?name >> ?a ?b .
-             OPTIONAL {
-                ?a rdfs:label ?a_label . 
-             }
-              OPTIONAL {
-                ?b rdfs:label ?b_label . 
-              }
-        }
-    }
-    UNION
-   
-    {
-        # claims - claims not endorsed
-        graph ?graph {       
-             <<?event schema:name ?name >> ?a ?b .
-             OPTIONAL {
-                ?a rdfs:label ?a_label . 
-             }
-              OPTIONAL {
-                ?b rdfs:label ?b_label . 
-              }
-        }
-    }
-    UNION
-    {
-        ?event  schema:sameAs ?sameAs .
-        graph ?graph {
-            ?sameAs schema:name ?name .
-             OPTIONAL {
+            OPTIONAL {
                 ?name ?name_pred ?name_obj .
                  filter (isBLANK(?name))
             }
-        }
-
-    }
-    UNION 
-    {
-        ?event  ^schema:sameAs ?sameAs .
-        graph ?graph {
-            ?sameAs schema:name ?name .
              OPTIONAL {
-               
-                ?name ?name_pred ?name_obj .
-                 filter (isBLANK(?name))
+                ?a rdfs:label ?a_label . 
             }
+            OPTIONAL {
+                ?b rdfs:label ?b_label . 
+            }
+      
+        
         }
     }
-
-     ?graph rdfs:label ?graph_label .
-
-    
 }
