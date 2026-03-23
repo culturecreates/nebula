@@ -43,7 +43,7 @@
                         graph: graph,
                       } %>
                     <% else %>
-                      <%= display_label(a.object) %>
+                      <%= display_object(a.object) %>
                       <% if a.predicate == "http://www.w3.org/ns/prov#hadPrimarySource" || a.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"%>
                       <turbo-frame
                         id='source-graph-info'
