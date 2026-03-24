@@ -4,7 +4,11 @@
 </h1>
 <turbo-frame id="source-graph-info">
     <% if @sources.count > 0 %>
-    claimed in <%= @sources.map { |source| "<a href='#{ entity_path(uri: source[:source_graph])}'>#{source[:graph_name]}</a> (#{ source[:graph_rank] ? "rank #{source[:graph_rank]}" : "no rating" })" }.join(', ').html_safe %>
+        <% if  @entity.entity_uri.ends_with?("#DataId") %>
+            deprecated
+        <% else %>
+            in graph <%= @sources.map { |source| "<a href='#{ entity_path(uri: source[:source_graph])}'>#{source[:graph_name]}</a> (#{ source[:graph_rank] ? "rank #{source[:graph_rank]}" : "no rating" })" }.join(', ').html_safe %>
+        <% end %>
     <% end %>
 </turbo-frame>
 
