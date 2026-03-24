@@ -10,7 +10,14 @@
       </h1>
       <%= render partial: "shared/clipboard", locals: { uri: @entity.entity_uri } %>
       <%= render partial: "entity_nav" %>
-      <%= "Non-authoritative".html_safe unless is_authoritative(@entity.entity_uri) %>
+      <% if !is_authoritative(@entity.entity_uri) %>
+        <%= "Non-authoritative".html_safe %>
+        <turbo-frame    id='source-graph-info'
+                        src="<%= source_graph_show_path(uri: @entity.entity_uri) %>"
+                        loading="lazy"
+                        target="_top">
+        </turbo-frame>
+      <% end %>
     </div>
     <% if @entity.image.present? %>
       <a href="<%= @entity.image %>"><img
