@@ -3,7 +3,7 @@ require 'timeout'
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
 
-  # Timeout to expand Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
+  # Timeout to dereference Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
   WIKIDATA_QUERY_TIMEOUT = 2 # seconds
 
   def initialize(**h) 
