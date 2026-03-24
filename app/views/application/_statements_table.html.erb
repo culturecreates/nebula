@@ -7,7 +7,7 @@
   } %>
   <% properties = triples.map { |s| s.predicate }.uniq %>
   <% properties.each do |prop| %>
-
+    <% subjet_predicate_hash = make_hash(triples.first&.subject.to_s, prop.to_s) %>
     <div class="statement">
       <div class="statement-predicate">
         <%= display_label(prop) %>
@@ -16,12 +16,11 @@
         <%= render partial: "statement_objects",
         locals: {
           triples: triples.select { |s| s.predicate == prop },
-          predicate_hash: prop.to_s.hash,
           graph: graph,
         } %>
-        <div id='property-claims-div-<%= prop.to_s.hash %>' class="d-none">
+        <div id='property-claims-div-<%= subjet_predicate_hash %>' class="d-none">
           <turbo-frame
-            id='property-claims-<%= prop.to_s.hash %>'
+            id='property-claims-<%= subjet_predicate_hash %>'
             src="<%= entity_property_claims_path(subject: @entity.entity_uri, predicate: prop.to_s) %>"
             loading="lazy"
             target="_top"
@@ -33,7 +32,7 @@
       locals: {
         subject: triples.first.subject,
         predicate: prop,
-        predicate_hash: prop.to_s.hash,
+        subject_predicate_hash: subjet_predicate_hash,
       } %>
       
     </div>

@@ -1,7 +1,7 @@
 
 <a><%= use_prefix(@entity.entity_uri) %></a>
 
-<turbo-frame id="property-claims-<%= @predicate.to_s.hash %>">
+<turbo-frame id="property-claims-<%= make_hash(@entity.entity_uri, @predicate.to_s) %>">
     <div class="bg-info-subtle">
     <% if @entity.graph.count > 0 %>
         <%= render partial: "statement_objects",

@@ -1,9 +1,9 @@
-<!-- Inputs: subject RDF::URI, predicate RDF::URI, predicate_hash -->
-<% if subject.uri? && subject.value.starts_with?("http://kg.artsdata.ca") && @show_expand_button %>
+<!-- Inputs: subject RDF::URI, predicate RDF::URI, subject_predicate_hash -->
+<% if subject.uri? && subject.value.starts_with?("http://kg.artsdata.ca") && @show_all_claims_button %>
   <%= generate_action_div %>
   <div class="statement_buttons">
-    <div class="change-on-click" data-predicate-hash="<%= predicate_hash %>">
-      <i class="fa-regular fa-layer-group text-secondary"></i>
+    <div class="change-on-click" data-predicate-hash="<%= subject_predicate_hash %>">
+      <i class="fa-regular fa-layer-group text-secondary" title="Show all claims"></i>
     </div>
   </div>
 <% end %>
