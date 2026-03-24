@@ -1,0 +1,26 @@
+
+<a><%= use_prefix(@entity.entity_uri) %></a>
+
+<turbo-frame id="property-claims-<%= @predicate.to_s.hash %>">
+    <div class="bg-info-subtle">
+    <% if @entity.graph.count > 0 %>
+        <%= render partial: "statement_objects",
+        locals: {
+            triples: @entity.graph.query([RDF.URI(@entity.entity_uri), @predicate, nil]),
+            graph: @entity.graph,
+        } %>
+    <% else %>
+        <p class="p-3">No additional claims.</p>
+    <% end %>
+    </div>
+</turbo-frame>
+
+<br>
+<br>
+<pre>
+  <code>
+    <% if  @entity.graph.count > 0 %>
+      <%= @entity.graph.dump(:jsonld) %>
+    <% end %>
+  </code>
+</pre>

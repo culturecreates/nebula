@@ -30,10 +30,9 @@ a:hover {
 .statement {
   display: flex;
   flex-direction: row;
-  background-color: rgb(246, 243, 243);
-  border-color: rgb(191, 190, 190);
   border-width: 1px;
   border-style: solid;
+  border-color: #bfbebe;
   margin: 5px 0px;
 }
 
@@ -44,6 +43,7 @@ a:hover {
 }
 
 .statement-predicate {
+  background-color: rgb(246, 243, 243);
   width: 20%;
   word-break:break-all;
   flex-shrink: 0;
@@ -55,16 +55,13 @@ a:hover {
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: white;
   overflow: hidden;
 
 }
 
 .statement-object {
-
   display: flex;
   flex-direction: column;
-  background-color: white;
   padding: 15px;
   border-color: rgb(191, 190, 190);
   border-width: 0.5px;
@@ -93,6 +90,7 @@ a:hover {
 
 .accordion-body {
   padding: 0;
+  background-color: white;
 }
 
 .accordion-item {

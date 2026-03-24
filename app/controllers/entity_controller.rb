@@ -92,6 +92,13 @@ class EntityController < ApplicationController
     @entity.expand_entity_property(predicate: @predicate)
   end
 
+  def property_claims
+    uri = params[:subject]
+    @predicate = RDF::URI(params[:predicate])
+    @entity = Entity.new(entity_uri: uri)
+    @entity.property_claims(predicate: @predicate)
+  end
+
   # unsupported claims (quoted only)
   # /entity/unsupported_claims?uri=[canonical URI]
   def unsupported_claims

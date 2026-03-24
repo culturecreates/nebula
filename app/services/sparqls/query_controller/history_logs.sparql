@@ -11,5 +11,5 @@ select ?log_date ?action ?source ?property ?value  where {
     ?log_entry schema:dateCreated ?log_date .
     ?log ado:hasActivityLog ?log_entry .
     ?log schema:about <URI_PLACEHOLDER> .
-    BIND(IF(BOUND(?nested), CONCAT( "Nested in ", REPLACE(STR(?subject), ".*/", "")), URI(?subject)) as ?source)
+    BIND(IF(BOUND(?nested), CONCAT( str(?nested), " nested in ", REPLACE(STR(?subject), ".*/", "")), URI(?subject)) as ?source)
 } order by DESC(?log_date)  ?property

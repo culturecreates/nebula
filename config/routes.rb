@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
     get "entity/expand", to: "entity#expand"
+    get "entity/property_claims", to: "entity#property_claims"
     get "dereference/card", to: "dereference#card"
     get "dereference/external", to: "dereference#external"
     get "query/show", to: "query#show"

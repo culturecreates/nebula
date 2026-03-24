@@ -12,18 +12,30 @@
       <div class="statement-predicate">
         <%= display_label(prop) %>
       </div>
-      <%= render partial: "statement_objects",
-      locals: {
-        triples: triples.select { |s| s.predicate == prop },
-        predicate_hash: prop.to_s.hash,
-        graph: graph,
-      } %>
+      <div class="d-flex flex-column w-100">
+        <%= render partial: "statement_objects",
+        locals: {
+          triples: triples.select { |s| s.predicate == prop },
+          predicate_hash: prop.to_s.hash,
+          graph: graph,
+        } %>
+        <div id='property-claims-div-<%= prop.to_s.hash %>' class="d-none">
+          <turbo-frame
+            id='property-claims-<%= prop.to_s.hash %>'
+            src="<%= entity_property_claims_path(subject: @entity.entity_uri, predicate: prop.to_s) %>"
+            loading="lazy"
+            target="_top"
+          >
+        </div>
+        </turbo-frame>
+      </div>
       <%= render partial: "extra_buttons",
       locals: {
         subject: triples.first.subject,
         predicate: prop,
         predicate_hash: prop.to_s.hash,
       } %>
+      
     </div>
   <% end %>
   <%= if triples.first&.subject&.node?

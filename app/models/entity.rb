@@ -172,8 +172,8 @@ class Entity
   end
 
 
-  def expand_entity_property(predicate:)
-    sparql =  SparqlLoader.load('expand_entity_property', [
+  def property_claims(predicate:)
+    sparql =  SparqlLoader.load('entity_model/property_claims', [
       'URI_PLACEHOLDER', self.entity_uri,
       'schema:name', "<#{predicate}>"
     ])

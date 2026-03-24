@@ -10,7 +10,15 @@ where {
     values ?id {
         <entity_uri_placeholder>
     }
-    ?id void:inDataset ?source_graph .
+    {
+        ?id void:inDataset ?source_graph .
+    } UNION {
+        graph ?source_graph {
+            ?id a ?type .
+        }
+
+    }
+    
     ?source_graph schema:name ?name .
     OPTIONAL {
         ?source_graph schema:contentRating ?rating .
