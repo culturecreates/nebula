@@ -8,10 +8,10 @@
       style="--bs-accordion-btn-padding-y: 5px;--bs-accordion-border-width: 0px;"
       id="accordionFlushExample"
     >
-      <div class="accordion-item">
+      <div class="accordion-item bg-transparent">
         <h6 class="accordion-header">
           <button
-            class="accordion-button btn-sm collapsed"
+            class="accordion-button btn-sm collapsed bg-transparent"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#collapse<%=random%>"
@@ -43,12 +43,20 @@
                         graph: graph,
                       } %>
                     <% else %>
-                      <%= display_label(a.object) %>
+                      <%= display_object(a.object) %>
+                      <% if a.predicate == "http://www.w3.org/ns/prov#hadPrimarySource" || a.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"%>
+                      <turbo-frame
+                        id='source-graph-info'
+                        src="<%= source_graph_show_path(uri: a.object) %>"
+                        loading="lazy"
+                        target="_top"
+                      >
+                      </turbo-frame>
+                      <% end %>
                     <% end %>
                   </div>
                 </div>
               </div>
-
             </div>
           <% end %>
         </div>

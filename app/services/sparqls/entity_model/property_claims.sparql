@@ -1,0 +1,38 @@
+PREFIX adr: <http://kg.artsdata.ca/resource/>
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+construct {
+    ?event schema:name ?name .
+    << ?event schema:name ?name >> ?a ?b .
+     ?name ?name_pred ?name_obj .
+    ?a rdfs:label ?a_label . 
+    ?b rdfs:label ?b_label . 
+} 
+where {
+    values ?event {
+        <URI_PLACEHOLDER>
+    }
+     graph <http://kg.artsdata.ca/core> {
+    
+        # claims - claims not endorsed
+    
+        <<?event schema:name ?name >> ?a ?b .
+        FILTER NOT EXISTS {
+           ?event schema:name ?name .
+        }
+        OPTIONAL {
+            ?name ?name_pred ?name_obj .
+                filter (isBLANK(?name))
+        }
+            OPTIONAL {
+            ?a rdfs:label ?a_label . 
+        }
+        OPTIONAL {
+            ?b rdfs:label ?b_label . 
+        }
+      
+        
+        
+    }
+}

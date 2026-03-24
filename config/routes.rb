@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     delete "entity", to: "entity#destroy", as: :destroy_entity
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
-    get "entity/expand", to: "entity#expand"
+    get "entity/property_claims", to: "entity#property_claims"
     get "dereference/card", to: "dereference#card"
     get "dereference/external", to: "dereference#external"
     get "query/show", to: "query#show"
@@ -21,7 +21,7 @@ Rails.application.routes.draw do
     get "reconcile/query", to: "reconcile#query"
     get "reconcile/batch", to: "reconcile#batch"
     get "validate", to: "validate#show"
-    get "history/show", to: "history#show"
+    get "source_graph/show", to: "source_graph#show"
     get "controlled_vocabularies", to: "controlled_vocabularies#index"
     get "job_status", to: "job_status#index"
 

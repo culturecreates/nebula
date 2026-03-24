@@ -151,6 +151,9 @@ module ApplicationHelper
     sub_graph.dump(:jsonld, standard_prefixes: true)
  
   end
+
+  def make_hash(*args)
+    args.join.to_s.hash
+  end
         
-    
 end

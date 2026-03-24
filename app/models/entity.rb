@@ -3,7 +3,7 @@ require 'timeout'
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
 
-  # Timeout to expand Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
+  # Timeout to dereference Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
   WIKIDATA_QUERY_TIMEOUT = 2 # seconds
 
   def initialize(**h) 
@@ -172,8 +172,8 @@ class Entity
   end
 
 
-  def expand_entity_property(predicate:)
-    sparql =  SparqlLoader.load('expand_entity_property', [
+  def property_claims(predicate:)
+    sparql =  SparqlLoader.load('entity_model/property_claims', [
       'URI_PLACEHOLDER', self.entity_uri,
       'schema:name', "<#{predicate}>"
     ])
@@ -185,6 +185,24 @@ class Entity
       'entity_uri_placeholder', self.entity_uri
     ])
     @graph = construct_turtle(sparql)
+  end
+
+  # Return: [{source_graph: graph_uri, graph_rank: rank, graph_name: name}]
+  def load_source_graph_info
+    sparql =  SparqlLoader.load('entity_model/load_source_graph_info', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    @graph = construct_turtle(sparql)
+    source_graphs = @graph.query([RDF::URI(self.entity_uri), RDF::Vocab::VOID.inDataset, nil]).objects
+    response = []
+    source_graphs.each do |g| 
+      graph = { source_graph: nil, graph_rank: nil, graph_name: nil }
+      graph[:source_graph] = g&.value
+      graph[:graph_rank] = @graph.query([g, RDF::Vocab::SCHEMA.ratingValue, nil]).objects.first&.value 
+      graph[:graph_name] = @graph.query([g, RDF::Vocab::SCHEMA.name, nil]).objects.first&.value
+      response << graph 
+    end
+    return response
   end
 
   def load_derived_statements

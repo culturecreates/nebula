@@ -1,7 +1,5 @@
-<!-- Inputs: triples = class RDF::Solutions, predicate_hash = unique turbo
-frame id, graph = class RDF::Graph -->
+<!-- Inputs: triples = class RDF::Solutions, graph = class RDF::Graph -->
 <div class="statement-objects">
-  <turbo-frame id="objects-frame-<%= predicate_hash %>">
     <% triples.each do |triple| %>
       <% setup_action(triple.object, triple.predicate) %>
       <div class="statement-object">
@@ -48,5 +46,5 @@ frame id, graph = class RDF::Graph -->
         } %>
       </div>
     <% end %>
-  </turbo-frame>
+
 </div>

@@ -1,5 +1,4 @@
 class EntityController < ApplicationController
-  before_action :user_signed_in?, only: [:expand] 
   before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
 
   # Show an entity's asserted statements
@@ -66,7 +65,7 @@ class EntityController < ApplicationController
         if @entity.errors.any?
           flash.alert = @entity.errors.join(", ")
         end
-        @show_expand_button = true if user_signed_in?
+        @show_all_claims_button = true if user_signed_in?
         @show_add_sameas_button = true if user_signed_in?
         @target_types = [
      #     RDF::Vocab::SCHEMA.Event, 
@@ -82,18 +81,14 @@ class EntityController < ApplicationController
     end
   end
 
-  # show all statements from all sources
-  # including claimed statements from other sources that are not endorsed (quoted only)
-  # /entity/expand?subject=[canonical URI]&predicate=[canonical URI]&predicate_hash=[predicate.hash]
-  def expand
+  def property_claims
     uri = params[:subject]
     @predicate = RDF::URI(params[:predicate])
-    @predicate_hash = params[:predicate_hash]
     @entity = Entity.new(entity_uri: uri)
-    @entity.expand_entity_property(predicate: @predicate)
+    @entity.property_claims(predicate: @predicate)
   end
 
-  # unsupported claims (quoted only)
+  # claims (quoted triples) for properties that have no assertions (triples)
   # /entity/unsupported_claims?uri=[canonical URI]
   def unsupported_claims
     uri = params[:uri]

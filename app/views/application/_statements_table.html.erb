@@ -7,23 +7,35 @@
   } %>
   <% properties = triples.map { |s| s.predicate }.uniq %>
   <% properties.each do |prop| %>
-
+    <% subject_predicate_hash = make_hash(triples.first&.subject.to_s, prop.to_s) %>
     <div class="statement">
       <div class="statement-predicate">
         <%= display_label(prop) %>
       </div>
-      <%= render partial: "statement_objects",
-      locals: {
-        triples: triples.select { |s| s.predicate == prop },
-        predicate_hash: prop.to_s.hash,
-        graph: graph,
-      } %>
+      <div class="d-flex flex-column w-100">
+        <%= render partial: "statement_objects",
+        locals: {
+          triples: triples.select { |s| s.predicate == prop },
+          graph: graph,
+        } %>
+        <div id='property-claims-div-<%= subject_predicate_hash %>' class="d-none">
+          <turbo-frame
+            id='property-claims-<%= subject_predicate_hash %>'
+            src="<%= entity_property_claims_path(subject: triples.first.subject, predicate: prop.to_s) %>"
+            loading="lazy"
+            target="_top"
+          >
+        
+          </turbo-frame>
+        </div>
+      </div>
       <%= render partial: "extra_buttons",
       locals: {
         subject: triples.first.subject,
         predicate: prop,
-        predicate_hash: prop.to_s.hash,
+        subject_predicate_hash: subject_predicate_hash,
       } %>
+      
     </div>
   <% end %>
   <%= if triples.first&.subject&.node?
