@@ -158,7 +158,7 @@ export default class extends Controller {
     const path = d3.geoPath().projection(projection)
 
     const maxCount = Math.max(...Object.values(counts), 1)
-    const colorScale = d3.scaleSequential(d3.interpolateBlues)
+    const colorScale = d3.scaleSequential(t => d3.interpolateBlues(0.2 + t * 0.8))
       .domain([0, maxCount])
 
     const svg = d3.select(this.mapTarget)
