@@ -96,8 +96,10 @@ WHERE {
             ?shacl_bn2 sh:focusNode ?bns ; 
                 ?shacl_bn2_pred ?shal_bn2_obj .
         }
-
-        ?bns ?bnp ?bno .
+        OPTIONAL {
+             ?bns ?bnp ?bno .
+        }
+       
         OPTIONAL {
              << ?bns ?bnp ?bno >> ?abn2 ?bbn2 .
         }
