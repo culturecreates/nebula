@@ -2,37 +2,130 @@ PREFIX adr: <http://kg.artsdata.ca/resource/>
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
 construct {
-    ?event schema:name ?name .
-    << ?event schema:name ?name >> ?a ?b .
-     ?name ?name_pred ?name_obj .
-    ?a rdfs:label ?a_label . 
-    ?b rdfs:label ?b_label . 
+   ?s ?p ?o  .
+
+    <<?s ?p ?o>> ?a ?b .
+    ?p rdfs:label ?prop_label .
+    ?o rdfs:label ?obj_label, ?obj_name .
+    ?a rdfs:label ?a_label .
+    ?b rdfs:label ?b_label .
+
+    <<?s ?p ?o>> ?a ?qbns .
+    ?qbns ?qbnp ?qbno .
+    ?qbnp rdfs:label ?qbnp_label .
+    ?qbno rdfs:label ?qbno_label .
+
+     <<?s ?p ?bns>> ?abn ?bbn .
+    ?bns ?bnp ?bno .
+    << ?bns ?bnp ?bno >> ?abn2 ?bbn2 .
+    ?bnp rdfs:label ?bnp_label .
+    ?bno rdfs:label ?bno_label .
+
+    ?bns ?bnp ?2bns .
+    ?2bns ?2bnp ?2bno .
+    ?2bnp rdfs:label ?2bnp_label .  
+    ?2bno rdfs:label ?2bno_label .
+
+
+    ?shacl_bn sh:focusNode ?s ; 
+        ?shacl_pred ?shal_obj .
+
+    ?shacl_bn2 sh:focusNode ?bns ; 
+        ?shacl_bn2_pred ?shal_bn2_obj .
 } 
 where {
-    values ?event {
+    values ?s {
         <URI_PLACEHOLDER>
     }
-     graph <http://kg.artsdata.ca/core> {
-    
-        # claims - claims not endorsed
-    
-        <<?event schema:name ?name >> ?a ?b .
-        FILTER NOT EXISTS {
-           ?event schema:name ?name .
-        }
-        OPTIONAL {
-            ?name ?name_pred ?name_obj .
-                filter (isBLANK(?name))
-        }
-            OPTIONAL {
-            ?a rdfs:label ?a_label . 
-        }
-        OPTIONAL {
-            ?b rdfs:label ?b_label . 
-        }
-      
-        
-        
+    values ?p {
+        <PROPERTY_PLACEHOLDER>
     }
+    graph <http://kg.artsdata.ca/core> {
+    
+        # main triple labels
+        OPTIONAL {
+            ?o rdfs:label ?obj_label .
+        }
+        OPTIONAL {
+            ?p rdfs:label ?prop_label .
+        }
+        OPTIONAL {
+            ?o schema:name ?obj_name .
+        }
+
+        # quoted triple
+        <<?s ?p ?o>> ?a ?b .
+
+        FILTER NOT EXISTS {?s ?p ?o . }
+        
+    
+        # quoted triple labels
+        OPTIONAL {
+            <<?s ?p ?o>> ?a ?b .
+            ?a rdfs:label ?a_label .
+        }
+        OPTIONAL {
+            <<?s ?p ?o>> ?a ?b .
+            ?b rdfs:label ?b_label .
+        }
+        # quoted triple blank nodes
+        OPTIONAL {
+            <<?s ?p ?o>> ?a ?qbns .
+            filter(isBLANK(?qbns))
+
+            ?qbns ?qbnp ?qbno .
+        
+            OPTIONAL {
+                ?qbnp rdfs:label ?qbnp_label .
+            }
+            OPTIONAL {
+                ?qbno rdfs:label ?qbno_label .
+            }
+            
+        }
+
+        # blank nodes
+        OPTIONAL {
+            <<?s ?p ?bns>> ?abn ?bbn .
+            filter(isBLANK(?bns))
+            FILTER NOT EXISTS {?s ?p ?bns . }
+
+            OPTIONAL {
+                ?shacl_bn2 sh:focusNode ?bns ; 
+                    ?shacl_bn2_pred ?shal_bn2_obj .
+            }
+
+            OPTIONAL {
+                ?bns ?bnp ?bno .
+            }
+            
+            OPTIONAL {
+                << ?bns ?bnp ?bno >> ?abn2 ?bbn2 .
+            }
+            OPTIONAL {
+                ?bnp rdfs:label ?bnp_label .
+            }
+            OPTIONAL {
+                ?bno rdfs:label ?bno_label .
+            }
+
+            # second level blank nodes
+            OPTIONAL {
+                ?bns ?bnp ?2bns .
+                filter(isBLANK(?2bns))
+
+                ?2bns ?2bnp ?2bno .
+                OPTIONAL {
+                    ?2bnp rdfs:label ?2bnp_label .
+                }
+                OPTIONAL {
+                    ?2bno rdfs:label ?2bno_label .
+                }
+            }
+        }
+        
+   }
 }

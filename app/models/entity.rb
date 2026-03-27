@@ -175,7 +175,7 @@ class Entity
   def property_claims(predicate:)
     sparql =  SparqlLoader.load('entity_model/property_claims', [
       'URI_PLACEHOLDER', self.entity_uri,
-      'schema:name', "<#{predicate}>"
+      'PROPERTY_PLACEHOLDER', predicate
     ])
     @graph = construct_turtle(sparql)
   end
