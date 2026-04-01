@@ -13,10 +13,14 @@ require 'digest'
 class BotVerificationController < ApplicationController
   # Load Private Ed25519 Key once
   PRIVATE_KEY_ENCODED = ENV['ED25519_PRIVATE_KEY']
-  raise "ED25519_PRIVATE_KEY is not set" if PRIVATE_KEY_ENCODED.nil?
+  raise "ED25519_PRIVATE_KEY is not set" if PRIVATE_KEY_ENCODED.nil? && !Rails.env.test?
 
-  PRIVATE_KEY_PEM = Base64.decode64(PRIVATE_KEY_ENCODED)    # Read private key PEM file
-  PRIVATE_KEY = OpenSSL::PKey.read(PRIVATE_KEY_PEM)         # Parse PEM into OpenSSL key object
+  PRIVATE_KEY = if PRIVATE_KEY_ENCODED
+                  OpenSSL::PKey.read(Base64.decode64(PRIVATE_KEY_ENCODED))
+                else
+                  OpenSSL::PKey.generate_key('ED25519') # fallback for test environment
+                end
+  PRIVATE_KEY_PEM = PRIVATE_KEY.private_to_pem          # PEM representation of private key
 
   # Extract Ed25519 Public 'x' coordinate for JWK
   def self.extract_ed25519_x(private_key)

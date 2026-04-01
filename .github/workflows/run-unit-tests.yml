@@ -15,6 +15,10 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Generate test ED25519 key
+        run: |
+          TEST_KEY=$(ruby -e "require 'openssl'; require 'base64'; k = OpenSSL::PKey.generate_key('ED25519'); print Base64.strict_encode64(k.private_to_pem)")
+          echo "ED25519_PRIVATE_KEY=$TEST_KEY" >> $GITHUB_ENV
+
       - name: Run tests
         run: bundle exec rails test
-        
