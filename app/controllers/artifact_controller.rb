@@ -74,18 +74,18 @@ class ArtifactController < ApplicationController
   # DELETE /artifact?artifactUri=
   def destroy
     @artifact_uri = params[:artifactUri]
+    @graph_uri = params[:graph]
     databus_service = DatabusService.new(@artifact_uri, user_uri)
     if databus_service.delete_artifact
-      flash.notice = "Deleted all versions of artifact '#{@artifact_uri}' in Databus."
+      delete_graph_from_kg(@graph_uri)
+      flash.notice = "Deleted artifact '#{@artifact_uri}' and its graph from Artsdata."
       redirect_to artifact_index_path
     else
       flash.alert = "Could not delete '#{@artifact_uri}' : #{databus_service.errors}."
       redirect_back(fallback_location: root_path)
     end
-    
   end
 
-  
   def new
     @artifact = Artifact.new
   end
@@ -107,5 +107,32 @@ class ArtifactController < ApplicationController
   # Only allow a list of trusted parameters through.
   def artifact_params
     params.permit(:name, :description, :type, :sheet_url, :webpage_url, :link_identifier)
+  end
+
+  def delete_graph_from_kg(graph_uri)
+    return if graph_uri.blank?
+
+    begin
+      parsed = URI.parse(graph_uri.to_s)
+      unless parsed.is_a?(URI::HTTP) && parsed.host.present? &&
+             graph_uri.start_with?("http://kg.artsdata.ca/", "https://kg.artsdata.ca/")
+        raise URI::InvalidURIError, "invalid or disallowed graph URI"
+      end
+    rescue URI::InvalidURIError
+      flash.alert = "Could not delete graph: invalid URI."
+      return
+    end
+
+    begin
+      ArtsdataGraph::SparqlService.update_client.update("DROP SILENT GRAPH <#{graph_uri}>")
+      metadata_query = <<~SPARQL
+        WITH <http://kg.artsdata.ca/Graph_Ranking>
+        DELETE { <#{graph_uri}> ?p ?o . }
+        WHERE  { <#{graph_uri}> ?p ?o . }
+      SPARQL
+      ArtsdataGraph::SparqlService.update_client.update(metadata_query)
+    rescue StandardError => e
+      flash.alert = "#{flash[:alert]} Could not delete graph '#{graph_uri}': #{e.message}".strip
+    end
   end
 end

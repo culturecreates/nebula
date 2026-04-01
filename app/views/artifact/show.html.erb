@@ -31,8 +31,9 @@
 
     <%= link_to "edit", artifact_path(@artifact), class: "btn btn-secondary disabled" %>
 
-    <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}?" } } do |form| %>
+    <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}? This will also delete the corresponding graph from the Artsdata Knowledge Graph." } } do |form| %>
       <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+      <%= form.hidden_field :graph, value: @artifact.graph %>
       <%= form.submit "delete",
                   class: "btn btn-danger",
                   data: {
