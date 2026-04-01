@@ -31,24 +31,14 @@
 
     <%= link_to "edit", artifact_path(@artifact), class: "btn btn-secondary disabled" %>
 
-    <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}?" } } do |form| %>
+    <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}? This will also delete the corresponding graph from the Artsdata Knowledge Graph." } } do |form| %>
       <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+      <%= form.hidden_field :graph, value: @artifact.graph %>
       <%= form.submit "delete",
                   class: "btn btn-danger",
                   data: {
                     disable_with: "Deleting...",
                   } %>
-    <% end %>
-
-    <% if user_has_access?("delete_graph") %>
-      <%= form_with url: delete_graph_artifact_index_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete graph data for #{@artifact.artifact_id} from the Artsdata Knowledge Graph? This cannot be undone." } } do |form| %>
-        <%= form.hidden_field :graph, value: @artifact.graph %>
-        <%= form.submit "delete graph",
-                    class: "btn btn-danger",
-                    data: {
-                      disable_with: "Deleting...",
-                    } %>
-      <% end %>
     <% end %>
 
   </div>

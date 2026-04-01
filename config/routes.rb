@@ -32,7 +32,6 @@ Rails.application.routes.draw do
     resources :artifact do 
       collection do
         post :push_latest,  :toggle_auto_minting
-        delete :delete_graph
       end
     end
 
