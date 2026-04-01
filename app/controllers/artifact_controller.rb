@@ -127,8 +127,17 @@ class ArtifactController < ApplicationController
       ArtsdataGraph::SparqlService.update_client.update("DROP SILENT GRAPH <#{graph_uri}>")
       metadata_query = <<~SPARQL
         WITH <http://kg.artsdata.ca/Graph_Ranking>
-        DELETE { <#{graph_uri}> ?p ?o . }
-        WHERE  { <#{graph_uri}> ?p ?o . }
+        DELETE { 
+          <#{graph_uri}> ?p ?o . 
+          ?o ?bnp ?bno .
+        }
+        WHERE  { 
+          <#{graph_uri}> ?p ?o . 
+          OPTIONAL {
+            ?o ?bnp ?bno .
+            FILTER(isBlank(?o)) 
+          }
+        }
       SPARQL
       ArtsdataGraph::SparqlService.update_client.update(metadata_query)
     rescue StandardError => e
