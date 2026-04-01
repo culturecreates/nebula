@@ -153,7 +153,7 @@ module ApplicationHelper
   end
 
   def make_hash(*args)
-    args.join.to_s.hash
+    "f#{Digest::SHA256.hexdigest(args.join.to_s)[0, 16]}"
   end
         
 end

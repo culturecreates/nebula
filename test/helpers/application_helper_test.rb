@@ -29,5 +29,19 @@ class ApplicationHelperTest < ActiveSupport::TestCase
     assert_equal expected, JSON.parse(output)
   end
 
+  test "make_hash returns a deterministic string starting with 'f'" do
+    result1 = make_hash("http://example.com/entity", "http://schema.org/name")
+    result2 = make_hash("http://example.com/entity", "http://schema.org/name")
+    assert_equal result1, result2, "make_hash should return the same value for the same input"
+    assert result1.start_with?("f"), "make_hash result should start with 'f' for a valid DOM id"
+    assert_match(/\A[a-z0-9]+\z/, result1, "make_hash result should contain only lowercase alphanumeric characters")
+  end
+
+  test "make_hash returns different values for different inputs" do
+    result1 = make_hash("http://example.com/entity", "http://schema.org/name")
+    result2 = make_hash("http://example.com/entity", "http://schema.org/description")
+    assert_not_equal result1, result2, "make_hash should return different values for different inputs"
+  end
+
   # Add more tests for ApplicationHelper methods here
 end
