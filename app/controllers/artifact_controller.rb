@@ -1,5 +1,6 @@
 class ArtifactController < ApplicationController
   before_action :authenticate_databus_user! # ensure user has permissions
+  before_action :check_delete_graph_access, only: [:delete_graph]
 
   def index
     @databus_account = session[:accounts].first
@@ -85,7 +86,44 @@ class ArtifactController < ApplicationController
     
   end
 
-  
+  # DELETE /artifact/delete_graph?graph=
+  def delete_graph
+    @graph_uri = params[:graph]
+
+    # Validate URI to prevent SPARQL injection: require a valid http(s) URI
+    # under the expected artsdata.ca host.
+    begin
+      parsed = URI.parse(@graph_uri.to_s)
+      unless parsed.is_a?(URI::HTTP) && parsed.host.present?
+        raise URI::InvalidURIError, "must be an http/https URI"
+      end
+    rescue URI::InvalidURIError
+      flash.alert = "Invalid graph URI format."
+      return redirect_back(fallback_location: artifact_index_path)
+    end
+
+    unless @graph_uri.start_with?("http://kg.artsdata.ca/", "https://kg.artsdata.ca/")
+      flash.alert = "Invalid graph URI: only graphs under kg.artsdata.ca may be deleted."
+      return redirect_back(fallback_location: artifact_index_path)
+    end
+
+    begin
+      # Drop the named graph from the knowledge graph
+      ArtsdataGraph::SparqlService.update_client.update("DROP SILENT GRAPH <#{@graph_uri}>")
+      # Remove any metadata about the graph stored in Graph_Ranking
+      metadata_query = <<~SPARQL
+        WITH <http://kg.artsdata.ca/Graph_Ranking>
+        DELETE { <#{@graph_uri}> ?p ?o . }
+        WHERE  { <#{@graph_uri}> ?p ?o . }
+      SPARQL
+      ArtsdataGraph::SparqlService.update_client.update(metadata_query)
+      flash.notice = "Deleted graph '#{@graph_uri}' from the Artsdata Knowledge Graph."
+    rescue StandardError => e
+      flash.alert = "Could not delete graph '#{@graph_uri}': #{e.message}"
+    end
+    redirect_back(fallback_location: artifact_index_path)
+  end
+
   def new
     @artifact = Artifact.new
   end
@@ -107,5 +145,9 @@ class ArtifactController < ApplicationController
   # Only allow a list of trusted parameters through.
   def artifact_params
     params.permit(:name, :description, :type, :sheet_url, :webpage_url, :link_identifier)
+  end
+
+  def check_delete_graph_access
+    ensure_access("delete_graph")
   end
 end

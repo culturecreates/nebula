@@ -40,6 +40,17 @@
                   } %>
     <% end %>
 
+    <% if user_has_access?("delete_graph") %>
+      <%= form_with url: delete_graph_artifact_index_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete graph data for #{@artifact.artifact_id} from the Artsdata Knowledge Graph? This cannot be undone." } } do |form| %>
+        <%= form.hidden_field :graph, value: @artifact.graph %>
+        <%= form.submit "delete graph",
+                    class: "btn btn-danger",
+                    data: {
+                      disable_with: "Deleting...",
+                    } %>
+      <% end %>
+    <% end %>
+
   </div>
   <!-- Toggle Auto-Minting Button -->
   <div class="card mb-4">
