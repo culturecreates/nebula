@@ -11,17 +11,17 @@ where {
     }
     {
         ?id void:inDataset ?source_graph .
-    } UNION {
+        ?source_graph schema:contentRating ?rating .
+        ?rating schema:ratingValue ?rank .
+    } 
+    UNION 
+    {
         graph ?source_graph {
             ?id a ?type .
         }
     }
     OPTIONAL {
         ?source_graph schema:name ?name .
-    }
-    OPTIONAL {
-        ?source_graph schema:contentRating ?rating .
-        ?rating schema:ratingValue ?rank .
     }
     BIND(COALESCE(?name, str(?source_graph)) as ?picked_name)
 }
