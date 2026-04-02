@@ -5,7 +5,7 @@ class MaintenanceController < ApplicationController
     artsdata_uri = params[:uri]
     dryrun = ActiveModel::Type::Boolean.new.cast(params[:dryrun])
     publisher = user_uri
-    timeout_seconds = 10
+    timeout_seconds = 15
     # Call Artsdata API to refresh entity data
     api_endpoint = Rails.application.config.artsdata_maintenance_endpoint + "/refresh_entity"
     begin
