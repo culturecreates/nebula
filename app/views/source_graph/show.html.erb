@@ -7,7 +7,7 @@
             <% if  @entity.entity_uri.ends_with?("#DataId") %>
                 deprecated
             <% else %>
-                in graph <%= safe_join(
+                in dataset <%= safe_join(
                 @sources.map do |source|
                     link = link_to(source[:graph_name], entity_path(uri: source[:source_graph]))
                     rank_text = " (#{ source[:graph_rank] ? "rank #{source[:graph_rank]}" : "no rating" })"
