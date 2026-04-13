@@ -1,0 +1,145 @@
+name: Check Suspended Scheduled Workflows
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Every Monday at 9:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  check-suspended-workflows:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check suspended scheduled workflows across org
+        env:
+          GH_TOKEN: ${{ secrets.ORG_PAT }}
+          ORG: culturecreates
+        run: |
+          echo "## 🔍 Suspended Scheduled Workflows Report" >> $GITHUB_STEP_SUMMARY
+          echo "**Organisation:** \`$ORG\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Run date:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Collect all repos in the org (handles pagination)
+          repos=()
+          page=1
+          while true; do
+            batch=$(curl -s \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/orgs/$ORG/repos?per_page=100&page=$page" | jq -r '.[].name')
+            [ -z "$batch" ] && break
+            while IFS= read -r r; do repos+=("$r"); done <<< "$batch"
+            ((page++))
+          done
+
+          suspended_count=0
+          active_count=0
+          total_cron_repos=0
+          json_entries="[]"
+          rows=""
+
+          for repo in "${repos[@]}"; do
+
+            # Get all workflows for this repo
+            workflows=$(curl -s \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$ORG/$repo/actions/workflows?per_page=100" \
+              | jq -c '.workflows[]?' 2>/dev/null || true)
+            [ -z "$workflows" ] && continue
+
+            has_cron_repo=false
+
+            while IFS= read -r workflow_json; do
+              [ -z "$workflow_json" ] && continue
+
+              wf_id=$(echo "$workflow_json" | jq -r '.id')
+              wf_name=$(echo "$workflow_json" | jq -r '.name')
+              wf_state=$(echo "$workflow_json" | jq -r '.state')
+              wf_path=$(echo "$workflow_json" | jq -r '.path')
+
+              # Fetch raw workflow file content and check for schedule trigger
+              wf_content=$(curl -s \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github.v3.raw" \
+                "https://api.github.com/repos/$ORG/$repo/contents/$wf_path")
+
+              echo "$wf_content" | grep -qE '^\s*schedule:' || continue
+
+              has_cron_repo=true
+
+              # Get the last run timestamp for this workflow
+              last_run=$(curl -s \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/$ORG/$repo/actions/workflows/$wf_id/runs?per_page=1" \
+                | jq -r '.workflow_runs[0].created_at // "N/A"')
+
+              # Determine status
+              if [ "$wf_state" = "disabled_inactivity" ]; then
+                suspended_count=$((suspended_count + 1))
+                status="SUSPENDED"
+              elif [ "$wf_state" = "active" ]; then
+                active_count=$((active_count + 1))
+                status="Active"
+              else
+                status="$wf_state"
+              fi
+
+              rows+="| [$repo](https://github.com/$ORG/$repo) | $wf_name | $status | $last_run |\n"
+
+              # Append entry to JSON array
+              json_entries=$(echo "$json_entries" | jq \
+                --arg repo "$repo" \
+                --arg wf "$wf_name" \
+                --arg id "$wf_id" \
+                --arg path "$wf_path" \
+                --arg state "$wf_state" \
+                --arg last_run "$last_run" \
+                --arg url "https://github.com/$ORG/$repo/actions/workflows/$(basename $wf_path)" \
+                '. += [{"repo": $repo, "workflow": $wf, "workflow_id": $id, "path": $path, "state": $state, "last_run": $last_run, "url": $url}]')
+
+            done <<< "$workflows"
+
+            $has_cron_repo && total_cron_repos=$((total_cron_repos + 1))
+
+          done
+
+          # Write JSON report
+          echo "$json_entries" | jq \
+            --arg generated_at "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+            --arg org "$ORG" \
+            '{"generated_at": $generated_at, "organisation": $org, "repos": .}' \
+            > suspended_workflows_report.json
+
+          # Write summary stats
+          echo "### Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Repos with scheduled workflows | $total_cron_repos |" >> $GITHUB_STEP_SUMMARY
+          echo "| Active | $active_count |" >> $GITHUB_STEP_SUMMARY
+          echo "| Suspended (auto-disabled by GitHub) | $suspended_count |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Workflow Details" >> $GITHUB_STEP_SUMMARY
+          echo "| Repo | Workflow | Status | Last Run |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|----------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          printf "$rows" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$suspended_count" -gt 0 ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "> **$suspended_count suspended workflow(s) found.** Re-enable them via the Actions tab in each repo, or by pushing a commit to trigger activity." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "> All scheduled workflows are active." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload JSON report
+        uses: actions/upload-artifact@v4
+        with:
+          name: suspended-workflows-report-${{ github.run_id }}
+          path: suspended_workflows_report.json
+          retention-days: 90
