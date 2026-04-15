@@ -11,26 +11,45 @@ class ReconcileController < ApplicationController
     @link_service_endpoint = Rails.application.config.artsdata_link_endpoint
   end
 
-  # Reconcile - returns only Artsdata URIs
-  # GET /reconcile/query?query=&type=&postalCode=
-  # https://wikidata.reconci.link/en/api
+  # Reconcile - calls a Reconciliation API v0.2 API with a query and returns results
+  # Main params:
+  #   - query (required) : the reconciliation query string to match against (e.g. name of a person, place, or organization)
+  #   - reconEndpoint : Reconciliation API v0.2 endpoint to send the query to, default is set to Artsdata Reconciliation API
+  #   - type : the type to reconcile against (e.g. Person, Place, Organization)
+  #   - postalCode : to restrict reconciliation to a postal code (if supported by the Reconciliation API)
+  #   - match : set to true to return only results with a high confidence match
+  #   
+  # Optional params (not used in reconciliation API): pass through to the view for display and linking
+  #   - routeName : the named route to use when clicking a match results in the view, default is entity_path. Set to "wikidata_path" when using "mint from Wikidata" feature.
+  #   - externalUri : the external URI of the entity being reconciled, used for link buttons in the view
+  #   - dataset : the source graph (void:inDataset) URI of the entity being reconciled, used for link buttons in the view
+  # 
+  # Common Reconciliation API endpoints: 
+  #   - Artsdata: https://api.artsdata.ca/recon
+  #   - Wikidata: https://wikidata.reconci.link/en/api
+  # 
+  # GET /reconcile/query
   def query
     required = [:query]
     if required.all? { |k| params.key? k }
-      @route_name = params[:routeName] ||= 'entity_path' # default is to call entity_path
       @query = params[:query] # pass through to view
+      recon_uri = params[:reconEndpoint] || Rails.application.config.artsdata_recon_endpoint_v0
       @type = params[:type] # pass through to view
-      @externalUri = params[:externalUri] # pass through to view for link button
       @postalCode = params[:postalCode] # restrict reconciliation to a postal code
       match = params[:match] || false # to set to return only matches
       
-
+      @route_name = params[:routeName] ||= 'entity_path' # default is to call entity_path
+      @externalUri = params[:externalUri] # pass through to view for link button
+      @dataset = params[:dataset] # pass through to view for link button
+      
+      # If the query looks like an Artsdata URI or an entity ID, skip reconciliation and go straight to the entity page
       redirect_to entity_path(uri: @query) if @query.starts_with?("http") || @query.match?(/^K.*-.*$/)
 
-      @query.squish! # remove extra spaces and newlines
-      recon_uri = params[:reconEndpoint] || Rails.application.config.artsdata_recon_endpoint_v0
+      # remove extra spaces and newlines
+      @query.squish! 
+      
       recon_service = ReconService.new(recon_uri)
-      response = recon_service.query_party(params)
+      response = recon_service.query_party(query: @query, type: @type, postalCode: @postalCode)
     
       if response.code.to_s.include?("200")
         @result = JSON.parse(response.body)
@@ -46,20 +65,6 @@ class ReconcileController < ApplicationController
       flash.alert = "Missing a required param. Required list: #{required}"
       redirect_back(fallback_location: root_path)
     end
-  end
-
-  # Query skipping recon service by using luc:name and include URIs outside of artsdata.ca
-  def query_non_authoritative
-    required = [:query]
-    if required.all? { |k| params.key? k }
-      @query = params[:query] # pass through to view
-     
-
-    else
-      flash.alert = "Missing a required param. Required list: #{required}"
-      redirect_back(fallback_location: root_path)
-    end
-    
   end
 
   private

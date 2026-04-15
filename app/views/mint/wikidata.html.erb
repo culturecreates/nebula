@@ -59,7 +59,7 @@
       <p>
         <turbo-frame
           id='recon_results'
-          src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri)%>"
+          src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri, dataset: "http://kg.artsdata.ca/resource/K1-20")%>"
           loading="lazy"
           target="_top"
         >

@@ -7,6 +7,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX void: <http://rdfs.org/ns/void#>
 
 construct { 
   ?entity rdfs:label ?c ; 
@@ -19,7 +20,7 @@ construct {
   schema:startDate ?startDate ;
   schema:endDate ?endDate ;
   schema:location ?place_name ;
-  prov:wasDerivedFrom ?g .
+  void:inDataset ?g .
 } 
 where { 
   VALUES ?entity { <URI_PLACEHOLDER> }

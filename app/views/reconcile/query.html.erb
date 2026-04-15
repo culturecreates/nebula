@@ -7,13 +7,20 @@
     <ul class="list-group ">
       <% @result.each do |result| %>
         <% if result["id"].start_with?("K") %>
-          <%= render partial: "result", locals: { result: result, type: @type, query: @query } %>
+          <%= render partial: "result", 
+          locals: { 
+            result: result, 
+            type: @type, 
+            query: @query,
+            externalUri: @externalUri,
+            dataset: @dataset
+          } %>
         <% else %>
           <%= render partial: "external_result",
           locals: {
             result: result,
             type: @type,
-            query: @query,
+            route_name: @route_name
           } %>
         <% end %>
       <% end %>

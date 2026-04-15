@@ -3,8 +3,8 @@ class ReconService
     @recon_uri = URI.parse(recon_uri)
   end
 
-  def query_party(params)
-    q = params[:query].gsub("?","") # Need more investigation: even though query gets CGI.escaped below, it is necessary to remove ? character to reconcile urls with query strings
+  def query_party(query:, type: nil, postalCode: nil)
+    q = query.gsub("?","") # Need more investigation: even though query gets CGI.escaped below, it is necessary to remove ? character to reconcile urls with query strings
     headers = { "Content-Type" => "application/json" }
     query =   {
         "q0" => {
@@ -12,14 +12,14 @@ class ReconService
         }
       }
    
-    if params[:type].presence
-      query["q0"]["type"] = params[:type]
+    if type.presence
+      query["q0"]["type"] = type    
     end
-    if params[:postalCode].presence 
-      if params[:type].downcase.include?("event")
-        query["q0"]["properties"] = [{pid: "schema:location/schema:address/schema:postalCode", v: params[:postalCode]}]
+    if postalCode.presence 
+      if type.downcase.include?("event")
+        query["q0"]["properties"] = [{pid: "schema:location/schema:address/schema:postalCode", v: postalCode}]
       else
-        query["q0"]["properties"] = [{pid: "schema:address/schema:postalCode", v: params[:postalCode]}]
+        query["q0"]["properties"] = [{pid: "schema:address/schema:postalCode", v: postalCode}]
       end
     end
 
@@ -35,30 +35,6 @@ class ReconService
    HTTParty.get(@recon_uri, :headers => headers)
     
   end
- 
-  def query(params)
-    request = Net::HTTP::Get.new(@recon_uri)
-    request["Content-Type"] = "application/json"
 
-    body_hash = {
-      "query" => params[:query]
-    }
-
-    if params[:type]
-      body_hash[:type] = params[:type]
-    end
-
-    if params[:postalCode]
-      body_hash["properties"] = [{pid: "schema:address/schema:postalCode", v: params[:postalCode]}]
-    end
-    request.body = JSON.dump(body_hash)
-
-    req_options = {
-      use_ssl: @recon_uri.scheme == "https",
-    }
-    response = Net::HTTP.start(@recon_uri.hostname, @recon_uri.port, req_options) do |http|
-      http.request(request)
-    end
-  end
 
 end

@@ -9,4 +9,10 @@ class EntityTest < ActiveSupport::TestCase
   end
  
 
+  test "should load graph and populate attributes" do
+    assert_not_nil @entity.graph
+    assert_equal "http://kg.artsdata.ca/resource/K23-300", @entity.entity_uri
+    assert_equal "http://schema.org/Event", @entity.type.value
+    assert_equal "Le dîner de cons", @entity.label.value
+  end
 end

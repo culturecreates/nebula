@@ -1,6 +1,5 @@
 class MintController < ApplicationController
-  before_action :check_minting_access # ensure user has permissions
-  include DereferenceHelper 
+  before_action :check_minting_access # ensure user has permission
 
   # Preview data and SHACL report before minting a new Artsdata URI
   # GET /mint/preview
@@ -8,7 +7,7 @@ class MintController < ApplicationController
   #   - classToMint
   #   - label
   #   - language
-  #   - reference: the prov#wasDerivedFrom URI of the entity
+  #   - dataset : [string] The void:inDataset URI of the entity
   #   - postalCode
   #   - startDate
   def preview
@@ -18,12 +17,12 @@ class MintController < ApplicationController
       @classToMint = params[:classToMint]
 
       @label = params[:label]
-      @reference =  params[:reference]
+      @dataset =  params[:dataset]
       @user_uri = user_uri
 
       # get extra data about the entity when only externalUri is provided
       # Need: 
-      # - reference (i.e. graph URI that contains external URI)
+      # - dataset (i.e. graph URI that contains external URI)
       # - label (i.e. name)
       # - language (of name)
       # - classToMint (i.e. type)
@@ -33,13 +32,9 @@ class MintController < ApplicationController
       @entity.load_card
       
     
-      if !@reference
-        reference = {
-          subject: RDF::URI(@externalUri),
-          predicate: RDF::URI("http://www.w3.org/ns/prov#wasDerivedFrom"),
-          object: nil
-        }
-        @reference =  @entity.graph.query(reference)&.first&.object&.value
+      if !@dataset
+        datasets = [RDF::URI(@externalUri), RDF::URI("http://rdfs.org/ns/void#inDataset"), nil]
+        @dataset =  @entity.graph.query(datasets)&.first&.object&.value
       end
 
       if !@label
@@ -68,9 +63,9 @@ class MintController < ApplicationController
   end
 
   # Link to an existing Artsdata URI
-  # GET /mint/link?externalUri=&classToMint=&adUri=&
+  # GET /mint/link
   def link 
-    required = [:externalUri, :classToMint, :adUri]
+    required = [:externalUri, :classToMint, :adUri, :dataset]
     if required.all? { |k| params.key? k } 
       @externalUri = params[:externalUri]
       @classToMint =  if params[:classToMint].starts_with?("http") 
@@ -79,6 +74,8 @@ class MintController < ApplicationController
                         "http://schema.org/" + params[:classToMint]
                       end
       @adUri = params[:adUri]
+      @dataset = params[:dataset]
+      @publisher = user_uri
 
       # call link in mint service
       artsdata_link_endpoint = Rails.application.config.artsdata_link_endpoint
@@ -89,7 +86,9 @@ class MintController < ApplicationController
       request.body = JSON.dump({
           "externalUri" => @externalUri,
           "classToLink" => @classToMint,
-          "adUri" => @adUri
+          "adUri" => @adUri,
+          "dataset" => @dataset,
+          "publisher" => @publisher
       })
       
       req_options = {

@@ -1,0 +1,59 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://staging.db.artsdata.ca/repositories/artsdata
+    body:
+      encoding: UTF-8
+      string: query=%23+load_rdfstar_graph%0A%23+TODO%3A+Add+SHACL+triples+for+blank+nodes.+Currently+removed+for+performance+crash+when+over+10+subevents+%28ville-de-laval%29%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E+%0APREFIX+onto%3A+%3Chttp%3A%2F%2Fwww.ontotext.com%2F%3E%0APREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0APREFIX+sh%3A+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fshacl%23%3E%0ACONSTRUCT+%7B%0A++++%3Fs+%3Fp+%3Fo++.%0A++++%3C%3C%3Fs+%3Fp+%3Fo%3E%3E+%3Fa+%3Fb+.%0A++++%3Fp+rdfs%3Alabel+%3Fprop_label+.%0A++++%3Fo+rdfs%3Alabel+%3Fobj_label+.%0A++++%3Fa+rdfs%3Alabel+%3Fa_label+.%0A++++%3Fqbns+%3Fqbnp+%3Fqbno+.%0A++++%3Fqbnp+rdfs%3Alabel+%3Fqbnp_label+.%0A++++%3Fs+%3Fp+%3Fbns+.%0A++++%3Fbns+%3Fbnp+%3Fbno+.%0A++++%3Fbnp+rdfs%3Alabel+%3Fbnp_label+.%0A++++%3C%3C%3Fbns+%3Fbnp+%3Fbno%3E%3E+%3Fbna+%3Fbnb+.%0A++++%3Fbna+rdfs%3Alabel+%3Fbna_label+.%0A++++++++++++++++%0A++++%3F2bns+%3F2bnp+%3F2bno+.%0A++++%3F2bnp+rdfs%3Alabel+%3F2bnp_label+.%0A%0A++++%3F2bns+%3F2bnp+%3F3bns+.%0A++++%3F3bns+%3F3bnp+%3F3bno+.%0A%0A++++%3Fshacl_bn+sh%3AfocusNode+%3Fs+%3B%0A++++++++%3Fshacl_pred+%3Fshal_obj+.%0A%7D%0AFROM+onto%3Aexplicit+%0AWHERE+%7B%0A++++values+%3Fs+%7B%0A++++++++%3Chttp%3A%2F%2Fkg.artsdata.ca%2Fresource%2FK23-300%3E+%0A++++%7D%0A++++%7B%0A++++++++%3Fs+%3Fp+%3Fo++.%0A++++++++%23+main+triple+labels%0A++++++++OPTIONAL+%7B%0A++++++++++++%3Fo+rdfs%3Alabel+%3Fobj_label+.%0A++++++++%7D%0A++++++++OPTIONAL+%7B%0A++++++++++++%3Fp+rdfs%3Alabel+%3Fprop_label+.%0A++++++++%7D%0A++++++++OPTIONAL+%7B%0A++++++++++++%3Fo+schema%3Aname+%3Fobj_name+.%0A++++++++%7D%0A++++++++%23+quoted+triple%0A++++++++OPTIONAL+%7B%0A++++++++++++%3C%3C%3Fs+%3Fp+%3Fo%3E%3E+%3Fa+%3Fb+.%0A++++++++++++%23+quoted+triple+labels%0A++++++++++++OPTIONAL+%7B%0A++++++++++++++++%3Fa+rdfs%3Alabel+%3Fa_label+.%0A++++++++++++%7D%0A++++++++%7D%0A++++++++%23+quoted+triple+blank+nodes%0A++++++++OPTIONAL+%7B%0A++++++++++++%3C%3C%3Fs+%3Fp+%3Fo%3E%3E+%3Fa+%3Fqbns+.%0A++++++++++++filter%28isBLANK%28%3Fqbns%29%29%0A++++++++++++%3Fqbns+%3Fqbnp+%3Fqbno+.%0A++++++++++++OPTIONAL+%7B%0A++++++++++++++++%3Fqbnp+rdfs%3Alabel+%3Fqbnp_label+.%0A++++++++++++%7D%0A++++++++%7D%0A++++++++%23+blank+nodes%0A++++++++OPTIONAL+%7B%0A++++++++++++%3Fs+%3Fp+%3Fbns+.%0A++++++++++++filter%28isBLANK%28%3Fbns%29%29%0A++++++++++++%3Fbns+%3Fbnp+%3Fbno+.%0A++++++++++++OPTIONAL+%7B%0A++++++++++++++++%3Fbnp+rdfs%3Alabel+%3Fbnp_label+.%0A++++++++++++%7D%0A++++++++++++%23+quoted+triple%0A++++++++++++OPTIONAL+%7B%0A++++++++++++++++%3C%3C%3Fbns+%3Fbnp+%3Fbno%3E%3E+%3Fbna+%3Fbnb+.%0A++++++++++++++++%23+quoted+triple+labels%0A++++++++++++++++OPTIONAL+%7B%0A++++++++++++++++++++%3Fbna+rdfs%3Alabel+%3Fbna_label+.%0A++++++++++++++++%7D%0A++++++++++++%7D%0A%0A%0A++++++++++++%23+second+level+blank+nodes%0A++++++++++++OPTIONAL+%7B%0A++++++++++++++++%3Fbns+%3Fbnp+%3F2bns+.%0A++++++++++++++++filter%28isBLANK%28%3F2bns%29%29%0A++++++++++++++++%3F2bns+%3F2bnp+%3F2bno+.%0A++++++++++++++++OPTIONAL+%7B%0A++++++++++++++++++++%3F2bnp+rdfs%3Alabel+%3F2bnp_label+.%0A++++++++++++++++%7D%0A++++++++++++++++%23+third+level+blank+nodes%0A++++++++++++++++OPTIONAL+%7B%0A++++++++++++++++++++%3F2bns+%3F2bnp+%3F3bns+.%0A++++++++++++++++++++filter%28isBLANK%28%3F3bns%29%29%0A++++++++++++++++++++%3F3bns+%3F3bnp+%3F3bno+.%0A++++++++++++++++%7D+%0A++++++++++++%7D%0A++++++++%7D%0A++++%7D%0A++++UNION+%7B%0A++++++++OPTIONAL+%7B%0A++++++++++++%3Fshacl_bn+sh%3AfocusNode+%3Fs+%3B%0A++++++++++++++++++++++%3Fshacl_pred+%3Fshal_obj+.%0A++++++++%7D%0A++++%7D%0A%7D+limit+1000
+    headers:
+      User-Agent:
+      - Faraday v2.12.1 (compatible; ArtsdataGraph::V2::Client; +https://artsdata.ca)
+      Accept:
+      - text/x-turtlestar
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Server:
+      - nginx/1.24.0 (Ubuntu)
+      Date:
+      - Wed, 15 Apr 2026 19:55:04 GMT
+      Content-Type:
+      - text/x-turtlestar;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept
+      Cache-Control:
+      - no-store
+      Content-Disposition:
+      - attachment; filename=query-result.ttls
+      X-Xss-Protection:
+      - 1; mode=block
+      - 1; mode=block
+      X-Frame-Options:
+      - DENY
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      - nosniff
+      Content-Language:
+      - en-US
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Referrer-Policy:
+      - origin
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        QHByZWZpeCByZGZzOiA8aHR0cDovL3d3dy53My5vcmcvMjAwMC8wMS9yZGYtc2NoZW1hIz4gLgpAcHJlZml4IG9udG86IDxodHRwOi8vd3d3Lm9udG90ZXh0LmNvbS8+IC4KQHByZWZpeCBzY2hlbWE6IDxodHRwOi8vc2NoZW1hLm9yZy8+IC4KQHByZWZpeCBzaDogPGh0dHA6Ly93d3cudzMub3JnL25zL3NoYWNsIz4gLgpAcHJlZml4IHJkZjogPGh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyM+IC4KQHByZWZpeCByZGY0ajogPGh0dHA6Ly9yZGY0ai5vcmcvc2NoZW1hL3JkZjRqIz4gLgpAcHJlZml4IHNlc2FtZTogPGh0dHA6Ly93d3cub3BlbnJkZi5vcmcvc2NoZW1hL3Nlc2FtZSM+IC4KQHByZWZpeCBvd2w6IDxodHRwOi8vd3d3LnczLm9yZy8yMDAyLzA3L293bCM+IC4KQHByZWZpeCB4c2Q6IDxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSM+IC4KQHByZWZpeCBmbjogPGh0dHA6Ly93d3cudzMub3JnLzIwMDUveHBhdGgtZnVuY3Rpb25zIz4gLgoKPGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9yZXNvdXJjZS9LMjMtMzAwPiBhIHNjaGVtYTpFdmVudDsKICBzY2hlbWE6bG9jYXRpb24gPGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9yZXNvdXJjZS9LMi0xOTc+OwogIHNjaGVtYTpkaXNhbWJpZ3VhdGluZ0Rlc2NyaXB0aW9uICJTYWxsZSBPZHlzc8OpZSAtIDIwMjMtMDgtMDVUMjA6MDA6MDAtMDQ6MDAiOwogIHNjaGVtYTpuYW1lICJMZSBkw65uZXIgZGUgY29ucyJAZnI7CiAgc2NoZW1hOnN0YXJ0RGF0ZSAiMjAyMy0wOC0wNVQyMDowMDowMC0wNDowMCJeXnhzZDpkYXRlVGltZTsKICA8aHR0cDovL3d3dy53My5vcmcvMjAwNC8wMi9za29zL2NvcmUjaGlzdG9yeU5vdGU+ICJNaW50ZWQgQXJzdHNkYXRhIElEIGZvciBzY2hlbWE6RXZlbnQgJ0xlIGTDrm5lciBkZSBjb25zJyBvbiAyMDIzLTA1LTAyVDE3OjU4OjIyLjE1MFoiOwogIDxodHRwOi8vd3d3LnczLm9yZy9ucy9wcm92I2dlbmVyYXRlZEF0VGltZT4gIjIwMjMtMDUtMDJUMTc6NTg6MjIuMTUwWiJeXnhzZDpkYXRlVGltZSAuCgpyZGY6dHlwZSByZGZzOmxhYmVsICJ0eXBlIiAuCgpzY2hlbWE6RXZlbnQgcmRmczpsYWJlbCAiRXZlbnQiIC4KCjw8PGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9yZXNvdXJjZS9LMjMtMzAwPiBzY2hlbWE6bG9jYXRpb24gPGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9yZXNvdXJjZS9LMi0xOTc+Pj4KICA8aHR0cDovL3d3dy53My5vcmcvbnMvcHJvdiN3YXNEZXJpdmVkRnJvbT4gPGh0dHA6Ly9rZy5hcnRzZGF0YS5jYS9kYXRhYnVzL2N1bHR1cmUtY3JlYXRlcy9mb290bGlnaHQvdG91dGN1bHR1cmUtY2EvMjAyMy0wNC0yNSNEYXRhSWQ+IC4KCnNjaGVtYTpsb2NhdGlvbiByZGZzOmxhYmVsICJsb2NhdGlvbiIgLgoKc2NoZW1hOmRpc2FtYmlndWF0aW5nRGVzY3JpcHRpb24gcmRmczpsYWJlbCAiZGlzYW1iaWd1YXRpbmdEZXNjcmlwdGlvbiIgLgoKPDw8aHR0cDovL2tnLmFydHNkYXRhLmNhL3Jlc291cmNlL0syMy0zMDA+IHNjaGVtYTpuYW1lICJMZSBkw65uZXIgZGUgY29ucyJAZnI+PiA8aHR0cDovL3d3dy53My5vcmcvbnMvcHJvdiN3YXNEZXJpdmVkRnJvbT4KICAgIDxodHRwOi8va2cuYXJ0c2RhdGEuY2EvZGF0YWJ1cy9jdWx0dXJlLWNyZWF0ZXMvZm9vdGxpZ2h0L3RvdXRjdWx0dXJlLWNhLzIwMjMtMDQtMjUjRGF0YUlkPiAuCgpzY2hlbWE6bmFtZSByZGZzOmxhYmVsICJuYW1lIiAuCgo8PDxodHRwOi8va2cuYXJ0c2RhdGEuY2EvcmVzb3VyY2UvSzIzLTMwMD4gc2NoZW1hOnN0YXJ0RGF0ZSAiMjAyMy0wOC0wNVQyMDowMDowMC0wNDowMCJeXnhzZDpkYXRlVGltZT4+CiAgPGh0dHA6Ly93d3cudzMub3JnL25zL3Byb3Yjd2FzRGVyaXZlZEZyb20+IDxodHRwOi8va2cuYXJ0c2RhdGEuY2EvZGF0YWJ1cy9jdWx0dXJlLWNyZWF0ZXMvZm9vdGxpZ2h0L3RvdXRjdWx0dXJlLWNhLzIwMjMtMDQtMjUjRGF0YUlkPiAuCgpzY2hlbWE6c3RhcnREYXRlIHJkZnM6bGFiZWwgInN0YXJ0RGF0ZSIgLgoKPGh0dHA6Ly93d3cudzMub3JnLzIwMDQvMDIvc2tvcy9jb3JlI2hpc3RvcnlOb3RlPiByZGZzOmxhYmVsICJoaXN0b3J5IG5vdGUiQGVuIC4K
+  recorded_at: Wed, 15 Apr 2026 19:55:04 GMT
+recorded_with: VCR 6.3.1
