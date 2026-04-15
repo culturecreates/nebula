@@ -218,7 +218,7 @@ class MintController < ApplicationController
       @label = solutions.map { |s| s.label.to_s if s.bound?(:label) }.first 
       @description = solutions.map { |s| s.desc.to_s if s.bound?(:desc) }.first 
       @language = "en"
-      @reference = "http://kg.artsdata.ca/resource/K1-20"
+      @dataset = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
       @user_uri = user_uri
     end
