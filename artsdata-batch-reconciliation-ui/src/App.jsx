@@ -1051,7 +1051,7 @@ const App = ({ config }) => {
         // Link to matched entity - use schema: format for classToLink
         const classToLink = `schema:${type}`;
         const adUri = `http://kg.artsdata.ca/resource/${matchCandidate.id}`;
-        const linkResult = await linkEntity(item.uri, classToLink, adUri, config);
+        const linkResult = await linkEntity(item.uri, classToLink, adUri, dataFeed, config);
         updateData = {
           status: "reconciled",
           linkedTo: matchCandidate.id,
@@ -1279,7 +1279,7 @@ const App = ({ config }) => {
             // Use schema: format for classToLink and full Artsdata URI for adUri
             const classToLink = `schema:${type}`;
             const adUri = `http://kg.artsdata.ca/resource/${matchToLink.id}`;
-            await linkEntity(item.uri, classToLink, adUri, config);
+            await linkEntity(item.uri, classToLink, adUri, dataFeed, config);
             results.successCounts.matched++;
           }
         } else if (currentStatus === 'mint-ready') {

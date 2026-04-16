@@ -493,18 +493,22 @@ export async function mintEntity(uri, classToMint, reference, config = {}) {
  * @param {string} externalUri - URI of the entity to link
  * @param {string} classToLink - schema:Person, schema:Organization, etc.
  * @param {string} adUri - Artsdata URI of the entity to link to
+ * @param {string} dataset - URI of the data feed/dataset
  * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Object>} - Link results
  */
-export async function linkEntity(externalUri, classToLink, adUri, config = {}) {
+export async function linkEntity(externalUri, classToLink, adUri, dataset, config = {}) {
   // Use config endpoints or fall back to defaults
   const linkEndpoint = config.linkEndpoint || DEFAULT_STAGING_API_BASE;
+  const publisherUri = config.userUri || DEFAULT_PUBLISHER_URI;
   
   try {
     const params = new URLSearchParams({
       externalUri,
       classToLink,
-      adUri
+      adUri,
+      dataset,
+      publisher: publisherUri
     });
     
     const response = await fetch(`${buildLinkUrl(linkEndpoint, '')}?${params}`, {
