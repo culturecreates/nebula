@@ -10,13 +10,13 @@ Bienvenue au graphe de connaissances Artsdata. Pour découvrir les avantages des
 
 - [Carte du nombre d'événements par région](/events)
 - [Visualisation des vocabulaires contrôlés](/vocabularies)
-- [Documentation sur le modèle de données](https://culturecreates.github.io/artsdata-data-model/index.fr.html)
-- [Architecture des flux de données](https://culturecreates.github.io/artsdata-data-model/architecture/overview.fr.html)
-- [Lignes directrices sur les identifiants pérennes](https://culturecreates.github.io/artsdata-data-model/identifier-recommendations.fr)
-- [Liste des sources de données](https://kg.artsdata.ca/fr/query/show?sparql=feeds_all&title=Data+Feeds)
-- [Liste des consommateurs de données](https://kg.artsdata.ca/en/doc/data-consumers)
-- [Politique d’images](https://kg.artsdata.ca/fr/doc/image-policy)
-- [Conditions pour les fournisseurs de données](https://kg.artsdata.ca/fr/doc/contributor-conditions)
+- [Documentation sur le modèle de données](https://docs.artsdata.ca/index.fr.html)
+- [Architecture des flux de données](https://docs.artsdata.ca/architecture/overview.fr.html)
+- [Lignes directrices sur les identifiants pérennes](https://docs.artsdata.ca/identifiers-guidelines/identifier-recommendations.fr.html)
+- [Liste des sources de données](/fr/query/show?sparql=feeds_all&title=Data+Feeds)
+- [Liste des consommateurs de données](/en/doc/data-consumers)
+- [Politique d’images](/fr/doc/image-policy)
+- [Conditions pour les fournisseurs de données](/fr/doc/contributor-conditions)
 
 ---
 ## Explorer le graphe de connaissances
