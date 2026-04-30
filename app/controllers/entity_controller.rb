@@ -14,15 +14,20 @@ class EntityController < ApplicationController
   # /entity.jsonlds?uri=  --> JSON-LD Star
   # /entity.rdf?uri=  --> RDF/XML
   def show
-    uri = params[:uri] 
+    uri = params[:uri]
     uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
     uri.gsub!(' ', '+')
+
+    unless user_signed_in?
+      fresh_when etag: [uri, request.format, I18n.locale], public: true
+    end
+
     @entity = Entity.new(entity_uri: uri)
-    
+
     respond_to do |format|
       format.jsonld {
         # see https://json-ld.github.io/json-ld.org/spec/latest/json-ld-api-best-practices/
-        @entity.load_graph_without_triple_terms
+        @entity.load_graph_without_triple_terms(use_cache: !user_signed_in?)
         frame_template = params[:frameTemplate]
         frame, context, jsonld = shape(@entity, frame_template)
         if frame.present?
@@ -41,27 +46,27 @@ class EntityController < ApplicationController
       }
       format.jsonlds {
         puts "rendering expanded jsonld-star..."
-        @entity.load_graph
+        @entity.load_graph(use_cache: !user_signed_in?)
         render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
       }
-      format.ttl { 
+      format.ttl {
         puts "rendering turtle..."
-        @entity.load_graph_without_triple_terms
+        @entity.load_graph_without_triple_terms(use_cache: !user_signed_in?)
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
-      format.ttls { 
+      format.ttls {
         puts "rendering turtle-star..."
-        @entity.load_graph
+        @entity.load_graph(use_cache: !user_signed_in?)
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
-      format.rdf { 
+      format.rdf {
         puts "rendering rdf..."
-        @entity.load_graph_without_triple_terms
+        @entity.load_graph_without_triple_terms(use_cache: !user_signed_in?)
         render xml: @entity.graph.dump(:rdfxml, validate: false, standard_prefixes: true), content_type: 'application/rdf+xml'
       }
       # render in entity view
-      format.all { 
-        @entity.load_graph
+      format.all {
+        @entity.load_graph(use_cache: !user_signed_in?)
         if @entity.errors.any?
           flash.alert = @entity.errors.join(", ")
         end

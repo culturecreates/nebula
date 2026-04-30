@@ -71,6 +71,9 @@ class MaintenanceController < ApplicationController
       if response.code != 200
         flash[:alert] = "Failed. Error: #{response.body.truncate(1000)}"
       else
+        Rails.cache.delete("entity:graph:#{artsdata_uri}")
+        Rails.cache.delete("entity:graph_without_triple_terms:#{artsdata_uri}")
+        Rails.cache.delete("entity:card:#{artsdata_uri}")
         flash[:notice] = "Successfully refreshed #{artsdata_uri}."
       end
       render json: { redirect_url: entity_path(uri: artsdata_uri) }

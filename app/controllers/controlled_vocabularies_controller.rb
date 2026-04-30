@@ -2,6 +2,7 @@ class ControlledVocabulariesController < ApplicationController
   # GET /controlled_vocabularies
   # Returns the list of controlled vocabularies for lazy loading in the navigation menu
   def index
+    expires_in 24.hours, public: true unless user_signed_in?
     @controlled_vocabularies = fetch_controlled_vocabularies
     render partial: "list", locals: { controlled_vocabularies: @controlled_vocabularies }
   end
@@ -14,7 +15,7 @@ class ControlledVocabulariesController < ApplicationController
     
     begin
       query = SparqlLoader.load("list_controlled_vocabularies")
-      solutions = ArtsdataGraph::SparqlService.client.query(query).limit(100)
+      solutions = ArtsdataGraph::SparqlService.cached_query(query, expires_in: 24.hours, force: user_signed_in?).limit(100)
       
       # Group solutions by URI to collect all labels
       vocabularies_by_uri = {}

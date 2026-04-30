@@ -27,7 +27,7 @@ class QueryController < ApplicationController
 
     solutions = if !construct_files
                   begin
-                    ArtsdataGraph::SparqlService.client.query(@query).limit(1000)
+                    ArtsdataGraph::SparqlService.cached_query(@query, expires_in: 30.minutes, force: user_signed_in?).limit(1000)
                   rescue StandardError => e # SPARQL::Client::ClientError and SPARQL::Client::ServerError
                     flash.alert = e.message[0..100] + (e.message.length > 100 ? "..." : "")
                     return redirect_to root_path,  data: { turbo: false }

@@ -5,9 +5,10 @@ class DereferenceController < ApplicationController
   # /dereference/card?uri=
   def card
     @frame_id = params[:frame_id]
-    @uri = params[:uri] 
+    @uri = params[:uri]
+    expires_in 6.hours, public: true unless user_signed_in?
     @entity = Entity.new(entity_uri: @uri)
-    @entity.load_card
+    @entity.load_card(use_cache: !user_signed_in?)
   end
 
   # /dereference/external[.jsonld]?uri=

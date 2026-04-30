@@ -1,7 +1,5 @@
-<h3>
-  SPARQLs
-</h3>
 <turbo-frame id="sparqls">
+  <h3>SPARQLs <%= button_to "↻", github_sparqls_refresh_path, method: :post, class: "btn btn-sm btn-outline-secondary" %></h3>
   <ul>
     <% @sparqls.each do |sparql| %>
       <li>

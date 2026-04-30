@@ -120,18 +120,28 @@ class Entity
   end
 
   # Cards are short summaries of entities loaded from the triple store
-  def load_card
+  def load_card(use_cache: true)
     sparql =  SparqlLoader.load('load_card', [
       'URI_PLACEHOLDER', self.entity_uri
     ])
-    @graph = construct_turtle(sparql)
 
-    if @graph.count < 4 
-      if self.entity_uri =~ /wikidata/ # then try Wikidata
-        sparql =  SparqlLoader.load('load_card_wikidata', [
-          'URI_PLACEHOLDER', self.entity_uri
-        ])
-        @graph = construct_turtle(sparql,"wikidata")
+    if use_cache
+      turtle = Rails.cache.fetch("entity:card:#{entity_uri}", expires_in: 1.hour) do
+        response = artsdata_client.execute_construct_turtle_star_sparql(sparql)
+        response[:code] == 200 ? response[:message] : nil
+      end
+      @graph = turtle ?
+        RDF::Graph.new { |g| RDF::Turtle::Reader.new(turtle, rdfstar: true) { |r| g << r } } :
+        RDF::Graph.new
+    else
+      @graph = construct_turtle(sparql)
+      if @graph.count < 4
+        if self.entity_uri =~ /wikidata/ # then try Wikidata
+          sparql =  SparqlLoader.load('load_card_wikidata', [
+            'URI_PLACEHOLDER', self.entity_uri
+          ])
+          @graph = construct_turtle(sparql,"wikidata")
+        end
       end
     end
 
@@ -262,12 +272,26 @@ class Entity
   end
 
 
-  def load_graph(language = "en")
+  def load_graph(language = "en", use_cache: true)
     sparql =  SparqlLoader.load('load_rdfstar_graph', [
                   'entity_uri_placeholder', self.entity_uri,
                   'locale_placeholder' , language
                 ])
-    @graph = construct_turtle(sparql)
+    turtle = if use_cache
+      Rails.cache.fetch("entity:graph:#{entity_uri}", expires_in: 1.hour) do
+        response = artsdata_client.execute_construct_turtle_star_sparql(sparql)
+        response[:code] == 200 ? response[:message] : nil
+      end
+    else
+      response = artsdata_client.execute_construct_turtle_star_sparql(sparql)
+      response[:code] == 200 ? response[:message] : nil
+    end
+    @graph = if turtle
+      RDF::Graph.new { |g| RDF::Turtle::Reader.new(turtle, rdfstar: true) { |r| g << r } }
+    else
+      @errors << "Failed to construct graph"
+      RDF::Graph.new
+    end
   end
 
   def graph_uri
@@ -288,25 +312,27 @@ class Entity
     @graph_uri
   end
 
-  def load_graph_without_triple_terms(language = "en")
+  def load_graph_without_triple_terms(language = "en", use_cache: true)
     sparql =  SparqlLoader.load('load_rdf_graph_without_triple_terms', [
                   'entity_uri_placeholder', self.entity_uri,
                   'locale_placeholder' , language
                 ])
-   
-    response = artsdata_client.execute_construct_turtle_sparql(sparql)
-
-    @graph =  if response[:code] == 200
-                graph = RDF::Graph.new
-                RDF::Turtle::Reader.new(response[:message]) do |reader|
-                  reader.each_statement do |statement|
-                    graph << statement
-                  end
-                end
-                graph
-              else
-                RDF::Graph.new
-              end
+    turtle = if use_cache
+      Rails.cache.fetch("entity:graph_without_triple_terms:#{entity_uri}", expires_in: 1.hour) do
+        response = artsdata_client.execute_construct_turtle_sparql(sparql)
+        response[:code] == 200 ? response[:message] : nil
+      end
+    else
+      response = artsdata_client.execute_construct_turtle_sparql(sparql)
+      response[:code] == 200 ? response[:message] : nil
+    end
+    @graph = if turtle
+      graph = RDF::Graph.new
+      RDF::Turtle::Reader.new(turtle) { |r| r.each_statement { |s| graph << s } }
+      graph
+    else
+      RDF::Graph.new
+    end
   end
 
   def history

@@ -1,5 +1,7 @@
 class GithubController < ApplicationController
-  before_action :user_signed_in?, only: [:workflows, :sparqls]
+  before_action :user_signed_in?, only: [:workflows, :sparqls, :refresh_sparqls_cache]
+
+  SPARQLS_CACHE_KEY = "github:sparqls"
 
   # Exchange the code for an access token
   # This is used in the callback method after user authorizes the app
@@ -51,11 +53,18 @@ class GithubController < ApplicationController
     @workflows = JSON.parse(res.body)["workflow_runs"]
   end
 
-  # List of SPARQL queries in the repository 
+  # List of SPARQL queries in the repository
   def sparqls
-      uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
-      @sparqls = GithubService.info(nil, uri)
-      @sparqls.select! { |sparql| sparql["download_url"].present?} # skip directories
+    uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
+    all_sparqls = Rails.cache.fetch(SPARQLS_CACHE_KEY, expires_in: 1.hour) do
+      GithubService.info(nil, uri)
+    end
+    @sparqls = Array(all_sparqls).select { |sparql| sparql["download_url"].present? }
+  end
+
+  def refresh_sparqls_cache
+    Rails.cache.delete(SPARQLS_CACHE_KEY)
+    redirect_to github_sparqls_path
   end
 
   def logout!

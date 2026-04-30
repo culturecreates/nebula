@@ -11,6 +11,13 @@ module ArtsdataGraph
       )
     end
 
+    def self.cached_query(sparql, expires_in: 1.hour, force: false)
+      cache_key = "sparql:#{Digest::MD5.hexdigest(sparql_endpoint + sparql)}"
+      Rails.cache.fetch(cache_key, expires_in: expires_in, force: force) do
+        client.query(sparql)
+      end
+    end
+
     def self.update_client
       SPARQL::Client.new("#{sparql_endpoint}/statements", headers: {
           "User-Agent" => user_agent,
