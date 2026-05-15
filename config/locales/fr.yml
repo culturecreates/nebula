@@ -72,6 +72,16 @@ fr:
       smart_chip_instructions: |
         <h4>Smart Chip Instructions</h4><p> Enter the URL of the Google Sheets document that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>         
   entity:
+    nav:
+      dereference: "Déréférencer"
+      cms_v3: "CMS v3"
+      cms_v4: "CMS v4"
+      minter: "Minter"
+      history_logs: "Voir l’historique"
+      history_log_title: "Révisions pour "
+      ranked: "Classé"
+      ranked_properties: "Classé (propriétés)"
+      aggregator_place_v2: "Aggregator Place V2"
     download:
       jsonld_for_schema_org: "JSON-LD utilisant le @context de Schema.org. Il peut être copié-collé dans des pages Web HTML."
       copy_button: "Copier"
