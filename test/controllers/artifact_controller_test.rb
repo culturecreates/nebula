@@ -329,13 +329,15 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     mock_databus = mock('databus_service')
     mock_databus.stubs(:push_version).returns(true)
     DatabusService.stubs(:new).returns(mock_databus)
+    version_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact/2024-01-01#Dataset"
 
     post push_version_artifact_index_path, params: {
       artifactUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact",
-      artifactVersionUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact/2024-01-01#Dataset"
+      artifactVersionUri: version_uri
     }
 
     assert_match(/Loaded artifact version/, flash[:notice])
+    assert_includes flash[:notice], version_uri
     assert_response :redirect
   end
 
@@ -344,13 +346,15 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     mock_databus.stubs(:push_version).returns(false)
     mock_databus.stubs(:errors).returns(["API Error: 500"])
     DatabusService.stubs(:new).returns(mock_databus)
+    version_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact/2024-01-01#Dataset"
 
     post push_version_artifact_index_path, params: {
       artifactUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact",
-      artifactVersionUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact/2024-01-01#Dataset"
+      artifactVersionUri: version_uri
     }
 
     assert_match(/Error loading/, flash[:alert])
+    assert_includes flash[:alert], version_uri
     assert_response :redirect
   end
 

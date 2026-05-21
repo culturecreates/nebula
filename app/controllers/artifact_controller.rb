@@ -240,7 +240,7 @@ class ArtifactController < ApplicationController
     begin
       ArtsdataGraph::SparqlService.client.query(query)
     rescue StandardError => e
-      flash.alert = "Error loading artifact versions: #{e.message[0..100]}"
+      flash.alert = "Error loading artifact versions: #{e.message[0..100]}#{e.message.length > 100 ? '...' : ''}"
       []
     end
   end
