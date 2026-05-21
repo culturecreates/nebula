@@ -21,6 +21,7 @@ class ArtifactController < ApplicationController
     @artifact = Artifact.find(params[:artifactUri])
     @automint_status = get_automint_status( @artifact.graph)
     @graph_metadata = get_graph_metadata(@artifact.graph)
+    @artifact_versions = get_artifact_versions(@artifact.uri)
   end
 
   def get_automint_status(graph)
@@ -177,6 +178,19 @@ class ArtifactController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
 
+  # POST /artifact/push_version
+  def push_version
+    @artifact_uri = params[:artifactUri]
+    @artifact_version_uri = params[:artifactVersionUri]
+    databus_service = DatabusService.new(@artifact_uri, user_uri)
+    if databus_service.push_version(@artifact_version_uri)
+      flash.notice = "Loaded artifact version '#{@artifact_version_uri}' to Artsdata."
+    else
+      flash.alert = "Error loading '#{@artifact_version_uri}' : #{databus_service.errors}."
+    end
+    redirect_back(fallback_location: root_path)
+  end
+
   # DELETE /artifact?artifactUri=
   def destroy
     @artifact_uri = params[:artifactUri]
@@ -218,6 +232,17 @@ class ArtifactController < ApplicationController
   def get_object_value(subject, predicate)
     response = ArtsdataGraph::SparqlService.client.select.where([subject, predicate, :o]).execute
     response.first&.o&.value
+  end
+
+  def get_artifact_versions(artifact_uri)
+    sparql_file = "artifact_controller/list_artifact_versions"
+    query = SparqlLoader.load(sparql_file, ["ARTIFACT_URI", artifact_uri])
+    begin
+      ArtsdataGraph::SparqlService.client.query(query)
+    rescue StandardError => e
+      flash.alert = "Error loading artifact versions: #{e.message[0..100]}"
+      []
+    end
   end
 
   def get_object_term(subject, predicate)

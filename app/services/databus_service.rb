@@ -22,6 +22,13 @@ class DatabusService
     call_databus_api(api_url,"post")
   end
 
+  # Push a specific artifact version URI to Artsdata
+  def push_version(artifact_version_uri)
+    api_endpoint = "#{Rails.application.config.artsdata_databus_endpoint}/push_artifact_version"
+    api_url = "#{api_endpoint}?artifact_version_uri=#{CGI.escape(artifact_version_uri)}&publisher=#{CGI.escape(@user_uri)}"
+    call_databus_api(api_url, "post")
+  end
+
   # Delete all versions of the artifact from Databus
   def delete_artifact
       api_endpoint = "#{Rails.application.config.artsdata_databus_endpoint}"
