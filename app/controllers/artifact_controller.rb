@@ -1,4 +1,6 @@
 class ArtifactController < ApplicationController
+  GRAPH_METADATA_RATING_FRAGMENT = "endorsementRating".freeze
+
   before_action :authenticate_databus_user! # ensure user has permissions
 
   def index
@@ -18,6 +20,7 @@ class ArtifactController < ApplicationController
   def show
     @artifact = Artifact.find(params[:artifactUri])
     @automint_status = get_automint_status( @artifact.graph)
+    @graph_metadata = get_graph_metadata(@artifact.graph)
   end
 
   def get_automint_status(graph)
@@ -56,6 +59,109 @@ class ArtifactController < ApplicationController
     rescue StandardError => e
       flash.alert = "Failed to toggle Auto-Minting: #{e.message}"
     end
+    redirect_back(fallback_location: root_path)
+  end
+
+  def get_graph_metadata(graph)
+    subject = RDF::URI(graph)
+    schema = RDF::Vocab::SCHEMA
+    rating_node = get_object_term(subject, schema.contentRating)
+
+    {
+      name: get_object_value(subject, schema.name),
+      maintainer: get_object_value(subject, schema.maintainer),
+      rating_value: rating_node ? get_object_value(rating_node, schema.ratingValue) : nil,
+      rating_explanation: rating_node ? get_object_value(rating_node, schema.ratingExplanation) : nil
+    }
+  end
+
+  def update_graph_metadata
+    graph = params[:graph].to_s
+    graph_name = params[:graph_name].to_s.strip
+    maintainer = params[:maintainer].to_s.strip
+    rating_value = params[:rating_value].to_s.strip
+    rating_explanation = params[:rating_explanation].to_s.strip
+    deleting = params[:delete_metadata] == "true"
+
+    unless valid_graph_uri?(graph)
+      flash.alert = "Failed to update graph metadata: invalid graph URI."
+      return redirect_back(fallback_location: root_path)
+    end
+
+    if !deleting && maintainer.present? && !valid_http_uri?(maintainer)
+      flash.alert = "Failed to update graph metadata: maintainer must be a valid URL."
+      return redirect_back(fallback_location: root_path)
+    end
+
+    graph_name = "" if deleting
+    maintainer = "" if deleting
+    rating_value = "" if deleting
+    rating_explanation = "" if deleting
+
+    graph_term = sparql_uri(graph)
+    rating_uri = "#{graph}##{GRAPH_METADATA_RATING_FRAGMENT}"
+    rating_term = sparql_uri(rating_uri)
+    schema_name = sparql_uri(RDF::Vocab::SCHEMA.name.to_s)
+    schema_maintainer = sparql_uri(RDF::Vocab::SCHEMA.maintainer.to_s)
+    schema_content_rating = sparql_uri(RDF::Vocab::SCHEMA.contentRating.to_s)
+    schema_rating_value = sparql_uri(RDF::Vocab::SCHEMA.ratingValue.to_s)
+    schema_rating_explanation = sparql_uri(RDF::Vocab::SCHEMA.ratingExplanation.to_s)
+    schema_endorsement_rating = sparql_uri(RDF::Vocab::SCHEMA.EndorsementRating.to_s)
+    rdf_type = sparql_uri(RDF.type.to_s)
+    insert_triples = []
+    insert_triples << "#{graph_term} #{schema_name} #{sparql_string_literal(graph_name)} ." if graph_name.present?
+    insert_triples << "#{graph_term} #{schema_maintainer} #{sparql_uri(maintainer)} ." if maintainer.present?
+
+    if rating_value.present? || rating_explanation.present?
+      insert_triples << "#{graph_term} #{schema_content_rating} #{rating_term} ."
+      insert_triples << "#{rating_term} #{rdf_type} #{schema_endorsement_rating} ."
+      insert_triples << "#{rating_term} #{schema_rating_value} #{sparql_string_literal(rating_value)} ." if rating_value.present?
+      insert_triples << "#{rating_term} #{schema_rating_explanation} #{sparql_string_literal(rating_explanation)} ." if rating_explanation.present?
+    end
+
+    delete_block = <<~SPARQL
+      WITH <http://kg.artsdata.ca/Graph_Ranking>
+      DELETE {
+        #{graph_term} #{schema_name} ?old_name .
+        #{graph_term} #{schema_maintainer} ?old_maintainer .
+        #{graph_term} #{schema_content_rating} ?old_rating .
+        ?old_rating ?old_rating_p ?old_rating_o .
+      }
+    SPARQL
+
+    where_block = <<~SPARQL
+      WHERE {
+        OPTIONAL { #{graph_term} #{schema_name} ?old_name . }
+        OPTIONAL { #{graph_term} #{schema_maintainer} ?old_maintainer . }
+        OPTIONAL {
+          #{graph_term} #{schema_content_rating} ?old_rating .
+          OPTIONAL { ?old_rating ?old_rating_p ?old_rating_o . }
+        }
+      }
+    SPARQL
+
+    query = if insert_triples.empty?
+      <<~SPARQL
+        #{delete_block}
+        #{where_block}
+      SPARQL
+    else
+      <<~SPARQL
+        #{delete_block}
+        INSERT {
+          #{insert_triples.join("\n")}
+        }
+        #{where_block}
+      SPARQL
+    end
+
+    begin
+      ArtsdataGraph::SparqlService.update_client.update(query)
+      flash.notice = deleting ? "Graph metadata has been deleted." : "Graph metadata has been updated."
+    rescue StandardError => e
+      flash.alert = "Failed to update graph metadata: #{e.message}"
+    end
+
     redirect_back(fallback_location: root_path)
   end
 
@@ -107,6 +213,39 @@ class ArtifactController < ApplicationController
   # Only allow a list of trusted parameters through.
   def artifact_params
     params.permit(:name, :description, :type, :sheet_url, :webpage_url, :link_identifier)
+  end
+
+  def get_object_value(subject, predicate)
+    response = ArtsdataGraph::SparqlService.client.select.where([subject, predicate, :o]).execute
+    response.first&.o&.value
+  end
+
+  def get_object_term(subject, predicate)
+    response = ArtsdataGraph::SparqlService.client.select.where([subject, predicate, :o]).execute
+    response.first&.o
+  end
+
+  def sparql_string_literal(value)
+    RDF::Literal(value.to_s).to_ntriples
+  end
+
+  def sparql_uri(value)
+    RDF::URI(value.to_s).to_ntriples
+  end
+
+  def valid_http_uri?(value)
+    parsed = URI.parse(value)
+    parsed.is_a?(URI::HTTP) && parsed.host.present?
+  rescue URI::InvalidURIError
+    false
+  end
+
+  def valid_graph_uri?(value)
+    parsed = URI.parse(value.to_s)
+    parsed.is_a?(URI::HTTP) && parsed.host.present? &&
+      value.start_with?("http://kg.artsdata.ca/", "https://kg.artsdata.ca/")
+  rescue URI::InvalidURIError
+    false
   end
 
   def delete_graph_from_kg(graph_uri)
