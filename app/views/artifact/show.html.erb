@@ -56,12 +56,12 @@
         </p>
         <%= form_with url: toggle_auto_minting_artifact_index_path, method: :post, local: true, html: { class: "mb-0", data: { turbo: "false" } } do |form| %>
           <%= form.hidden_field :graph, value: @artifact.graph %>
-          <%= form.hidden_field :new_boolean, value: @automint_status ? "false" : "true" %>
+          <%= form.hidden_field :new_boolean, value: !@automint_status %>
           <%= check_box_tag :auto_minting_toggle, "1", @automint_status,
               class: "btn-check",
               id: automint_toggle_id,
               autocomplete: "off",
-              onchange: "this.form.requestSubmit();" %>
+              onchange: "this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit();" %>
           <%= label_tag automint_toggle_id,
               "Auto-Minting #{@automint_status ? 'enabled' : 'disabled'}",
               class: "btn btn-outline-secondary" %>
