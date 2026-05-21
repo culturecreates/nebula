@@ -98,35 +98,43 @@ class ArtifactController < ApplicationController
     rating_value = "" if deleting
     rating_explanation = "" if deleting
 
-    schema_ns = RDF::Vocab::SCHEMA.to_s
+    graph_term = sparql_uri(graph)
     rating_uri = "#{graph}##{GRAPH_METADATA_RATING_FRAGMENT}"
+    rating_term = sparql_uri(rating_uri)
+    schema_name = sparql_uri(RDF::Vocab::SCHEMA.name.to_s)
+    schema_maintainer = sparql_uri(RDF::Vocab::SCHEMA.maintainer.to_s)
+    schema_content_rating = sparql_uri(RDF::Vocab::SCHEMA.contentRating.to_s)
+    schema_rating_value = sparql_uri(RDF::Vocab::SCHEMA.ratingValue.to_s)
+    schema_rating_explanation = sparql_uri(RDF::Vocab::SCHEMA.ratingExplanation.to_s)
+    schema_endorsement_rating = sparql_uri(RDF::Vocab::SCHEMA.EndorsementRating.to_s)
+    rdf_type = sparql_uri(RDF.type.to_s)
     insert_triples = []
-    insert_triples << "<#{graph}> <#{schema_ns}name> #{sparql_literal(graph_name)} ." if graph_name.present?
-    insert_triples << "<#{graph}> <#{schema_ns}maintainer> <#{maintainer}> ." if maintainer.present?
+    insert_triples << "#{graph_term} #{schema_name} #{sparql_string_literal(graph_name)} ." if graph_name.present?
+    insert_triples << "#{graph_term} #{schema_maintainer} #{sparql_uri(maintainer)} ." if maintainer.present?
 
     if rating_value.present? || rating_explanation.present?
-      insert_triples << "<#{graph}> <#{schema_ns}contentRating> <#{rating_uri}> ."
-      insert_triples << "<#{rating_uri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <#{schema_ns}EndorsementRating> ."
-      insert_triples << "<#{rating_uri}> <#{schema_ns}ratingValue> #{sparql_literal(rating_value)} ." if rating_value.present?
-      insert_triples << "<#{rating_uri}> <#{schema_ns}ratingExplanation> #{sparql_literal(rating_explanation)} ." if rating_explanation.present?
+      insert_triples << "#{graph_term} #{schema_content_rating} #{rating_term} ."
+      insert_triples << "#{rating_term} #{rdf_type} #{schema_endorsement_rating} ."
+      insert_triples << "#{rating_term} #{schema_rating_value} #{sparql_string_literal(rating_value)} ." if rating_value.present?
+      insert_triples << "#{rating_term} #{schema_rating_explanation} #{sparql_string_literal(rating_explanation)} ." if rating_explanation.present?
     end
 
     query = <<~SPARQL
       WITH <http://kg.artsdata.ca/Graph_Ranking>
       DELETE {
-        <#{graph}> <#{schema_ns}name> ?old_name .
-        <#{graph}> <#{schema_ns}maintainer> ?old_maintainer .
-        <#{graph}> <#{schema_ns}contentRating> ?old_rating .
+        #{graph_term} #{schema_name} ?old_name .
+        #{graph_term} #{schema_maintainer} ?old_maintainer .
+        #{graph_term} #{schema_content_rating} ?old_rating .
         ?old_rating ?old_rating_p ?old_rating_o .
       }
       INSERT {
         #{insert_triples.join("\n")}
       }
       WHERE {
-        OPTIONAL { <#{graph}> <#{schema_ns}name> ?old_name . }
-        OPTIONAL { <#{graph}> <#{schema_ns}maintainer> ?old_maintainer . }
+        OPTIONAL { #{graph_term} #{schema_name} ?old_name . }
+        OPTIONAL { #{graph_term} #{schema_maintainer} ?old_maintainer . }
         OPTIONAL {
-          <#{graph}> <#{schema_ns}contentRating> ?old_rating .
+          #{graph_term} #{schema_content_rating} ?old_rating .
           OPTIONAL { ?old_rating ?old_rating_p ?old_rating_o . }
         }
       }
@@ -202,8 +210,12 @@ class ArtifactController < ApplicationController
     response.first&.o
   end
 
-  def sparql_literal(value)
-    value.to_s.to_json
+  def sparql_string_literal(value)
+    RDF::Literal(value.to_s).to_ntriples
+  end
+
+  def sparql_uri(value)
+    RDF::URI(value.to_s).to_ntriples
   end
 
   def valid_http_uri?(value)

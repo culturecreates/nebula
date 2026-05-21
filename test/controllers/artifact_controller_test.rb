@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class ArtifactControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -130,18 +131,33 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     artifact_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact"
     graph_uri = "http://kg.artsdata.ca/testaccount/group/artifact"
     rating_uri = RDF::URI("#{graph_uri}#endorsementRating")
-    results = [
-      [stub(o: stub(value: "true"))], # automint
-      [stub(o: stub(value: "Graph Name"))], # name
-      [stub(o: stub(value: "https://example.org/maintainer"))], # maintainer
-      [stub(o: rating_uri)], # contentRating node
-      [stub(o: stub(value: "4"))], # ratingValue
-      [stub(o: stub(value: "Trusted source"))] # ratingExplanation
-    ]
-
     mock_select = Object.new
-    mock_select.define_singleton_method(:where) { |_triple_pattern| self }
-    mock_select.define_singleton_method(:execute) { results.shift || [] }
+    mock_select.define_singleton_method(:where) do |triple_pattern|
+      @last_subject = triple_pattern[0]
+      @last_predicate = triple_pattern[1]
+      self
+    end
+    mock_select.define_singleton_method(:execute) do
+      schema = RDF::Vocab::SCHEMA
+      automint = RDF::URI("http://kg.artsdata.ca/ontology/automint")
+      literal_solution = ->(value) { [OpenStruct.new(o: OpenStruct.new(value: value))] }
+
+      if @last_predicate == automint
+        literal_solution.call("true")
+      elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.name
+        literal_solution.call("Graph Name")
+      elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.maintainer
+        literal_solution.call("https://example.org/maintainer")
+      elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.contentRating
+        [OpenStruct.new(o: rating_uri)]
+      elsif @last_subject == rating_uri && @last_predicate == schema.ratingValue
+        literal_solution.call("4")
+      elsif @last_subject == rating_uri && @last_predicate == schema.ratingExplanation
+        literal_solution.call("Trusted source")
+      else
+        []
+      end
+    end
     @mock_client.stubs(:select).returns(mock_select)
 
     get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
@@ -151,6 +167,9 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_match(/schema:name/, response.body)
     assert_match(/schema:maintainer/, response.body)
     assert_match(/schema:ratingExplanation/, response.body)
+    assert_includes response.body, "Graph Name"
+    assert_includes response.body, "https://example.org/maintainer"
+    assert_match(/Trusted source/, response.body)
   end
 
   # ---------------------------------------------------------------------------
