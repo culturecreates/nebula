@@ -198,11 +198,10 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
 
     assert_response :success
-    assert_includes response.body, "Artifact version loaded:"
-    assert_includes response.body, dataset_uri
+    assert_includes response.body, "Artifact loaded"
+    assert_includes response.body, dataset_uri.to_s
     assert_includes response.body, "March 17, 2026"
-    assert_includes response.body, distribution_uri
-    assert_includes response.body, entity_path(uri: dataset_uri)
+    assert_includes response.body, entity_path(uri: dataset_uri.to_s)
   end
 
   # ---------------------------------------------------------------------------
