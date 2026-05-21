@@ -42,8 +42,7 @@
     <div class="card-body">
       <h3 class="card-title">Auto-Minting</h3>
       <p>
-        Automatically mint events with Artsdata URIs every time this artifact
-        is pushed to Artsdata.
+        Automatically mint events with Artsdata URIs every time this artifact is loaded into an Artsdata data feed graph.
       </p>
       <p>
         Current status:
@@ -69,30 +68,30 @@
   <div class="card mb-4">
     <div class="card-body">
       <h3 class="card-title">Graph Metadata</h3>
-      <p>Metadata used every time the artifact is loaded into Artsdata as a data feed graph.</p>
+      <p>Metadata for the Artsdata data feed graph used for describing and ranking sources.</p>
       <p>
-        <%= link_to "View Graph", entity_path(uri: @artifact.graph), class: "btn btn-outline-secondary btn-sm" %>
+        <%= link_to "View Data Feed", entity_path(uri: @artifact.graph), class: "btn btn-outline-secondary btn-sm" %>
       </p>
       <%= form_with url: update_graph_metadata_artifact_index_path, method: :post, local: true, html: { data: { turbo: "false" } } do |form| %>
         <%= form.hidden_field :graph, value: @artifact.graph %>
 
         <div class="mb-3">
-          <%= form.label :graph_name, "schema:name", class: "form-label" %>
-          <%= text_field_tag :graph_name, @graph_metadata[:name], class: "form-control" %>
+          <%= form.label :graph_name, "Name", class: "form-label" %>
+          <%= text_field_tag :graph_name, @graph_metadata[:name], class: "form-control"%>
         </div>
 
         <div class="mb-3">
-          <%= form.label :maintainer, "schema:maintainer", class: "form-label" %>
-          <%= url_field_tag :maintainer, @graph_metadata[:maintainer], class: "form-control" %>
+          <%= form.label :maintainer, "Maintainer", class: "form-label" %>
+          <%= url_field_tag :maintainer, @graph_metadata[:maintainer], class: "form-control", placeholder: "website of the organization maintaining the data" %>
         </div>
 
         <div class="mb-3">
-          <%= form.label :rating_value, "schema:ratingValue", class: "form-label" %>
+          <%= form.label :rating_value, "Rating Value", class: "form-label" %>
           <%= text_field_tag :rating_value, @graph_metadata[:rating_value], class: "form-control" %>
         </div>
 
         <div class="mb-3">
-          <%= form.label :rating_explanation, "schema:ratingExplanation", class: "form-label" %>
+          <%= form.label :rating_explanation, "Rating Explanation", class: "form-label" %>
           <%= text_area_tag :rating_explanation, @graph_metadata[:rating_explanation], class: "form-control", rows: 3 %>
         </div>
 
