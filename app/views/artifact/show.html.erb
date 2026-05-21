@@ -75,6 +75,9 @@
     <div class="card-body">
       <h3 class="card-title">Graph Metadata</h3>
       <p>Metadata used when the artifact is loaded into Artsdata as a data feed graph.</p>
+      <p>
+        <%= link_to "View Graph Metadata", entity_path(uri: @artifact.graph), class: "btn btn-outline-secondary btn-sm" %>
+      </p>
       <%= form_with url: update_graph_metadata_artifact_index_path, method: :post, local: true, html: { data: { turbo: "false" } } do |form| %>
         <%= form.hidden_field :graph, value: @artifact.graph %>
 
