@@ -1,5 +1,4 @@
 require "test_helper"
-require "ostruct"
 
 class ArtifactControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -140,7 +139,9 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     mock_select.define_singleton_method(:execute) do
       schema = RDF::Vocab::SCHEMA
       automint = RDF::URI("http://kg.artsdata.ca/ontology/automint")
-      literal_solution = ->(value) { [OpenStruct.new(o: OpenStruct.new(value: value))] }
+      solution_class = Struct.new(:o)
+      literal_class = Struct.new(:value)
+      literal_solution = ->(value) { [solution_class.new(literal_class.new(value))] }
 
       if @last_predicate == automint
         literal_solution.call("true")
@@ -149,7 +150,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.maintainer
         literal_solution.call("https://example.org/maintainer")
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.contentRating
-        [OpenStruct.new(o: rating_uri)]
+        [solution_class.new(rating_uri)]
       elsif @last_subject == rating_uri && @last_predicate == schema.ratingValue
         literal_solution.call("4")
       elsif @last_subject == rating_uri && @last_predicate == schema.ratingExplanation
