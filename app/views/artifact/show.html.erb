@@ -44,24 +44,29 @@
       <p>
         Automatically mint events with Artsdata URIs every time this artifact is loaded into an Artsdata data feed graph.
       </p>
-      <p>
-        Current status:
-        <% if @automint_status %>
-          <strong>enabled &#10003;
-          </strong>
-        <% else %>
-          <strong>disabled</strong>
-        <% end %>
-        <%= form_with url: toggle_auto_minting_artifact_index_path, method: :post, local: true, html: { data: { turbo: "false" } }  do |form| %>
+      <% automint_toggle_id = "auto-minting-toggle" %>
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <p class="mb-0">
+          Current status:
+          <% if @automint_status %>
+            <strong>enabled &#10003;</strong>
+          <% else %>
+            <strong>disabled</strong>
+          <% end %>
+        </p>
+        <%= form_with url: toggle_auto_minting_artifact_index_path, method: :post, local: true, html: { class: "mb-0", data: { turbo: "false" } } do |form| %>
           <%= form.hidden_field :graph, value: @artifact.graph %>
-          <%= form.hidden_field :new_boolean, value: !@automint_status %>
-          <%= form.submit @automint_status ? "Turn Off" : "Turn On",
-                      class: "btn btn-secondary",
-                      data: {
-                        disable_with: "updating...",
-                      } %>
+          <%= form.hidden_field :new_boolean, value: @automint_status ? "false" : "true" %>
+          <%= check_box_tag :auto_minting_toggle, "1", @automint_status,
+              class: "btn-check",
+              id: automint_toggle_id,
+              autocomplete: "off",
+              onchange: "this.form.requestSubmit();" %>
+          <%= label_tag automint_toggle_id,
+              "Auto-Minting #{@automint_status ? 'enabled' : 'disabled'}",
+              class: "btn btn-outline-secondary" %>
         <% end %>
-      </p>
+      </div>
     </div>
   </div>
 

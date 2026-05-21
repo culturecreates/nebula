@@ -124,7 +124,12 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     @mock_client.stubs(:query).returns([])
 
     get artifact_path(id: 'show'), params: { artifactUri: artifact_uri }
+    document = Nokogiri::HTML(response.body)
+
     assert_response :success
+    assert_not_nil document.at_css('input#auto-minting-toggle.btn-check')
+    assert_equal "true", document.at_css('input[name="new_boolean"]')["value"]
+    assert_match(/Auto-Minting disabled/, response.body)
   end
 
   test "show should display graph metadata values when available" do
@@ -164,6 +169,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     @mock_client.stubs(:query).returns([])
 
     get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
+    document = Nokogiri::HTML(response.body)
 
     assert_response :success
     assert_match(/Graph Metadata/, response.body)
@@ -174,6 +180,9 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Graph Name"
     assert_includes response.body, "https://example.org/maintainer"
     assert_match(/Trusted source/, response.body)
+    assert_not_nil document.at_css('input#auto-minting-toggle.btn-check')
+    assert_equal "false", document.at_css('input[name="new_boolean"]')["value"]
+    assert_match(/Auto-Minting enabled/, response.body)
   end
 
   # ---------------------------------------------------------------------------
