@@ -11,31 +11,56 @@
   </h1>
   <%= render partial: "shared/clipboard", locals: { uri: @artifact.uri } %>
 
+  <% if @loaded_artifact_version.present? %>
+    <p>
+    <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: { class: "d-inline", data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Reload artifact and replace the data in the Artsdata data feed graph?" } } do |form| %>
+      <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+        <strong>Artifact loaded:</strong>
+        <%= link_to @loaded_artifact_version.version.to_s, entity_path(uri: @loaded_artifact_version.dataset_uri.to_s), class: "py-0 px-1" %>
+     
+     
+        <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+        <%= form.submit "Reload",
+                  class: "btn btn-outline-secondary btn-sm py-0 px-1",
+                  data: {
+                    disable_with: "Loading...",
+                  } %>
+        <% end %>
+        <%= form_with url: artifact_path, method: :delete, local: true, html: { class: "d-inline", data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}? This will also delete the corresponding graph from the Artsdata Knowledge Graph." } } do |form| %>
+          <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+          <%= form.hidden_field :graph, value: @artifact.graph %>
+          <%= form.submit "Delete",
+                      class: "btn btn-sm py-0 px-1 btn-outline-danger",
+                      data: {
+                        disable_with: "Deleting...",
+                      } %>
+        <% end %>
+      </p>
+    <% else %>
+      <p class="mt-4">Artifact not loaded into Artsdata.</p> 
+      <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: {  class: "d-inline", data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Create an Artsdata data feed graph with this artifact?" } } do |form| %>
+        <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+        <%= form.submit "Load Artifact",
+                    class: "btn btn-secondary",
+                    data: {
+                      disable_with: "Loading...",
+                    } %>
+      <% end %>
+      <%= form_with url: artifact_path, method: :delete, local: true, html: {  class: "d-inline", data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}? This will also delete the corresponding graph from the Artsdata Knowledge Graph." } } do |form| %>
+        <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+        <%= form.hidden_field :graph, value: @artifact.graph %>
+        <%= form.submit "Delete",
+                    class: "btn btn-danger",
+                    data: {
+                      disable_with: "Deleting...",
+                    } %>
+      <% end %>
+  <% end %>
+
   <div class="mt-3">
     <p>
       <%= @artifact.description %>
     </p>
-  </div>
-  <div class="d-flex gap-2 mb-4">
-    <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Load the latest artifact into an Artsdata data feed graph?" } } do |form| %>
-      <%= form.hidden_field :artifactUri, value: @artifact.uri %>
-      <%= form.submit "Load Artifact",
-                  class: "btn btn-secondary",
-                  data: {
-                    disable_with: "Loading...",
-                  } %>
-    <% end %>
-
-    <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}? This will also delete the corresponding graph from the Artsdata Knowledge Graph." } } do |form| %>
-      <%= form.hidden_field :artifactUri, value: @artifact.uri %>
-      <%= form.hidden_field :graph, value: @artifact.graph %>
-      <%= form.submit "Delete",
-                  class: "btn btn-danger",
-                  data: {
-                    disable_with: "Deleting...",
-                  } %>
-    <% end %>
-
   </div>
   <!-- Toggle Auto-Minting Button -->
   <div class="card mb-4">
@@ -114,36 +139,45 @@
       <p>Versions of artifacts that can be loaded into Artsdata data feed graphs.</p>
       <% if @artifact_versions.present? %>
         <% total_versions = @artifact_versions.count %>
-        <% displayed_versions = @artifact_versions.first(10) %>
+        <% displayed_versions = @artifact_versions.first(100) %>
         <p><strong>Total versions: <%= total_versions %></strong></p>
         <table class="table table-sm">
           <thead>
             <tr>
-              <th>Date</th>
-              <th></th>
+              <th>#</th>
+              <th>Version</th>
+              <th>Issued</th>
+              <th colspan="2"></th>
             </tr>
           </thead>
           <tbody>
-            <% displayed_versions.each do |version| %>
-              <% version_uri = "#{@artifact.uri}/#{version.version}#Dataset" %>
+            <% displayed_versions.each_with_index do |version, idx| %>
+              <% issued_display = date_display(version.issued.to_s).presence || version.issued %>
               <tr>
-                <td><%= version.version %></td>
-                <td>
-                  <%= form_with url: push_version_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Load artifact version #{version.version} into an Artsdata data feed graph?" } } do |form| %>
-                    <%= form.hidden_field :artifactUri, value: @artifact.uri %>
-                    <%= form.hidden_field :artifactVersionUri, value: version_uri %>
-                    <%= form.submit "Load",
-                                class: "btn btn-secondary btn-sm",
-                                data: {
-                                  disable_with: "Loading...",
-                                } %>
-                  <% end %>
+                <td><%= idx + 1 %></td>
+                <td><%= link_to version.version, entity_path(uri: version.dataset_uri) %></td>
+                <td><%= issued_display.presence || "—" %></td>
+                <td colspan="2">
+                  <div class="d-flex justify-content-end gap-2">
+                    <% if version.distribution_uri.present? %>
+                      <%= link_to "Files", entity_path(uri: version.distribution_uri.to_s), class: "btn btn-outline-secondary btn-sm" %>
+                    <% end %>
+                    <%= form_with url: push_version_artifact_index_path, method: :post, local: true, html: { class: "d-inline", data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Load artifact version #{version.version} into an Artsdata data feed graph?" } } do |form| %>
+                      <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+                      <%= form.hidden_field :artifactVersionUri, value: version.dataset_uri %>
+                      <%= form.submit "Load",
+                                  class: "btn btn-secondary btn-sm",
+                                  data: {
+                                    disable_with: "Loading...",
+                                  } %>
+                    <% end %>
+                  </div>
                 </td>
               </tr>
             <% end %>
           </tbody>
         </table>
-        <% if total_versions > 10 %>
+        <% if total_versions > 100 %>
           <p><%= link_to "View all #{total_versions} versions", entity_path(uri: @artifact.uri) %></p>
         <% end %>
       <% else %>
