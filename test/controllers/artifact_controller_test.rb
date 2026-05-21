@@ -126,6 +126,33 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show should display graph metadata values when available" do
+    artifact_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact"
+    graph_uri = "http://kg.artsdata.ca/testaccount/group/artifact"
+    rating_uri = RDF::URI("#{graph_uri}#endorsementRating")
+    results = [
+      [stub(o: stub(value: "true"))], # automint
+      [stub(o: stub(value: "Graph Name"))], # name
+      [stub(o: stub(value: "https://example.org/maintainer"))], # maintainer
+      [stub(o: rating_uri)], # contentRating node
+      [stub(o: stub(value: "4"))], # ratingValue
+      [stub(o: stub(value: "Trusted source"))] # ratingExplanation
+    ]
+
+    mock_select = Object.new
+    mock_select.define_singleton_method(:where) { |_triple_pattern| self }
+    mock_select.define_singleton_method(:execute) { results.shift || [] }
+    @mock_client.stubs(:select).returns(mock_select)
+
+    get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
+
+    assert_response :success
+    assert_match(/Graph Metadata/, response.body)
+    assert_match(/schema:name/, response.body)
+    assert_match(/schema:maintainer/, response.body)
+    assert_match(/schema:ratingExplanation/, response.body)
+  end
+
   # ---------------------------------------------------------------------------
   # toggle_auto_minting action
   # ---------------------------------------------------------------------------
@@ -163,6 +190,59 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_match(/Failed to toggle Auto-Minting/, flash[:alert])
+    assert_response :redirect
+  end
+
+  # ---------------------------------------------------------------------------
+  # update_graph_metadata action
+  # ---------------------------------------------------------------------------
+
+  test "update_graph_metadata should set notice and redirect on success" do
+    @mock_update_client.stubs(:update)
+
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      graph_name: "My graph",
+      maintainer: "https://example.org/org",
+      rating_value: "5",
+      rating_explanation: "Great quality"
+    }
+
+    assert_match(/updated/, flash[:notice])
+    assert_response :redirect
+  end
+
+  test "update_graph_metadata should reject invalid maintainer URL" do
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      maintainer: "not-a-url"
+    }
+
+    assert_match(/maintainer must be a valid URL/, flash[:alert])
+    assert_response :redirect
+  end
+
+  test "update_graph_metadata should set deleted notice when delete button is used" do
+    @mock_update_client.stubs(:update)
+
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      delete_metadata: "true"
+    }
+
+    assert_match(/deleted/, flash[:notice])
+    assert_response :redirect
+  end
+
+  test "update_graph_metadata should set alert on SPARQL update error" do
+    @mock_update_client.stubs(:update).raises(StandardError.new("SPARQL update error"))
+
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      graph_name: "My graph"
+    }
+
+    assert_match(/Failed to update graph metadata/, flash[:alert])
     assert_response :redirect
   end
 
