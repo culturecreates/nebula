@@ -17,24 +17,19 @@
     </p>
   </div>
   <div class="d-flex gap-2 mb-4">
-    <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Push the latest artifact to Artsdata?" } } do |form| %>
+    <%= form_with url: push_latest_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Load the latest artifact into an Artsdata data feed graph?" } } do |form| %>
       <%= form.hidden_field :artifactUri, value: @artifact.uri %>
-      <%= form.submit "push latest",
+      <%= form.submit "Load Artifact",
                   class: "btn btn-secondary",
                   data: {
-                    disable_with: "Pushing...",
+                    disable_with: "Loading...",
                   } %>
     <% end %>
-    <%= link_to "create new version",
-    artifact_path(@artifact),
-    class: "btn btn-secondary disabled" %>
-
-    <%= link_to "edit", artifact_path(@artifact), class: "btn btn-secondary disabled" %>
 
     <%= form_with url: artifact_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete artifact metadata for #{@artifact.artifact_id}? This will also delete the corresponding graph from the Artsdata Knowledge Graph." } } do |form| %>
       <%= form.hidden_field :artifactUri, value: @artifact.uri %>
       <%= form.hidden_field :graph, value: @artifact.graph %>
-      <%= form.submit "delete",
+      <%= form.submit "Delete",
                   class: "btn btn-danger",
                   data: {
                     disable_with: "Deleting...",
@@ -61,7 +56,7 @@
         <%= form_with url: toggle_auto_minting_artifact_index_path, method: :post, local: true, html: { data: { turbo: "false" } }  do |form| %>
           <%= form.hidden_field :graph, value: @artifact.graph %>
           <%= form.hidden_field :new_boolean, value: !@automint_status %>
-          <%= form.submit @automint_status ? "turn off" : "turn on",
+          <%= form.submit @automint_status ? "Turn Off" : "Turn On",
                       class: "btn btn-secondary",
                       data: {
                         disable_with: "updating...",
