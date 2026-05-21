@@ -253,6 +253,21 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test "update_graph_metadata should allow blank values and clear metadata" do
+    @mock_update_client.stubs(:update)
+
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      graph_name: "",
+      maintainer: "",
+      rating_value: "",
+      rating_explanation: ""
+    }
+
+    assert_match(/updated/, flash[:notice])
+    assert_response :redirect
+  end
+
   test "update_graph_metadata should set alert on SPARQL update error" do
     @mock_update_client.stubs(:update).raises(StandardError.new("SPARQL update error"))
 

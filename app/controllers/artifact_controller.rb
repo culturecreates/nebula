@@ -119,7 +119,7 @@ class ArtifactController < ApplicationController
       insert_triples << "#{rating_term} #{schema_rating_explanation} #{sparql_string_literal(rating_explanation)} ." if rating_explanation.present?
     end
 
-    query = <<~SPARQL
+    delete_block = <<~SPARQL
       WITH <http://kg.artsdata.ca/Graph_Ranking>
       DELETE {
         #{graph_term} #{schema_name} ?old_name .
@@ -127,9 +127,9 @@ class ArtifactController < ApplicationController
         #{graph_term} #{schema_content_rating} ?old_rating .
         ?old_rating ?old_rating_p ?old_rating_o .
       }
-      INSERT {
-        #{insert_triples.join("\n")}
-      }
+    SPARQL
+
+    where_block = <<~SPARQL
       WHERE {
         OPTIONAL { #{graph_term} #{schema_name} ?old_name . }
         OPTIONAL { #{graph_term} #{schema_maintainer} ?old_maintainer . }
@@ -139,6 +139,21 @@ class ArtifactController < ApplicationController
         }
       }
     SPARQL
+
+    query = if insert_triples.empty?
+      <<~SPARQL
+        #{delete_block}
+        #{where_block}
+      SPARQL
+    else
+      <<~SPARQL
+        #{delete_block}
+        INSERT {
+          #{insert_triples.join("\n")}
+        }
+        #{where_block}
+      SPARQL
+    end
 
     begin
       ArtsdataGraph::SparqlService.update_client.update(query)
