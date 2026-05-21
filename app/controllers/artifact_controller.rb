@@ -201,8 +201,7 @@ class ArtifactController < ApplicationController
   end
 
   def sparql_string(value)
-    escaped = value.to_s.gsub("\\", "\\\\\\\\").gsub("\"", "\\\\\"").gsub("\n", "\\n").gsub("\r", "\\r")
-    "\"#{escaped}\""
+    value.to_s.to_json
   end
 
   def valid_http_uri?(value)
