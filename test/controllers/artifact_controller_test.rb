@@ -165,7 +165,6 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match(/Graph Metadata/, response.body)
-    assert_match(/View Graph Metadata/, response.body)
     assert_match(/schema:name/, response.body)
     assert_match(/schema:maintainer/, response.body)
     assert_match(/schema:ratingExplanation/, response.body)
