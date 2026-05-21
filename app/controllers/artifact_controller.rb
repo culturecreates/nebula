@@ -21,6 +21,7 @@ class ArtifactController < ApplicationController
     @artifact = Artifact.find(params[:artifactUri])
     @automint_status = get_automint_status( @artifact.graph)
     @graph_metadata = get_graph_metadata(@artifact.graph)
+    @loaded_artifact_version = get_loaded_artifact_version(@artifact.graph)
     @artifact_versions = get_artifact_versions(@artifact.uri)
   end
 
@@ -242,6 +243,17 @@ class ArtifactController < ApplicationController
     rescue StandardError => e
       flash.alert = "Error loading artifact versions: #{e.message[0..100]}#{e.message.length > 100 ? '...' : ''}"
       []
+    end
+  end
+
+  def get_loaded_artifact_version(graph_uri)
+    sparql_file = "artifact_controller/get_loaded_artifact_version"
+    query = SparqlLoader.load(sparql_file, ["GRAPH_URI", graph_uri])
+    begin
+      ArtsdataGraph::SparqlService.client.query(query).first
+    rescue StandardError => e
+      flash.alert = "Error loading loaded artifact version: #{e.message[0..100]}#{e.message.length > 100 ? '...' : ''}"
+      nil
     end
   end
 

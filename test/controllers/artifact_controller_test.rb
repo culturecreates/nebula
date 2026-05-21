@@ -176,6 +176,35 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_match(/Trusted source/, response.body)
   end
 
+  test "show should display the loaded artifact version and version actions" do
+    artifact_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact"
+    dataset_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact/2026-03-17T02_40_05#Dataset"
+    distribution_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact/2026-03-17T02_40_05#Distribution"
+    loaded_version = Struct.new(:version, :dataset_uri).new("2026-03-17T02_40_05", dataset_uri)
+    artifact_version = Struct.new(:version, :dataset_uri, :issued, :distribution_uri).new(
+      "2026-03-17T02_40_05",
+      dataset_uri,
+      "2026-03-17",
+      distribution_uri
+    )
+
+    mock_select = mock("select_query")
+    mock_select.stubs(:where).returns(mock_select)
+    mock_select.stubs(:execute).returns([])
+    @mock_client.stubs(:select).returns(mock_select)
+    @mock_client.stubs(:query).with { |query| query.include?("prov:wasDerivedFrom/foaf:primaryTopic") }.returns([loaded_version])
+    @mock_client.stubs(:query).with { |query| query.include?("dataid:artifact") }.returns([artifact_version])
+
+    get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
+
+    assert_response :success
+    assert_includes response.body, "Artifact version loaded:"
+    assert_includes response.body, dataset_uri
+    assert_includes response.body, "March 17, 2026"
+    assert_includes response.body, distribution_uri
+    assert_includes response.body, entity_path(uri: dataset_uri)
+  end
+
   # ---------------------------------------------------------------------------
   # toggle_auto_minting action
   # ---------------------------------------------------------------------------
@@ -378,6 +407,28 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
       "artifact_controller/list_artifact_versions",
       ["ARTIFACT_URI", "http://kg.artsdata.ca/databus/testaccount/group/artifact"]
     )
+    assert_nothing_raised do
+      SPARQL::Grammar.parse(sparql)
+    end
+  end
+
+  test "get_loaded_artifact_version SPARQL file should exist" do
+    assert File.exist?(Rails.root.join("app/services/sparqls/artifact_controller/get_loaded_artifact_version.sparql")),
+           "get_loaded_artifact_version.sparql file is missing"
+  end
+
+  test "get_loaded_artifact_version SPARQL should contain the GRAPH_URI placeholder" do
+    sparql = File.read(Rails.root.join("app/services/sparqls/artifact_controller/get_loaded_artifact_version.sparql"))
+    assert_includes sparql, "GRAPH_URI",
+                    "get_loaded_artifact_version.sparql is missing the GRAPH_URI placeholder"
+  end
+
+  test "get_loaded_artifact_version SPARQL should be syntactically valid after substitution" do
+    sparql = SparqlLoader.load(
+      "artifact_controller/get_loaded_artifact_version",
+      ["GRAPH_URI", "http://kg.artsdata.ca/testaccount/group/artifact"]
+    )
+
     assert_nothing_raised do
       SPARQL::Grammar.parse(sparql)
     end
