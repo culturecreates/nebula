@@ -121,6 +121,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     mock_select.stubs(:where).returns(mock_select)
     mock_select.stubs(:execute).returns([])
     @mock_client.stubs(:select).returns(mock_select)
+    @mock_client.stubs(:query).returns([])
 
     get artifact_path(id: 'show'), params: { artifactUri: artifact_uri }
     assert_response :success
@@ -160,6 +161,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
       end
     end
     @mock_client.stubs(:select).returns(mock_select)
+    @mock_client.stubs(:query).returns([])
 
     get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
 
@@ -317,6 +319,68 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
 
     assert_match(/Error pushing/, flash[:alert])
     assert_response :redirect
+  end
+
+  # ---------------------------------------------------------------------------
+  # push_version action
+  # ---------------------------------------------------------------------------
+
+  test "push_version should redirect with a success notice when load succeeds" do
+    mock_databus = mock('databus_service')
+    mock_databus.stubs(:push_version).returns(true)
+    DatabusService.stubs(:new).returns(mock_databus)
+    version_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact/2024-01-01#Dataset"
+
+    post push_version_artifact_index_path, params: {
+      artifactUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact",
+      artifactVersionUri: version_uri
+    }
+
+    assert_match(/Loaded artifact version/, flash[:notice])
+    assert_includes flash[:notice], version_uri
+    assert_response :redirect
+  end
+
+  test "push_version should redirect with an error alert when load fails" do
+    mock_databus = mock('databus_service')
+    mock_databus.stubs(:push_version).returns(false)
+    mock_databus.stubs(:errors).returns(["API Error: 500"])
+    DatabusService.stubs(:new).returns(mock_databus)
+    version_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact/2024-01-01#Dataset"
+
+    post push_version_artifact_index_path, params: {
+      artifactUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact",
+      artifactVersionUri: version_uri
+    }
+
+    assert_match(/Error loading/, flash[:alert])
+    assert_includes flash[:alert], version_uri
+    assert_response :redirect
+  end
+
+  # ---------------------------------------------------------------------------
+  # list_artifact_versions SPARQL file validations
+  # ---------------------------------------------------------------------------
+
+  test "list_artifact_versions SPARQL file should exist" do
+    assert File.exist?(Rails.root.join("app/services/sparqls/artifact_controller/list_artifact_versions.sparql")),
+           "list_artifact_versions.sparql file is missing"
+  end
+
+  test "list_artifact_versions SPARQL should contain the ARTIFACT_URI placeholder" do
+    sparql = File.read(Rails.root.join("app/services/sparqls/artifact_controller/list_artifact_versions.sparql"))
+    assert_includes sparql, "ARTIFACT_URI",
+                    "list_artifact_versions.sparql is missing the ARTIFACT_URI placeholder"
+  end
+
+  test "list_artifact_versions SPARQL should be syntactically valid after substitution" do
+    sparql = SparqlLoader.load(
+      "artifact_controller/list_artifact_versions",
+      ["ARTIFACT_URI", "http://kg.artsdata.ca/databus/testaccount/group/artifact"]
+    )
+    assert_nothing_raised do
+      SPARQL::Grammar.parse(sparql)
+    end
   end
 
   # ---------------------------------------------------------------------------

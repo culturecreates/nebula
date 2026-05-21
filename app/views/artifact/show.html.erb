@@ -111,14 +111,41 @@
   <div class="card mb-4">
     <div class="card-body">
       <h3 class="card-title">Artifact Versions</h3>
+      <p>Versions of artifacts that can be loaded into Artsdata data feed graphs.</p>
       <% if @artifact_versions.present? %>
-        <ul class="list-group">
-          <% @artifact_versions.each do |version| %>
-            <li class="list-group-item">
-              <%= link_to "Version #{version.version}", artifact_version_path(version) %>
-            </li>
-          <% end %>
-        </ul>
+        <% total_versions = @artifact_versions.count %>
+        <% displayed_versions = @artifact_versions.first(10) %>
+        <p><strong>Total versions: <%= total_versions %></strong></p>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% displayed_versions.each do |version| %>
+              <% version_uri = "#{@artifact.uri}/#{version.version}#Dataset" %>
+              <tr>
+                <td><%= version.version %></td>
+                <td>
+                  <%= form_with url: push_version_artifact_index_path, method: :post, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Load artifact version #{version.version} into an Artsdata data feed graph?" } } do |form| %>
+                    <%= form.hidden_field :artifactUri, value: @artifact.uri %>
+                    <%= form.hidden_field :artifactVersionUri, value: version_uri %>
+                    <%= form.submit "Load",
+                                class: "btn btn-secondary btn-sm",
+                                data: {
+                                  disable_with: "Loading...",
+                                } %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <% if total_versions > 10 %>
+          <p><%= link_to "View all #{total_versions} versions", entity_path(uri: @artifact.uri) %></p>
+        <% end %>
       <% else %>
         <p class="text-muted">No versions available yet. Check back later.</p>
       <% end %>

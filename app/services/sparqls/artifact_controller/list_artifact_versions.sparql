@@ -1,0 +1,10 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dataid: <http://dataid.dbpedia.org/ns/core#>
+
+SELECT ?version ?dataset_uri
+WHERE {
+    ?dataset_uri a dataid:Dataset ;
+                 dataid:artifact <ARTIFACT_URI> ;
+                 dcterms:hasVersion ?version .
+}
+ORDER BY DESC(?version)
