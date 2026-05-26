@@ -53,9 +53,38 @@
 
     <p>Check to make sure the entity does not already exist in Artsdata. If it
       appears in this list then click the link button instead of minting a new
-      entity.</p>
+      entity. You can match using a different name if necessary.</p>
 
     <div class="col-lg-8">
+      <%= form_with url: reconcile_query_path, method: :get, local: false, class: "form-inline", data: { turbo_frame: "recon_results" } do |form| %>
+        <div class="mb-1 row">
+          <%= form.label :query, "Name", class: "col-sm-1 col-form-label" %>
+          <div class="col-sm-11">
+            <%= form.text_field :query,
+                            value: @label,
+                            class: "form-control",
+                            autocomplete: "off",
+                            spellcheck: "false" %>
+          </div>
+        </div>
+        <div class="mb-1 row">
+          <%= form.label :type, "Type", class: "col-sm-1 col-form-label" %>
+          <div class="col-sm-11">
+            <%= form.text_field :type,
+                            value: classToReconcile(@class_to_mint),
+                            class: "form-control",
+                            autocomplete: "off",
+                            spellcheck: "false" %>
+          </div>
+        </div>
+        
+        
+        <%= form.hidden_field :externalUri, value: @external_uri %>
+        <div class="text-center">
+          <%= form.submit "Reconcile", class: "btn btn-sm btn-outline-dark mb-3" %>
+        </div>
+      <% end %>
+   
       <p>
         <turbo-frame
           id='recon_results'
