@@ -12,9 +12,9 @@ document.addEventListener('turbo:load', function() {
       if (icon) {
         if (icon.classList.contains('text-secondary')) {
           icon.classList.remove('text-secondary');
-          icon.classList.add('text-info-subtle');
+          icon.classList.add('text-info');
         } else {
-          icon.classList.remove('text-info-subtle');
+          icon.classList.remove('text-info');
           icon.classList.add('text-secondary');
         }
       }
