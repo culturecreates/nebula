@@ -83,7 +83,7 @@ export default class extends Controller {
         "publisher": this.publisherValue,
         "name": this.labelValue,
         "language": this.languageValue,
-        "reference": this.referenceValue,
+        "dataset": this.referenceValue,
         "facts": this.facts
       })
     }
