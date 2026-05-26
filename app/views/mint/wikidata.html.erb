@@ -80,6 +80,7 @@
         
         
         <%= form.hidden_field :externalUri, value: @external_uri %>
+        <%= form.hidden_field :dataset, value: "http://kg.artsdata.ca/resource/K1-20" %>
         <div class="text-center">
           <%= form.submit "Reconcile", class: "btn btn-sm btn-outline-dark mb-3" %>
         </div>
