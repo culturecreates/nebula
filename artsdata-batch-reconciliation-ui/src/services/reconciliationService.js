@@ -452,11 +452,11 @@ export async function previewMint(uri, classToMint, config = {}, facts = null) {
  * Mint a new entity
  * @param {string} uri - URI of the entity to mint
  * @param {string} classToMint - schema:Person, schema:Organization, etc.
- * @param {string} reference - URI of the graph/data feed
+ * @param {string} dataset - URI of the graph/dataset
  * @param {Object} config - Configuration object with endpoints
  * @returns {Promise<Object>} - Mint results
  */
-export async function mintEntity(uri, classToMint, reference, config = {}) {
+export async function mintEntity(uri, classToMint, dataset, config = {}) {
   // Use config endpoints or fall back to defaults
   const mintEndpoint = config.mintEndpoint || DEFAULT_STAGING_API_BASE;
   const publisherUri = config.userUri || DEFAULT_PUBLISHER_URI;
@@ -471,7 +471,7 @@ export async function mintEntity(uri, classToMint, reference, config = {}) {
       body: JSON.stringify({
         uri,
         classToMint,
-        reference,
+        dataset,
         publisher: publisherUri
       })
     });
