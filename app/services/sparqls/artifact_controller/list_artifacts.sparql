@@ -8,8 +8,7 @@ SELECT
 
 (max(?version) as ?latest_version) 
 (count(?dataset) as ?versions) 
-?auto_load
-(sample(?auto_mints) as ?auto_mint)
+(sample(?automints) as ?automint)
 (GROUP_CONCAT(distinct ?publisher ;
         separator=", ") as ?publishers) 
 ?action
@@ -26,7 +25,7 @@ WHERE {
                  <http://purl.org/dc/terms/hasVersion> ?version .
         BIND(URI(CONCAT("http://kg.artsdata.ca/",STRAFTER(str(?artifact_uri),"/databus/"))) as ?graph_uri)
         OPTIONAL{
-            ?graph_uri ado:automint ?auto_mints .   
+            ?graph_uri ado:automint ?automints .   
         }
     
     }
@@ -35,7 +34,7 @@ WHERE {
     bind(concat("<a href='",str(?artifact_uri),"'>",STRAFTER(str(?last_part),"/"),"</a>") as ?artifact)
     bind(STRBEFORE(str(?last_part),"/") as ?group)
     bind(concat("<a class='btn btn-primary btn-sm' href='/artifact/show?artifactUri=",ENCODE_FOR_URI(str(?artifact_uri)),"' data-turbo='false'>view</a>") as ?action)
-    bind("true" as ?auto_load)
-} group by    ?account  ?group ?auto_load  ?artifact ?action 
+   
+} group by    ?account  ?group   ?artifact ?action 
 order by DESC(?group)
 limit 500
