@@ -111,6 +111,11 @@
         </div>
 
         <div class="mb-3">
+          <%= form.label :github_issue, "Github Issue", class: "form-label" %>
+          <%= url_field_tag :github_issue, @graph_metadata[:github_issue], class: "form-control", placeholder: "Enter Github issue about this artifact" %>
+        </div>
+
+        <div class="mb-3">
           <%= form.label :rating_value, "Rating Value", class: "form-label" %>
           <%= text_field_tag :rating_value, @graph_metadata[:rating_value], class: "form-control" %>
         </div>

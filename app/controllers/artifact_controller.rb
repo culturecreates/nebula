@@ -72,6 +72,7 @@ class ArtifactController < ApplicationController
     {
       name: get_object_value(subject, schema.name),
       maintainer: get_object_value(subject, schema.maintainer),
+      github_issue: get_object_value(subject, schema.discussionUrl),
       rating_value: rating_node ? get_object_value(rating_node, schema.ratingValue) : nil,
       rating_explanation: rating_node ? get_object_value(rating_node, schema.ratingExplanation) : nil
     }
@@ -81,6 +82,7 @@ class ArtifactController < ApplicationController
     graph = params[:graph].to_s
     graph_name = params[:graph_name].to_s.strip
     maintainer = params[:maintainer].to_s.strip
+    github_issue = params[:github_issue].to_s.strip
     rating_value = params[:rating_value].to_s.strip
     rating_explanation = params[:rating_explanation].to_s.strip
     deleting = params[:delete_metadata] == "true"
@@ -95,8 +97,14 @@ class ArtifactController < ApplicationController
       return redirect_back(fallback_location: root_path)
     end
 
+    if !deleting && github_issue.present? && !valid_http_uri?(github_issue)
+      flash.alert = "Failed to update graph metadata: Github Issue must be a valid URL."
+      return redirect_back(fallback_location: root_path)
+    end
+
     graph_name = "" if deleting
     maintainer = "" if deleting
+    github_issue = "" if deleting
     rating_value = "" if deleting
     rating_explanation = "" if deleting
 
@@ -105,6 +113,7 @@ class ArtifactController < ApplicationController
     rating_term = sparql_uri(rating_uri)
     schema_name = sparql_uri(RDF::Vocab::SCHEMA.name.to_s)
     schema_maintainer = sparql_uri(RDF::Vocab::SCHEMA.maintainer.to_s)
+    schema_discussion_url = sparql_uri(RDF::Vocab::SCHEMA.discussionUrl.to_s)
     schema_content_rating = sparql_uri(RDF::Vocab::SCHEMA.contentRating.to_s)
     schema_rating_value = sparql_uri(RDF::Vocab::SCHEMA.ratingValue.to_s)
     schema_rating_explanation = sparql_uri(RDF::Vocab::SCHEMA.ratingExplanation.to_s)
@@ -113,6 +122,7 @@ class ArtifactController < ApplicationController
     insert_triples = []
     insert_triples << "#{graph_term} #{schema_name} #{sparql_string_literal(graph_name)} ." if graph_name.present?
     insert_triples << "#{graph_term} #{schema_maintainer} #{sparql_uri(maintainer)} ." if maintainer.present?
+    insert_triples << "#{graph_term} #{schema_discussion_url} #{sparql_uri(github_issue)} ." if github_issue.present?
 
     if rating_value.present? || rating_explanation.present?
       insert_triples << "#{graph_term} #{schema_content_rating} #{rating_term} ."
@@ -126,6 +136,7 @@ class ArtifactController < ApplicationController
       DELETE {
         #{graph_term} #{schema_name} ?old_name .
         #{graph_term} #{schema_maintainer} ?old_maintainer .
+        #{graph_term} #{schema_discussion_url} ?old_github_issue .
         #{graph_term} #{schema_content_rating} ?old_rating .
         ?old_rating ?old_rating_p ?old_rating_o .
       }
@@ -135,6 +146,7 @@ class ArtifactController < ApplicationController
       WHERE {
         OPTIONAL { #{graph_term} #{schema_name} ?old_name . }
         OPTIONAL { #{graph_term} #{schema_maintainer} ?old_maintainer . }
+        OPTIONAL { #{graph_term} #{schema_discussion_url} ?old_github_issue . }
         OPTIONAL {
           #{graph_term} #{schema_content_rating} ?old_rating .
           OPTIONAL { ?old_rating ?old_rating_p ?old_rating_o . }

@@ -150,6 +150,8 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
         literal_solution.call("Graph Name")
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.maintainer
         literal_solution.call("https://example.org/maintainer")
+      elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.discussionUrl
+        literal_solution.call("https://github.com/culturecreates/nebula/issues/123")
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.contentRating
         [solution_class.new(rating_uri)]
       elsif @last_subject == rating_uri && @last_predicate == schema.ratingValue
@@ -169,10 +171,13 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_match(/Graph Metadata/, response.body)
     assert_match(/Name/, response.body)
     assert_match(/Maintainer/, response.body)
+    assert_match(/Github Issue/, response.body)
     assert_match(/Rating Value/, response.body)
     assert_match(/Rating Explanation/, response.body)
     assert_includes response.body, "Graph Name"
     assert_includes response.body, "https://example.org/maintainer"
+    assert_includes response.body, "https://github.com/culturecreates/nebula/issues/123"
+    assert_includes response.body, "Enter Github issue about this artifact"
     assert_match(/Trusted source/, response.body)
   end
 
@@ -255,6 +260,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
       graph: "http://kg.artsdata.ca/testaccount/group/artifact",
       graph_name: "My graph",
       maintainer: "https://example.org/org",
+      github_issue: "https://github.com/culturecreates/nebula/issues/123",
       rating_value: "5",
       rating_explanation: "Great quality"
     }
@@ -270,6 +276,16 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_match(/maintainer must be a valid URL/, flash[:alert])
+    assert_response :redirect
+  end
+
+  test "update_graph_metadata should reject invalid Github Issue URL" do
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      github_issue: "not-a-url"
+    }
+
+    assert_match(/Github Issue must be a valid URL/, flash[:alert])
     assert_response :redirect
   end
 
@@ -292,6 +308,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
       graph: "http://kg.artsdata.ca/testaccount/group/artifact",
       graph_name: "",
       maintainer: "",
+      github_issue: "",
       rating_value: "",
       rating_explanation: ""
     }
