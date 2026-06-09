@@ -6,7 +6,7 @@
   end %>
 
   <%= link_to "SPARQL",
-  "http://artsdata-trifid-production.herokuapp.com/sparql/#endpoint=http://query.artsdata.ca/query&query=#{URI.encode_www_form_component(@query)}",
+  "http://artsdata-trifid-production.herokuapp.com/sparql/#endpoint=/query&query=#{URI.encode_www_form_component(@query)}",
   class: "btn btn-outlined btn-sm " %>
   |
   <% if user_has_access?("batch_operations") %>
