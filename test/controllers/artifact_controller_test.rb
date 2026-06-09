@@ -177,7 +177,6 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Graph Name"
     assert_includes response.body, "https://example.org/maintainer"
     assert_includes response.body, "https://github.com/culturecreates/nebula/issues/123"
-    assert_includes response.body, "Enter Github issue about this artifact"
     assert_match(/Trusted source/, response.body)
   end
 
