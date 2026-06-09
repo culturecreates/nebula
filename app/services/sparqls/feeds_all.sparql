@@ -23,7 +23,7 @@ select
 where 
 {
     ?graphs a schema:Dataset .
-    ?graphs rdfs:label ?datasets;
+    ?graphs rdfs:label ?dataset_name;
             prov:generatedAtTime ?generatedAtTimes ;
             prov:wasDerivedFrom/foaf:primaryTopic ?dataset_id .
      ?dataset_id  dataid:artifact ?artifact .
@@ -60,6 +60,9 @@ where
     OPTIONAL {
         ?graphs ado:automint ?automints .
     }
+    OPTIONAL {
+        ?graphs schema:discussionUrl ?github_issue .
+    }
     OPTIONAL{
         ?dataset_id dataid:group ?group_id .
         OPTIONAL{
@@ -69,10 +72,11 @@ where
     }
     OPTIONAL {
         ?graphs schema:additionalType ado:FlaggedForReview .
-        <<  ?graphs schema:additionalType ado:FlaggedForReview >> prov:wasGeneratedBy [ schema:description ?github_issue ; ] .
-        bind(CONCAT(" <a style='color:red' href='",str(?github_issue),"'><i class=\"fa fa-flag\"></i></a>") as ?issue_link)
+        <<  ?graphs schema:additionalType ado:FlaggedForReview >> prov:wasGeneratedBy [ schema:description ?review_issue ; ] .
+        bind(CONCAT(" <a style='color:red' href='",str(?review_issue),"'><i class=\"fa fa-flag\"></i></a>") as ?issue_link)
     }
-    bind(ENCODE_FOR_URI(str(?datasets)) as ?dataset_escaped)
+    bind(CONCAT(str(?dataset_name), IF(BOUND(?github_issue), CONCAT(" <a href='",str(?github_issue),"' title='Open GitHub issue' target='_blank'><i class=\"fa-brands fa-github\" style='font-size:0.75em;'></i></a>"), "")) as ?datasets)
+    bind(ENCODE_FOR_URI(str(?dataset_name)) as ?dataset_escaped)
     bind(CONCAT("<a href='/query/show?title=Event entities in ",str(?dataset_escaped),"&sparql=list_events&graph=",str(?graphs),"'>",str(?event_count),"</a>",IF(BOUND(?issue_link),str(?issue_link),"")) as ?event)
     bind(CONCAT("<a href='/query/show?title=Place entities in ",str(?dataset_escaped),"&sparql=list_places&graph=",str(?graphs),"'>",str(?place_count),"</a>") as ?place)
     bind(CONCAT("<a href='/query/show?title=Person entities in ",str(?dataset_escaped),"&sparql=list_people&graph=",str(?graphs),"'>",str(?person_count),"</a>") as ?person)
