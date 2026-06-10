@@ -43,4 +43,24 @@ class QueryControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, "Test Report"
   end
+
+  test "feeds_all should render github issue icon inline with dataset name" do
+    dataset_value = "Dataset Name <a href='https://github.com/culturecreates/nebula/issues/123' title='Source log' target='_blank'><i class=\"fa-brands fa-github\" style='font-size:0.75em;'></i></a>"
+    mock_solution = { dataset: RDF::Literal(dataset_value) }
+    mock_solutions = [mock_solution]
+    mock_solutions.stubs(:variable_names).returns([:dataset])
+    mock_result = mock("query_result")
+    mock_result.stubs(:limit).returns(mock_solutions)
+    @mock_client.stubs(:query).returns(mock_result)
+
+    get query_show_path, params: {
+      sparql: "feeds_all",
+      title: "Data Feeds"
+    }
+
+    assert_response :success
+    assert_includes @response.body, "Dataset Name"
+    assert_includes @response.body, "fa-brands fa-github"
+    assert_includes @response.body, "https://github.com/culturecreates/nebula/issues/123"
+  end
 end

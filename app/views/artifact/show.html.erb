@@ -102,22 +102,27 @@
 
         <div class="mb-3">
           <%= form.label :graph_name, "Name", class: "form-label" %>
-          <%= text_field_tag :graph_name, @graph_metadata[:name], class: "form-control"%>
+          <%= text_field_tag :graph_name, @graph_metadata[:name], class: "form-control", placeholder: "Enter a human friendly name for the dataset" %>
         </div>
 
         <div class="mb-3">
           <%= form.label :maintainer, "Maintainer", class: "form-label" %>
-          <%= url_field_tag :maintainer, @graph_metadata[:maintainer], class: "form-control", placeholder: "website of the organization maintaining the data" %>
+          <%= url_field_tag :maintainer, @graph_metadata[:maintainer], class: "form-control", placeholder: "Enter the website of the organization maintaining the data" %>
+        </div>
+
+        <div class="mb-3">
+          <%= form.label :github_issue, "Github Issue", class: "form-label" %>
+          <%= url_field_tag :github_issue, @graph_metadata[:github_issue], class: "form-control", placeholder: "Enter a Github issue about this artifact" %>
         </div>
 
         <div class="mb-3">
           <%= form.label :rating_value, "Rating Value", class: "form-label" %>
-          <%= text_field_tag :rating_value, @graph_metadata[:rating_value], class: "form-control" %>
+          <%= text_field_tag :rating_value, @graph_metadata[:rating_value], class: "form-control", placeholder: "Enter a numeric value for the dataset. Lower numbers indicate higher quality." %>
         </div>
 
         <div class="mb-3">
           <%= form.label :rating_explanation, "Rating Explanation", class: "form-label" %>
-          <%= text_area_tag :rating_explanation, @graph_metadata[:rating_explanation], class: "form-control", rows: 3 %>
+          <%= text_area_tag :rating_explanation, @graph_metadata[:rating_explanation], class: "form-control", rows: 3, placeholder: "Provide an explanation for the rating value." %>
         </div>
 
         <div class="d-flex gap-2">
