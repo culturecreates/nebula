@@ -661,21 +661,6 @@ export function processReconciliationResults(reconciliationResults, originalEnti
 
 
 /**
- * Get reference URI for a given feed
- * @param {string} feed - Feed identifier
- * @returns {string} - Reference URI
- */
-export function getReferenceUri(feed) {
-  const feedMap = {
-    'iwts-ca': 'http://kg.artsdata.ca/culture-creates/artsdata-planet-iwts/iwts-ca',
-    'capacoa': 'http://kg.artsdata.ca/culture-creates/artsdata-planet-capacoa/capacoa',
-    'adc-members': 'http://kg.artsdata.ca/culture-creates/artsdata-planet-adc-members/adc-members'
-  };
-  
-  return feedMap[feed] || `http://kg.artsdata.ca/culture-creates/artsdata-planet-${feed}/${feed}`;
-}
-
-/**
  * Batch reconcile entities with lazy loading
  * @param {Array} entities - Entities to reconcile
  * @param {string} entityType - Entity type
