@@ -15,7 +15,7 @@ import AcceptAllProgress from "./components/AcceptAllProgress";
 import AcceptAllSummary from "./components/AcceptAllSummary";
 import { StickyHeadersProvider } from "./components/StickyHeadersProvider";
 import { fetchDynamicData } from "./services/dataFeedService";
-import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity, getReferenceUri } from "./services/reconciliationService";
+import { batchReconcile, previewMint, mintEntity, linkEntity, flagEntity } from "./services/reconciliationService";
 import { validateGraphUrl } from "./utils/urlValidation";
 
 // Helper function to sort entities by priority: auto-selected first, then needs-judgment, then reconciled
@@ -1299,12 +1299,9 @@ const App = ({ config }) => {
           if (classToMint && !classToMint.startsWith('schema:')) {
             classToMint = `schema:${classToMint}`;
           }
-          
-          // Extract feed identifier from data feed URL
-          const feedIdentifier = dataFeed.split('/').pop() || dataFeed;
-          const referenceUri = getReferenceUri(feedIdentifier);
-          
-          await mintEntity(item.uri, classToMint, referenceUri, config);
+
+          // Use the selected data feed URI directly as dataset.
+          await mintEntity(item.uri, classToMint, dataFeed, config);
           results.successCounts.minted++;
         } else if (currentStatus === 'flagged') {
           // Update progress
