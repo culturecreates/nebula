@@ -5,7 +5,7 @@ Rails.application.configure do
 
   # External API endpoints for Artsdata services
   
-  # prefix = "staging." # Set to "staging." for staging or "" for production
+  # prefix = "staging-" # Set to "staging." for staging or "" for production
   # config.graph_api_endpoint = "http://#{prefix}db.artsdata.ca" 
   # config.artsdata_recon_endpoint_v0 = "https://#{prefix}api.artsdata.ca/recon"
   # config.artsdata_mint_endpoint = "https://#{prefix}api.artsdata.ca/mint" 
