@@ -8,8 +8,8 @@
 const DEFAULT_CONFIG = {
   userUri: 'http://kg.artsdata.ca/resource/K1-1',
   reconciliationEndpoint: 'https://staging-recon.artsdata.ca',
-  mintEndpoint: 'https://staging.api.artsdata.ca',
-  linkEndpoint: 'https://staging.api.artsdata.ca'
+  mintEndpoint: 'https://staging-api.artsdata.ca',
+  linkEndpoint: 'https://staging-api.artsdata.ca'
 };
 
 /**
