@@ -1196,7 +1196,8 @@ const App = ({ config }) => {
   }, [showAll]);
 
   const handleAcceptAll = () => {
-    if (currentPageReadyItems.length === 0) {
+    const allReadyItems = getAllReadyItems();
+    if (allReadyItems.length === 0) {
       return;
     }
 
@@ -1205,7 +1206,7 @@ const App = ({ config }) => {
     let mintCount = 0;
     let flagCount = 0;
 
-    currentPageReadyItems.forEach(item => {
+    allReadyItems.forEach(item => {
       const currentStatus = getCurrentItemStatus(item, globalJudgments);
       if (currentStatus === 'judgment-ready') {
         matchCount++;
@@ -1221,7 +1222,7 @@ const App = ({ config }) => {
       matchCount,
       mintCount,
       flagCount,
-      totalCount: currentPageReadyItems.length
+      totalCount: allReadyItems.length
     });
     setShowAcceptAllConfirm(true);
   };
@@ -1229,8 +1230,8 @@ const App = ({ config }) => {
   const handleAcceptAllConfirm = async () => {
     setShowAcceptAllConfirm(false);
     
-    // Use the same items that were counted for Accept All
-    const itemsToProcess = currentPageReadyItems;
+    // Use all ready items across visited pages for Accept All
+    const itemsToProcess = getAllReadyItems();
     
     // Initialize progress
     setAcceptAllProgress({
@@ -1493,62 +1494,47 @@ const App = ({ config }) => {
     }
   }, [frontendCurrentPage, totalPages]);
 
-  // Calculate dynamic Accept All count based on user interactions across visited pages
-  const calculateDynamicAcceptCount = () => {
-    // Count items from global judgments (user has acted upon these)
-    const globalReadyItems = Array.from(globalJudgments.values()).filter(item =>
-      // Exclude pre-reconciled entities from accept all count
-      !item.isPreReconciled &&
-      (item.mintReady || item.linkedTo || item.status === 'mint-ready' || item.status === 'judgment-ready' || item.status === 'flagged' ||
-      (item.hasAutoMatch && item.autoMatchCandidate) || (item.selectedMatch && !item.linkedTo))
-    );
+  // Get all items ready to accept across all visited pages
+  const getAllReadyItems = () => {
+    const readyItems = [];
+    const seenIds = new Set();
 
-    // Count items from visited pages that user has seen and are ready
-    let visitedPageReadyItems = 0;
+    // Items from globalJudgments that user has acted upon
+    Array.from(globalJudgments.entries()).forEach(([id, item]) => {
+      if (item.isPreReconciled) return;
+      const isReady = item.mintReady || item.linkedTo ||
+        item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+        item.status === 'flagged' ||
+        (item.hasAutoMatch && item.autoMatchCandidate) ||
+        (item.selectedMatch && !item.linkedTo);
+      if (isReady) {
+        readyItems.push(item);
+        seenIds.add(id);
+      }
+    });
 
-    // Use the properly filtered items (already filtered by showAll above)
-    const allFilteredItems = filtered;
-
-    // Only count items from pages the user has actually visited
+    // Items from visited pages that are ready but not in globalJudgments
     visitedPages.forEach(pageNum => {
-      const pageStartIndex = (pageNum - 1) * frontendPageSize;
-      const pageEndIndex = pageStartIndex + frontendPageSize;
-      const pageItems = allFilteredItems.slice(pageStartIndex, pageEndIndex);
-
-      pageItems.forEach(item => {
-        // Skip if already in global storage or pre-reconciled
-        if (globalJudgments.has(item.id) || item.isPreReconciled) return;
-
-        // Check if item is ready to accept
-        const isReady = item.mintReady || item.linkedTo || item.status === 'mint-ready' ||
-                       item.status === 'judgment-ready' || item.status === 'flagged' ||
-                       (item.hasAutoMatch && item.autoMatchCandidate) ||
-                       (item.selectedMatch && !item.linkedTo);
+      const start = (pageNum - 1) * frontendPageSize;
+      const end = start + frontendPageSize;
+      filtered.slice(start, end).forEach(item => {
+        if (seenIds.has(item.id) || item.isPreReconciled) return;
+        const isReady = item.mintReady || item.linkedTo ||
+          item.status === 'mint-ready' || item.status === 'judgment-ready' ||
+          item.status === 'flagged' ||
+          (item.hasAutoMatch && item.autoMatchCandidate) ||
+          (item.selectedMatch && !item.linkedTo);
         if (isReady) {
-          visitedPageReadyItems++;
+          readyItems.push(item);
+          seenIds.add(item.id);
         }
       });
     });
 
-    return globalReadyItems.length + visitedPageReadyItems;
+    return readyItems;
   };
 
-  const itemsReadyToAccept = calculateDynamicAcceptCount();
-
-  // Get items ready to accept from current page only (used by Accept All)
-  const currentPageReadyItems = currentPageItems.filter(item => {
-    // Exclude pre-reconciled entities from accept all
-    if (item.isPreReconciled) return false;
-
-    const currentStatus = getCurrentItemStatus(item, globalJudgments);
-
-    // Exclude already processed entities
-    if (currentStatus === 'reconciled') return false; // Already matched/minted
-    if (currentStatus === 'flagged-complete') return false; // Already flagged via API
-
-    // Only include entities that have action buttons ready (not already processed)
-    return currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged';
-  });
+  const itemsReadyToAccept = getAllReadyItems().length;
 
   return (
     <StickyHeadersProvider>

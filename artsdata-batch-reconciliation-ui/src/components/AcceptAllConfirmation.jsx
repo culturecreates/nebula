@@ -60,7 +60,7 @@ const AcceptAllConfirmation = ({
             
             <div className="alert alert-info">
               <small>
-                <strong>Note:</strong> This will process all ready judgments on the current page. 
+                <strong>Note:</strong> This will process all ready judgments across all visited pages. 
                 The operation cannot be undone.
               </small>
             </div>

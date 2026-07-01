@@ -66,7 +66,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         });
       }
       
-      // Combine ISNI and Wikidata into sameAs property
+      // Combine ISNI, Wikidata, and entity URI into sameAs property
       const sameAsValues = [];
       
       if (entity.isni && entity.isni.trim() !== '') {
@@ -75,6 +75,12 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
       
       if (entity.wikidata && entity.wikidata.trim() !== '') {
         sameAsValues.push(entity.wikidata);
+      }
+
+      // Add entity URI as sameAs condition to match against Artsdata entities
+      // that link to this external URI via schema:sameAs (e.g., MusicBrainz, Google KG)
+      if (entity.uri && entity.uri.trim() !== '') {
+        sameAsValues.push(entity.uri);
       }
       
       if (sameAsValues.length > 0) {
