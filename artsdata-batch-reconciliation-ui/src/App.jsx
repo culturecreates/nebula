@@ -1498,15 +1498,13 @@ const App = ({ config }) => {
   const getAllReadyItems = () => {
     const readyItems = [];
     const seenIds = new Set();
+    const actionableStatuses = new Set(['judgment-ready', 'mint-ready', 'flagged']);
 
     // Items from globalJudgments that user has acted upon
     Array.from(globalJudgments.entries()).forEach(([id, item]) => {
       if (item.isPreReconciled) return;
-      const isReady = item.mintReady || item.linkedTo ||
-        item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-        item.status === 'flagged' ||
-        (item.hasAutoMatch && item.autoMatchCandidate) ||
-        (item.selectedMatch && !item.linkedTo);
+      const currentStatus = getCurrentItemStatus(item, globalJudgments);
+      const isReady = actionableStatuses.has(currentStatus);
       if (isReady) {
         readyItems.push(item);
         seenIds.add(id);
@@ -1519,11 +1517,8 @@ const App = ({ config }) => {
       const end = start + frontendPageSize;
       filtered.slice(start, end).forEach(item => {
         if (seenIds.has(item.id) || item.isPreReconciled) return;
-        const isReady = item.mintReady || item.linkedTo ||
-          item.status === 'mint-ready' || item.status === 'judgment-ready' ||
-          item.status === 'flagged' ||
-          (item.hasAutoMatch && item.autoMatchCandidate) ||
-          (item.selectedMatch && !item.linkedTo);
+        const currentStatus = getCurrentItemStatus(item, globalJudgments);
+        const isReady = actionableStatuses.has(currentStatus);
         if (isReady) {
           readyItems.push(item);
           seenIds.add(item.id);
