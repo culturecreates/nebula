@@ -179,7 +179,7 @@ export function filterTargetProperties(properties, entityType, config = {}) {
         });
       }
       // SameAs property for Events
-      else if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+      else if (id.includes('sameas') || name.includes('sameas') || id === 'sameas' || name === 'sameas') {
         targetProperties.push({
           ...property,
           type: 'sameAs'
@@ -203,7 +203,7 @@ export function filterTargetProperties(properties, entityType, config = {}) {
         });
       }
       // SameAs property for Places
-      else if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+      else if (id.includes('sameas') || name.includes('sameas') || id === 'sameas' || name === 'sameas') {
         targetProperties.push({
           ...property,
           type: 'sameAs'
@@ -213,7 +213,7 @@ export function filterTargetProperties(properties, entityType, config = {}) {
     // Other entity types (Person, Organization, Agent, etc.)
     else {
       // SameAs property (contains ISNI and Wikidata)
-      if (id === 'sameas' || name === 'sameas' || id === 'sameAs' || name === 'sameAs') {
+      if (id.includes('sameas') || name.includes('sameas') || id === 'sameas' || name === 'sameas') {
         targetProperties.push({
           ...property,
           type: 'sameAs'
@@ -306,6 +306,7 @@ export function processExtendedData(extendedData, properties) {
       isni: null,
       wikidata: null,
       url: null,
+      sameAsValues: [],
       postalCode: null,
       addressLocality: null,
       addressRegion: null,
@@ -345,11 +346,14 @@ export function processExtendedData(extendedData, properties) {
             const value = propertyData.values[0];
             const stringValue = value.str || value.id || '';
             processed.url = stringValue;
-          } else if (propertyConfig.type === 'sameAs' && propertyId === 'sameAs') {
-            // For sameAs, check all values for ISNI and Wikidata URIs
+          } else if (propertyConfig.type === 'sameAs') {
+            // Preserve sameAs values to support URI-based auto-matching.
             
             propertyData.values.forEach(value => {
               const stringValue = value.str || value.id || '';
+              if (stringValue) {
+                processed.sameAsValues.push(stringValue);
+              }
               
               // Check for ISNI format: https://isni.org/isni/{isni_id}
               if (stringValue.includes('isni.org/isni/')) {
@@ -837,6 +841,7 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         isni: extendedInfo.isni || candidate.isni || '',
         wikidata: extendedInfo.wikidata || candidate.wikidata || '',
         url: extendedInfo.url || candidate.url || '',
+        sameAsValues: extendedInfo.sameAsValues || candidate.sameAsValues || [],
         postalCode: extendedInfo.postalCode || candidate.postalCode || '',
         addressLocality: extendedInfo.addressLocality || candidate.addressLocality || '',
         addressRegion: extendedInfo.addressRegion || candidate.addressRegion || '',
