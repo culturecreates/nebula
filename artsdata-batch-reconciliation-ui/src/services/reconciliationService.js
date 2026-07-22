@@ -576,83 +576,6 @@ export async function flagEntity(uri, config = {}) {
 }
 
 /**
- * Normalize URI for matching across APIs.
- * Treats http/https as equivalent and ignores trailing slashes.
- * @param {string} uri - URI to normalize
- * @returns {string} - Normalized URI for comparison
- */
-function normalizeUriForMatch(uri) {
-  if (!uri || typeof uri !== 'string') {
-    return '';
-  }
-
-  const trimmed = uri.trim();
-  if (!trimmed) {
-    return '';
-  }
-
-  // Compare protocol-agnostic values so http and https are equivalent.
-  const protocolAgnostic = trimmed.replace(/^https?:\/\//i, '').toLowerCase();
-  return protocolAgnostic.replace(/\/+$/, '');
-}
-
-/**
- * Add URI-like values to a normalized set.
- * @param {Set<string>} uriSet - Set of normalized URIs
- * @param {*} value - Value that may contain URI(s)
- */
-function addUriValuesToSet(uriSet, value) {
-  if (!value) {
-    return;
-  }
-
-  if (typeof value === 'string') {
-    const normalized = normalizeUriForMatch(value);
-    if (normalized) {
-      uriSet.add(normalized);
-    }
-    return;
-  }
-
-  if (Array.isArray(value)) {
-    value.forEach(item => addUriValuesToSet(uriSet, item));
-    return;
-  }
-
-  if (typeof value === 'object') {
-    if (value.id) {
-      addUriValuesToSet(uriSet, value.id);
-    }
-    if (value.str) {
-      addUriValuesToSet(uriSet, value.str);
-    }
-    if (value.url) {
-      addUriValuesToSet(uriSet, value.url);
-    }
-    if (value.uri) {
-      addUriValuesToSet(uriSet, value.uri);
-    }
-  }
-}
-
-/**
- * Collect candidate URIs that can be compared against source entity URI.
- * @param {Object} candidate - Match candidate
- * @returns {Set<string>} - Set of normalized comparable URIs
- */
-function collectCandidateComparableUris(candidate) {
-  const comparableUris = new Set();
-
-  // Keep URI-based auto-match strict to sameAs values only.
-  addUriValuesToSet(comparableUris, candidate.sameAs);
-  addUriValuesToSet(comparableUris, candidate.sameAsValues);
-  addUriValuesToSet(comparableUris, candidate['http://schema.org/sameAs']);
-  addUriValuesToSet(comparableUris, candidate['https://schema.org/sameAs']);
-
-  return comparableUris;
-}
-
-/**
  * Process reconciliation results and transform them for UI
  * @param {Object} reconciliationResults - Raw reconciliation results
  * @param {Array} originalEntities - Original entities that were reconciled
@@ -680,7 +603,6 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     // Check if entity is pre-reconciled and find matching candidate
     let hasAutoMatch = false;
     let autoMatchCandidate = null;
-    let hasAmbiguousUriMatches = false;
     
     if (entity.isPreReconciled && entity.linkedTo) {
       // Find candidate that matches the entity's artsdata_uri
@@ -690,18 +612,33 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         autoMatchCandidate = matchingCandidate;
       }
     } else {
-      const normalizedSourceUri = normalizeUriForMatch(entity.uri);
-      const uriMatchedCandidates = normalizedSourceUri
-        ? candidates.filter(candidate => collectCandidateComparableUris(candidate).has(normalizedSourceUri))
+      const sourceUri = entity.uri || entity.url;
+      const sourceComparable = typeof sourceUri === 'string' ? sourceUri.replace(/^https?:\/\//i, '') : sourceUri;
+
+      const uriMatchedCandidates = sourceUri
+        ? candidates.filter(candidate => {
+            const sameAsValues = candidate.sameAsValues || [];
+            const valuesArray = Array.isArray(sameAsValues) ? sameAsValues : [sameAsValues];
+            const isMatch = valuesArray.some(value => {
+              if (typeof value === 'string') {
+                const candidateComparable = value.replace(/^https?:\/\//i, '');
+                return candidateComparable === sourceComparable;
+              }
+              if (value && typeof value === 'object') {
+                const idComparable = typeof value.id === 'string' ? value.id.replace(/^https?:\/\//i, '') : value.id;
+                const strComparable = typeof value.str === 'string' ? value.str.replace(/^https?:\/\//i, '') : value.str;
+                return idComparable === sourceComparable || strComparable === sourceComparable;
+              }
+              return false;
+            });
+
+            return isMatch;
+          })
         : [];
 
       if (uriMatchedCandidates.length === 1) {
         hasAutoMatch = true;
         autoMatchCandidate = uriMatchedCandidates[0];
-      } else if (uriMatchedCandidates.length > 1) {
-        hasAutoMatch = false;
-        autoMatchCandidate = null;
-        hasAmbiguousUriMatches = true;
       } else {
         // Fall back to reconciliation API-provided true-match signal.
         const trueMatches = candidates.filter(candidate => candidate.match === true);
@@ -726,7 +663,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         externalId: candidate.id || '',
         // Additional fields from Artsdata entities
         url: candidate.url || candidate['http://schema.org/url'] || '',
-        sameAsValues: candidate.sameAsValues || candidate.sameAs || candidate['http://schema.org/sameAs'] || [],
+        sameAsValues: candidate.sameAsValues || [],
         isni: candidate.isni || candidate['http://www.wikidata.org/prop/direct/P213'] || '',
         wikidata: candidate.wikidata || candidate['http://www.wikidata.org/entity/'] || '',
         postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || '',
@@ -749,10 +686,10 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     const processedEntity = {
       ...entity,
       matches,
-      hasAutoMatch: hasAmbiguousUriMatches ? false : hasAutoMatch,
+      hasAutoMatch,
       autoMatchCandidate,
       // Preserve reconciled status for pre-reconciled entities, otherwise update based on auto-match
-      status: entity.isPreReconciled ? 'reconciled' : ((hasAmbiguousUriMatches ? false : hasAutoMatch) ? 'Auto-matched' : entity.status)
+      status: entity.isPreReconciled ? 'reconciled' : (hasAutoMatch ? 'Auto-matched' : entity.status)
     };
     
     return processedEntity;
