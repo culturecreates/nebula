@@ -263,7 +263,9 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 isni: enrichedCandidate.isni || originalCandidate.isni || '',
                 wikidata: enrichedCandidate.wikidata || originalCandidate.wikidata || '',
                 url: enrichedCandidate.url || originalCandidate.url || '',
-                sameAsValues: enrichedCandidate.sameAsValues || originalCandidate.sameAsValues || [],
+                sameAsValues: (Array.isArray(enrichedCandidate.sameAsValues) && enrichedCandidate.sameAsValues.length > 0)
+                  ? enrichedCandidate.sameAsValues
+                  : (originalCandidate.sameAsValues ?? []),
                 postalCode: enrichedCandidate.postalCode || originalCandidate.postalCode || '',
                 addressLocality: enrichedCandidate.addressLocality || originalCandidate.addressLocality || '',
                 addressRegion: enrichedCandidate.addressRegion || originalCandidate.addressRegion || '',
@@ -582,6 +584,16 @@ export async function flagEntity(uri, config = {}) {
  * @returns {Array} - Transformed entities with match candidates
  */
 export function processReconciliationResults(reconciliationResults, originalEntities) {
+  const normalizeUriForMatch = (value) => {
+    if (typeof value !== 'string') {
+      return '';
+    }
+
+    return value
+      .trim()
+      .replace(/^https?:\/\//i, '')
+      .replace(/\/+$/, '');
+  };
   
   // Handle the actual API response format
   const results = reconciliationResults?.results || [];
@@ -613,20 +625,20 @@ export function processReconciliationResults(reconciliationResults, originalEnti
       }
     } else {
       const sourceUri = entity.uri || entity.url;
-      const sourceComparable = typeof sourceUri === 'string' ? sourceUri.replace(/^https?:\/\//i, '') : sourceUri;
+      const sourceComparable = normalizeUriForMatch(sourceUri);
 
-      const uriMatchedCandidates = sourceUri
+      const uriMatchedCandidates = sourceComparable
         ? candidates.filter(candidate => {
             const sameAsValues = candidate.sameAsValues || [];
             const valuesArray = Array.isArray(sameAsValues) ? sameAsValues : [sameAsValues];
             const isMatch = valuesArray.some(value => {
               if (typeof value === 'string') {
-                const candidateComparable = value.replace(/^https?:\/\//i, '');
+                const candidateComparable = normalizeUriForMatch(value);
                 return candidateComparable === sourceComparable;
               }
               if (value && typeof value === 'object') {
-                const idComparable = typeof value.id === 'string' ? value.id.replace(/^https?:\/\//i, '') : value.id;
-                const strComparable = typeof value.str === 'string' ? value.str.replace(/^https?:\/\//i, '') : value.str;
+                const idComparable = normalizeUriForMatch(value.id);
+                const strComparable = normalizeUriForMatch(value.str);
                 return idComparable === sourceComparable || strComparable === sourceComparable;
               }
               return false;

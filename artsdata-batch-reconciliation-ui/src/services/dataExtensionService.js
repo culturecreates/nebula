@@ -841,7 +841,9 @@ export async function enrichMatchCandidates(candidates, entityType, config = {})
         isni: extendedInfo.isni || candidate.isni || '',
         wikidata: extendedInfo.wikidata || candidate.wikidata || '',
         url: extendedInfo.url || candidate.url || '',
-        sameAsValues: extendedInfo.sameAsValues || candidate.sameAsValues || [],
+        sameAsValues: (Array.isArray(extendedInfo.sameAsValues) && extendedInfo.sameAsValues.length > 0)
+          ? extendedInfo.sameAsValues
+          : (candidate.sameAsValues ?? []),
         postalCode: extendedInfo.postalCode || candidate.postalCode || '',
         addressLocality: extendedInfo.addressLocality || candidate.addressLocality || '',
         addressRegion: extendedInfo.addressRegion || candidate.addressRegion || '',
