@@ -239,9 +239,9 @@ class Entity
 
     sparql = SparqlLoader.load('entity_model/delete_statement', [
       'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
-      'SUBJECT_PLACEHOLDER', subject.to_ntriples,
-      'PREDICATE_PLACEHOLDER', predicate.to_ntriples,
-      'OBJECT_PLACEHOLDER', object.to_ntriples
+      '<SUBJECT_PLACEHOLDER>', subject.to_ntriples,
+      '<PREDICATE_PLACEHOLDER>', predicate.to_ntriples,
+      '<OBJECT_PLACEHOLDER>', object.to_ntriples
     ])
     response = artsdata_update_client.update(sparql)
     if response

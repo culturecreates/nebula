@@ -44,9 +44,9 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
       "entity_model/delete_statement",
       [
         "GRAPH_NAME_URI_PLACEHOLDER", "http://kg.artsdata.ca/graph/test",
-        "SUBJECT_PLACEHOLDER", "<http://kg.artsdata.ca/resource/K23-300>",
-        "PREDICATE_PLACEHOLDER", "<http://schema.org/name>",
-        "OBJECT_PLACEHOLDER", "\"Sample name\"@en"
+        "<SUBJECT_PLACEHOLDER>", "<http://kg.artsdata.ca/resource/K23-300>",
+        "<PREDICATE_PLACEHOLDER>", "<http://schema.org/name>",
+        "<OBJECT_PLACEHOLDER>", "\"Sample name\"@en"
       ]
     )
 
