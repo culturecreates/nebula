@@ -11,7 +11,7 @@ fr:
     data_feeds: "Flux de données"
     databus: "Databus"
     ical_feeds: "Flux iCal"
-    mint_using_wikidata: "Créer à partir de Wikidata"
+    mint_using_wikidata: "Réconcilier avec Wikidata"
     batch_reconcile: "Rapprochement par lot"
     batch_reconcile_menu:
       tool: "Outil de rapprochement par lot"
