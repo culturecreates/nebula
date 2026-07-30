@@ -38,6 +38,7 @@
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
       graph: @entity.graph,
+      graph_name_uri: @entity.graph_uri,
     } %>
     <br>
     <turbo-frame

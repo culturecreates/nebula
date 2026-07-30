@@ -8,6 +8,7 @@
         locals: {
             triples: @entity.graph.query([RDF.URI(@entity.entity_uri), @predicate, nil]),
             graph: @entity.graph,
+            graph_name_uri: @graph_name_uri,
         } %>
     <% else %>
         <p class="p-3">No additional claims.</p>
