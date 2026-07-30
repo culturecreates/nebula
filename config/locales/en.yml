@@ -42,7 +42,7 @@ en:
     data_feeds: "Data Feeds"
     databus: "Databus"
     ical_feeds: "iCal Feeds"
-    mint_using_wikidata: "Mint using Wikidata"
+    mint_using_wikidata: "Reconcile with Wikidata"
     batch_reconcile: "Batch Reconcile"
     batch_reconcile_menu:
       tool: "Batch reconcile tool"
@@ -59,8 +59,8 @@ en:
     login: "Login"
     logout: "Logout"
   minting_wikidata:
-    title: "Mint using Wikidata"
-    sub_title: "Add Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to mint an Artsdata Identifier."
+    title: "Reconcile with Wikidata"
+    sub_title: "Add/link Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to link to an existing Artsdata entity or mint a new Artsdata identifier."
     person_tab: "Person"
     person_description: "Wikidata entities that are instances of human (Q5)."
     organization_tab: "Organization"
@@ -107,7 +107,7 @@ en:
       dereference: "Dereference"
       cms_v3: "CMS v3"
       cms_v4: "CMS v4"
-      minter: "Minter"
+      minter: "Reconcile"
       history_logs: "View History"
       history_log_title: "Revisions for "
       ranked: "Ranked"
