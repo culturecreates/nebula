@@ -3,39 +3,65 @@
     <% triples.each do |triple| %>
       <% setup_action(triple.object, triple.predicate) %>
       <div class="statement-object">
-        <% if triple.object.statement? %>
-          <%= display_object(triple.object) %>
-        <% elsif triple.object.node? %>
-          <% trips = graph.query([triple.object, nil, nil]) %>
-          <% if trips.count > 0 %>
-            <%= render partial: "statements_table", locals: { triples: trips, graph: graph } %>
-          <% else %>
-            <%= display_object(triple.object) %>
-          <% end %>
-        <% elsif triple.object.uri? %>
-          <% if auto_dereference(triple.object.to_s) %>
-            <turbo-frame
-              id='card-<%= @frame_id %>'
-              src="<%= dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id)%>"
-              loading="lazy"
-              target="_top"
-            >
-              <%= triple.object.to_s %>
-            </turbo-frame>
-          <% else %>
-            <!-- click button to dereference -->
-            <turbo-frame id='card-<%= @frame_id %>' target="_top">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div class="w-100 overflow-hidden">
+            <% if triple.object.statement? %>
               <%= display_object(triple.object) %>
-              <%= link_to "&nbsp;#{render partial: "shared/icon_expand"}".html_safe,
-              dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id),
+            <% elsif triple.object.node? %>
+              <% trips = graph.query([triple.object, nil, nil]) %>
+              <% if trips.count > 0 %>
+                <%= render partial: "statements_table", locals: { triples: trips, graph: graph, graph_name_uri: local_assigns[:graph_name_uri] } %>
+              <% else %>
+                <%= display_object(triple.object) %>
+              <% end %>
+            <% elsif triple.object.uri? %>
+              <% if auto_dereference(triple.object.to_s) %>
+                <turbo-frame
+                  id='card-<%= @frame_id %>'
+                  src="<%= dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id)%>"
+                  loading="lazy"
+                  target="_top"
+                >
+                  <%= triple.object.to_s %>
+                </turbo-frame>
+              <% else %>
+                <!-- click button to dereference -->
+                <turbo-frame id='card-<%= @frame_id %>' target="_top">
+                  <%= display_object(triple.object) %>
+                  <%= link_to "&nbsp;#{render partial: "shared/icon_expand"}".html_safe,
+                  dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id),
+                  data: {
+                    turbo_frame: "card-#{@frame_id}",
+                  } %>
+                </turbo-frame>
+              <% end %>
+            <% else %>
+              <%= display_object(triple.object) %>
+            <% end %>
+          </div>
+          <% if local_assigns[:graph_name_uri].present? %>
+            <%= form_with url: delete_entity_statement_path,
+            method: :delete,
+            local: true,
+            html: {
+              class: "d-inline",
               data: {
-                turbo_frame: "card-#{@frame_id}",
-              } %>
-            </turbo-frame>
+                controller: "confirm",
+                action: "submit->confirm#confirm",
+                confirm: "Delete this statement?",
+              },
+            } do |form| %>
+              <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
+              <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
+              <%= hidden_field_tag :subject_ntriples, triple.subject.to_ntriples %>
+              <%= hidden_field_tag :predicate_ntriples, triple.predicate.to_ntriples %>
+              <%= hidden_field_tag :object_ntriples, triple.object.to_ntriples %>
+              <button type="submit" class="btn btn-sm p-0 text-danger" title="Delete statement" aria-label="Delete statement">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            <% end %>
           <% end %>
-        <% else %>
-          <%= display_object(triple.object) %>
-        <% end %>
+        </div>
         <!-- SHACL --> <!-- Annotations -->
         <% annotation_subject =
           RDF.Statement(triple.subject, triple.predicate, triple.object) %>

@@ -17,11 +17,12 @@
         locals: {
           triples: triples.select { |s| s.predicate == prop },
           graph: graph,
+          graph_name_uri: local_assigns[:graph_name_uri],
         } %>
         <div id='property-claims-div-<%= subject_predicate_hash %>' class="d-none">
           <turbo-frame
             id='property-claims-<%= subject_predicate_hash %>'
-            src="<%= entity_property_claims_path(subject: triples.first.subject, predicate: prop.to_s) %>"
+            src="<%= entity_property_claims_path(subject: triples.first.subject, predicate: prop.to_s, graph_name_uri: local_assigns[:graph_name_uri]) %>"
             loading="lazy"
             target="_top"
           >

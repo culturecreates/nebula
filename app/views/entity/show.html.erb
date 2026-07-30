@@ -37,7 +37,7 @@
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
-      graph: @entity.graph,
+      graph: @entity.graph
     } %>
     <br>
     <turbo-frame

@@ -1,5 +1,5 @@
 class EntityController < ApplicationController
-  before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
+  before_action :check_delete_entity_access, only: [:destroy, :delete_statement] # ensure user has permissions to delete entity
 
   # Show an entity's asserted statements
   # /entity?uri=  --> HTML
@@ -84,6 +84,7 @@ class EntityController < ApplicationController
   def property_claims
     uri = params[:subject]
     @predicate = RDF::URI(params[:predicate])
+    @graph_name_uri = params[:graph_name_uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.property_claims(predicate: @predicate)
   end
@@ -118,6 +119,24 @@ class EntityController < ApplicationController
       flash.alert = "Could not delete entity #{uri}."
     end
     redirect_to entity_path(uri: uri)
+  end
+
+  # DELETE /entity/statement
+  def delete_statement
+    entity_uri = params[:entity_uri]
+    @entity = Entity.new(entity_uri: entity_uri)
+    if @entity.delete_statement(
+      graph_name_uri: params[:graph_name_uri],
+      subject_ntriples: params[:subject_ntriples],
+      predicate_ntriples: params[:predicate_ntriples],
+      object_ntriples: params[:object_ntriples]
+    )
+      flash.notice = "Deleted statement."
+    else
+      flash.alert = "Could not delete statement."
+    end
+
+    redirect_back(fallback_location: entity_path(uri: entity_uri))
   end
 
   private

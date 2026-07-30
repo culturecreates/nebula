@@ -228,6 +228,32 @@ class Entity
     false
   end
 
+  def delete_statement(graph_name_uri:, subject_ntriples:, predicate_ntriples:, object_ntriples:)
+    return false if graph_name_uri.blank? || subject_ntriples.blank? || predicate_ntriples.blank? || object_ntriples.blank?
+    return false unless valid_graph_uri?(graph_name_uri)
+
+    subject = parse_ntriples_term(subject_ntriples, :subject)
+    predicate = parse_ntriples_term(predicate_ntriples, :predicate)
+    object = parse_ntriples_term(object_ntriples, :object)
+    return false unless subject&.uri? && predicate&.uri? && object.present?
+
+    sparql = SparqlLoader.load('entity_model/delete_statement', [
+      'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
+      '<SUBJECT_PLACEHOLDER>', subject.to_ntriples,
+      '<PREDICATE_PLACEHOLDER>', predicate.to_ntriples,
+      '<OBJECT_PLACEHOLDER>', object.to_ntriples
+    ])
+    response = artsdata_update_client.update(sparql)
+    if response
+      true
+    else
+      false
+    end
+  rescue => e
+    puts "Error deleting statement: #{e.message}"
+    false
+  end
+
   def construct_turtle(sparql, sparql_endpoint = nil)
     if sparql_endpoint == "wikidata"
       begin
@@ -381,6 +407,28 @@ class Entity
   end
 
   private
+
+  def parse_ntriples_term(term, position)
+    statement_line = case position
+                     when :subject
+                       "#{term} <http://example.org/predicate> <http://example.org/object> ."
+                     when :predicate
+                       "<http://example.org/subject> #{term} <http://example.org/object> ."
+                     when :object
+                       "<http://example.org/subject> <http://example.org/predicate> #{term} ."
+                     end
+    RDF::NTriples::Reader.new(StringIO.new(statement_line)).first&.public_send(position)
+  rescue StandardError
+    nil
+  end
+
+  def valid_graph_uri?(value)
+    parsed = URI.parse(value.to_s)
+    parsed.is_a?(URI::HTTP) && parsed.host.present? &&
+      value.start_with?("http://kg.artsdata.ca/", "https://kg.artsdata.ca/")
+  rescue URI::InvalidURIError
+    false
+  end
 
   def artsdata_client
     @@artsdata_client ||= ArtsdataGraph::V2::Client.new(

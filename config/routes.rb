@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     get "test", to: "application#test"
     get "entity", to: "entity#show"
     delete "entity", to: "entity#destroy", as: :destroy_entity
+    delete "entity/statement", to: "entity#delete_statement", as: :delete_entity_statement
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
     get "entity/property_claims", to: "entity#property_claims"
