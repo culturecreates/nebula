@@ -58,6 +58,7 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
   test "statement_objects partial should include conditional statement delete form" do
     partial = File.read(Rails.root.join("app/views/application/_statement_objects.html.erb"))
     assert_includes partial, "local_assigns[:graph_name_uri].present?"
+    assert_includes partial, "local_assigns[:triple_inverted]"
     assert_includes partial, "delete_entity_statement_path"
     assert_includes partial, "submit->confirm#confirm"
   end

@@ -205,6 +205,13 @@ class Entity
     return response
   end
 
+  def load_authorized_external_identifiers
+    sparql =  SparqlLoader.load('entity_model/load_authorized_external_identifiers', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    @graph = construct_turtle(sparql)
+  end
+
   def load_derived_statements
     sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
       'entity_uri_placeholder', self.entity_uri
@@ -228,13 +235,21 @@ class Entity
     false
   end
 
-  def delete_statement(graph_name_uri:, subject_ntriples:, predicate_ntriples:, object_ntriples:)
+  def delete_statement(graph_name_uri:, subject_ntriples:, predicate_ntriples:, object_ntriples:, triple_inverted:)
     return false if graph_name_uri.blank? || subject_ntriples.blank? || predicate_ntriples.blank? || object_ntriples.blank?
     return false unless valid_graph_uri?(graph_name_uri)
 
-    subject = parse_ntriples_term(subject_ntriples, :subject)
+    subject = if triple_inverted
+      parse_ntriples_term(object_ntriples, :object)
+    else
+      parse_ntriples_term(subject_ntriples, :subject)
+    end
     predicate = parse_ntriples_term(predicate_ntriples, :predicate)
-    object = parse_ntriples_term(object_ntriples, :object)
+    object = if triple_inverted
+      parse_ntriples_term(subject_ntriples, :subject)
+    else
+      parse_ntriples_term(object_ntriples, :object)
+    end
     return false unless subject&.uri? && predicate&.uri? && object.present?
 
     sparql = SparqlLoader.load('entity_model/delete_statement', [

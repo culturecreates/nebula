@@ -10,7 +10,7 @@
             <% elsif triple.object.node? %>
               <% trips = graph.query([triple.object, nil, nil]) %>
               <% if trips.count > 0 %>
-                <%= render partial: "statements_table", locals: { triples: trips, graph: graph, graph_name_uri: local_assigns[:graph_name_uri] } %>
+                <%= render partial: "statements_table", locals: { triples: trips, graph: graph, graph_name_uri: local_assigns[:graph_name_uri], triple_inverted: local_assigns[:triple_inverted] } %>
               <% else %>
                 <%= display_object(triple.object) %>
               <% end %>
@@ -53,6 +53,7 @@
             } do |form| %>
               <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
               <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
+              <%= hidden_field_tag :triple_inverted, local_assigns[:triple_inverted] %>
               <%= hidden_field_tag :subject_ntriples, triple.subject.to_ntriples %>
               <%= hidden_field_tag :predicate_ntriples, triple.predicate.to_ntriples %>
               <%= hidden_field_tag :object_ntriples, triple.object.to_ntriples %>

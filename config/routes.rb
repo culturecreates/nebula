@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     delete "entity/statement", to: "entity#delete_statement", as: :delete_entity_statement
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
+    get "entity/authorized_external_identifiers", to: "entity#authorized_external_identifiers"
     get "entity/property_claims", to: "entity#property_claims"
     get "dereference/card", to: "dereference#card"
     get "dereference/external", to: "dereference#external"

@@ -1,0 +1,48 @@
+# load_authorized_external_identifiers.sparql
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX onto: <http://www.ontotext.com/>
+PREFIX schema: <http://schema.org/>
+
+
+CONSTRUCT {
+    ?o schema:sameAs ?s  .
+    <<?o schema:sameAs ?s>> ?a ?b .
+
+    ?a rdfs:label ?a_label .
+
+    ?qbns ?qbnp ?qbno .
+    ?qbnp rdfs:label ?qbnp_label .
+
+    schema:sameAs rdfs:label "sameAs (inverse)" .
+
+}
+ FROM onto:explicit 
+WHERE {
+    values ?o {
+        <entity_uri_placeholder> 
+    }
+    graph <http://kg.artsdata.ca/core> {
+        ?s schema:sameAs ?o  .
+    }
+   
+    # quoted triple
+    OPTIONAL {
+        <<?s schema:sameAs ?o>> ?a ?b .
+        # quoted triple labels
+        OPTIONAL {
+            ?a schema:name ?a_label .
+        }
+    }
+    # quoted triple blank nodes
+    OPTIONAL {
+        <<?s schema:sameAs ?o>> ?a ?qbns .
+        filter(isBLANK(?qbns))
+        ?qbns ?qbnp ?qbno .
+        OPTIONAL {
+            ?qbnp rdfs:label ?qbnp_label .
+        }
+    }
+    FILTER(!contains(str(?s), "http://kg.artsdata.ca/")) # Hide merged duplicate Artsdata entities, which are not useful to show in the list of external identifiers
+   
+} limit 1000

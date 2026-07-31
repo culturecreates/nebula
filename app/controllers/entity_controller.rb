@@ -68,15 +68,19 @@ class EntityController < ApplicationController
         @show_all_claims_button = true if user_signed_in?
         @show_add_sameas_button = true if user_signed_in?
         @target_types = [
-     #     RDF::Vocab::SCHEMA.Event, 
+     #     RDF::Vocab::SCHEMA.Event,
      #     RDF::Vocab::SCHEMA.Person,
          RDF::Vocab::SCHEMA.Organization,
      #     RDF::Vocab::SCHEMA.PerformingGroup,
           RDF::Vocab::SCHEMA.Place
       ]
-  
+
         # TODO: add SHACL validation if artsdata entity
-       
+
+        # Force HTML rendering even if the request negotiates turbo_stream
+        # (e.g. Turbo following a redirect_back after an unauthorized delete_statement),
+        # since no turbo_stream template exists for this action.
+        render "show", formats: [:html]
        }
     end
   end
@@ -95,6 +99,14 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.load_claims
+  end
+
+  # authorized_external_identifiers
+  # /entity/authorized_external_identifiers?uri=[canonical URI]
+  def authorized_external_identifiers
+    uri = params[:uri]
+    @entity = Entity.new(entity_uri: uri)
+    @entity.load_authorized_external_identifiers
   end
 
   # derived statements (inverse path)
@@ -129,7 +141,8 @@ class EntityController < ApplicationController
       graph_name_uri: params[:graph_name_uri],
       subject_ntriples: params[:subject_ntriples],
       predicate_ntriples: params[:predicate_ntriples],
-      object_ntriples: params[:object_ntriples]
+      object_ntriples: params[:object_ntriples],
+      triple_inverted: params[:triple_inverted]
     )
       flash.notice = "Deleted statement."
     else

@@ -46,6 +46,14 @@
       loading="lazy"
       target="_top"
     >
+    </turbo-frame> 
+    <br>
+    <turbo-frame
+      id='authorized-external-identifiers'
+      src="<%= entity_authorized_external_identifiers_path(uri: @entity.entity_uri) %>"
+      loading="lazy"
+      target="_top"
+    >
     </turbo-frame>
     <br>
     <turbo-frame
