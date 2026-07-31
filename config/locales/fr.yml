@@ -39,6 +39,7 @@ fr:
     organization_description: "Entités Wikidata qui sont des instances d'organisation (Q43229). Cela inclut les groupes de performeurs et les organisations de présentation."
     place_tab: "Lieu"
     place_description: "Entités Wikidata qui sont des instances de lieu (Q17350442) : lieu utilisé pour une activité."
+    type_id: "ID de type Wikidata"
     search_placeholder: "Nom ou identifiant Wikidata"
   ical:
     ical_feeds: "Flux iCal"

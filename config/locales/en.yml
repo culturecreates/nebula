@@ -67,6 +67,7 @@ en:
     organization_description: "Wikidata entities that are instances of organization (Q43229). This includes groups of performers and presenting organizations."
     place_tab: "Place"
     place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
+    type_id: "Wikidata type ID"
     search_placeholder: "Name or Wikidata ID"
   ical:
     ical_feeds: "iCal Feeds"
