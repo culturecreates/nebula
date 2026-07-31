@@ -68,15 +68,19 @@ class EntityController < ApplicationController
         @show_all_claims_button = true if user_signed_in?
         @show_add_sameas_button = true if user_signed_in?
         @target_types = [
-     #     RDF::Vocab::SCHEMA.Event, 
+     #     RDF::Vocab::SCHEMA.Event,
      #     RDF::Vocab::SCHEMA.Person,
          RDF::Vocab::SCHEMA.Organization,
      #     RDF::Vocab::SCHEMA.PerformingGroup,
           RDF::Vocab::SCHEMA.Place
       ]
-  
+
         # TODO: add SHACL validation if artsdata entity
-       
+
+        # Force HTML rendering even if the request negotiates turbo_stream
+        # (e.g. Turbo following a redirect_back after an unauthorized delete_statement),
+        # since no turbo_stream template exists for this action.
+        render "show", formats: [:html]
        }
     end
   end
