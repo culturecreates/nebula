@@ -97,6 +97,14 @@ class EntityController < ApplicationController
     @entity.load_claims
   end
 
+  # authorized_external_identifiers
+  # /entity/authorized_external_identifiers?uri=[canonical URI]
+  def authorized_external_identifiers
+    uri = params[:uri]
+    @entity = Entity.new(entity_uri: uri)
+    @entity.load_authorized_external_identifiers
+  end
+
   # derived statements (inverse path)
   # /entity/derived_statements?uri=[canonical URI]
   def derived_statements
@@ -129,7 +137,8 @@ class EntityController < ApplicationController
       graph_name_uri: params[:graph_name_uri],
       subject_ntriples: params[:subject_ntriples],
       predicate_ntriples: params[:predicate_ntriples],
-      object_ntriples: params[:object_ntriples]
+      object_ntriples: params[:object_ntriples],
+      triple_inverted: params[:triple_inverted]
     )
       flash.notice = "Deleted statement."
     else
