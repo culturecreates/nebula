@@ -9,6 +9,7 @@ export default class extends Controller {
 
   updateType(event) {
     this.typeFieldTarget.value = event.target.value
+    this.typeFieldTarget.dispatchEvent(new Event("change", { bubbles: true }))
   }
 
   updateTypeFromSelectedTab() {

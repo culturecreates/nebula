@@ -35,7 +35,13 @@ Rails.application.configure do
       Rails.application.config.artsdata_mint_endpoint,
       Rails.application.config.artsdata_link_endpoint,
       Rails.application.config.artsdata_databus_endpoint,
-      Rails.application.config.artsdata_maintenance_endpoint
+      Rails.application.config.artsdata_maintenance_endpoint,
+      # Reconciliation API suggest services called client-side by the
+      # recon-suggest Stimulus controller (e.g. the Wikidata type/entity
+      # typeahead). wikidata.reconci.link redirects to wmcloud.org, and
+      # browsers enforce connect-src on each redirect hop, so both are needed.
+      "https://wikidata.reconci.link",
+      "https://wikidata-reconciliation.wmcloud.org"
     ].map { |url| origin_of(url) }.compact.uniq
 
     policy.connect_src :self, *connect_src_origins, "https://www.google-analytics.com"

@@ -27,27 +27,8 @@ class MintControllerTest < ActionDispatch::IntegrationTest
   test "wikidata mint resolves classToMint for a custom subtype id via Wikidata subclass lookup" do
     # "Q215380" (musical group) is a custom subtype, not one of the 3 broad
     # types (Q5/Q43229/Q17350442) the form's tabs default to.
-    stub_request(:get, "https://query.wikidata.org/sparql")
-      .with(query: hash_including("query" => /wdt:P279\*/))
-      .to_return(
-        status: 200,
-        headers: { "Content-Type" => "application/sparql-results+json" },
-        body: {
-          head: { vars: ["broad"] },
-          results: { bindings: [{ "broad" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/Q43229" } }] }
-        }.to_json
-      )
-
-    stub_request(:get, "https://query.wikidata.org/sparql")
-      .with(query: hash_including("query" => /rdfs:label/))
-      .to_return(
-        status: 200,
-        headers: { "Content-Type" => "application/sparql-results+json" },
-        body: {
-          head: { vars: ["label"] },
-          results: { bindings: [{ "label" => { "type" => "literal", "value" => "The Beatles", "xml:lang" => "en" } }] }
-        }.to_json
-      )
+    stub_wikidata_label_query
+    stub_wikidata_broad_type_query("Q43229")
 
     get mint_wikidata_url, params: { uri: "Q215380", type: "Q215380" }
 
@@ -57,16 +38,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
 
   test "wikidata mint asks the user to choose when the resolved type differs from the tab" do
     stub_wikidata_label_query
-    stub_request(:get, "https://query.wikidata.org/sparql")
-      .with(query: hash_including("query" => /wdt:P279\*/))
-      .to_return(
-        status: 200,
-        headers: { "Content-Type" => "application/sparql-results+json" },
-        body: {
-          head: { vars: ["broad"] },
-          results: { bindings: [{ "broad" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/Q43229" } }] }
-        }.to_json
-      )
+    stub_wikidata_broad_type_query("Q43229")
 
     # user started on the Person tab (tab_type=Q5) but edited the type field
     # to a subtype ("Q215380", musical group) that resolves to Organization
@@ -99,8 +71,8 @@ class MintControllerTest < ActionDispatch::IntegrationTest
   private
 
   def stub_wikidata_label_query
-    stub_request(:get, "https://query.wikidata.org/sparql")
-      .with(query: hash_including("query" => /rdfs:label/))
+    stub_request(:post, "https://query.wikidata.org/sparql")
+      .with { |request| decoded_sparql_query(request).include?("rdfs:label") }
       .to_return(
         status: 200,
         headers: { "Content-Type" => "application/sparql-results+json" },
@@ -109,6 +81,23 @@ class MintControllerTest < ActionDispatch::IntegrationTest
           results: { bindings: [{ "label" => { "type" => "literal", "value" => "The Beatles", "xml:lang" => "en" } }] }
         }.to_json
       )
+  end
+
+  def stub_wikidata_broad_type_query(broad_qid)
+    stub_request(:post, "https://query.wikidata.org/sparql")
+      .with { |request| decoded_sparql_query(request).include?("wdt:P279*") }
+      .to_return(
+        status: 200,
+        headers: { "Content-Type" => "application/sparql-results+json" },
+        body: {
+          head: { vars: ["broad"] },
+          results: { bindings: [{ "broad" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/#{broad_qid}" } }] }
+        }.to_json
+      )
+  end
+
+  def decoded_sparql_query(request)
+    URI.decode_www_form(request.body).to_h["query"].to_s
   end
 
 end

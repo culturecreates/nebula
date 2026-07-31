@@ -95,10 +95,26 @@
   <div class="row mb-2 col-12 col-lg-8">
     <div class="col">
       <%= form.label :type, t("minting_wikidata.type_id"), class: "form-label" %>
-      <%= form.text_field :type,
-                      class: "form-control",
-                      value: selected_type,
-                      data: { wikidata_type_target: "typeField" } %>
+      <div
+        class="dropdown"
+        data-controller="recon-suggest"
+        data-recon-suggest-service-url-value="https://wikidata.reconci.link"
+        data-recon-suggest-service-path-value="/en/suggest/type"
+        data-recon-suggest-id-pattern-value="^[Qq]\d+$"
+      >
+        <%= form.hidden_field :type,
+                        value: selected_type,
+                        data: { wikidata_type_target: "typeField", recon_suggest_target: "hidden" } %>
+        <input
+          type="text"
+          class="form-control"
+          autocomplete="off"
+          value="<%= selected_type %>"
+          data-recon-suggest-target="input"
+          data-action="input->recon-suggest#search keydown.esc->recon-suggest#closeResults"
+        >
+        <ul class="dropdown-menu" data-recon-suggest-target="results"></ul>
+      </div>
     </div>
   </div>
 
