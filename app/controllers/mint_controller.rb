@@ -195,12 +195,13 @@ class MintController < ApplicationController
         @wikidata_data[:label] = params[:wikidata_search] 
       end
       @wikidata_data[:type] = params[:type] if params[:type]
+      @wikidata_data[:tab_type] = params[:tab_type] if params[:tab_type]
     end
-   
+
     # Continue after user selects a wikidata entity from initial search results
-    if params[:uri].present? 
+    if params[:uri].present?
       @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
-      @class_to_mint = map_wikidata_type_to_schema(params[:type])
+      resolve_class_to_mint
 
       # call wikidata sparql to get more data
       sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
@@ -228,6 +229,28 @@ class MintController < ApplicationController
 
   private
 
+  # Determines @class_to_mint from the (possibly custom) type ID the user
+  # searched with. If that type resolves to a broad type (person/org/place)
+  # different from the tab the user started from, don't guess: set
+  # @tab_class_choice / @wikidata_class_choice so the view can ask the user
+  # which one to use, unless they already answered via params[:classToMint].
+  def resolve_class_to_mint
+    if params[:classToMint].present?
+      @class_to_mint = params[:classToMint]
+      return
+    end
+
+    wikidata_class = map_wikidata_type_to_schema(params[:type])
+    tab_class = map_wikidata_type_to_schema(params[:tab_type]) if params[:tab_type].present?
+
+    if tab_class.present? && wikidata_class.present? && tab_class != wikidata_class
+      @tab_class_choice = tab_class
+      @wikidata_class_choice = wikidata_class
+    else
+      @class_to_mint = wikidata_class || tab_class
+    end
+  end
+
   # Check if the user has access the the minting feature
   def check_minting_access
     ensure_access("minting")
@@ -247,7 +270,31 @@ class MintController < ApplicationController
       "schema:Person"
     elsif wikidata_type == @wikidata_organization_type
       "schema:Organization"
+    elsif wikidata_type.present?
+      # Custom type IDs (e.g. a specific occupation or place subtype) aren't
+      # one of the 3 broad types we know how to mint. Follow its subclass-of
+      # (P279) chain in Wikidata to find which broad type it belongs to.
+      broad_type = broad_wikidata_type(wikidata_type)
+      map_wikidata_type_to_schema(broad_type) if broad_type
     end
+  end
+
+  # Resolves a Wikidata type QID to one of the 3 broad types (person,
+  # organization, place) by checking if it is a subclass of one of them.
+  def broad_wikidata_type(wikidata_type)
+    return nil unless wikidata_type =~ /\AQ\d+\z/
+
+    sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
+    select_query = <<-SPARQL
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      SELECT ?broad WHERE {
+        VALUES ?broad { wd:#{@wikidata_person_type} wd:#{@wikidata_organization_type} wd:#{@wikidata_place_type} }
+        wd:#{wikidata_type} wdt:P279* ?broad .
+      } LIMIT 1
+    SPARQL
+    solutions = sparql.query(select_query)
+    solutions.first&.broad&.to_s&.split("/")&.last
   end
 
 

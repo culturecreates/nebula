@@ -41,6 +41,7 @@ class ReconcileController < ApplicationController
       @route_name = params[:routeName] ||= 'entity_path' # default is to call entity_path
       @externalUri = params[:externalUri] # pass through to view for link button
       @dataset = params[:dataset] # pass through to view for link button
+      @tab_type = params[:tabType] # pass through to view, used by the "mint from Wikidata" feature
       
       # If the query looks like an Artsdata URI or an entity ID, skip reconciliation and go straight to the entity page
       redirect_to entity_path(uri: @query) if @query.starts_with?("http") || @query.match?(/^K.*-.*$/)

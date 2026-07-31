@@ -41,6 +41,9 @@ fr:
     place_description: "Entités Wikidata qui sont des instances de lieu (Q17350442) : lieu utilisé pour une activité."
     type_id: "ID de type Wikidata"
     search_placeholder: "Nom ou identifiant Wikidata"
+    type_mismatch_message: "L'ID de type Wikidata utilisé pour la recherche correspond à %{wikidata_type}, ce qui diffère de l'onglet %{tab_type} de départ. Quel type doit être utilisé pour créer cette entité?"
+    use_wikidata_type: "Utiliser %{type}"
+    keep_tab_type: "Conserver %{type}"
   ical:
     ical_feeds: "Flux iCal"
     description: |

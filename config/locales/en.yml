@@ -69,6 +69,9 @@ en:
     place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
     type_id: "Wikidata type ID"
     search_placeholder: "Name or Wikidata ID"
+    type_mismatch_message: "The Wikidata type ID you searched with resolves to %{wikidata_type}, which differs from the %{tab_type} tab you started from. Which type should be used to mint this entity?"
+    use_wikidata_type: "Use %{type}"
+    keep_tab_type: "Keep %{type}"
   ical:
     ical_feeds: "iCal Feeds"
     description: |
