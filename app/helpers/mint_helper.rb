@@ -1,6 +1,6 @@
 module MintHelper
 
-  # 
+  #
   def classToReconcile(classToMint)
     if classToMint.class == RDF::URI
       classToMint = classToMint.value

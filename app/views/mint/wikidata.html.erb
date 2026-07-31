@@ -19,7 +19,7 @@
     </h4>
     <turbo-frame
       id='recon_results'
-      src="<%= reconcile_query_path(reconEndpoint: "https://wikidata.reconci.link/en/api", routeName: "mint_wikidata_path", query: @wikidata_data[:label], type: @wikidata_data[:type])%>"
+      src="<%= reconcile_query_path(reconEndpoint: "https://wikidata.reconci.link/en/api", routeName: "mint_wikidata_path", query: @wikidata_data[:label], type: @wikidata_data[:type], tabType: @wikidata_data[:tab_type])%>"
       loading="lazy"
       target="_top"
     >
@@ -27,7 +27,23 @@
     </turbo-frame>
   <% end %>
 
-  <% if @external_uri %>
+  <% if @wikidata_class_choice %>
+    <div class="alert alert-warning">
+      <p>
+        <%= t("minting_wikidata.type_mismatch_message",
+              wikidata_type: @wikidata_class_choice,
+              tab_type: @tab_class_choice) %>
+      </p>
+      <%= link_to t("minting_wikidata.use_wikidata_type", type: @wikidata_class_choice),
+      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], classToMint: @wikidata_class_choice),
+      class: "btn btn-sm btn-primary me-2" %>
+      <%= link_to t("minting_wikidata.keep_tab_type", type: @tab_class_choice),
+      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], classToMint: @tab_class_choice),
+      class: "btn btn-sm btn-outline-secondary" %>
+    </div>
+  <% end %>
+
+  <% if @external_uri && @class_to_mint %>
 
     <h3>Step 1</h3>
     <p>Preview the transformed data from Wikidata that will be added to
