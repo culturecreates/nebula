@@ -7,7 +7,7 @@
   <% if @entity.graph.count > 0 %>
     <h4>Authorized External Identifiers
     </h4>
-    <p> Identifiers listed here will refresh claims in Artsdata authoritative entities when external data changes. Delete the external identifier sameAs to unauthorize it.</p>
+    <p> Identifiers listed here will refresh claims in Artsdata authoritative entities when external data changes. Delete an external identifier sameAs to unauthorize it.</p>
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
