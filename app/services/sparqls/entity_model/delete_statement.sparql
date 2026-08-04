@@ -3,7 +3,11 @@ DELETE {
         <SUBJECT_PLACEHOLDER> <PREDICATE_PLACEHOLDER> <OBJECT_PLACEHOLDER> .
         << <SUBJECT_PLACEHOLDER> <PREDICATE_PLACEHOLDER> <OBJECT_PLACEHOLDER> >> ?a ?b .
         ?b ?bp ?bo .
+        <OBJECT_PLACEHOLDER> <PREDICATE_PLACEHOLDER> <SUBJECT_PLACEHOLDER> .
+        << <OBJECT_PLACEHOLDER> <PREDICATE_PLACEHOLDER> <SUBJECT_PLACEHOLDER> >> ?reverse_a ?reverse_b .
+        ?reverse_b ?reverse_bp ?reverse_bo .    
     }
+
 }
 WHERE {
     GRAPH <GRAPH_NAME_URI_PLACEHOLDER> {
@@ -14,6 +18,16 @@ WHERE {
                 ?b ?bp ?bo .
                 FILTER(isBlank(?b))
             }
+        }
+        OPTIONAL {
+              <OBJECT_PLACEHOLDER> <PREDICATE_PLACEHOLDER> <SUBJECT_PLACEHOLDER>  .
+              OPTIONAL {
+                  << <OBJECT_PLACEHOLDER> <PREDICATE_PLACEHOLDER> <SUBJECT_PLACEHOLDER> >> ?reverse_a ?reverse_b .
+                  OPTIONAL {
+                      ?reverse_b ?reverse_bp ?reverse_bo .
+                      FILTER(isBlank(?reverse_b))
+                  }
+              }
         }
     }
 }
