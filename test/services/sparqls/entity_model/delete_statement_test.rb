@@ -14,7 +14,7 @@ class DeleteStatementSparqlTest < ActiveSupport::TestCase
         "GRAPH_NAME_URI_PLACEHOLDER", GRAPH_NAME_URI,
         "<SUBJECT_PLACEHOLDER>", SUBJECT_URI,
         "<PREDICATE_PLACEHOLDER>", PREDICATE_URI,
-        "<OBJECT_PLACEHOLDER>", object_ntriples
+        "?OBJECT_PLACEHOLDER", object_ntriples
       ]
     )
   end

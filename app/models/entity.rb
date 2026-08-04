@@ -235,29 +235,21 @@ class Entity
     false
   end
 
-  def delete_statement(graph_name_uri:, subject_ntriples:, predicate_ntriples:, object_ntriples:, triple_inverted:)
-    return false if graph_name_uri.blank? || subject_ntriples.blank? || predicate_ntriples.blank? || object_ntriples.blank?
+  def delete_statement(graph_name_uri:, subject:, predicate:, object:, triple_inverted:)
+    return false if graph_name_uri.blank? || subject.blank? || predicate.blank? || object.blank?
     return false unless valid_graph_uri?(graph_name_uri)
-
-    subject = if triple_inverted
-      parse_ntriples_term(object_ntriples, :object)
-    else
-      parse_ntriples_term(subject_ntriples, :subject)
+    
+    if triple_inverted
+      subject, object = object, subject
     end
-    predicate = parse_ntriples_term(predicate_ntriples, :predicate)
-    object = if triple_inverted
-      parse_ntriples_term(subject_ntriples, :subject)
-    else
-      parse_ntriples_term(object_ntriples, :object)
-    end
-    return false unless subject&.uri? && predicate&.uri? && object.present?
 
     sparql = SparqlLoader.load('entity_model/delete_statement', [
       'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
-      '<SUBJECT_PLACEHOLDER>', subject.to_ntriples,
-      '<PREDICATE_PLACEHOLDER>', predicate.to_ntriples,
-      '<OBJECT_PLACEHOLDER>', object.to_ntriples
+      '<SUBJECT_PLACEHOLDER>', subject,
+      '<PREDICATE_PLACEHOLDER>', predicate,
+      '?OBJECT_PLACEHOLDER', object
     ])
+
     response = artsdata_update_client.update(sparql)
     if response
       true

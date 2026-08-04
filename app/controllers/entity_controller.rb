@@ -140,9 +140,9 @@ class EntityController < ApplicationController
     @entity = Entity.new(entity_uri: entity_uri)
     if @entity.delete_statement(
       graph_name_uri: params[:graph_name_uri],
-      subject_ntriples: params[:subject_ntriples],
-      predicate_ntriples: params[:predicate_ntriples],
-      object_ntriples: params[:object_ntriples],
+      subject: params[:subject_ntriples],
+      predicate: params[:predicate_ntriples],
+      object: params[:object_ntriples],
       triple_inverted: params[:triple_inverted]
     )
       flash.notice = "Deleted statement."
