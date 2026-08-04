@@ -1,5 +1,6 @@
 class EntityController < ApplicationController
-  before_action :check_delete_entity_access, only: [:destroy, :delete_statement] # ensure user has permissions to delete entity
+  before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
+  before_action :check_delete_statement_access, only: [:delete_statement] # ensure user has permissions to delete statement like sameAs
 
   # Show an entity's asserted statements
   # /entity?uri=  --> HTML
@@ -156,6 +157,10 @@ class EntityController < ApplicationController
 
   def check_delete_entity_access
     ensure_access("delete_entity")
+  end
+
+  def check_delete_statement_access
+    ensure_access("delete_statement")
   end
 
   # determine the shape for JSON-LD output
