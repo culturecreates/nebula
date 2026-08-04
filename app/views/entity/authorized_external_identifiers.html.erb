@@ -1,13 +1,14 @@
-<h1>Authorized External Identifiers for
+<h1><%= t("entity.authorized_external_identifiers.title") %> - 
   <%= @entity.label&.value %>
 </h1>
+
 <a><%= use_prefix(@entity.entity_uri) %></a>
 
 <turbo-frame id="authorized-external-identifiers">
   <% if @entity.graph.count > 0 %>
-    <h4>Authorized External Identifiers
+    <h4><%= t("entity.authorized_external_identifiers.title") %>
     </h4>
-    <p> Identifiers listed here will refresh claims in Artsdata authoritative entities when external data changes. Delete an external identifier sameAs to unauthorize it.</p>
+    <p><%= t("entity.authorized_external_identifiers.description") %></p>
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
