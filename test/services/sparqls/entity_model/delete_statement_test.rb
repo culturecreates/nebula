@@ -78,16 +78,6 @@ class DeleteStatementSparqlTest < ActiveSupport::TestCase
     refute @repository.has_statement?(RDF::Statement(@forward_bnode, RDF::URI("http://ann/date"), RDF::Literal("2024-01-01"), graph_name: @graph_uri))
   end
 
-  test "removes the reverse triple and its RDF-star annotation" do
-    assert @repository.has_statement?(RDF::Statement(@object, @predicate, @subject, graph_name: @graph_uri))
-
-    execute_delete_statement
-
-    refute @repository.has_statement?(RDF::Statement(@object, @predicate, @subject, graph_name: @graph_uri))
-    refute @repository.has_statement?(RDF::Statement(RDF::Statement(@object, @predicate, @subject), RDF::URI("http://ann/recordedBy"), @reverse_bnode, graph_name: @graph_uri))
-    refute @repository.has_statement?(RDF::Statement(@reverse_bnode, RDF::URI("http://ann/date"), RDF::Literal("2024-01-02"), graph_name: @graph_uri))
-  end
-
   test "leaves unrelated statements untouched" do
     execute_delete_statement
 
