@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  helper_method :ensure_access, :user_has_access?
+  helper_method :ensure_access, :user_has_access?, :level_2_access?
   before_action :set_locale, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
 
@@ -111,6 +111,11 @@ class ApplicationController < ActionController::Base
       halt_and_redirect
       return
     end
+  end
+
+  # Level 2 access check (Artsdata Admins), independent of any specific feature flag
+  def level_2_access?
+    session[:teams].present? && session[:teams].any? { |team| team.key?("10808270") }
   end
 
   # Role-Based Access Control (RBAC) pattern

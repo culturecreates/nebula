@@ -37,7 +37,8 @@
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
-      graph: @entity.graph
+      graph: @entity.graph,
+      graph_name_uri: (level_2_access? ? (@entity.graph_uri || "http://kg.artsdata.ca/core") : nil)
     } %>
     <br>
     <turbo-frame
@@ -45,7 +46,7 @@
       src="<%= entity_unsupported_claims_path(uri: @entity.entity_uri) %>"
       loading="lazy"
       target="_top"
-    >
+    > 
     </turbo-frame> 
     <br>
     <turbo-frame

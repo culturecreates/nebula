@@ -145,7 +145,8 @@ class EntityController < ApplicationController
       object: params[:object_ntriples],
       triple_inverted: params[:triple_inverted]
     )
-      flash.notice = "Deleted statement."
+      flash.notice = "Deleted statement in graph"
+      flash[:notice_uri] = params[:graph_name_uri]
     else
       flash.alert = "Could not delete statement."
     end

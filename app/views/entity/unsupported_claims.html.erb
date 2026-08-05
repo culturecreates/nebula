@@ -11,8 +11,7 @@
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),
       graph: @entity.graph,
-      graph_name_uri: "http://kg.artsdata.ca/core",
-      triple_inverted: false
+      graph_name_uri: "http://kg.artsdata.ca/core"
     } %>
   <% end %>
 </turbo-frame>

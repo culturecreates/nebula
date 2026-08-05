@@ -235,9 +235,12 @@ class Entity
     false
   end
 
-  def delete_statement(graph_name_uri:, subject:, predicate:, object:, triple_inverted:)
-    return false if graph_name_uri.blank? || subject.blank? || predicate.blank? || object.blank?
+  def delete_statement(graph_name_uri:, subject:, predicate:, object:, triple_inverted: false)
+    return false if graph_name_uri.blank? || subject.blank? || subject.starts_with?("_:") || predicate.blank? || object.blank? || object.starts_with?("_:")
     return false unless valid_graph_uri?(graph_name_uri)
+    
+    triple_inverted = ActiveModel::Type::Boolean.new.cast(triple_inverted)
+    
     
     if triple_inverted
       subject, object = object, subject
@@ -249,10 +252,19 @@ class Entity
       '<PREDICATE_PLACEHOLDER>', predicate,
       '?OBJECT_PLACEHOLDER', object
     ])
-
+   
     response = artsdata_update_client.update(sparql)
     if response
-      true
+      if triple_inverted && predicate == "<http://schema.org/sameAs>"
+        # Also delete the inverse statement of the sameAs. Wikidata is usually linked as sameAs.
+        if delete_statement(graph_name_uri: graph_name_uri, subject: object, predicate: predicate, object: subject)
+          true
+        else
+          false
+        end
+      else
+        true
+      end
     else
       false
     end
