@@ -593,11 +593,11 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     const candidates = result.candidates || [];
     
     
-    // Check if entity is pre-reconciled and find matching candidate
+    // Check if entity carries a sameAs Artsdata claim and find the claimed candidate
     let hasAutoMatch = false;
     let autoMatchCandidate = null;
     
-    if (entity.isPreReconciled && entity.linkedTo) {
+    if (entity.hasArtsdataClaim && entity.linkedTo) {
       // Find candidate that matches the entity's artsdata_uri
       const matchingCandidate = candidates.find(candidate => candidate.id === entity.linkedTo);
       if (matchingCandidate) {
@@ -605,7 +605,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         autoMatchCandidate = matchingCandidate;
       }
     } else {
-      // Find true matches (where match property is true) for non-pre-reconciled entities
+      // Find true matches (where match property is true) for entities without a claim
       const trueMatches = candidates.filter(candidate => candidate.match === true);
       // Auto-judgment logic: only if there's exactly one true match
       hasAutoMatch = trueMatches.length === 1;
@@ -614,8 +614,8 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     
     // Transform candidates for UI display
     const matches = candidates.map(candidate => {
-      // For pre-reconciled entities, mark the matching candidate as a true match
-      const isMatchingCandidate = entity.isPreReconciled && entity.linkedTo && candidate.id === entity.linkedTo;
+      // For entities with a sameAs Artsdata claim, mark the claimed candidate as a true match
+      const isMatchingCandidate = entity.hasArtsdataClaim && entity.linkedTo && candidate.id === entity.linkedTo;
       
       return {
         id: candidate.id,
@@ -623,7 +623,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         description: candidate.description || candidate.disambiguatingDescription || '',
         type: candidate.type || [],
         score: candidate.score || 0,
-        match: isMatchingCandidate ? true : (candidate.match || false), // Override match for pre-reconciled
+        match: isMatchingCandidate ? true : (candidate.match || false), // Override match for claimed candidate
         externalId: candidate.id || '',
         // Additional fields from Artsdata entities
         url: candidate.url || candidate['http://schema.org/url'] || '',
@@ -651,8 +651,9 @@ export function processReconciliationResults(reconciliationResults, originalEnti
       matches,
       hasAutoMatch,
       autoMatchCandidate,
-      // Preserve reconciled status for pre-reconciled entities, otherwise update based on auto-match
-      status: entity.isPreReconciled ? 'reconciled' : (hasAutoMatch ? 'Auto-matched' : entity.status)
+      // Keep reconciled status only for entities asserted in Artsdata core.
+      // A sameAs claim (reconciled=false) becomes an actionable auto-match.
+      status: entity.isReconciled ? 'reconciled' : (hasAutoMatch ? 'Auto-matched' : entity.status)
     };
     
     return processedEntity;

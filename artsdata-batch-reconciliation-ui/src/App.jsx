@@ -477,8 +477,8 @@ const App = ({ config }) => {
       let sortedData = data;
       if (!currentShowAll) {
         sortedData = data.sort((a, b) => {
-          const aIsReconciled = a.status === 'reconciled' || a.isPreReconciled || a.linkedTo || a.mintedAs;
-          const bIsReconciled = b.status === 'reconciled' || b.isPreReconciled || b.linkedTo || b.mintedAs;
+          const aIsReconciled = a.status === 'reconciled' || a.isPreReconciled || (a.linkedTo && !a.hasArtsdataClaim) || a.mintedAs;
+          const bIsReconciled = b.status === 'reconciled' || b.isPreReconciled || (b.linkedTo && !b.hasArtsdataClaim) || b.mintedAs;
 
           // Non-reconciled entities first (aIsReconciled = false comes before bIsReconciled = true)
           if (!aIsReconciled && bIsReconciled) return -1;
@@ -1454,8 +1454,9 @@ const App = ({ config }) => {
         return true;
       }
 
-      // Hide pre-reconciled entities (entities that were already reconciled when loaded)
-      if (item.status === 'reconciled' || item.linkedTo || item.mintedAs || item.isPreReconciled) {
+      // Hide pre-reconciled entities (entities that were already reconciled when loaded).
+      // A sameAs Artsdata claim (hasArtsdataClaim but not reconciled) stays visible so it can be judged.
+      if (item.status === 'reconciled' || (item.linkedTo && !item.hasArtsdataClaim) || item.mintedAs || item.isPreReconciled) {
         return false;
       }
 
@@ -1687,7 +1688,7 @@ const App = ({ config }) => {
           <div className="alert alert-info" role="alert">
             {items.length === 0 ? (
               <strong>No entities found for the selected data feed and type.</strong>
-            ) : (items.every(item => item.isPreReconciled || item.linkedTo || item.mintedAs || item.status === 'reconciled') ? (
+            ) : (items.every(item => item.isPreReconciled || (item.linkedTo && !item.hasArtsdataClaim) || item.mintedAs || item.status === 'reconciled') ? (
               <strong>All entities have been reconciled!</strong>
             ) : (
               <strong>No entities match the current filters.</strong>
