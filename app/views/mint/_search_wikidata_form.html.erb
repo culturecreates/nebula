@@ -1,46 +1,59 @@
-<%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container') do |form| %>
+<%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container', data: { controller: "wikidata-type" }) do |form| %>
+  <% selected_type = type.presence || @wikidata_person_type %>
   <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <%= form.radio_button :type,
-                        @wikidata_person_type,
-                        class: "d-none",
-                        id: "person",
-                        checked: type == @wikidata_person_type || type.nil? %>
+      <%= form.radio_button :tab_type,
+                       @wikidata_person_type,
+                       class: "d-none",
+                       id: "person",
+                       checked: selected_type == @wikidata_person_type,
+                       data: {
+                         action: "change->wikidata-type#updateType",
+                         wikidata_type_target: "tabType",
+                       } %>
       <%= form.label :person,
                  t("minting_wikidata.person_tab"),
                  class:
-                   "nav-link #{"active" if type == @wikidata_person_type || type.nil?}",
+                   "nav-link #{"active" if selected_type == @wikidata_person_type}",
                  data: {
                    bs_toggle: "tab",
                    bs_target: "#person-content",
                  } %>
     </li>
     <li class="nav-item" role="presentation">
-      <%= form.radio_button :type,
-                        @wikidata_organization_type,
-                        class: "d-none",
-                        id: "organization",
-                        checked: type == @wikidata_organization_type %>
+      <%= form.radio_button :tab_type,
+                       @wikidata_organization_type,
+                       class: "d-none",
+                       id: "organization",
+                       checked: selected_type == @wikidata_organization_type,
+                       data: {
+                         action: "change->wikidata-type#updateType",
+                         wikidata_type_target: "tabType",
+                       } %>
       <%= form.label :organization,
                  t("minting_wikidata.organization_tab"),
-                 class: "nav-link #{"active" if type == @wikidata_organization_type}",
+                 class: "nav-link #{"active" if selected_type == @wikidata_organization_type}",
                  data: {
-                   bs_toggle: "tab",
-                   bs_target: "#organization-content",
+                  bs_toggle: "tab",
+                  bs_target: "#organization-content",
                  } %>
     </li>
     <li class="nav-item" role="presentation">
-      <%= form.radio_button :type,
-                        @wikidata_place_type,
-                        class: "d-none",
-                        id: "place",
-                        checked: type == @wikidata_place_type %>
+      <%= form.radio_button :tab_type,
+                       @wikidata_place_type,
+                       class: "d-none",
+                       id: "place",
+                       checked: selected_type == @wikidata_place_type,
+                       data: {
+                         action: "change->wikidata-type#updateType",
+                         wikidata_type_target: "tabType",
+                       } %>
       <%= form.label :place,
                  t("minting_wikidata.place_tab"),
-                 class: "nav-link #{"active" if type == @wikidata_place_type}",
+                 class: "nav-link #{"active" if selected_type == @wikidata_place_type}",
                  data: {
-                   bs_toggle: "tab",
-                   bs_target: "#place-content",
+                  bs_toggle: "tab",
+                  bs_target: "#place-content",
                  } %>
     </li>
   </ul>
@@ -48,7 +61,7 @@
   <div class="tab-content" id="myTabContent">
 
     <div
-      class="tab-pane fade <%= "show active" if type == @wikidata_person_type || type.nil? %>"
+      class="tab-pane fade <%= "show active" if selected_type == @wikidata_person_type %>"
       id="person-content"
       role="tabpanel"
     >
@@ -58,7 +71,7 @@
       </p>
     </div>
     <div
-      class="tab-pane fade <%= "show active" if type == @wikidata_organization_type %>"
+      class="tab-pane fade <%= "show active" if selected_type == @wikidata_organization_type %>"
       id="organization-content"
       role="tabpanel"
     >
@@ -68,7 +81,7 @@
       </p>
     </div>
     <div
-      class="tab-pane fade <%= "show active" if type == @wikidata_place_type %>"
+      class="tab-pane fade <%= "show active" if selected_type == @wikidata_place_type %>"
       id="place-content"
       role="tabpanel"
     >
@@ -76,6 +89,32 @@
       <p>
         <%= t("minting_wikidata.place_description") %>
       </p>
+    </div>
+  </div>
+
+  <div class="row mb-2 col-12 col-lg-8">
+    <div class="col">
+      <%= form.label :type, t("minting_wikidata.type_id"), class: "form-label" %>
+      <div
+        class="dropdown"
+        data-controller="recon-suggest"
+        data-recon-suggest-service-url-value="https://wikidata.reconci.link"
+        data-recon-suggest-service-path-value="/en/suggest/type"
+        data-recon-suggest-id-pattern-value="^[Qq]\d+$"
+      >
+        <%= form.hidden_field :type,
+                        value: selected_type,
+                        data: { wikidata_type_target: "typeField", recon_suggest_target: "hidden" } %>
+        <input
+          type="text"
+          class="form-control"
+          autocomplete="off"
+          value="<%= selected_type %>"
+          data-recon-suggest-target="input"
+          data-action="input->recon-suggest#search keydown.esc->recon-suggest#closeResults"
+        >
+        <ul class="dropdown-menu" data-recon-suggest-target="results"></ul>
+      </div>
     </div>
   </div>
 

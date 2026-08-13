@@ -7,7 +7,7 @@
         <%= render partial: "statement_objects",
         locals: {
             triples: @entity.graph.query([RDF.URI(@entity.entity_uri), @predicate, nil]),
-            graph: @entity.graph,
+            graph: @entity.graph
         } %>
     <% else %>
         <p class="p-3">No additional claims.</p>

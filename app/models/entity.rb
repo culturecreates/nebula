@@ -205,6 +205,13 @@ class Entity
     return response
   end
 
+  def load_authorized_external_identifiers
+    sparql =  SparqlLoader.load('entity_model/load_authorized_external_identifiers', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    @graph = construct_turtle(sparql)
+  end
+
   def load_derived_statements
     sparql =  SparqlLoader.load('load_rdfstar_inverse_graph', [
       'entity_uri_placeholder', self.entity_uri
@@ -225,6 +232,44 @@ class Entity
     end
   rescue => e
     puts "Error deleting entity: #{e.message}"
+    false
+  end
+
+  def delete_statement(graph_name_uri:, subject:, predicate:, object:, triple_inverted: false)
+    return false if graph_name_uri.blank? || subject.blank? || subject.starts_with?("_:") || predicate.blank? || object.blank? || object.starts_with?("_:")
+    return false unless valid_graph_uri?(graph_name_uri)
+    
+    triple_inverted = ActiveModel::Type::Boolean.new.cast(triple_inverted)
+    
+    
+    if triple_inverted
+      subject, object = object, subject
+    end
+
+    sparql = SparqlLoader.load('entity_model/delete_statement', [
+      'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
+      '<SUBJECT_PLACEHOLDER>', subject,
+      '<PREDICATE_PLACEHOLDER>', predicate,
+      '?OBJECT_PLACEHOLDER', object
+    ])
+   
+    response = artsdata_update_client.update(sparql)
+    if response
+      if triple_inverted && predicate == "<http://schema.org/sameAs>"
+        # Also delete the inverse statement of the sameAs. Wikidata is usually linked as sameAs.
+        if delete_statement(graph_name_uri: graph_name_uri, subject: object, predicate: predicate, object: subject)
+          true
+        else
+          false
+        end
+      else
+        true
+      end
+    else
+      false
+    end
+  rescue => e
+    puts "Error deleting statement: #{e.message}"
     false
   end
 
@@ -381,6 +426,28 @@ class Entity
   end
 
   private
+
+  def parse_ntriples_term(term, position)
+    statement_line = case position
+                     when :subject
+                       "#{term} <http://example.org/predicate> <http://example.org/object> ."
+                     when :predicate
+                       "<http://example.org/subject> #{term} <http://example.org/object> ."
+                     when :object
+                       "<http://example.org/subject> <http://example.org/predicate> #{term} ."
+                     end
+    RDF::NTriples::Reader.new(StringIO.new(statement_line)).first&.public_send(position)
+  rescue StandardError
+    nil
+  end
+
+  def valid_graph_uri?(value)
+    parsed = URI.parse(value.to_s)
+    parsed.is_a?(URI::HTTP) && parsed.host.present? &&
+      value.start_with?("http://kg.artsdata.ca/", "https://kg.artsdata.ca/")
+  rescue URI::InvalidURIError
+    false
+  end
 
   def artsdata_client
     @@artsdata_client ||= ArtsdataGraph::V2::Client.new(

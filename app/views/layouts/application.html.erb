@@ -68,6 +68,9 @@
         data-turbo-temporary
       >
         <%= flash.notice %>
+        <% if flash[:notice_uri].present? %>
+          <%= link_to flash[:notice_uri], flash[:notice_uri] %>
+        <% end %>
         <button
           type="button"
           class="btn-close"

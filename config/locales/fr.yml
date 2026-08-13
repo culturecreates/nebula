@@ -11,7 +11,7 @@ fr:
     data_feeds: "Flux de données"
     databus: "Databus"
     ical_feeds: "Flux iCal"
-    mint_using_wikidata: "Créer à partir de Wikidata"
+    mint_using_wikidata: "Réconcilier avec Wikidata"
     batch_reconcile: "Rapprochement par lot"
     batch_reconcile_menu:
       tool: "Outil de rapprochement par lot"
@@ -31,15 +31,19 @@ fr:
     login: "Connexion"
     logout: "Déconnexion"
   minting_wikidata:
-    title: "Mint using Wikidata"
-    sub_title: "Ajoutez des personnes, des lieux et des organisations de Wikidata à Artsdata. Commencez par sélectionner le type et saisir le nom ou l’identifiant Wikidata. Il vous sera demandé de confirmer l’entité Wikidata avant de procéder à la création d’un identifiant Artsdata."
-    person_tab: "Person"
-    person_description: "Wikidata entities that are instances of human (Q5)."
-    organization_tab: "Organization"
-    organization_description: "Wikidata entities that are instances of organization (Q43229). This includes groups of performers and presenting organizations."
-    place_tab: "Place"
-    place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
-    search_placeholder: "Name or Wikidata ID"
+    title: "Réconcilier avec Wikidata"
+    sub_title: "Ajoutez/liez des personnes, des lieux et des organisations de Wikidata à Artsdata. Commencez par sélectionner le type et saisir le nom ou l’identifiant Wikidata. Il vous sera demandé de confirmer l’entité Wikidata avant de procéder à la création d’un identifiant Artsdata."
+    person_tab: "Personne"
+    person_description: "Entités Wikidata qui sont des instances de type humain (Q5)."
+    organization_tab: "Organisation"
+    organization_description: "Entités Wikidata qui sont des instances de type organisation (Q43229). Cela inclut les groupes de performeurs et les organisations de présentation."
+    place_tab: "Lieu"
+    place_description: "Entités Wikidata qui sont des instances de lieu (Q17350442) : lieu utilisé pour une activité."
+    type_id: "type Wikidata"
+    search_placeholder: "Nom ou identifiant Wikidata"
+    type_mismatch_message: "Le type Wikidata utilisé pour la recherche correspond à %{wikidata_type}, ce qui diffère de l'onglet %{tab_type} de départ. Quel type doit être utilisé pour créer cette entité?"
+    use_wikidata_type: "Utiliser %{type}"
+    keep_tab_type: "Conserver %{type}"
   ical:
     ical_feeds: "Flux iCal"
     description: |
@@ -72,12 +76,15 @@ fr:
       smart_chip_instructions: |
         <h4>Smart Chip Instructions</h4><p> Enter the URL of the Google Sheets document that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>         
   entity:
+    authorized_external_identifiers:
+      title: "Identifiants externes validés"
+      description: "Les identifiants listés ici mettront à jour les informations dans les entités principales d'Artsdata lorsque les données externes changent. Supprimez un identifiant externe sameAs pour empêcher sa mise à jour dans l'entité principale d'Artsdata."
     nav:
       dereference: "Déréférencer"
       cms_v3: "CMS v3"
       cms_v4: "CMS v4"
-      minter: "Minter"
-      history_logs: "Voir l’historique"
+      minter: "Réconcilier"
+      history_logs: "Historique"
       history_log_title: "Révisions pour "
       ranked: "Classé"
       ranked_properties: "Classé (propriétés)"

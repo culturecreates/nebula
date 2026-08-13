@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  helper_method :ensure_access, :user_has_access?
+  helper_method :ensure_access, :user_has_access?, :level_2_access?
   before_action :set_locale, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
 
@@ -113,6 +113,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Level 2 access check (Artsdata Admins), independent of any specific feature flag
+  def level_2_access?
+    session[:teams].present? && session[:teams].any? { |team| team.key?("10808270") }
+  end
+
   # Role-Based Access Control (RBAC) pattern
   # Github Team IDs:
   #     Level 2: 10808270 (Artsdata Admins)
@@ -133,6 +138,8 @@ class ApplicationController < ActionController::Base
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
     when "delete_entity"
       return session[:teams].any? { |team| team.key?("10808270") }
+    when "delete_statement"
+      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
     when "refresh_entity"
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293")  }
     when "batch_operations"
