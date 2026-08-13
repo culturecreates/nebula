@@ -169,7 +169,11 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
   return apiResults.map((item, index) => {
     // Check if entity already has artsdata_uri (new format)
     const hasArtsdataUri = item.artsdata_uri && item.artsdata_uri.trim() !== '';
-    
+
+    // Whether the sameAs Artsdata claim is actually asserted/reconciled in Artsdata core.
+    // When false, the artsdata_uri is only an external claim that still needs steward judgment.
+    const isReconciled = item.reconciled === true;
+
     // Extract Artsdata ID if artsdata_uri exists
     let artsdataId = null;
     let artsdataName = null;
@@ -207,13 +211,21 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       performerName: item.performer_name || '', // Map performer_name to performerName for Events
       // Check if entity is flagged for review
       isFlaggedForReview: item.is_flagged_for_review === true,
-      // Mark status based on flags and reconciliation
-      status: hasArtsdataUri ? 'reconciled' : (item.is_flagged_for_review === true ? 'flagged-complete' : 'needs-judgment'),
+      // Mark status based on flags and reconciliation.
+      // Only entities actually reconciled in Artsdata core are shown as "reconciled".
+      // A sameAs Artsdata claim that is not yet asserted (reconciled=false) still needs judgment
+      // and will be surfaced as an auto-match after reconciliation.
+      status: (hasArtsdataUri && isReconciled) ? 'reconciled' : (item.is_flagged_for_review === true ? 'flagged-complete' : 'needs-judgment'),
       linkedTo: artsdataId,
       linkedToName: artsdataName,
       artsdataUri: hasArtsdataUri ? item.artsdata_uri : '', // Preserve full artsdata_uri from data feed
       matches: [], // Initialize empty matches array
-      isPreReconciled: hasArtsdataUri // Flag to identify pre-reconciled entities
+      // Entity carries a sameAs Artsdata claim (either an unasserted claim or already reconciled).
+      // Drives pre-selection of the claimed candidate during reconciliation.
+      hasArtsdataClaim: hasArtsdataUri,
+      // Entity is actually reconciled/asserted in Artsdata core.
+      isReconciled: hasArtsdataUri && isReconciled,
+      isPreReconciled: hasArtsdataUri && isReconciled // Flag to identify already-reconciled entities
     };
   });
 }
