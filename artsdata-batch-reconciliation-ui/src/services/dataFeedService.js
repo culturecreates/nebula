@@ -189,7 +189,8 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       url: item.url || '', // Direct from API
       externalId: item.uri ? item.uri.split('/').pop() : '',
       type: extractFirstType(item.type) || schemaType, // Use first API-provided type, fallback to generated schema type
-      description: item.description || '',
+      // disambiguating_description is the source-entity key (may be absent); fall back to legacy description
+      description: item.disambiguating_description || item.description || '',
       location: item.location || '', // New field from API
       startDate: item.start_date || item.startDate || '', // Map start_date to startDate
       endDate: item.end_date || item.endDate || '', // Map end_date to endDate

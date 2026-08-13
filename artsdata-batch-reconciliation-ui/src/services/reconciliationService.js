@@ -66,7 +66,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         });
       }
       
-      // Combine ISNI and Wikidata into sameAs property
+      // Combine ISNI, Wikidata, and entity URI into sameAs property
       const sameAsValues = [];
       
       if (entity.isni && entity.isni.trim() !== '') {
@@ -75,6 +75,12 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
       
       if (entity.wikidata && entity.wikidata.trim() !== '') {
         sameAsValues.push(entity.wikidata);
+      }
+
+      // Add entity URI as sameAs condition to match against Artsdata entities
+      // that link to this external URI via schema:sameAs (e.g., MusicBrainz, Google KG)
+      if (entity.uri && entity.uri.trim() !== '') {
+        sameAsValues.push(entity.uri);
       }
       
       if (sameAsValues.length > 0) {
@@ -257,6 +263,9 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
                 isni: enrichedCandidate.isni || originalCandidate.isni || '',
                 wikidata: enrichedCandidate.wikidata || originalCandidate.wikidata || '',
                 url: enrichedCandidate.url || originalCandidate.url || '',
+                sameAsValues: (Array.isArray(enrichedCandidate.sameAsValues) && enrichedCandidate.sameAsValues.length > 0)
+                  ? enrichedCandidate.sameAsValues
+                  : (originalCandidate.sameAsValues ?? []),
                 postalCode: enrichedCandidate.postalCode || originalCandidate.postalCode || '',
                 addressLocality: enrichedCandidate.addressLocality || originalCandidate.addressLocality || '',
                 addressRegion: enrichedCandidate.addressRegion || originalCandidate.addressRegion || '',
@@ -575,6 +584,16 @@ export async function flagEntity(uri, config = {}) {
  * @returns {Array} - Transformed entities with match candidates
  */
 export function processReconciliationResults(reconciliationResults, originalEntities) {
+  const normalizeUriForMatch = (value) => {
+    if (typeof value !== 'string') {
+      return '';
+    }
+
+    return value
+      .trim()
+      .replace(/^https?:\/\//i, '')
+      .replace(/\/+$/, '');
+  };
   
   // Handle the actual API response format
   const results = reconciliationResults?.results || [];
@@ -627,6 +646,7 @@ export function processReconciliationResults(reconciliationResults, originalEnti
         externalId: candidate.id || '',
         // Additional fields from Artsdata entities
         url: candidate.url || candidate['http://schema.org/url'] || '',
+        sameAsValues: candidate.sameAsValues || [],
         isni: candidate.isni || candidate['http://www.wikidata.org/prop/direct/P213'] || '',
         wikidata: candidate.wikidata || candidate['http://www.wikidata.org/entity/'] || '',
         postalCode: candidate.postalCode || candidate['http://schema.org/postalCode'] || '',

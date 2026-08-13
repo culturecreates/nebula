@@ -42,7 +42,7 @@ en:
     data_feeds: "Data Feeds"
     databus: "Databus"
     ical_feeds: "iCal Feeds"
-    mint_using_wikidata: "Mint using Wikidata"
+    mint_using_wikidata: "Reconcile with Wikidata"
     batch_reconcile: "Batch Reconcile"
     batch_reconcile_menu:
       tool: "Batch reconcile tool"
@@ -59,15 +59,19 @@ en:
     login: "Login"
     logout: "Logout"
   minting_wikidata:
-    title: "Mint using Wikidata"
-    sub_title: "Add Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to mint an Artsdata Identifier."
+    title: "Reconcile with Wikidata"
+    sub_title: "Add/link Wikidata people, places and organizations to Artsdata. Start by selecting the type and entering the name or Wikidata ID. You will be asked to confirm the Wikidata entity before proceeding to link to an existing Artsdata entity or mint a new Artsdata identifier."
     person_tab: "Person"
-    person_description: "Wikidata entities that are instances of human (Q5)."
+    person_description: "Wikidata entities that are instances of type human (Q5)."
     organization_tab: "Organization"
-    organization_description: "Wikidata entities that are instances of organization (Q43229). This includes groups of performers and presenting organizations."
+    organization_description: "Wikidata entities that are instances of type organization (Q43229). This includes groups of performers and presenting organizations."
     place_tab: "Place"
-    place_description: "Wikidata entities that are instances of venue (Q17350442): place used for some activity."
+    place_description: "Wikidata entities that are instances of type venue (Q17350442): place used for some activity."
+    type_id: "Wikidata type"
     search_placeholder: "Name or Wikidata ID"
+    type_mismatch_message: "The Wikidata type you searched with resolves to %{wikidata_type}, which differs from the %{tab_type} tab you started from. Which type should be used to mint this entity?"
+    use_wikidata_type: "Use %{type}"
+    keep_tab_type: "Keep %{type}"
   ical:
     ical_feeds: "iCal Feeds"
     description: |
@@ -103,11 +107,15 @@ en:
       smart_chip_instructions: |
         <h4>Smart Chip Instructions</h4><p> Enter the URL of the Google Sheets document that contains the data for this artifact. The sheet MUST have columns: name, startDate, startTime, location, description, eventType, url, organizer, performer. The location, eventType, organizer, and performer columns must be URIs from Artsdata (example: http://kg.artsdata.ca/resource/K2-5334).</p>
   entity:
+    authorized_external_identifiers:
+      title: "Validated External Identifiers"
+      description: "Identifiers listed here will refresh claims in Artsdata core entities when external data changes. Delete an external identifier sameAs to block it from updating the Artsdata core entity."
+    for: "for"
     nav:
       dereference: "Dereference"
       cms_v3: "CMS v3"
       cms_v4: "CMS v4"
-      minter: "Minter"
+      minter: "Reconcile"
       history_logs: "View History"
       history_log_title: "Revisions for "
       ranked: "Ranked"

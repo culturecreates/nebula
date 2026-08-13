@@ -19,7 +19,7 @@ export default class extends Controller {
     console.log("publisher", this.publisherValue)
     console.log("mintendpoint",  this.mintendpointValue)
     console.log("language", this.languageValue)
-    console.log("reference", this.referenceValue)
+    console.log("dataset or reference", this.referenceValue)
 
      // Listen for the custom event
      window.addEventListener('validationFactsLoaded', this.handleValidationData.bind(this))
@@ -83,8 +83,7 @@ export default class extends Controller {
         "publisher": this.publisherValue,
         "name": this.labelValue,
         "language": this.languageValue,
-        "dataset": this.referenceValue,
-        "facts": this.facts
+        "dataset": this.referenceValue
       })
     }
     const res = await fetch(url, options);

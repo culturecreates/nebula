@@ -424,7 +424,9 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                   <td>
                     <div className="name-cell">
                       <div className="name-primary">{item.name}</div>
-                      <div className="name-secondary">{item.description}</div>
+                      {item.description && (
+                        <div className="name-secondary">{item.description}</div>
+                      )}
                     </div>
                   </td>
                   {/* Show StartDate column for Event entities */}

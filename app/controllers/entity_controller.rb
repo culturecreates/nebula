@@ -1,5 +1,6 @@
 class EntityController < ApplicationController
   before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
+  before_action :check_delete_statement_access, only: [:delete_statement] # ensure user has permissions to delete statement like sameAs
 
   # Show an entity's asserted statements
   # /entity?uri=  --> HTML
@@ -68,15 +69,19 @@ class EntityController < ApplicationController
         @show_all_claims_button = true if user_signed_in?
         @show_add_sameas_button = true if user_signed_in?
         @target_types = [
-     #     RDF::Vocab::SCHEMA.Event, 
+     #     RDF::Vocab::SCHEMA.Event,
      #     RDF::Vocab::SCHEMA.Person,
          RDF::Vocab::SCHEMA.Organization,
      #     RDF::Vocab::SCHEMA.PerformingGroup,
           RDF::Vocab::SCHEMA.Place
       ]
-  
+
         # TODO: add SHACL validation if artsdata entity
-       
+
+        # Force HTML rendering even if the request negotiates turbo_stream
+        # (e.g. Turbo following a redirect_back after an unauthorized delete_statement),
+        # since no turbo_stream template exists for this action.
+        render "show", formats: [:html]
        }
     end
   end
@@ -84,6 +89,7 @@ class EntityController < ApplicationController
   def property_claims
     uri = params[:subject]
     @predicate = RDF::URI(params[:predicate])
+    @graph_name_uri = params[:graph_name_uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.property_claims(predicate: @predicate)
   end
@@ -94,6 +100,14 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     @entity.load_claims
+  end
+
+  # authorized_external_identifiers
+  # /entity/authorized_external_identifiers?uri=[canonical URI]
+  def authorized_external_identifiers
+    uri = params[:uri]
+    @entity = Entity.new(entity_uri: uri)
+    @entity.load_authorized_external_identifiers
   end
 
   # derived statements (inverse path)
@@ -120,10 +134,34 @@ class EntityController < ApplicationController
     redirect_to entity_path(uri: uri)
   end
 
+  # DELETE /entity/statement
+  def delete_statement
+    entity_uri = params[:entity_uri]
+    @entity = Entity.new(entity_uri: entity_uri)
+    if @entity.delete_statement(
+      graph_name_uri: params[:graph_name_uri],
+      subject: params[:subject_ntriples],
+      predicate: params[:predicate_ntriples],
+      object: params[:object_ntriples],
+      triple_inverted: params[:triple_inverted]
+    )
+      flash.notice = "Deleted statement in graph"
+      flash[:notice_uri] = params[:graph_name_uri]
+    else
+      flash.alert = "Could not delete statement."
+    end
+
+    redirect_back(fallback_location: entity_path(uri: entity_uri))
+  end
+
   private
 
   def check_delete_entity_access
     ensure_access("delete_entity")
+  end
+
+  def check_delete_statement_access
+    ensure_access("delete_statement")
   end
 
   # determine the shape for JSON-LD output
