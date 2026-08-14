@@ -39,7 +39,10 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     const queries = entities.map(entity => {
       const conditions = [];
 
-      if (entity.artsdataUri && entity.artsdataUri.trim() !== '') {
+      // Only pass the Artsdata id in the payload when the entity is actually
+      // reconciled/asserted in Artsdata core (reconcile flag). An unasserted
+      // sameAs Artsdata claim must not force an id match; fall back to name.
+      if (entity.artsdataUri && entity.artsdataUri.trim() !== '' && entity.isReconciled) {
         conditions.push({
           matchType: "id",
           propertyValue: entity.artsdataUri,
@@ -612,37 +615,25 @@ export function processReconciliationResults(reconciliationResults, originalEnti
     const candidates = result.candidates || [];
     
     
-    // Check if entity carries a sameAs Artsdata claim and find the claimed candidate
+    // Auto-match is driven solely by the match service response.
+    // An entity is auto-matched only when the service returns exactly one
+    // candidate with match === true.
     let hasAutoMatch = false;
     let autoMatchCandidate = null;
-    
-    if (entity.hasArtsdataClaim && entity.linkedTo) {
-      // Find candidate that matches the entity's artsdata_uri
-      const matchingCandidate = candidates.find(candidate => candidate.id === entity.linkedTo);
-      if (matchingCandidate) {
-        hasAutoMatch = true;
-        autoMatchCandidate = matchingCandidate;
-      }
-    } else {
-      // Find true matches (where match property is true) for entities without a claim
-      const trueMatches = candidates.filter(candidate => candidate.match === true);
-      // Auto-judgment logic: only if there's exactly one true match
-      hasAutoMatch = trueMatches.length === 1;
-      autoMatchCandidate = hasAutoMatch ? trueMatches[0] : null;
-    }
+
+    const trueMatches = candidates.filter(candidate => candidate.match === true);
+    hasAutoMatch = trueMatches.length === 1;
+    autoMatchCandidate = hasAutoMatch ? trueMatches[0] : null;
     
     // Transform candidates for UI display
     const matches = candidates.map(candidate => {
-      // For entities with a sameAs Artsdata claim, mark the claimed candidate as a true match
-      const isMatchingCandidate = entity.hasArtsdataClaim && entity.linkedTo && candidate.id === entity.linkedTo;
-      
       return {
         id: candidate.id,
         name: candidate.name,
         description: candidate.description || candidate.disambiguatingDescription || '',
         type: candidate.type || [],
         score: candidate.score || 0,
-        match: isMatchingCandidate ? true : (candidate.match || false), // Override match for claimed candidate
+        match: candidate.match || false, // Use the match flag from the match service response
         externalId: candidate.id || '',
         // Additional fields from Artsdata entities
         url: candidate.url || candidate['http://schema.org/url'] || '',
