@@ -234,10 +234,6 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
       if (selectedMatch) {
         return selectedMatch.id === match.id;
       }
-      // For entities with a sameAs Artsdata claim, only show the claimed entity (auto-selected)
-      if (item.hasArtsdataClaim && item.linkedTo) {
-        return match.id === item.linkedTo;
-      }
       // For reconciled entities with linkedTo (including newly minted), only show the linked entity
       if (currentStatus === 'reconciled' && item.linkedTo) {
         return match.id === item.linkedTo;
