@@ -174,10 +174,12 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
     // When false, the artsdata_uri is only an external claim that still needs steward judgment.
     const isReconciled = item.reconciled === true;
 
-    // Extract Artsdata ID if artsdata_uri exists
+    // Extract Artsdata ID only when the entity is actually reconciled in Artsdata core.
+    // An unasserted sameAs claim (reconciled=false) must NOT be treated as linked; the
+    // steward has to choose and link a candidate manually from the match candidates.
     let artsdataId = null;
     let artsdataName = null;
-    if (hasArtsdataUri) {
+    if (hasArtsdataUri && isReconciled) {
       artsdataId = item.artsdata_uri.split('/').pop();
       artsdataName = item.name || ''; // Use the entity's own name
     }
@@ -220,9 +222,6 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       linkedToName: artsdataName,
       artsdataUri: hasArtsdataUri ? item.artsdata_uri : '', // Preserve full artsdata_uri from data feed
       matches: [], // Initialize empty matches array
-      // Entity carries a sameAs Artsdata claim (either an unasserted claim or already reconciled).
-      // Drives pre-selection of the claimed candidate during reconciliation.
-      hasArtsdataClaim: hasArtsdataUri,
       // Entity is actually reconciled/asserted in Artsdata core.
       isReconciled: hasArtsdataUri && isReconciled,
       isPreReconciled: hasArtsdataUri && isReconciled // Flag to identify already-reconciled entities
