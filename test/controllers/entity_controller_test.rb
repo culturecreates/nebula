@@ -454,4 +454,40 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     assert real_repository.has_statement?(RDF::Statement(real_base_statement, recorded_by, recorded_by_bnode, graph_name: graph_uri))
     assert real_repository.has_statement?(RDF::Statement(external_uri, same_as, entity_uri, graph_name: graph_uri))
   end
+
+  test "a prov:wasGeneratedBy annotation object renders as a dereference card, not plain text" do
+    subject = RDF::URI("http://kg.artsdata.ca/resource/K23-300")
+    predicate = RDF::URI("http://schema.org/name")
+    object = RDF::Literal("Sample")
+    activity = RDF::URI("http://kg.artsdata.ca/activity/A1")
+
+    graph = RDF::Graph.new
+    graph << RDF::Statement(subject, predicate, object)
+    base_statement = RDF::Statement(subject, predicate, object)
+    graph << RDF::Statement(base_statement, RDF::URI("http://www.w3.org/ns/prov#wasGeneratedBy"), activity)
+
+    entity = Entity.new(entity_uri: subject.to_s)
+    entity.graph = graph
+
+    html = ApplicationController.render(
+      partial: "application/statement_objects",
+      locals: {
+        triples: graph.query([subject, nil, nil]),
+        graph: graph,
+        graph_name_uri: "http://kg.artsdata.ca/graph/test",
+      },
+      assigns: { entity: entity }
+    )
+
+    assert_includes html, "/dereference/card?"
+    assert_includes html, CGI.escape(activity.to_s)
+  end
+
+  test "annotations partial should dereference prov:wasGeneratedBy annotation objects" do
+    partial = File.read(Rails.root.join("app/views/application/_annotations.html.erb"))
+    assert_includes partial, "http://www.w3.org/ns/prov#wasGeneratedBy"
+    assert_includes partial, "was_generated_by"
+    assert_includes partial, "dereference_card_path"
+    assert_includes partial, "auto_dereference"
+  end
 end

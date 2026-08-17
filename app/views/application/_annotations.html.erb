@@ -29,6 +29,7 @@
         >
           <% had_primary_source = RDF::URI("http://www.w3.org/ns/prov#hadPrimarySource") %>
           <% was_derived_from = RDF::URI("http://www.w3.org/ns/prov#wasDerivedFrom") %>
+          <% was_generated_by = RDF::URI("http://www.w3.org/ns/prov#wasGeneratedBy") %>
           <% annotations_editable = local_assigns[:graph_name_uri].present? %>
           <% annotations.each do |a| %>
             <%
@@ -67,6 +68,26 @@
                             root_subject_ntriples: annotation_true_reified_subject_ntriples,
                             path_predicates: [a.predicate.to_ntriples],
                           } %>
+                        <% elsif a.predicate == was_generated_by && a.object.uri? %>
+                          <% if auto_dereference(a.object.to_s) %>
+                            <turbo-frame
+                              id='card-<%= @frame_id %>'
+                              src="<%= dereference_card_path(uri: a.object.to_s, frame_id: @frame_id) %>"
+                              loading="lazy"
+                              target="_top"
+                            >
+                              <%= a.object.to_s %>
+                            </turbo-frame>
+                          <% else %>
+                            <turbo-frame id='card-<%= @frame_id %>' target="_top">
+                              <%= display_object(a.object) %>
+                              <%= link_to "&nbsp;#{render partial: "shared/icon_expand"}".html_safe,
+                              dereference_card_path(uri: a.object.to_s, frame_id: @frame_id),
+                              data: {
+                                turbo_frame: "card-#{@frame_id}",
+                              } %>
+                            </turbo-frame>
+                          <% end %>
                         <% else %>
                           <%= display_object(a.object) %>
                           <% if a.predicate == had_primary_source || a.predicate == was_derived_from %>
