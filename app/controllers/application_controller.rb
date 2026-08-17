@@ -140,6 +140,8 @@ class ApplicationController < ActionController::Base
       return session[:teams].any? { |team| team.key?("10808270") }
     when "delete_statement"
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
+    when "update_statement_rank"
+      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
     when "refresh_entity"
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293")  }
     when "batch_operations"

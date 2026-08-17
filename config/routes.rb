@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     get "entity", to: "entity#show"
     delete "entity", to: "entity#destroy", as: :destroy_entity
     delete "entity/statement", to: "entity#delete_statement", as: :delete_entity_statement
+    patch "entity/statement/rank", to: "entity#update_statement_rank", as: :update_entity_statement_rank
     get "entity/unsupported_claims", to: "entity#unsupported_claims"
     get "entity/derived_statements", to: "entity#derived_statements"
     get "entity/authorized_external_identifiers", to: "entity#authorized_external_identifiers"
