@@ -128,6 +128,11 @@ module EntityHelper
     "<< #{display_object(statement.subject)} #{display_object(statement.predicate)} #{display_object(statement.object)} >>".html_safe
   end
 
+  # N-Triples-star representation of a statement used as the subject of an annotation, e.g. "<<<s> <p> <o>>>"
+  def reified_subject_ntriples(statement)
+    "<<#{statement.subject.to_ntriples} #{statement.predicate.to_ntriples} #{statement.object.to_ntriples}>>"
+  end
+
 
   def date_display(date_time)
     begin

@@ -1,6 +1,7 @@
 class EntityController < ApplicationController
   before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
   before_action :check_delete_statement_access, only: [:delete_statement] # ensure user has permissions to delete statement like sameAs
+  before_action :check_update_statement_rank_access, only: [:update_statement_rank] # ensure user has permissions to change an annotation's rank
 
   # Show an entity's asserted statements
   # /entity?uri=  --> HTML
@@ -154,6 +155,27 @@ class EntityController < ApplicationController
     redirect_back(fallback_location: entity_path(uri: entity_uri))
   end
 
+  def update_statement_rank
+    entity_uri = params[:entity_uri]
+    @entity = Entity.new(entity_uri: entity_uri)
+    if @entity.update_statement_rank(
+      graph_name_uri: params[:graph_name_uri],
+      base_subject: params[:base_subject_ntriples],
+      base_predicate: params[:base_predicate_ntriples],
+      base_object: params[:base_object_ntriples],
+      old_predicate: params[:old_predicate_ntriples],
+      new_predicate: params[:new_predicate_ntriples],
+      annotation_object: params[:annotation_object_ntriples]
+    )
+      flash.notice = "Updated statement rank"
+      flash[:notice_uri] = params[:graph_name_uri]
+    else
+      flash.alert = "Could not update statement rank."
+    end
+
+    redirect_back(fallback_location: entity_path(uri: entity_uri))
+  end
+
   private
 
   def check_delete_entity_access
@@ -162,6 +184,10 @@ class EntityController < ApplicationController
 
   def check_delete_statement_access
     ensure_access("delete_statement")
+  end
+
+  def check_update_statement_rank_access
+    ensure_access("update_statement_rank")
   end
 
   # determine the shape for JSON-LD output

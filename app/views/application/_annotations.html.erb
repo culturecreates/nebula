@@ -27,6 +27,8 @@
           class="accordion-collapse collapse"
           data-bs-parent="#accordionFlushExample"
         >
+          <% had_primary_source = RDF::URI("http://www.w3.org/ns/prov#hadPrimarySource") %>
+          <% was_derived_from = RDF::URI("http://www.w3.org/ns/prov#wasDerivedFrom") %>
           <% annotations.each do |a| %>
             <div class="accordion-body">
 
@@ -36,24 +38,92 @@
                 </div>
                 <div class="statement-objects">
                   <div class="statement-object">
-                    <% if a.object.node? %>
-                      <%= render partial: "statements_table",
-                      locals: {
-                        triples: graph.query([a.object, nil, nil]),
-                        graph: graph,
-                      } %>
-                    <% else %>
-                      <%= display_object(a.object) %>
-                      <% if a.predicate == "http://www.w3.org/ns/prov#hadPrimarySource" || a.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"%>
-                      <turbo-frame
-                        id='source-graph-info'
-                        src="<%= source_graph_show_path(uri: a.object) %>"
-                        loading="lazy"
-                        target="_top"
-                      >
-                      </turbo-frame>
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                      <div class="w-100 overflow-hidden">
+                        <% if a.object.node? %>
+                          <%= render partial: "statements_table",
+                          locals: {
+                            triples: graph.query([a.object, nil, nil]),
+                            graph: graph,
+                          } %>
+                        <% else %>
+                          <%= display_object(a.object) %>
+                          <% if a.predicate == had_primary_source || a.predicate == was_derived_from %>
+                          <turbo-frame
+                            id='source-graph-info'
+                            src="<%= source_graph_show_path(uri: a.object) %>"
+                            loading="lazy"
+                            target="_top"
+                          >
+                          </turbo-frame>
+                          <% end %>
+                        <% end %>
+                      </div>
+                      <% if local_assigns[:graph_name_uri].present? %>
+                        <div class="dropdown">
+                          <button
+                            class="btn btn-sm annotation-menu-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            data-bs-popper-config='{"strategy": "fixed"}'
+                            aria-expanded="false"
+                            aria-label="Annotation actions"
+                          >
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end annotation-menu">
+                            <% if a.predicate == had_primary_source %>
+                              <li>
+                                <%= form_with url: update_entity_statement_rank_path, method: :patch, local: true do %>
+                                  <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
+                                  <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
+                                  <%= hidden_field_tag :base_subject_ntriples, a.subject.subject.to_ntriples %>
+                                  <%= hidden_field_tag :base_predicate_ntriples, a.subject.predicate.to_ntriples %>
+                                  <%= hidden_field_tag :base_object_ntriples, a.subject.object.to_ntriples %>
+                                  <%= hidden_field_tag :old_predicate_ntriples, a.predicate.to_ntriples %>
+                                  <%= hidden_field_tag :new_predicate_ntriples, was_derived_from.to_ntriples %>
+                                  <%= hidden_field_tag :annotation_object_ntriples, a.object.to_ntriples %>
+                                  <button type="submit" class="dropdown-item">Normal rank</button>
+                                <% end %>
+                              </li>
+                            <% elsif a.predicate == was_derived_from %>
+                              <li>
+                                <%= form_with url: update_entity_statement_rank_path, method: :patch, local: true do %>
+                                  <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
+                                  <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
+                                  <%= hidden_field_tag :base_subject_ntriples, a.subject.subject.to_ntriples %>
+                                  <%= hidden_field_tag :base_predicate_ntriples, a.subject.predicate.to_ntriples %>
+                                  <%= hidden_field_tag :base_object_ntriples, a.subject.object.to_ntriples %>
+                                  <%= hidden_field_tag :old_predicate_ntriples, a.predicate.to_ntriples %>
+                                  <%= hidden_field_tag :new_predicate_ntriples, had_primary_source.to_ntriples %>
+                                  <%= hidden_field_tag :annotation_object_ntriples, a.object.to_ntriples %>
+                                  <button type="submit" class="dropdown-item">Primary rank</button>
+                                <% end %>
+                              </li>
+                            <% end %>
+                            <li>
+                              <%= form_with url: delete_entity_statement_path,
+                              method: :delete,
+                              local: true,
+                              html: {
+                                data: {
+                                  controller: "confirm",
+                                  action: "submit->confirm#confirm",
+                                  confirm: "Delete this annotation?",
+                                },
+                              } do %>
+                                <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
+                                <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
+                                <%= hidden_field_tag :subject_ntriples, reified_subject_ntriples(a.subject) %>
+                                <%= hidden_field_tag :predicate_ntriples, a.predicate.to_ntriples %>
+                                <%= hidden_field_tag :object_ntriples, a.object.to_ntriples %>
+                                <button type="submit" class="dropdown-item text-danger">Delete</button>
+                              <% end %>
+                            </li>
+                          </ul>
+                        </div>
                       <% end %>
-                    <% end %>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -273,6 +273,30 @@ class Entity
     false
   end
 
+  # Swap the predicate of an annotation (RDF-star) triple, e.g. to change a source's
+  # rank between prov:hadPrimarySource and prov:wasDerivedFrom, keeping the same
+  # reified base statement and annotation object.
+  def update_statement_rank(graph_name_uri:, base_subject:, base_predicate:, base_object:, old_predicate:, new_predicate:, annotation_object:)
+    return false if graph_name_uri.blank? || base_subject.blank? || base_predicate.blank? || base_object.blank? || old_predicate.blank? || new_predicate.blank? || annotation_object.blank?
+    return false unless valid_graph_uri?(graph_name_uri)
+
+    sparql = SparqlLoader.load('entity_model/update_statement_rank', [
+      'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
+      '<BASE_SUBJECT_PLACEHOLDER>', base_subject,
+      '<BASE_PREDICATE_PLACEHOLDER>', base_predicate,
+      '?BASE_OBJECT_PLACEHOLDER', base_object,
+      '<OLD_PREDICATE_PLACEHOLDER>', old_predicate,
+      '<NEW_PREDICATE_PLACEHOLDER>', new_predicate,
+      '?ANNOTATION_OBJECT_PLACEHOLDER', annotation_object
+    ])
+
+    response = artsdata_update_client.update(sparql)
+    response ? true : false
+  rescue => e
+    puts "Error updating statement rank: #{e.message}"
+    false
+  end
+
   def construct_turtle(sparql, sparql_endpoint = nil)
     if sparql_endpoint == "wikidata"
       begin
