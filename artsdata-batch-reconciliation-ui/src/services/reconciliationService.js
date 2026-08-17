@@ -55,7 +55,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         conditions.push({
           matchType: "name",
           propertyValue: entity.name,
-          required: true,
+          required: false,
           matchQuantifier: "any"
         });
 
