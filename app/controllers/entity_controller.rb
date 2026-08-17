@@ -144,7 +144,11 @@ class EntityController < ApplicationController
       subject: params[:subject_ntriples],
       predicate: params[:predicate_ntriples],
       object: params[:object_ntriples],
-      triple_inverted: params[:triple_inverted]
+      triple_inverted: params[:triple_inverted],
+      base_predicate: params[:base_predicate_ntriples],
+      base_object: params[:base_object_ntriples],
+      root_subject: params[:root_subject_ntriples],
+      path_predicates: Array(params[:path_predicates])
     )
       flash.notice = "Deleted statement in graph"
       flash[:notice_uri] = params[:graph_name_uri]
@@ -165,7 +169,9 @@ class EntityController < ApplicationController
       base_object: params[:base_object_ntriples],
       old_predicate: params[:old_predicate_ntriples],
       new_predicate: params[:new_predicate_ntriples],
-      annotation_object: params[:annotation_object_ntriples]
+      annotation_object: params[:annotation_object_ntriples],
+      root_subject: params[:root_subject_ntriples],
+      path_predicates: Array(params[:path_predicates])
     )
       flash.notice = "Updated statement rank"
       flash[:notice_uri] = params[:graph_name_uri]

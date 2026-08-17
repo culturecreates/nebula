@@ -29,7 +29,19 @@
         >
           <% had_primary_source = RDF::URI("http://www.w3.org/ns/prov#hadPrimarySource") %>
           <% was_derived_from = RDF::URI("http://www.w3.org/ns/prov#wasDerivedFrom") %>
+          <% annotations_editable = local_assigns[:graph_name_uri].present? %>
           <% annotations.each do |a| %>
+            <%
+              # In a triple_inverted view (e.g. authorized_external_identifiers), a.subject (the
+              # annotated base triple) is presented with subject/object swapped relative to how
+              # it's actually stored. Acting on the annotation — deleting it, changing its rank,
+              # or reaching nested properties of its value — must use the TRUE (un-swapped)
+              # base subject/object, or it won't match anything in the real graph.
+              inverted = ActiveModel::Type::Boolean.new.cast(local_assigns[:triple_inverted])
+              true_base_subject = inverted ? a.subject.object : a.subject.subject
+              true_base_object = inverted ? a.subject.subject : a.subject.object
+              annotation_true_reified_subject_ntriples = "<<#{true_base_subject.to_ntriples} #{a.subject.predicate.to_ntriples} #{true_base_object.to_ntriples}>>"
+            %>
             <div class="accordion-body">
 
               <div class="statement">
@@ -45,6 +57,15 @@
                           locals: {
                             triples: graph.query([a.object, nil, nil]),
                             graph: graph,
+                            graph_name_uri: local_assigns[:graph_name_uri],
+                            # An annotation's own value (a.object here) and its nested properties
+                            # are always stored/displayed in the forward direction, regardless of
+                            # whether the containing view is triple_inverted — unlike the base
+                            # triple/annotation subject above, there's no swapped-direction
+                            # reconstruction for this data, so it's always safe to delete.
+                            triple_inverted: false,
+                            root_subject_ntriples: annotation_true_reified_subject_ntriples,
+                            path_predicates: [a.predicate.to_ntriples],
                           } %>
                         <% else %>
                           <%= display_object(a.object) %>
@@ -59,7 +80,7 @@
                           <% end %>
                         <% end %>
                       </div>
-                      <% if local_assigns[:graph_name_uri].present? %>
+                      <% if annotations_editable %>
                         <div class="dropdown">
                           <button
                             class="btn btn-sm annotation-menu-toggle"
@@ -77,12 +98,18 @@
                                 <%= form_with url: update_entity_statement_rank_path, method: :patch, local: true do %>
                                   <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
                                   <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
-                                  <%= hidden_field_tag :base_subject_ntriples, a.subject.subject.to_ntriples %>
+                                  <%= hidden_field_tag :base_subject_ntriples, true_base_subject.to_ntriples %>
                                   <%= hidden_field_tag :base_predicate_ntriples, a.subject.predicate.to_ntriples %>
-                                  <%= hidden_field_tag :base_object_ntriples, a.subject.object.to_ntriples %>
+                                  <%= hidden_field_tag :base_object_ntriples, true_base_object.to_ntriples %>
                                   <%= hidden_field_tag :old_predicate_ntriples, a.predicate.to_ntriples %>
                                   <%= hidden_field_tag :new_predicate_ntriples, was_derived_from.to_ntriples %>
                                   <%= hidden_field_tag :annotation_object_ntriples, a.object.to_ntriples %>
+                                  <% if true_base_subject.node? %>
+                                    <%= hidden_field_tag :root_subject_ntriples, local_assigns[:root_subject_ntriples] %>
+                                    <% (local_assigns[:path_predicates] || []).each do |p| %>
+                                      <%= hidden_field_tag "path_predicates[]", p %>
+                                    <% end %>
+                                  <% end %>
                                   <button type="submit" class="dropdown-item">Normal rank</button>
                                 <% end %>
                               </li>
@@ -91,12 +118,18 @@
                                 <%= form_with url: update_entity_statement_rank_path, method: :patch, local: true do %>
                                   <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
                                   <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
-                                  <%= hidden_field_tag :base_subject_ntriples, a.subject.subject.to_ntriples %>
+                                  <%= hidden_field_tag :base_subject_ntriples, true_base_subject.to_ntriples %>
                                   <%= hidden_field_tag :base_predicate_ntriples, a.subject.predicate.to_ntriples %>
-                                  <%= hidden_field_tag :base_object_ntriples, a.subject.object.to_ntriples %>
+                                  <%= hidden_field_tag :base_object_ntriples, true_base_object.to_ntriples %>
                                   <%= hidden_field_tag :old_predicate_ntriples, a.predicate.to_ntriples %>
                                   <%= hidden_field_tag :new_predicate_ntriples, had_primary_source.to_ntriples %>
                                   <%= hidden_field_tag :annotation_object_ntriples, a.object.to_ntriples %>
+                                  <% if true_base_subject.node? %>
+                                    <%= hidden_field_tag :root_subject_ntriples, local_assigns[:root_subject_ntriples] %>
+                                    <% (local_assigns[:path_predicates] || []).each do |p| %>
+                                      <%= hidden_field_tag "path_predicates[]", p %>
+                                    <% end %>
+                                  <% end %>
                                   <button type="submit" class="dropdown-item">Primary rank</button>
                                 <% end %>
                               </li>
@@ -114,9 +147,17 @@
                               } do %>
                                 <%= hidden_field_tag :entity_uri, params[:uri] || params[:subject] %>
                                 <%= hidden_field_tag :graph_name_uri, local_assigns[:graph_name_uri] %>
-                                <%= hidden_field_tag :subject_ntriples, reified_subject_ntriples(a.subject) %>
+                                <%= hidden_field_tag :subject_ntriples, true_base_subject.to_ntriples %>
+                                <%= hidden_field_tag :base_predicate_ntriples, a.subject.predicate.to_ntriples %>
+                                <%= hidden_field_tag :base_object_ntriples, true_base_object.to_ntriples %>
                                 <%= hidden_field_tag :predicate_ntriples, a.predicate.to_ntriples %>
                                 <%= hidden_field_tag :object_ntriples, a.object.to_ntriples %>
+                                <% if true_base_subject.node? %>
+                                  <%= hidden_field_tag :root_subject_ntriples, local_assigns[:root_subject_ntriples] %>
+                                  <% (local_assigns[:path_predicates] || []).each do |p| %>
+                                    <%= hidden_field_tag "path_predicates[]", p %>
+                                  <% end %>
+                                <% end %>
                                 <button type="submit" class="dropdown-item text-danger">Delete</button>
                               <% end %>
                             </li>

@@ -235,24 +235,50 @@ class Entity
     false
   end
 
-  def delete_statement(graph_name_uri:, subject:, predicate:, object:, triple_inverted: false)
-    return false if graph_name_uri.blank? || subject.blank? || subject.starts_with?("_:") || predicate.blank? || object.blank? || object.starts_with?("_:")
+  # subject may be a blank node's N-Triples label (e.g. "_:b0"), which is only meaningful
+  # within the SPARQL result that produced it and can't be matched in a fresh request. When
+  # that's the case, root_subject/path_predicates must describe the join path that reaches it
+  # from a real, addressable subject, so the query can re-bind it instead of naming it.
+  # base_predicate/base_object, when given, mean "subject" is the base subject of an
+  # annotation and the resolved term should be wrapped as a reified << subject predicate object >>.
+  def delete_statement(graph_name_uri:, subject:, predicate:, object:, triple_inverted: false, base_predicate: nil, base_object: nil, root_subject: nil, path_predicates: [])
+    return false if graph_name_uri.blank? || subject.blank? || predicate.blank? || object.blank?
     return false unless valid_graph_uri?(graph_name_uri)
-    
+
     triple_inverted = ActiveModel::Type::Boolean.new.cast(triple_inverted)
-    
-    
+
     if triple_inverted
       subject, object = object, subject
     end
 
-    sparql = SparqlLoader.load('entity_model/delete_statement', [
+    resolved_subject, path_where = resolve_subject_path(subject, root_subject, path_predicates)
+    return false if resolved_subject.nil?
+
+    subject_term = if base_predicate.present? && base_object.present?
+      "<<#{resolved_subject} #{base_predicate} #{base_object}>>"
+    else
+      resolved_subject
+    end
+
+    # A blank-node object has the same "can't be referenced by label across requests" problem
+    # as a blank-node subject. There's no need for a join path to find it though, since it's
+    # directly bound by (subject, predicate) in this same query — so leave ?OBJECT_PLACEHOLDER
+    # as a real SPARQL variable (skip substituting it) and cascade-delete its own direct
+    # properties, so the edit doesn't leave an orphaned, unreachable blank node behind.
+    object_is_blank = object.starts_with?("_:")
+
+    substitutions = [
       'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
-      '<SUBJECT_PLACEHOLDER>', subject,
+      '# PATH_WHERE_PLACEHOLDER', path_where,
+      '<SUBJECT_PLACEHOLDER>', subject_term,
       '<PREDICATE_PLACEHOLDER>', predicate,
-      '?OBJECT_PLACEHOLDER', object
-    ])
-   
+      '# OBJECT_CASCADE_DELETE_PLACEHOLDER', object_is_blank ? '?OBJECT_PLACEHOLDER ?op ?oo .' : '',
+      '# OBJECT_CASCADE_WHERE_PLACEHOLDER', object_is_blank ? 'OPTIONAL { ?OBJECT_PLACEHOLDER ?op ?oo . }' : ''
+    ]
+    substitutions += ['?OBJECT_PLACEHOLDER', object] unless object_is_blank
+
+    sparql = SparqlLoader.load('entity_model/delete_statement', substitutions)
+
     response = artsdata_update_client.update(sparql)
     if response
       if triple_inverted && predicate == "<http://schema.org/sameAs>"
@@ -275,20 +301,32 @@ class Entity
 
   # Swap the predicate of an annotation (RDF-star) triple, e.g. to change a source's
   # rank between prov:hadPrimarySource and prov:wasDerivedFrom, keeping the same
-  # reified base statement and annotation object.
-  def update_statement_rank(graph_name_uri:, base_subject:, base_predicate:, base_object:, old_predicate:, new_predicate:, annotation_object:)
+  # reified base statement and annotation object. See delete_statement's comment above
+  # for root_subject/path_predicates (base_subject may be a blank node).
+  def update_statement_rank(graph_name_uri:, base_subject:, base_predicate:, base_object:, old_predicate:, new_predicate:, annotation_object:, root_subject: nil, path_predicates: [])
     return false if graph_name_uri.blank? || base_subject.blank? || base_predicate.blank? || base_object.blank? || old_predicate.blank? || new_predicate.blank? || annotation_object.blank?
     return false unless valid_graph_uri?(graph_name_uri)
 
-    sparql = SparqlLoader.load('entity_model/update_statement_rank', [
+    resolved_base_subject, path_where = resolve_subject_path(base_subject, root_subject, path_predicates)
+    return false if resolved_base_subject.nil?
+
+    # A blank-node base_object has the same unreferenceable-label problem as a blank-node
+    # base_subject (see delete_statement above). It's already directly bound by the required
+    # WHERE pattern below (base_subject, base_predicate, old_predicate, annotation_object
+    # together uniquely identify it), so just leave ?BASE_OBJECT_PLACEHOLDER as a real SPARQL
+    # variable (skip substituting it) instead of naming the unreferenceable blank node.
+    substitutions = [
       'GRAPH_NAME_URI_PLACEHOLDER', graph_name_uri,
-      '<BASE_SUBJECT_PLACEHOLDER>', base_subject,
+      '# PATH_WHERE_PLACEHOLDER', path_where,
+      '<BASE_SUBJECT_PLACEHOLDER>', resolved_base_subject,
       '<BASE_PREDICATE_PLACEHOLDER>', base_predicate,
-      '?BASE_OBJECT_PLACEHOLDER', base_object,
       '<OLD_PREDICATE_PLACEHOLDER>', old_predicate,
       '<NEW_PREDICATE_PLACEHOLDER>', new_predicate,
       '?ANNOTATION_OBJECT_PLACEHOLDER', annotation_object
-    ])
+    ]
+    substitutions += ['?BASE_OBJECT_PLACEHOLDER', base_object] unless base_object.starts_with?("_:")
+
+    sparql = SparqlLoader.load('entity_model/update_statement_rank', substitutions)
 
     response = artsdata_update_client.update(sparql)
     response ? true : false
@@ -463,6 +501,25 @@ class Entity
     RDF::NTriples::Reader.new(StringIO.new(statement_line)).first&.public_send(position)
   rescue StandardError
     nil
+  end
+
+  # Resolves a subject that may be a blank node's (request-local, unreferenceable) N-Triples
+  # label into either the term itself (when it's a real subject) or a SPARQL variable bound
+  # via a join path from root_subject through path_predicates, plus the WHERE-clause lines
+  # needed to bind that path. Returns [term_or_var, where_fragment], or nil if subject is a
+  # blank node and root_subject/path_predicates don't safely resolve it.
+  def resolve_subject_path(subject, root_subject, path_predicates)
+    return [subject, ""] unless subject.to_s.starts_with?("_:")
+    return nil if root_subject.blank? || root_subject.to_s.starts_with?("_:") || path_predicates.blank?
+
+    lines = []
+    current = root_subject
+    path_predicates.each_with_index do |predicate, i|
+      var = "?bnode_path_#{i}"
+      lines << "#{current} #{predicate} #{var} ."
+      current = var
+    end
+    [current, lines.join("\n")]
   end
 
   def valid_graph_uri?(value)
