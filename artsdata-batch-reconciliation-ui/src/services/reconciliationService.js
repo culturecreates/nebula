@@ -39,9 +39,11 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     const queries = entities.map(entity => {
       const conditions = [];
 
-      // Only pass the Artsdata id in the payload when the entity is actually
-      // reconciled/asserted in Artsdata core (reconcile flag). An unasserted
-      // sameAs Artsdata claim must not force an id match; fall back to name.
+      // Only pass the Artsdata id as a REQUIRED match when the entity is actually
+      // reconciled/asserted in Artsdata core (reconcile flag). An unasserted sameAs
+      // Artsdata claim must not force an id match; match on name instead, but still
+      // surface the claimed candidate as a non-required id match so the steward can
+      // review and judge it alongside the name/property based candidates.
       if (entity.artsdataUri && entity.artsdataUri.trim() !== '' && entity.isReconciled) {
         conditions.push({
           matchType: "id",
@@ -53,9 +55,18 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         conditions.push({
           matchType: "name",
           propertyValue: entity.name,
-          required: true,
+          required: false,
           matchQuantifier: "any"
         });
+
+        if (entity.artsdataUri && entity.artsdataUri.trim() !== '') {
+          conditions.push({
+            matchType: "id",
+            propertyValue: entity.artsdataUri,
+            required: false,
+            matchQuantifier: "any"
+          });
+        }
       }
       
       // Add URL as separate property
