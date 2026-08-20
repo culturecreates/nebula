@@ -18,7 +18,9 @@
           triples: triples.select { |s| s.predicate == prop },
           graph: graph,
           graph_name_uri: local_assigns[:graph_name_uri],
-          triple_inverted: local_assigns[:triple_inverted]
+          triple_inverted: local_assigns[:triple_inverted],
+          root_subject_ntriples: local_assigns[:root_subject_ntriples],
+          path_predicates: local_assigns[:path_predicates]
         } %>
         <div id='property-claims-div-<%= subject_predicate_hash %>' class="d-none">
           <turbo-frame
