@@ -37,6 +37,22 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     
     // Build queries for batch reconciliation
     const queries = entities.map(entity => {
+      // Reconciled entities are already asserted in Artsdata core, so match them
+      // solely on their id. Skip name/sameAs/property conditions and the
+      // dbo:Agent type, and request a single candidate.
+      if (entity.isReconciled && entity.artsdataUri && entity.artsdataUri.trim() !== '') {
+        return {
+          conditions: [
+            {
+              matchType: "id",
+              propertyValue: entity.artsdataUri,
+              required: true
+            }
+          ],
+          limit: 10
+        };
+      }
+
       const conditions = [];
 
       if (entity.name && entity.name.trim() !== '') {
@@ -85,11 +101,13 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         sameAsValues.push(entity.uri);
       }
       
-      if (sameAsValues.length > 0) {
+      const uniqueSameAs = [...new Set(sameAsValues)];
+
+      if (uniqueSameAs.length > 0) {
         conditions.push({
           matchType: "property",
           propertyId: "http://schema.org/sameAs",
-          propertyValue: sameAsValues.length === 1 ? sameAsValues[0] : sameAsValues,
+          propertyValue: uniqueSameAs.length === 1 ? uniqueSameAs[0] : uniqueSameAs,
           required: false,
           matchQuantifier: "any"
         });
