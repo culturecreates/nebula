@@ -45,11 +45,11 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
           conditions: [
             {
               matchType: "id",
-              propertyValue: entity.artsdataUri,
+              propertyValue: entity.artsdataUri.trim(),
               required: true
             }
           ],
-          limit: 10
+          limit: 1
         };
       }
 
