@@ -39,12 +39,14 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     const queries = entities.map(entity => {
       const conditions = [];
 
-      conditions.push({
-        matchType: "name",
-        propertyValue: entity.name,
-        required: false,
-        matchQuantifier: "any"
-      });
+      if (entity.name && entity.name.trim() !== '') {
+        conditions.push({
+          matchType: "name",
+          propertyValue: entity.name,
+          required: false,
+          matchQuantifier: "any"
+        });
+      }
 
       if (entity.artsdataUri && entity.artsdataUri.trim() !== '') {
         conditions.push({
