@@ -1372,63 +1372,53 @@ const App = ({ config }) => {
 
   const handleRefreshRow = async (id) => {
     try {
-      // Find the original item from the items array (before reconciliation)
-      const originalItem = items.find(item => item.id === id);
-      if (!originalItem) return;
-      
-      // Reset the item to its original state as if viewed for the first time
-      const resetItem = {
-        ...originalItem,
-        // Clear all reconciliation data
-        matches: [],
-        hasAutoMatch: false,
-        autoMatchCandidate: null,
-        status: 'needs-judgment', // Reset to initial state
-        reconciliationError: null,
-        mintReady: false,
-        mintError: null,
-        linkedTo: null,
-        linkedToName: null,
-        actionError: null
-      };
-      
-      // Update the item in the list to show loading state
-      setReconciledItems(prev => 
-        prev.map(prevItem => 
-          prevItem.id === id ? { ...resetItem, reconciliationStatus: 'loading' } : prevItem
+      const currentItem = reconciledItems.find(item => item.id === id);
+      if (!currentItem || !currentItem.uri) return;
+
+      setReconciledItems(prev =>
+        prev.map(prevItem =>
+          prevItem.id === id ? { ...prevItem, reconciliationStatus: 'loading', reconciliationError: null } : prevItem
         )
       );
-      
-      // Perform fresh reconciliation for this single item
+
+   
+      const freshRows = await fetchDynamicData(type, dataFeed, 1, 1, config, null, '', [currentItem.uri]);
+      if (!freshRows || freshRows.length === 0) {
+        throw new Error('Entity not found in the data feed');
+      }
+
+      const freshItem = {
+        ...freshRows[0],
+        id: currentItem.id,
+        originalIndex: currentItem.originalIndex
+      };
+
       const schemaType = `schema:${type}`; // Add schema: prefix for reconciliation API
-      const reconciled = await batchReconcile([resetItem], schemaType, 1, config);
-      
-      if (reconciled.length > 0) {
-        const refreshedItem = reconciled[0];
+      const reconciled = await batchReconcile([freshItem], schemaType, 1, config);
+      const refreshedItem = reconciled.length > 0 ? reconciled[0] : freshItem;
 
-        // Update with fresh reconciled data
-        setReconciledItems(prev =>
-          prev.map(prevItem =>
-            prevItem.id === id ? { ...refreshedItem, reconciliationStatus: 'complete' } : prevItem
-          )
-        );
+      setReconciledItems(prev =>
+        prev.map(prevItem =>
+          prevItem.id === id ? { ...refreshedItem, reconciliationStatus: 'complete' } : prevItem
+        )
+      );
 
+      if (refreshedItem.status === 'reconciled' || refreshedItem.isFlaggedForReview) {
+        setRecentlyReconciled(prev => new Set([...prev, id]));
+      }
+
+      setGlobalJudgments(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(id);
         if (refreshedItem.hasAutoMatch && refreshedItem.autoMatchCandidate) {
-          setGlobalJudgments(prev => {
-            const newMap = new Map(prev);
-
-            if (!newMap.has(refreshedItem.id)) {
-              newMap.set(refreshedItem.id, {
-                ...refreshedItem,
-                status: 'judgment-ready',
-                selectedMatch: refreshedItem.autoMatchCandidate
-              });
-            }
-
-            return newMap;
+          newMap.set(id, {
+            ...refreshedItem,
+            status: 'judgment-ready',
+            selectedMatch: refreshedItem.autoMatchCandidate
           });
         }
-      }
+        return newMap;
+      });
     } catch (error) {
       console.error('Error refreshing row:', error);
       // Show error in the item
