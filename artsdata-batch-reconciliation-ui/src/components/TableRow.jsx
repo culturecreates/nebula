@@ -678,13 +678,13 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
           </div>
         </td>
         <td>
-          {/* Refresh button */}
           <button
             onClick={e => { e.stopPropagation(); onRefresh && onRefresh(item.id); }}
             className="icon-button"
-            title="Refresh row"
+            title={item.reconciliationStatus === 'loading' ? 'Refreshing...' : 'Refresh row'}
+            disabled={item.reconciliationStatus === 'loading'}
           >
-            <RefreshCw className="table-icon" />
+            <RefreshCw className={`table-icon ${item.reconciliationStatus === 'loading' ? 'icon-spinning' : ''}`} />
           </button>
         </td>
       </tr>
