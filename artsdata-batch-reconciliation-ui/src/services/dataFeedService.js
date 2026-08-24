@@ -13,9 +13,10 @@ const DEFAULT_API_BASE_URL = 'https://staging-recon.artsdata.ca/extend';
  * @param {Object} config - Configuration object with endpoints
  * @param {AbortSignal} signal - Abort signal for canceling requests
  * @param {string} region - Optional region filter (2-letter Canadian province/territory code)
+ * @param {Array<string>} uris - Optional entity URIs to fetch (repeated uri query params, e.g. for single-row refresh)
  * @returns {Promise<Array>} - Array of transformed data
  */
-export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}, signal = null, region = '') {
+export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, config = {}, signal = null, region = '', uris = []) {
   // Use config endpoint or fall back to default
   const apiBaseUrl = config.reconciliationEndpoint ? `${config.reconciliationEndpoint}/extend` : DEFAULT_API_BASE_URL;
   
@@ -32,7 +33,13 @@ export async function fetchDynamicData(type, graphUrl, page = 1, limit = 20, con
     if (region && region.trim() !== '') {
       apiUrl += `&region=${encodeURIComponent(region)}`;
     }
-    
+
+    if (Array.isArray(uris) && uris.length > 0) {
+      uris.forEach(uri => {
+        apiUrl += `&uri=${encodeURIComponent(uri)}`;
+      });
+    }
+
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -170,16 +177,16 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
     // Check if entity already has artsdata_uri (new format)
     const hasArtsdataUri = item.artsdata_uri && item.artsdata_uri.trim() !== '';
 
-    // Whether the sameAs Artsdata claim is actually asserted/reconciled in Artsdata core.
-    // When false, the artsdata_uri is only an external claim that still needs steward judgment.
+    // The reconciled boolean from the API is the sole source of truth for
+    // whether the entity is reconciled in Artsdata core.
     const isReconciled = item.reconciled === true;
 
-    // Extract Artsdata ID only when the entity is actually reconciled in Artsdata core.
+    // Extract the linked Artsdata ID when the URI is available.
     // An unasserted sameAs claim (reconciled=false) must NOT be treated as linked; the
     // steward has to choose and link a candidate manually from the match candidates.
     let artsdataId = null;
     let artsdataName = null;
-    if (hasArtsdataUri && isReconciled) {
+    if (isReconciled && hasArtsdataUri) {
       artsdataId = item.artsdata_uri.split('/').pop();
       artsdataName = item.name || ''; // Use the entity's own name
     }
@@ -217,14 +224,14 @@ function transformApiResults(apiResults, page = 1, limit = 20, selectedType = 'E
       // Only entities actually reconciled in Artsdata core are shown as "reconciled".
       // A sameAs Artsdata claim that is not yet asserted (reconciled=false) still needs judgment
       // and will be surfaced as an auto-match after reconciliation.
-      status: (hasArtsdataUri && isReconciled) ? 'reconciled' : (item.is_flagged_for_review === true ? 'flagged-complete' : 'needs-judgment'),
+      status: isReconciled ? 'reconciled' : (item.is_flagged_for_review === true ? 'flagged-complete' : 'needs-judgment'),
       linkedTo: artsdataId,
       linkedToName: artsdataName,
       artsdataUri: hasArtsdataUri ? item.artsdata_uri : '', // Preserve full artsdata_uri from data feed
       matches: [], // Initialize empty matches array
       // Entity is actually reconciled/asserted in Artsdata core.
-      isReconciled: hasArtsdataUri && isReconciled,
-      isPreReconciled: hasArtsdataUri && isReconciled // Flag to identify already-reconciled entities
+      isReconciled: isReconciled,
+      isPreReconciled: isReconciled // Flag to identify already-reconciled entities
     };
   });
 }
