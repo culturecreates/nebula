@@ -772,6 +772,26 @@ body.modal-open .sticky-left {
   height: 1rem;
 }
 
+/* Spinning refresh icon while a row is refreshing */
+.icon-button:disabled {
+  cursor: default;
+  color: #9ca3af;
+  background: none;
+}
+
+.icon-spinning {
+  animation: icon-spin 1s linear infinite;
+}
+
+@keyframes icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Pagination */
 .pagination {
   background-color: transparent;
