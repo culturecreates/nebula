@@ -42,22 +42,22 @@ class EntityController < ApplicationController
         end
       }
       format.jsonlds {
-        puts "rendering expanded jsonld-star..."
+        Rails.logger.debug "rendering expanded jsonld-star..."
         @entity.load_graph
         render json: JSON::LD::API::fromRdf(@entity.graph), content_type: 'application/ld+json'
       }
       format.ttl { 
-        puts "rendering turtle..."
+        Rails.logger.debug "rendering turtle..."
         @entity.load_graph_without_triple_terms
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
       format.ttls { 
-        puts "rendering turtle-star..."
+        Rails.logger.debug "rendering turtle-star..."
         @entity.load_graph
         render plain: @entity.graph.dump(:turtle, standard_prefixes: true), content_type: 'text/turtle'
       }
       format.rdf { 
-        puts "rendering rdf..."
+        Rails.logger.debug "rendering rdf..."
         @entity.load_graph_without_triple_terms
         render xml: @entity.graph.dump(:rdfxml, validate: false, standard_prefixes: true), content_type: 'application/rdf+xml'
       }
@@ -199,7 +199,7 @@ class EntityController < ApplicationController
   # determine the shape for JSON-LD output
   # Frame_template can be "schema_org" or nil
   def shape(entity, frame_template)
-    puts "Determining shape for entity: #{entity.entity_uri} with frame template: #{frame_template}"
+    Rails.logger.debug "Determining shape for entity: #{entity.entity_uri} with frame template: #{frame_template}"
     if frame_template
       if frame_template == "schema_org"
         entity_class = entity.type.value.split('/').last.downcase
@@ -209,7 +209,7 @@ class EntityController < ApplicationController
           raise StandardError, "no frame file for entity class #{entity_class}" unless ["event","person","place","organization"].include? entity_class 
           frame = JSON.parse(File.read(file_path)) 
         rescue StandardError => e
-          puts "Error parsing frame: #{e.message}"
+          Rails.logger.debug "Error parsing frame: #{e.message}"
           return
         end
         context = "http://schema.org"
@@ -227,7 +227,7 @@ class EntityController < ApplicationController
         graph = pick_language(graph, I18n.locale)
         jsonld = JSON::LD::API::fromRdf(graph)
       else
-        puts "No matching frame template: #{e.message}"
+        Rails.logger.debug "No matching frame template: #{e.message}"
         frame = nil
       end
     else
