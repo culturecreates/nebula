@@ -13,7 +13,7 @@
 | Indigenous Performances Calendar | Lodge Pole Alliance | [lodgepolearts.ca/events](https://lodgepolearts.ca/events/#national) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | La Vitrine | La Vitrine | [www.lavitrine.com](https://www.lavitrine.com/) | [artsdata-planet-lavitrine](https://github.com/culturecreates/artsdata-planet-lavitrine) |
 | LIVE Performing Arts Directory | CAPACOA | [capacoa.ca/en/member/directory](https://capacoa.ca/en/member/directory/) | [artsdata-shortcode](https://github.com/culturecreates/artsdata-shortcode) |
-| Re-Imagining Customer Relationships | Chaire de gestion des arts Carmelle et Rémi-Marcoux, HEC Montréal | [wwww.artsdata.ca/en/user-stories](https://www.artsdata.ca/en/stories/open-data-and-marketing-research) | [artsdata-planet-rcr-survey](https://github.com/culturecreates/artsdata-planet-rcr-survey) |
+| Re-Imagining Customer Relationships | Chaire de gestion des arts Carmelle et Rémi-Marcoux, HEC Montréal | [wwww.artsdata.ca/en/stories](https://www.artsdata.ca/en/stories/open-data-and-marketing-research) | [artsdata-planet-rcr-survey](https://github.com/culturecreates/artsdata-planet-rcr-survey) |
 | Signé Laval |  Culture Laval | [signelaval.com](https://signelaval.com/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Tourisme Mauricie | Calendrier des événements en Mauricie | [tourismemauricie.com/evenements](https://tourismemauricie.com/evenements) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Tout Culture |  Culture Outaouais | [toutculture.ca/](https://toutculture.ca/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
