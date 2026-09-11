@@ -12,8 +12,9 @@
 | IPAA Member Directory | Indigenous Performing Arts Alliance (IPAA) | [ipaa.ca/indigenous-artists/](https://ipaa.ca/indigenous-artists/) | [artsdata-planet-ipaa](https://github.com/culturecreates/artsdata-planet-ipaa) |
 | I Want To Showcase | Organization of Saskatchewan Arts Councils | [iwanttoshowcase.ca](https://iwanttoshowcase.ca) | [artsdata-planet-iwts](https://github.com/culturecreates/artsdata-planet-iwts) |
 | La Vitrine | La Vitrine | [artsdata-planet-lavitrine](https://github.com/culturecreates/artsdata-planet-lavitrine) | [artsdata-planet-lavitrine](https://github.com/culturecreates/artsdata-planet-lavitrine) |
+| Réimaginer les relations avec la clientèle | Chaire de gestion des arts Carmelle et Rémi-Marcoux, HEC Montréal | [wwww.artsdata.ca/fr/recits](https://www.artsdata.ca/fr/recits/donnees-ouvertes-et-recherche-marketing) | [artsdata-planet-rcr-survey](https://github.com/culturecreates/artsdata-planet-rcr-survey) |
 | Répertoire VIVANT du spectacle | CAPACOA | [capacoa.ca/en/member/directory](https://capacoa.ca/en/member/directory/) | [artsdata-shortcode](https://github.com/culturecreates/artsdata-shortcode) |
-| Signé Laval |  Culture Laval | [signelaval.com](https://signelaval.com/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
+| Signé Laval | Culture Laval | [signelaval.com](https://signelaval.com/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Tourisme Mauricie | Calendrier des événements en Mauricie | [tourismemauricie.com/evenements](https://tourismemauricie.com/evenements) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Tout Culture |  Culture Outaouais | [toutculture.ca/](https://toutculture.ca/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Wikidata | Foundation Wikimedia | [wikidata.org](https://www.wikidata.org/) | [artsdata-planet-wikidata](https://github.com/culturecreates/artsdata-planet-wikidata) |
