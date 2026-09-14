@@ -17,11 +17,7 @@
 
 ## Programmatic / agent access
 
-- MCP server: https://mcp.artsdata.ca/mcp (Model Context Protocol,
-  JSON-RPC over HTTP). Exposes:
-  - Tools: search_entities, get_entity, search_events, get_schema, sparql_query
-  - Resources: the Artsdata Core (minus provenance) RDF dump manifest,
-    readable via resources/list and resources/read
+- MCP server: https://mcp.artsdata.ca/llms.txt — canonical documentation for the Artsdata MCP server and protocol details.
 - SPARQL endpoint: https://query.artsdata.ca/query — public read-only
   SPARQL 1.1 endpoint over the full Artsdata knowledge graph. Use get_schema
   (via the MCP server) to learn the data model before writing queries.
