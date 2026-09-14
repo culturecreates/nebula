@@ -67,8 +67,8 @@ class ArtsdataMcpServiceTest < ActiveSupport::TestCase
     assert_equal 1, dumps.length
     assert_equal RESOURCE_URI, dumps.first[:resource_uri]
     assert_equal "core_minus_provenance_latest", dumps.first[:translation_key]
-    assert_equal ARTIFACT_URI, dumps.first[:data_dump_uri]
-    assert_equal DISTRIBUTION_URI, dumps.first[:distribution_uri]
+    assert_equal DISTRIBUTION_URI, dumps.first[:data_dump_uri]
+    assert_equal ARTIFACT_URI, dumps.first[:artifact_uri]
     assert_equal DOWNLOAD_URL, dumps.first[:download_url]
   end
 
