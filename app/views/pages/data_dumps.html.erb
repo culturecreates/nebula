@@ -1,8 +1,28 @@
 <% content_for(:title) { t("data_dumps.title") } %>
+<% content_for(:description) { t("data_dumps.description") } %>
+<% content_for(:canonical_url) do %>
+  <%# /data-dumps and /en/data-dumps serve identical (default-locale) content, so they
+      canonicalize to the locale-less URL. /fr/data-dumps has genuinely different
+      content, so it canonicalizes to itself - pointing it at the English URL would
+      tell crawlers to drop the French page from the index. %>
+  <%= data_dumps_url(locale: I18n.locale == I18n.default_locale ? nil : I18n.locale) %>
+<% end %>
+
+<% jsonld_script = data_dumps_jsonld_script_tag(@data_dumps) %>
+<% if jsonld_script.present? %>
+  <% content_for(:head) do %>
+    <%= jsonld_script %>
+  <% end %>
+<% end %>
 
 <div class="container py-4">
   <h1 class="h3 mb-3"><%= t("data_dumps.title") %></h1>
   <p><%= t("data_dumps.description") %></p>
+
+  <p class="text-muted small">
+    <%= t("data_dumps.mcp_note.text") %>
+    <%= t("data_dumps.mcp_note.endpoint_label") %> <code><%= @mcp_endpoint %></code>
+  </p>
 
   <% if @data_dumps.present? %>
     <div class="table-responsive">
@@ -22,7 +42,8 @@
             <tr>
             <% data_dump_url = safe_external_url(dump[:data_dump_uri]) %>
             <% download_url = safe_external_url(dump[:download_url]) %>
-              <td><%= I18n.t("data_dumps.dumps.#{dump[:translation_key]}.title", default: dump[:title]) %></td>
+            <% dump_title = I18n.t("data_dumps.dumps.#{dump[:translation_key]}.title", default: dump[:title]) %>
+              <td><%= dump_title %></td>
               <td><%= dump[:version].presence || t("data_dumps.not_available") %></td>
               <td><%= I18n.t("data_dumps.dumps.#{dump[:translation_key]}.description", default: dump[:description].presence || t("data_dumps.not_available")) %></td>
               <td><code><%= dump[:resource_uri] %></code></td>
@@ -37,7 +58,12 @@
               </td>
               <td>
                 <% if download_url.present? %>
-                  <%= link_to download_url.split("/").last, download_url, target: "_blank", rel: "noopener noreferrer" %>
+                  <% media_type_label = dump[:media_type].presence || t("data_dumps.not_available") %>
+                  <% size_label = dump[:byte_size].present? ? number_to_human_size(dump[:byte_size]) : t("data_dumps.not_available") %>
+                  <% download_label = t("data_dumps.table.download_link_label", title: dump_title, media_type: media_type_label, size: size_label) %>
+                  <%= link_to download_url.split("/").last, download_url,
+                        target: "_blank", rel: "noopener noreferrer",
+                        "aria-label": download_label, title: download_label %>
                 <% else %>
                   <%= t("data_dumps.not_available") %>
                 <% end %>

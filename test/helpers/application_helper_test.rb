@@ -50,5 +50,25 @@ class ApplicationHelperTest < ActiveSupport::TestCase
     assert_nil safe_external_url("artsdata://dumps/core-minus-provenance/latest")
   end
 
+  test "data_dumps_jsonld builds a dcat:Distribution graph and skips unsafe/missing download urls" do
+    dumps = [
+      { title: "A", distribution_uri: "http://example.com/a", download_url: "https://example.com/a.ttl.gz", byte_size: 10 },
+      { title: "B", distribution_uri: "http://example.com/b", download_url: "javascript:alert(1)" },
+      { title: "C", distribution_uri: "http://example.com/c" }
+    ]
+    result = data_dumps_jsonld(dumps)
+    assert_equal 1, result["@graph"].size
+    node = result["@graph"].first
+    assert_equal "http://example.com/a", node["id"]
+    assert_equal "dcat:Distribution", node["type"]
+    assert_equal "https://example.com/a.ttl.gz", node["downloadURL"]
+    assert_equal 10, node["byteSize"]
+  end
+
+  test "data_dumps_jsonld returns nil when no dumps have a safe download url" do
+    assert_nil data_dumps_jsonld([])
+    assert_nil data_dumps_jsonld([{ title: "A", download_url: nil }])
+  end
+
   # Add more tests for ApplicationHelper methods here
 end

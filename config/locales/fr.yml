@@ -120,6 +120,9 @@ fr:
     unavailable: "Les métadonnées des jeux de données Artsdata Core sont temporairement indisponibles."
     empty: "Aucune ressource de jeu de données Artsdata Core n’est publiée pour le moment."
     not_available: "Indisponible"
+    mcp_note:
+      text: "Ces mêmes métadonnées sont disponibles de façon programmatique pour les agents IA et autres outils via les méthodes resources/list et resources/read du serveur MCP d’Artsdata."
+      endpoint_label: "Point d’accès MCP :"
     table:
       name: "Nom"
       version: "Version"
@@ -127,6 +130,7 @@ fr:
       resource_uri: "URI de la ressource MCP"
       data_dump_uri: "Artefact Databus"
       download_url: "downloadURL"
+      download_link_label: "Télécharger %{title} (%{media_type}, %{size})"
     dumps:
       core_minus_provenance_latest:
         title: "Artsdata Core sans provenance"
