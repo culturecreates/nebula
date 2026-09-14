@@ -48,4 +48,43 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, 'data-events-target="loading"'
     assert_includes @response.body, 'data-events-target="tooltip"'
   end
+
+  test "should get data dumps" do
+    ArtsdataMcpService.any_instance.stubs(:dumps).returns([])
+
+    get data_dumps_path
+
+    assert_response :success
+    assert_includes @response.body, "Artsdata Core data dumps"
+  end
+
+  test "data dumps page should render dump metadata" do
+    ArtsdataMcpService.any_instance.stubs(:dumps).returns([
+      {
+        translation_key: "core_minus_provenance_latest",
+        title: "Artsdata core minus provenance",
+        description: "Core dump",
+        version: "2026-09-01T05_18_57",
+        resource_uri: "artsdata://dumps/core-minus-provenance/latest",
+        data_dump_uri: "http://kg.artsdata.ca/databus/example/distribution",
+        download_url: "https://example.test/core.ttl.gz"
+      }
+    ])
+
+    get data_dumps_path
+
+    assert_response :success
+    assert_includes @response.body, "2026-09-01T05_18_57"
+    assert_includes @response.body, "artsdata://dumps/core-minus-provenance/latest"
+    assert_includes @response.body, "https://example.test/core.ttl.gz"
+  end
+
+  test "data dumps page should render in french" do
+    ArtsdataMcpService.any_instance.stubs(:dumps).returns([])
+
+    get data_dumps_path(locale: :fr)
+
+    assert_response :success
+    assert_includes @response.body, "Jeux de données Artsdata Core"
+  end
 end

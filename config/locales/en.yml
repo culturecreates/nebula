@@ -146,3 +146,19 @@ en:
         This reports lists unique organizations that have been reconciled and assigned (i.e. "minted") an Artsdata identifier. By "<a href='http://kg.artsdata.ca/resource/Organization'>Organization</a>", we mean any structured group of people, united by a common purpose. This includes formal organizations (e.g., a not-for-profit corporation) as well as music bands and other performing groups.
   job_status:
     data_feed_loading: "Data feed loading"
+  data_dumps:
+    title: "Artsdata Core data dumps"
+    description: "This page lists the Artsdata Core dump resources currently exposed by the Artsdata MCP Server."
+    unavailable: "Artsdata Core dump metadata is temporarily unavailable."
+    not_available: "Not available"
+    table:
+      name: "Name"
+      version: "Version"
+      description: "Description"
+      resource_uri: "MCP resource URI"
+      data_dump_uri: "Data dump URI"
+      download_url: "downloadURL"
+    dumps:
+      core_minus_provenance_latest:
+        title: "Artsdata core minus provenance"
+        description: "Monthly Artsdata Core dump with provenance triples and RDF-star annotations removed."

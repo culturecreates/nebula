@@ -46,6 +46,15 @@ Avez-vous déjà structuré vos événements ? Faites-nous savoir afin que nous 
 <a href="mailto:artsdata-support@capacoa.ca?subject=Participation%20à%20Artsdata.ca&body=Mon%20site%20Web%20contient%20des%20données%20structurées.%20Veuillez%20l'ajouter%20à%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Nous joindre</a></br>
 
 ---
+
+## Jeux de données Artsdata Core
+
+Téléchargez les métadonnées du plus récent jeu de données Artsdata Core, y compris la version courante, l’URI du jeu de données et l’URL de téléchargement publiées par le serveur MCP d’Artsdata.
+
+- [Voir les jeux de données Artsdata Core](/fr/data-dumps)
+
+---
+
 ## Soutenu par
 
 ![Canada Council for the Arts](https://canadacouncil.ca/-/media/Images/CCA/Design_Elements/Logos/CCFA-logo-full-en.svg?la=en&hash=F297C9D9740B613B144255DF6A5FDE48869615EC)

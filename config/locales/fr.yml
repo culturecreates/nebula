@@ -114,3 +114,19 @@ fr:
         Ce rapport énumère les organisations pour lesquels un identifiant Artsdata a été créé et assigné (c'est-à-dire "minté"). Par "<a href='http://kg.artsdata.ca/resource/Organization'>Organisation</a>", nous entendons tout groupe structuré de personnes, unies par un objectif commun. Il peut s'agir d'organisation formelles (e.g., une société à but non lucratif) ou de groupes informels, comme des groupes de musique.
   job_status:
     data_feed_loading: "Chargement du flux de données"
+  data_dumps:
+    title: "Jeux de données Artsdata Core"
+    description: "Cette page présente les ressources de jeux de données Artsdata Core actuellement exposées par le serveur MCP d’Artsdata."
+    unavailable: "Les métadonnées des jeux de données Artsdata Core sont temporairement indisponibles."
+    not_available: "Indisponible"
+    table:
+      name: "Nom"
+      version: "Version"
+      description: "Description"
+      resource_uri: "URI de la ressource MCP"
+      data_dump_uri: "URI du jeu de données"
+      download_url: "downloadURL"
+    dumps:
+      core_minus_provenance_latest:
+        title: "Artsdata Core sans provenance"
+        description: "Jeu de données mensuel d’Artsdata Core sans triplets de provenance ni annotations RDF-star."

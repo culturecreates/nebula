@@ -4,4 +4,8 @@ class PagesController < ApplicationController
 
   def events
   end
+
+  def data_dumps
+    @data_dumps = ArtsdataMcpService.new.dumps
+  end
 end

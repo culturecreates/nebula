@@ -38,6 +38,7 @@ module Nebula
     end
     config.i18n.default_locale = :en
     config.i18n.available_locales = [:en, :fr]
+    config.artsdata_mcp_endpoint = ENV.fetch("ARTSDATA_MCP_ENDPOINT", "https://mcp.artsdata.ca/mcp")
 
   end
 end

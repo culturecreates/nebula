@@ -51,6 +51,14 @@ Already have structured data for events? Let us know so we can add your events t
 
 ---
 
+## Artsdata Core data dumps
+
+Download the latest Artsdata Core data dump metadata, including the current version, dump URI, and download URL exposed through the Artsdata MCP Server.
+
+- [View Artsdata Core data dumps](/en/data-dumps)
+
+---
+
 ## Funded by
 
 ![Canada Council for the Arts](https://canadacouncil.ca/-/media/Images/CCA/Design_Elements/Logos/CCFA-logo-full-en.svg?la=en&hash=F297C9D9740B613B144255DF6A5FDE48869615EC)
