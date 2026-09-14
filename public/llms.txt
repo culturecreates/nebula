@@ -24,8 +24,7 @@
 
 ## Notes for agents
 
-- Prefer the MCP server's get_schema + sparql_query tools, or the SPARQL
-  endpoint directly, over scraping Nebula's HTML pages.
+- Prefer the MCP server's get_schema + sparql_query tools or data-dumps over scraping Nebula's HTML pages.
 - The data-dumps page's JSON-LD (`<script type="application/ld+json">`,
   `@graph` of `dcat:Distribution` nodes) is the authoritative place to find
   current downloadURLs for bulk RDF dumps without parsing HTML.
