@@ -22,6 +22,14 @@ Welcome to the Artsdata knowledge graph. To discover the advantages of linked op
 
 ---
 
+## Artsdata data dumps
+
+View the latest Artsdata data dump metadata, including the current version and download URL exposed through the Artsdata MCP Server.
+
+- [View Artsdata data dumps](/en/data-dumps)
+
+---
+
 ## Explore the knowledge graph
 
 You may use the knowledge graph’s interface in many ways:
@@ -48,14 +56,6 @@ With a GitHub user account, you may also use these additional features:
 Already have structured data for events? Let us know so we can add your events to Artsdata.ca.
 
 <a href="mailto:artsdata-support@capacoa.ca?subject=Artsdata.ca%20participation&body=My%20website%20has%20structured%20data.%20Please%20add%20it%20to%20artsdata.ca." style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; border-radius: 5px;">Contact us</a></br>
-
----
-
-## Artsdata Core data dumps
-
-Download the latest Artsdata Core data dump metadata, including the current version, dump URI, and download URL exposed through the Artsdata MCP Server.
-
-- [View Artsdata Core data dumps](/en/data-dumps)
 
 ---
 
