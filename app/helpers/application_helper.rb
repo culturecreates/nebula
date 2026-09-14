@@ -23,6 +23,89 @@ module ApplicationHelper
     nil
   end
 
+  # @context reused verbatim from the Artsdata MCP server's dump manifests
+  # (culturecreates/artsdata-mcp-server: app/resource/artsdata_core_minus_provenance_dump.rb)
+  # so this JSON-LD stays structurally consistent with the upstream resource payloads,
+  # even though it's rebuilt from nebula's already-flattened ArtsdataMcpService hashes.
+  DUMP_JSONLD_CONTEXT = {
+    "rdfs" => "http://www.w3.org/2000/01/rdf-schema#",
+    "schema" => "https://schema.org/",
+    "dcat" => "http://www.w3.org/ns/dcat#",
+    "dct" => "http://purl.org/dc/terms/",
+    "id" => "@id",
+    "name" => "schema:name",
+    "type" => "@type",
+    "byteSize" => "dcat:byteSize",
+    "downloadURL" => "dcat:downloadURL",
+    "comment" => "rdfs:comment",
+    "version" => "schema:version",
+    "isVersionOf" => "dct:isVersionOf",
+    "mediaType" => "dcat:mediaType"
+  }.freeze
+
+  # Builds { "@context" => ..., "@graph" => [...] } describing each dump as a
+  # dcat:Distribution. Only dumps with a safe (http/https) download_url are included -
+  # a Distribution without a working downloadURL isn't worth advertising. Returns nil
+  # when there's nothing to advertise, so callers can skip the <script> tag entirely.
+  def data_dumps_jsonld(dumps)
+    nodes = Array(dumps).filter_map do |dump|
+      download_url = safe_external_url(dump[:download_url])
+      next if download_url.blank?
+
+      id = dump[:distribution_uri].presence || dump[:resource_uri]
+      next if id.blank?
+
+      {
+        "id" => id,
+        "type" => "dcat:Distribution",
+        "name" => dump[:title],
+        "comment" => dump[:description],
+        "version" => dump[:version],
+        "isVersionOf" => dump[:artifact_uri].presence || dump[:data_dump_uri],
+        "mediaType" => dump[:media_type],
+        "downloadURL" => download_url,
+        "byteSize" => dump[:byte_size]
+      }.select { |_, v| v.present? }
+    end
+
+    return if nodes.empty?
+
+    { "@context" => DUMP_JSONLD_CONTEXT, "@graph" => nodes }
+  end
+
+  # Renders the JSON-LD as a CSP-nonce'd <script> tag, or nil if there's nothing to render.
+  # json_escape (ERB::Util, mixed into every view) neutralizes "</script>", "<", ">", "&"
+  # inside the JSON before marking it html_safe - required because title/description
+  # strings come from an external MCP server response and a literal "</script>" would
+  # otherwise break out of the tag. Do NOT use raw(...)/.html_safe alone here.
+  def data_dumps_jsonld_script_tag(dumps)
+    jsonld = data_dumps_jsonld(dumps)
+    return if jsonld.blank?
+
+    tag.script(
+      json_escape(jsonld.to_json).html_safe,
+      type: "application/ld+json",
+      nonce: content_security_policy_nonce
+    )
+  end
+
+  def meta_description_tag(description)
+    description = description.to_s.strip
+    return if description.blank?
+
+    tag.meta(name: "description", content: description)
+  end
+
+  def canonical_link_tag(url)
+    # content_for(:canonical_url) do...end (used for the locale-conditional URL in
+    # data_dumps.html.erb) captures the block's rendered whitespace/newlines along with
+    # its output, so the value needs stripping before it lands in an href attribute.
+    url = url.to_s.strip
+    return if url.blank?
+
+    tag.link(rel: "canonical", href: url)
+  end
+
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')
     str = "Artsdata"

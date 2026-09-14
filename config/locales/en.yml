@@ -152,6 +152,9 @@ en:
     unavailable: "Artsdata Core dump metadata is temporarily unavailable."
     empty: "No Artsdata Core dump resources are currently published."
     not_available: "Not available"
+    mcp_note:
+      text: "This same dump metadata is available programmatically for AI agents and other tools via the Artsdata MCP Server's resources/list and resources/read methods."
+      endpoint_label: "MCP endpoint:"
     table:
       name: "Name"
       version: "Version"
@@ -159,6 +162,7 @@ en:
       resource_uri: "MCP resource URI"
       data_dump_uri: "Databus Artifact"
       download_url: "downloadURL"
+      download_link_label: "Download %{title} (%{media_type}, %{size})"
     dumps:
       core_minus_provenance_latest:
         title: "Artsdata core minus provenance"

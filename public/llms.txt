@@ -1,0 +1,35 @@
+# Artsdata / Nebula
+
+> Artsdata is Canada's arts and culture knowledge graph. Nebula is the
+> low-code RDF viewer and admin front-end for Artsdata: it lets people
+> browse, search, reconcile, and mint Artsdata identifiers for entities
+> (organizations, people, places, events) described as Linked Open Data
+> (RDF/JSON-LD/schema.org), and it publishes bulk RDF data dumps and a
+> public SPARQL endpoint for programmatic and AI-agent access.
+
+## Data dumps
+
+- [Artsdata Core data dumps](https://kg.artsdata.ca/data-dumps): human-readable
+  list of downloadable RDF dumps (e.g. the monthly Artsdata Core dump with
+  provenance/RDF-star annotations removed), each also described as a
+  dcat:Distribution in embedded JSON-LD on that page for machine discovery
+  of the downloadURL, mediaType and byteSize.
+
+## Programmatic / agent access
+
+- MCP server: https://mcp.artsdata.ca/mcp (Model Context Protocol,
+  JSON-RPC over HTTP). Exposes:
+  - Tools: search_entities, get_entity, search_events, get_schema, sparql_query
+  - Resources: the Artsdata Core (minus provenance) RDF dump manifest,
+    readable via resources/list and resources/read
+- SPARQL endpoint: https://query.artsdata.ca/query — public read-only
+  SPARQL 1.1 endpoint over the full Artsdata knowledge graph. Use get_schema
+  (via the MCP server) to learn the data model before writing queries.
+
+## Notes for agents
+
+- Prefer the MCP server's get_schema + sparql_query tools, or the SPARQL
+  endpoint directly, over scraping Nebula's HTML pages.
+- The data-dumps page's JSON-LD (`<script type="application/ld+json">`,
+  `@graph` of `dcat:Distribution` nodes) is the authoritative place to find
+  current downloadURLs for bulk RDF dumps without parsing HTML.

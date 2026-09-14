@@ -9,5 +9,6 @@ class PagesController < ApplicationController
     service = ArtsdataMcpService.new
     @data_dumps = service.dumps
     @data_dumps_error = service.error.present?
+    @mcp_endpoint = Rails.application.config.artsdata_mcp_endpoint
   end
 end
