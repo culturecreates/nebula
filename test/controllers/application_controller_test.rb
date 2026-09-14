@@ -68,7 +68,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_includes @response.body, "Artsdata Core data dumps"
+    assert_includes @response.body, "Artsdata data dumps"
     assert_includes @response.body, "/en/data-dumps"
   end
 
@@ -76,7 +76,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     get root_path(locale: :fr)
 
     assert_response :success
-    assert_includes @response.body, "Jeux de données Artsdata Core"
+    assert_includes @response.body, "Jeux de données Artsdata"
     assert_includes @response.body, "/fr/data-dumps"
   end
 
