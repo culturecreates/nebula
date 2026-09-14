@@ -56,7 +56,9 @@ class ApplicationHelperTest < ActiveSupport::TestCase
       { title: "B", distribution_uri: "http://example.com/b", download_url: "javascript:alert(1)" },
       { title: "C", distribution_uri: "http://example.com/c" }
     ]
-    result = data_dumps_jsonld(dumps)
+    context_url = "https://kg.artsdata.ca/context/dump-distribution.jsonld"
+    result = data_dumps_jsonld(dumps, context_url: context_url)
+    assert_equal context_url, result["@context"]
     assert_equal 1, result["@graph"].size
     node = result["@graph"].first
     assert_equal "http://example.com/a", node["id"]
@@ -66,8 +68,9 @@ class ApplicationHelperTest < ActiveSupport::TestCase
   end
 
   test "data_dumps_jsonld returns nil when no dumps have a safe download url" do
-    assert_nil data_dumps_jsonld([])
-    assert_nil data_dumps_jsonld([{ title: "A", download_url: nil }])
+    context_url = "https://kg.artsdata.ca/context/dump-distribution.jsonld"
+    assert_nil data_dumps_jsonld([], context_url: context_url)
+    assert_nil data_dumps_jsonld([{ title: "A", download_url: nil }], context_url: context_url)
   end
 
   # Add more tests for ApplicationHelper methods here

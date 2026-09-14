@@ -23,31 +23,17 @@ module ApplicationHelper
     nil
   end
 
-  # @context reused verbatim from the Artsdata MCP server's dump manifests
-  # (culturecreates/artsdata-mcp-server: app/resource/artsdata_core_minus_provenance_dump.rb)
-  # so this JSON-LD stays structurally consistent with the upstream resource payloads,
-  # even though it's rebuilt from nebula's already-flattened ArtsdataMcpService hashes.
-  DUMP_JSONLD_CONTEXT = {
-    "rdfs" => "http://www.w3.org/2000/01/rdf-schema#",
-    "schema" => "https://schema.org/",
-    "dcat" => "http://www.w3.org/ns/dcat#",
-    "dct" => "http://purl.org/dc/terms/",
-    "id" => "@id",
-    "name" => "schema:name",
-    "type" => "@type",
-    "byteSize" => "dcat:byteSize",
-    "downloadURL" => "dcat:downloadURL",
-    "comment" => "rdfs:comment",
-    "version" => "schema:version",
-    "isVersionOf" => "dct:isVersionOf",
-    "mediaType" => "dcat:mediaType"
-  }.freeze
-
-  # Builds { "@context" => ..., "@graph" => [...] } describing each dump as a
-  # dcat:Distribution. Only dumps with a safe (http/https) download_url are included -
-  # a Distribution without a working downloadURL isn't worth advertising. Returns nil
-  # when there's nothing to advertise, so callers can skip the <script> tag entirely.
-  def data_dumps_jsonld(dumps)
+  # Builds { "@context" => context_url, "@graph" => [...] } describing each dump as a
+  # dcat:Distribution. `context_url` must point at a dereferenceable JSON-LD context
+  # document (see public/context/dump-distribution.jsonld) rather than embedding the
+  # context object inline - a lot of third-party tooling that scans pages for JSON-LD
+  # (browser extensions, link-preview/social-share bots) assumes "@context" is always a
+  # plain string and calls string methods on it directly; an inline object value breaks
+  # those tools with something like "r[\"@context\"].toLowerCase is not a function".
+  # Only dumps with a safe (http/https) download_url are included - a Distribution
+  # without a working downloadURL isn't worth advertising. Returns nil when there's
+  # nothing to advertise, so callers can skip the <script> tag entirely.
+  def data_dumps_jsonld(dumps, context_url:)
     nodes = Array(dumps).filter_map do |dump|
       download_url = safe_external_url(dump[:download_url])
       next if download_url.blank?
@@ -70,7 +56,7 @@ module ApplicationHelper
 
     return if nodes.empty?
 
-    { "@context" => DUMP_JSONLD_CONTEXT, "@graph" => nodes }
+    { "@context" => context_url, "@graph" => nodes }
   end
 
   # Renders the JSON-LD as a CSP-nonce'd <script> tag, or nil if there's nothing to render.
@@ -79,7 +65,8 @@ module ApplicationHelper
   # strings come from an external MCP server response and a literal "</script>" would
   # otherwise break out of the tag. Do NOT use raw(...)/.html_safe alone here.
   def data_dumps_jsonld_script_tag(dumps)
-    jsonld = data_dumps_jsonld(dumps)
+    context_url = "#{request.scheme}://#{request.host_with_port}/context/dump-distribution.jsonld"
+    jsonld = data_dumps_jsonld(dumps, context_url: context_url)
     return if jsonld.blank?
 
     tag.script(

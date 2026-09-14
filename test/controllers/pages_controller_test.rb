@@ -152,10 +152,18 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert script["nonce"].present?, "expected the script tag to carry a CSP nonce"
 
     payload = JSON.parse(script.text)
-    assert_equal "http://www.w3.org/ns/dcat#", payload["@context"]["dcat"]
+    assert_equal "http://www.example.com/context/dump-distribution.jsonld", payload["@context"]
     node = payload["@graph"].first
     assert_equal "http://kg.artsdata.ca/databus/example/distribution", node["id"]
     assert_equal "dcat:Distribution", node["type"]
+
+    # "@context" is a dereferenceable URL, not an inline object, precisely so tooling
+    # that assumes @context is always a string (many browser extensions/link-preview
+    # bots do) doesn't crash trying to call string methods on it.
+    get payload["@context"]
+    assert_response :success
+    context_document = JSON.parse(@response.body)
+    assert_equal "http://www.w3.org/ns/dcat#", context_document["@context"]["dcat"]
     assert_equal "https://example.test/core.ttl.gz", node["downloadURL"]
     assert_equal 123_456, node["byteSize"]
   end
