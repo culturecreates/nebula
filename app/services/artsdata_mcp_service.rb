@@ -57,14 +57,17 @@ class ArtsdataMcpService
       http.request(request)
     end
 
-    raise Error, "MCP request failed with HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+    body = begin
+      JSON.parse(response.body)
+    rescue JSON::ParserError
+      nil
+    end
 
-    body = JSON.parse(response.body)
-    raise Error, body.dig("error", "message") || "MCP request failed" if body["error"].present?
+    raise Error, body.dig("error", "message") if body&.dig("error", "message").present?
+    raise Error, "MCP request failed with HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+    raise Error, "Invalid MCP response" if body.nil?
 
     body.fetch("result", {})
-  rescue JSON::ParserError => e
-    raise Error, "Invalid MCP response: #{e.message}"
   rescue StandardError => e
     raise e if e.is_a?(Error)
 

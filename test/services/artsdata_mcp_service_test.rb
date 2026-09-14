@@ -83,4 +83,34 @@ class ArtsdataMcpServiceTest < ActiveSupport::TestCase
     assert_equal [], service.dumps
     assert_equal "MCP request failed with HTTP 500", service.error
   end
+
+  test "dumps returns JSON-RPC error messages from MCP responses" do
+    stub_request(:post, ENDPOINT).to_return(
+      status: 500,
+      body: JSON.generate(
+        jsonrpc: "2.0",
+        id: "1",
+        error: { message: "Unsupported resource URI" }
+      ),
+      headers: { "Content-Type" => "application/json" }
+    )
+
+    service = ArtsdataMcpService.new(endpoint: ENDPOINT)
+
+    assert_equal [], service.dumps
+    assert_equal "Unsupported resource URI", service.error
+  end
+
+  test "dumps returns invalid response errors for malformed JSON" do
+    stub_request(:post, ENDPOINT).to_return(
+      status: 200,
+      body: "{not-json}",
+      headers: { "Content-Type" => "application/json" }
+    )
+
+    service = ArtsdataMcpService.new(endpoint: ENDPOINT)
+
+    assert_equal [], service.dumps
+    assert_equal "Invalid MCP response", service.error
+  end
 end
