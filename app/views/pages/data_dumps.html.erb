@@ -29,6 +29,8 @@
               <td>
                 <% if data_dump_url.present? %>
                   <%= link_to dump[:data_dump_uri], data_dump_url, target: "_blank", rel: "noopener" %>
+                <% elsif dump[:data_dump_uri].present? %>
+                  <code><%= dump[:data_dump_uri] %></code>
                 <% else %>
                   <%= t("data_dumps.not_available") %>
                 <% end %>

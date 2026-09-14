@@ -87,4 +87,26 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, "Jeux de données Artsdata Core"
   end
+
+  test "data dumps page should not link unsafe URLs" do
+    ArtsdataMcpService.any_instance.stubs(:dumps).returns([
+      {
+        translation_key: "core_minus_provenance_latest",
+        title: "Artsdata core minus provenance",
+        description: "Core dump",
+        version: "2026-09-01T05_18_57",
+        resource_uri: "artsdata://dumps/core-minus-provenance/latest",
+        data_dump_uri: "artsdata://dumps/core-minus-provenance/latest",
+        download_url: "javascript:alert(1)"
+      }
+    ])
+
+    get data_dumps_path
+
+    assert_response :success
+    assert_includes @response.body, "artsdata://dumps/core-minus-provenance/latest"
+    assert_not_includes @response.body, 'href="artsdata://dumps/core-minus-provenance/latest"'
+    assert_not_includes @response.body, 'href="javascript:alert(1)"'
+    assert_includes @response.body, "Not available"
+  end
 end
