@@ -67,7 +67,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
         description: "Core dump",
         version: "2026-09-01T05_18_57",
         resource_uri: "artsdata://dumps/core-minus-provenance/latest",
-        data_dump_uri: "http://kg.artsdata.ca/databus/example/distribution",
+        data_dump_uri: "http://kg.artsdata.ca/databus/example/artifact",
+        distribution_uri: "http://kg.artsdata.ca/databus/example/distribution",
         download_url: "https://example.test/core.ttl.gz"
       }
     ])
@@ -77,6 +78,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, "2026-09-01T05_18_57"
     assert_includes @response.body, "artsdata://dumps/core-minus-provenance/latest"
+    assert_includes @response.body, "http://kg.artsdata.ca/databus/example/artifact"
+    assert_includes @response.body, "http://kg.artsdata.ca/databus/example/distribution"
     assert_includes @response.body, "https://example.test/core.ttl.gz"
   end
 

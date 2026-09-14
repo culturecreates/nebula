@@ -14,14 +14,16 @@
             <th scope="col"><%= t("data_dumps.table.description") %></th>
             <th scope="col"><%= t("data_dumps.table.resource_uri") %></th>
             <th scope="col"><%= t("data_dumps.table.data_dump_uri") %></th>
+            <th scope="col"><%= t("data_dumps.table.distribution_uri") %></th>
             <th scope="col"><%= t("data_dumps.table.download_url") %></th>
           </tr>
         </thead>
         <tbody>
           <% @data_dumps.each do |dump| %>
             <tr>
-              <% data_dump_url = safe_external_url(dump[:data_dump_uri]) %>
-              <% download_url = safe_external_url(dump[:download_url]) %>
+            <% data_dump_url = safe_external_url(dump[:data_dump_uri]) %>
+            <% distribution_url = safe_external_url(dump[:distribution_uri]) %>
+            <% download_url = safe_external_url(dump[:download_url]) %>
               <td><%= I18n.t("data_dumps.dumps.#{dump[:translation_key]}.title", default: dump[:title]) %></td>
               <td><%= dump[:version].presence || t("data_dumps.not_available") %></td>
               <td><%= I18n.t("data_dumps.dumps.#{dump[:translation_key]}.description", default: dump[:description].presence || t("data_dumps.not_available")) %></td>
@@ -31,6 +33,15 @@
                   <%= link_to dump[:data_dump_uri], data_dump_url, target: "_blank", rel: "noopener noreferrer" %>
                 <% elsif dump[:data_dump_uri].present? %>
                   <code><%= dump[:data_dump_uri] %></code>
+                <% else %>
+                  <%= t("data_dumps.not_available") %>
+                <% end %>
+              </td>
+              <td>
+                <% if distribution_url.present? %>
+                  <%= link_to dump[:distribution_uri], distribution_url, target: "_blank", rel: "noopener noreferrer" %>
+                <% elsif dump[:distribution_uri].present? %>
+                  <code><%= dump[:distribution_uri] %></code>
                 <% else %>
                   <%= t("data_dumps.not_available") %>
                 <% end %>
