@@ -118,6 +118,7 @@ fr:
     title: "Jeux de données Artsdata Core"
     description: "Cette page présente les ressources de jeux de données Artsdata Core actuellement exposées par le serveur MCP d’Artsdata."
     unavailable: "Les métadonnées des jeux de données Artsdata Core sont temporairement indisponibles."
+    empty: "Aucune ressource de jeu de données Artsdata Core n’est publiée pour le moment."
     not_available: "Indisponible"
     table:
       name: "Nom"

@@ -56,6 +56,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes @response.body, "Artsdata Core data dumps"
+    assert_includes @response.body, "No Artsdata Core dump resources are currently published."
   end
 
   test "data dumps page should render dump metadata" do
@@ -108,5 +109,17 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes @response.body, 'href="artsdata://dumps/core-minus-provenance/latest"'
     assert_not_includes @response.body, 'href="javascript:alert(1)"'
     assert_includes @response.body, "Not available"
+  end
+
+  test "data dumps page should show unavailable message on MCP failure" do
+    mock_service = mock
+    mock_service.stubs(:dumps).returns([])
+    mock_service.stubs(:error).returns("MCP request failed with HTTP 500")
+    ArtsdataMcpService.stubs(:new).returns(mock_service)
+
+    get data_dumps_path
+
+    assert_response :success
+    assert_includes @response.body, "Artsdata Core dump metadata is temporarily unavailable."
   end
 end

@@ -150,6 +150,7 @@ en:
     title: "Artsdata Core data dumps"
     description: "This page lists the Artsdata Core dump resources currently exposed by the Artsdata MCP Server."
     unavailable: "Artsdata Core dump metadata is temporarily unavailable."
+    empty: "No Artsdata Core dump resources are currently published."
     not_available: "Not available"
     table:
       name: "Name"

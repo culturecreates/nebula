@@ -33,7 +33,10 @@ class ArtsdataMcpServiceTest < ActiveSupport::TestCase
       )
 
     stub_request(:post, ENDPOINT)
-      .with { |request| JSON.parse(request.body)["method"] == "resources/read" }
+      .with do |request|
+        body = JSON.parse(request.body)
+        body["method"] == "resources/read" && body.dig("params", "uris") == [RESOURCE_URI]
+      end
       .to_return(
         status: 200,
         body: JSON.generate(
@@ -75,6 +78,9 @@ class ArtsdataMcpServiceTest < ActiveSupport::TestCase
   test "dumps returns empty array when the MCP server fails" do
     stub_request(:post, ENDPOINT).to_return(status: 500, body: "error")
 
-    assert_equal [], ArtsdataMcpService.new(endpoint: ENDPOINT).dumps
+    service = ArtsdataMcpService.new(endpoint: ENDPOINT)
+
+    assert_equal [], service.dumps
+    assert_equal "MCP request failed with HTTP 500", service.error
   end
 end

@@ -47,9 +47,13 @@
         </tbody>
       </table>
     </div>
-  <% else %>
+  <% elsif @data_dumps_error %>
     <div class="alert alert-warning" role="alert">
       <%= t("data_dumps.unavailable") %>
+    </div>
+  <% else %>
+    <div class="alert alert-info" role="alert">
+      <%= t("data_dumps.empty") %>
     </div>
   <% end %>
 </div>

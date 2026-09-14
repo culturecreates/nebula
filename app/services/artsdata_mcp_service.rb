@@ -8,15 +8,19 @@ class ArtsdataMcpService
 
   class Error < StandardError; end
 
+  attr_reader :error
+
   def initialize(endpoint: Rails.application.config.artsdata_mcp_endpoint)
     @endpoint = URI.parse(endpoint)
   end
 
   def dumps
+    @error = nil
     list_resources
       .select { |resource| resource["uri"].to_s.start_with?(DUMP_RESOURCE_PREFIX) }
       .map { |resource| normalize_dump(resource, read_resource(resource["uri"])) }
   rescue Error => e
+    @error = e.message
     Rails.logger.error("Artsdata MCP dump fetch error: #{e.message}")
     []
   end
@@ -28,7 +32,7 @@ class ArtsdataMcpService
   end
 
   def read_resource(resource_uri)
-    result = rpc("resources/read", { uri: resource_uri })
+    result = rpc("resources/read", { uris: [resource_uri] })
     content = result.fetch("contents", []).first || {}
     JSON.parse(content.fetch("text", "{}"))
   rescue JSON::ParserError => e

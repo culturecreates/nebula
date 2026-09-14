@@ -6,6 +6,8 @@ class PagesController < ApplicationController
   end
 
   def data_dumps
-    @data_dumps = ArtsdataMcpService.new.dumps
+    service = ArtsdataMcpService.new
+    @data_dumps = service.dumps
+    @data_dumps_error = service.error.present?
   end
 end
