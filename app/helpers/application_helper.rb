@@ -14,6 +14,15 @@ module ApplicationHelper
     url.split("/").last.split(".").first.humanize
   end
 
+  def safe_external_url(url)
+    return if url.blank?
+
+    parsed_url = URI.parse(url)
+    return url if parsed_url.is_a?(URI::HTTP) || parsed_url.is_a?(URI::HTTPS)
+  rescue URI::InvalidURIError
+    nil
+  end
+
   # Returns the full title on a per-page basis.
   def full_title(page_title = '')
     str = "Artsdata"

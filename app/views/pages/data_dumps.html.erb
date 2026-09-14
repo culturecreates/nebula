@@ -20,20 +20,22 @@
         <tbody>
           <% @data_dumps.each do |dump| %>
             <tr>
+              <% data_dump_url = safe_external_url(dump[:data_dump_uri]) %>
+              <% download_url = safe_external_url(dump[:download_url]) %>
               <td><%= I18n.t("data_dumps.dumps.#{dump[:translation_key]}.title", default: dump[:title]) %></td>
               <td><%= dump[:version].presence || t("data_dumps.not_available") %></td>
               <td><%= I18n.t("data_dumps.dumps.#{dump[:translation_key]}.description", default: dump[:description].presence || t("data_dumps.not_available")) %></td>
               <td><code><%= dump[:resource_uri] %></code></td>
               <td>
-                <% if dump[:data_dump_uri].present? %>
-                  <%= link_to dump[:data_dump_uri], dump[:data_dump_uri], target: "_blank", rel: "noopener" %>
+                <% if data_dump_url.present? %>
+                  <%= link_to dump[:data_dump_uri], data_dump_url, target: "_blank", rel: "noopener" %>
                 <% else %>
                   <%= t("data_dumps.not_available") %>
                 <% end %>
               </td>
               <td>
-                <% if dump[:download_url].present? %>
-                  <%= link_to dump[:download_url], dump[:download_url], target: "_blank", rel: "noopener" %>
+                <% if download_url.present? %>
+                  <%= link_to dump[:download_url], download_url, target: "_blank", rel: "noopener" %>
                 <% else %>
                   <%= t("data_dumps.not_available") %>
                 <% end %>
