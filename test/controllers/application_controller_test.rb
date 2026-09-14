@@ -64,4 +64,20 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "home page should link to English data dumps page" do
+    get root_path
+
+    assert_response :success
+    assert_includes @response.body, "Artsdata Core data dumps"
+    assert_includes @response.body, "/en/data-dumps"
+  end
+
+  test "home page should link to French data dumps page" do
+    get root_path(locale: :fr)
+
+    assert_response :success
+    assert_includes @response.body, "Jeux de données Artsdata Core"
+    assert_includes @response.body, "/fr/data-dumps"
+  end
+
 end

@@ -43,5 +43,12 @@ class ApplicationHelperTest < ActiveSupport::TestCase
     assert_not_equal result1, result2, "make_hash should return different values for different inputs"
   end
 
+  test "safe_external_url only allows http and https URLs" do
+    assert_equal "https://example.com/file.ttl.gz", safe_external_url("https://example.com/file.ttl.gz")
+    assert_equal "http://example.com/file.ttl.gz", safe_external_url("http://example.com/file.ttl.gz")
+    assert_nil safe_external_url("javascript:alert(1)")
+    assert_nil safe_external_url("artsdata://dumps/core-minus-provenance/latest")
+  end
+
   # Add more tests for ApplicationHelper methods here
 end

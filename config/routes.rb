@@ -30,6 +30,7 @@ Rails.application.routes.draw do
 
     get "vocabularies", to: "pages#vocabularies"
     get "events", to: "pages#events"
+    get "data-dumps", to: "pages#data_dumps", as: :data_dumps
 
 
     resources :artifact do 

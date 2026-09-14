@@ -4,4 +4,10 @@ class PagesController < ApplicationController
 
   def events
   end
+
+  def data_dumps
+    service = ArtsdataMcpService.new
+    @data_dumps = service.dumps
+    @data_dumps_error = service.error.present?
+  end
 end
