@@ -32,7 +32,7 @@ class ArtsdataMcpService
   end
 
   def read_resource(resource_uri)
-    result = rpc("resources/read", { uris: [resource_uri] })
+    result = rpc("resources/read", { uri: resource_uri })
     content = result.fetch("contents", []).first || {}
     JSON.parse(content.fetch("text", "{}"))
   rescue JSON::ParserError => e
@@ -41,7 +41,7 @@ class ArtsdataMcpService
 
   def rpc(method, params = nil)
     request = Net::HTTP::Post.new(@endpoint.request_uri)
-    request["Accept"] = "application/json"
+    request["Accept"] = "application/json, text/event-stream"
     request["Content-Type"] = "application/json"
     request["MCP-Protocol-Version"] = PROTOCOL_VERSION
     request.body = JSON.generate(

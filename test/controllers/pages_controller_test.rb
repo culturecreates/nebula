@@ -79,7 +79,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, "2026-09-01T05_18_57"
     assert_includes @response.body, "artsdata://dumps/core-minus-provenance/latest"
     assert_includes @response.body, "http://kg.artsdata.ca/databus/example/artifact"
-    assert_includes @response.body, "http://kg.artsdata.ca/databus/example/distribution"
+    assert_includes @response.body, "core.ttl.gz"
     assert_includes @response.body, "https://example.test/core.ttl.gz"
   end
 

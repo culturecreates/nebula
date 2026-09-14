@@ -125,8 +125,7 @@ fr:
       version: "Version"
       description: "Description"
       resource_uri: "URI de la ressource MCP"
-      data_dump_uri: "URI du jeu de données"
-      distribution_uri: "URI de distribution"
+      data_dump_uri: "Artefact Databus"
       download_url: "downloadURL"
     dumps:
       core_minus_provenance_latest:

@@ -35,7 +35,7 @@ class ArtsdataMcpServiceTest < ActiveSupport::TestCase
     stub_request(:post, ENDPOINT)
       .with do |request|
         body = JSON.parse(request.body)
-        body["method"] == "resources/read" && body.dig("params", "uris") == [RESOURCE_URI]
+        body["method"] == "resources/read" && body.dig("params", "uri") == RESOURCE_URI
       end
       .to_return(
         status: 200,

@@ -157,8 +157,7 @@ en:
       version: "Version"
       description: "Description"
       resource_uri: "MCP resource URI"
-      data_dump_uri: "Data dump URI"
-      distribution_uri: "Distribution URI"
+      data_dump_uri: "Databus Artifact"
       download_url: "downloadURL"
     dumps:
       core_minus_provenance_latest:
