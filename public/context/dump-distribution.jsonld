@@ -1,0 +1,17 @@
+{
+  "@context": {
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "schema": "https://schema.org/",
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "id": "@id",
+    "name": "schema:name",
+    "type": "@type",
+    "byteSize": "dcat:byteSize",
+    "downloadURL": "dcat:downloadURL",
+    "comment": "rdfs:comment",
+    "version": "schema:version",
+    "isVersionOf": "dct:isVersionOf",
+    "mediaType": "dcat:mediaType"
+  }
+}
