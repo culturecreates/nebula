@@ -1,13 +1,29 @@
 class DereferenceController < ApplicationController
   rescue_from StandardError, with: :failed_dereference
   before_action :user_signed_in!, only: [:external] # ensure user has permissions
+  # This action is only ever loaded via <turbo-frame src="..."> from
+  # within this app's own pages (entity/statement/annotation views,
+  # reconcile results, mint preview) - never embedded on third-party
+  # sites. Turbo still fetches and discards the full document around the
+  # matched frame, so a lean layout (no nav bar, no meta helpers) cuts
+  # real render time and payload on what is this app's hottest endpoint,
+  # since a single busy entity page can fan out into many card requests
+  # (one per triple whose object is a URI).
+  layout "embed", only: [:card]
 
   # /dereference/card?uri=
   def card
     @frame_id = params[:frame_id]
-    @uri = params[:uri] 
-    @entity = Entity.new(entity_uri: @uri)
-    @entity.load_card
+    @uri = params[:uri]
+    # Card data (name, dates, address) doesn't need per-request freshness,
+    # and the same popular URIs (venues, performers, organizations) get
+    # dereferenced repeatedly across many different pages - cache the
+    # loaded entity to skip the SPARQL round-trip on repeat hits.
+    @entity = Rails.cache.fetch(["dereference_card", @uri], expires_in: 10.minutes) do
+      entity = Entity.new(entity_uri: @uri)
+      entity.load_card
+      entity
+    end
   end
 
   # /dereference/external[.jsonld]?uri=
