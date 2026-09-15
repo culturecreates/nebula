@@ -78,7 +78,6 @@ group :test do
   gem "vcr"
 end
 
-gem 'bootstrap', '~> 5.3.2'
 gem 'faraday'
 gem 'oj'
 gem 'nokogiri'

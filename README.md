@@ -41,28 +41,26 @@ Ensure your Github repo has [granted access](https://github.com/organizations/cu
     To rebuild assets:
     `rails assets:precompile`
 
-## Heroku deploys: pinning the Node.js version
+## No Node.js / JS build step
 
-This app has no JS build step (Bootstrap/Stimulus are pinned via
-`importmap-rails`, not a bundler), but `execjs` (a Sprockets dependency)
-still needs *some* JS runtime available at asset-compile time. Because of
-that, `heroku/ruby` silently installs a Node.js binary even though we don't
-use it directly, and if no version is pinned it falls back to whatever
-Node release is current for that buildpack version — which drifts over
-time and shows up as a `WARNING: Installing a default version of Node.js`
-build log message.
+This app has no JS build step at all — Bootstrap/Stimulus JS are pinned via
+`importmap-rails`, and CSS is compiled with `sassc-rails` (libsass, a C
+extension via `ffi`), not a JS-based Sass compiler. There's deliberately no
+`bootstrap` Ruby gem either: it pulls in `autoprefixer-rails`/`execjs`,
+which needs a Node.js runtime to run at asset-compile time, causing
+Heroku's `heroku/ruby` buildpack to silently install (and periodically
+drift) a default Node version. Since this app applies zero Sass-level
+customization to Bootstrap, `app/assets/stylesheets/bootstrap.min.css` is
+instead a vendored, prebuilt Bootstrap CSS file, loaded directly in the
+layout — same styling, no Node dependency, one less runtime to install to
+clone and run this app locally.
 
-`package.json`'s `engines.node` field alone does **not** silence this
-warning — `heroku/ruby` only reads that field when the `heroku/nodejs`
-buildpack is also installed and runs *before* `heroku/ruby`. To fully pin
-the version, run once against the Heroku app:
-
-```
-heroku buildpacks:add heroku/nodejs --index 1
-```
-
-(`heroku/ruby` should end up at index 2). After that, the version in this
-repo's `package.json` `engines.node` will be honored on every build.
+If a future change needs the `bootstrap` gem again (e.g. to override Sass
+variables), re-adding it will reintroduce the Node/execjs requirement; pin
+the Node version via `package.json`'s `engines.node` field **and** add the
+`heroku/nodejs` buildpack ahead of `heroku/ruby`
+(`heroku buildpacks:add heroku/nodejs --index 1`) if so, since `heroku/ruby`
+alone ignores that field.
 
 ## Rails 7 Setup
   Steps from scratch:
