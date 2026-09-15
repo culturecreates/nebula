@@ -79,6 +79,7 @@ group :test do
 end
 
 gem 'faraday'
+gem 'rack-attack'
 gem 'oj'
 gem 'nokogiri'
 gem 'redcarpet', '~>  3.6.0'
