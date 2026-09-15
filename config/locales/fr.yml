@@ -115,10 +115,10 @@ fr:
   job_status:
     data_feed_loading: "Chargement du flux de données"
   data_dumps:
-    title: "Jeux de données Artsdata Core"
-    description: "Cette page présente les ressources de jeux de données Artsdata Core actuellement exposées par le serveur MCP d’Artsdata."
-    unavailable: "Les métadonnées des jeux de données Artsdata Core sont temporairement indisponibles."
-    empty: "Aucune ressource de jeu de données Artsdata Core n’est publiée pour le moment."
+    title: "Jeux de données Artsdata"
+    description: "Cette page présente les ressources de jeux de données Artsdata actuellement exposées par le serveur MCP d’Artsdata."
+    unavailable: "Les métadonnées des jeux de données Artsdata sont temporairement indisponibles."
+    empty: "Aucune ressource de jeu de données Artsdata n’est publiée pour le moment."
     not_available: "Indisponible"
     mcp_note:
       text: "Ces mêmes métadonnées sont disponibles de façon programmatique pour les agents IA et autres outils via les méthodes resources/list et resources/read du serveur MCP d’Artsdata."
@@ -133,5 +133,5 @@ fr:
       download_link_label: "Télécharger %{title} (%{media_type}, %{size})"
     dumps:
       core_minus_provenance_latest:
-        title: "Artsdata Core sans provenance"
-        description: "Jeu de données mensuel d’Artsdata Core sans triplets de provenance ni annotations RDF-star."
+        title: "Artsdata Core"
+        description: "Jeu de données mensuel d’Artsdata sans triplets de provenance ni annotations RDF-star."

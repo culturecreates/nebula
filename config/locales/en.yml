@@ -147,10 +147,10 @@ en:
   job_status:
     data_feed_loading: "Data feed loading"
   data_dumps:
-    title: "Artsdata Core data dumps"
-    description: "This page lists the Artsdata Core dump resources currently exposed by the Artsdata MCP Server."
-    unavailable: "Artsdata Core dump metadata is temporarily unavailable."
-    empty: "No Artsdata Core dump resources are currently published."
+    title: "Artsdata data dumps"
+    description: "This page lists the Artsdata dump resources currently exposed by the Artsdata MCP Server."
+    unavailable: "Artsdata dump metadata is temporarily unavailable."
+    empty: "No Artsdata dump resources are currently published."
     not_available: "Not available"
     mcp_note:
       text: "This same dump metadata is available programmatically for AI agents and other tools via the Artsdata MCP Server's resources/list and resources/read methods."
@@ -165,5 +165,5 @@ en:
       download_link_label: "Download %{title} (%{media_type}, %{size})"
     dumps:
       core_minus_provenance_latest:
-        title: "Artsdata core minus provenance"
-        description: "Monthly Artsdata Core dump with provenance triples and RDF-star annotations removed."
+        title: "Artsdata core"
+        description: "Monthly Artsdata dump with provenance triples and RDF-star annotations removed to ensure compatibility with standard RDF tools."

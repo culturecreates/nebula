@@ -55,8 +55,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get data_dumps_path
 
     assert_response :success
-    assert_includes @response.body, "Artsdata Core data dumps"
-    assert_includes @response.body, "No Artsdata Core dump resources are currently published."
+    assert_includes @response.body, "Artsdata data dumps"
+    assert_includes @response.body, "No Artsdata dump resources are currently published."
   end
 
   test "data dumps page should render dump metadata" do
@@ -89,7 +89,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get data_dumps_path(locale: :fr)
 
     assert_response :success
-    assert_includes @response.body, "Jeux de données Artsdata Core"
+    assert_includes @response.body, "Jeux de données Artsdata"
   end
 
   test "data dumps page should not link unsafe URLs" do
@@ -123,7 +123,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get data_dumps_path
 
     assert_response :success
-    assert_includes @response.body, "Artsdata Core dump metadata is temporarily unavailable."
+    assert_includes @response.body, "Artsdata dump metadata is temporarily unavailable."
   end
 
   test "data dumps page should include JSON-LD structured data with a CSP nonce" do
