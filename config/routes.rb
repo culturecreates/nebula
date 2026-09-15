@@ -3,9 +3,8 @@ Rails.application.routes.draw do
 
   scope "(:locale)", locale: /#{I18n.available_locales.join("|")}/ do
     # Defines the root path route ("/")
-    root "application#home"
+    root "pages#home"
 
-    get "test", to: "application#test"
     get "entity", to: "entity#show"
     delete "entity", to: "entity#destroy", as: :destroy_entity
     delete "entity/statement", to: "entity#delete_statement", as: :delete_entity_statement
@@ -44,7 +43,7 @@ Rails.application.routes.draw do
 
     get "logout", to: "github#logout!"
     
-    match "doc/*path", to: "application#doc", via: :get
+    match "doc/*path", to: "pages#doc", via: :get
     
   end
 

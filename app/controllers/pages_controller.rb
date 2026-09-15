@@ -1,4 +1,11 @@
 class PagesController < ApplicationController
+  def home; end
+
+  def doc
+    template = "#{I18n.locale.to_s}/#{params[:path]}"
+    render template: template
+  end
+  
   def vocabularies
   end
 

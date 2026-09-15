@@ -24,12 +24,7 @@ class ApplicationController < ActionController::Base
   end
   
 
-  def home; end
 
-  def doc
-    template = "#{I18n.locale.to_s}/#{params[:path]}"
-    render template: template
-  end
 
   def maintenance_mode?
     if Rails.application.config.feature_maintenance_mode_enabled
