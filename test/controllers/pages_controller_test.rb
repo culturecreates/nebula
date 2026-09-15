@@ -247,7 +247,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     ArtsdataMcpService.any_instance.stubs(:dumps).returns([
       {
         translation_key: "core_minus_provenance_latest",
-        title: "Artsdata core minus provenance",
+        title: "Artsdata core",
         media_type: "application/n-triples",
         byte_size: 1_048_576,
         distribution_uri: "http://kg.artsdata.ca/databus/example/distribution",
@@ -258,6 +258,6 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get data_dumps_path
 
     assert_response :success
-    assert_includes @response.body, 'aria-label="Download Artsdata core minus provenance (application/n-triples, 1 MB)"'
+    assert_includes @response.body, 'aria-label="Download Artsdata core (application/n-triples, 1 MB)"'
   end
 end
