@@ -2,7 +2,12 @@ class ControlledVocabulariesController < ApplicationController
   # GET /controlled_vocabularies
   # Returns the list of controlled vocabularies for lazy loading in the navigation menu
   def index
-    @controlled_vocabularies = fetch_controlled_vocabularies
+    # This frame loads on nearly every page in the app (nav dropdown), and
+    # the vocabulary list rarely changes - cache it instead of querying
+    # GraphDB on every page view.
+    @controlled_vocabularies = Rails.cache.fetch(["controlled_vocabularies", I18n.locale], expires_in: 1.hour) do
+      fetch_controlled_vocabularies
+    end
     render partial: "list", locals: { controlled_vocabularies: @controlled_vocabularies }
   end
 
