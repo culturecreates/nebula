@@ -9,7 +9,7 @@
 
 ## Data dumps
 
-- [Artsdata Core data dumps](https://kg.artsdata.ca/data-dumps): human-readable
+- [Artsdata data dumps](https://kg.artsdata.ca/data-dumps): human-readable
   list of downloadable RDF dumps (e.g. the monthly Artsdata Core dump with
   provenance/RDF-star annotations removed), each also described as a
   dcat:Distribution in embedded JSON-LD on that page for machine discovery
