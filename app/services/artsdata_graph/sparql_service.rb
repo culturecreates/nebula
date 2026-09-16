@@ -5,7 +5,7 @@ module ArtsdataGraph
   class SparqlService
 
     def self.client
-      SPARQL::Client.new(sparql_endpoint, headers: {
+      @client ||= SPARQL::Client.new(sparql_endpoint, headers: {
           "User-Agent" => user_agent
         }
       )

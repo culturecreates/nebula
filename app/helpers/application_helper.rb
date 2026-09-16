@@ -168,7 +168,7 @@ module ApplicationHelper
   # Note that derived statements are a separate table.
   # The offset is used to ensure that multiple tables have different frame_ids
   def auto_dereference(string)
-    @max ||= 8
+    @max ||= 3
     if @frame_id
       @frame_id += 1 
       return false if @frame_id >  @offset +  @max

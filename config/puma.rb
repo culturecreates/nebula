@@ -30,14 +30,27 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 # Workers do not work on JRuby or Windows (both of which do not support
 # processes).
 #
-# workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+workers ENV.fetch("WEB_CONCURRENCY") { 2 }
 
 # Use the `preload_app!` method when specifying a `workers` number.
 # This directive tells Puma to first boot the application and load code
 # before forking the application. This takes advantage of Copy On Write
 # process behavior so workers use less memory.
 #
-# preload_app!
+preload_app!
+
+# preload_app! forks a booted process, so any memoized SPARQL/HTTP client
+# built before the fork would have its underlying connection shared across
+# worker processes. Drop those memoized clients before/after forking so
+# each worker lazily rebuilds its own connection on first use.
+before_fork do
+  Entity.send(:class_variable_set, :@@artsdata_client, nil) if Entity.class_variable_defined?(:@@artsdata_client)
+end
+
+on_worker_boot do
+  Entity.send(:class_variable_set, :@@artsdata_client, nil) if Entity.class_variable_defined?(:@@artsdata_client)
+  ArtsdataGraph::SparqlService.instance_variable_set(:@client, nil) if ArtsdataGraph::SparqlService.instance_variable_defined?(:@client)
+end
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart

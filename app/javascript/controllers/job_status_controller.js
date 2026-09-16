@@ -10,22 +10,36 @@ export default class extends Controller {
 
   connect() {
     // Only poll in production and staging environments
-    const shouldPoll = this.shouldPollValue === "true"
-    
-    if (shouldPoll) {
-      this.poll()
-      this.pollInterval = setInterval(() => this.poll(), 10000) // Poll every 10 seconds
+    this.shouldPoll = this.shouldPollValue === "true"
+
+    if (this.shouldPoll) {
+      this.visibilityHandler = () => {
+        if (document.hidden) {
+          this.stopPolling()
+        } else {
+          this.poll()
+          this.startPolling()
+        }
+      }
+      document.addEventListener("visibilitychange", this.visibilityHandler)
+
+      if (!document.hidden) {
+        this.poll()
+        this.startPolling()
+      }
     }
-    
+
     // Store processing job start time
     this.processingStartTime = null
   }
 
   disconnect() {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval)
+    this.stopPolling()
+
+    if (this.visibilityHandler) {
+      document.removeEventListener("visibilitychange", this.visibilityHandler)
     }
-    
+
     // Clean up any active popovers
     if (this.hasProcessingIconTarget) {
       const popover = bootstrap.Popover.getInstance(this.processingIconTarget)
@@ -33,12 +47,24 @@ export default class extends Controller {
         popover.dispose()
       }
     }
-    
+
     if (this.hasQueueBadgeTarget) {
       const popover = bootstrap.Popover.getInstance(this.queueBadgeTarget)
       if (popover) {
         popover.dispose()
       }
+    }
+  }
+
+  startPolling() {
+    if (this.pollInterval) return
+    this.pollInterval = setInterval(() => this.poll(), 10000) // Poll every 10 seconds
+  }
+
+  stopPolling() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval)
+      this.pollInterval = null
     }
   }
 

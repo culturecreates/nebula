@@ -99,24 +99,33 @@ class EntityController < ApplicationController
   # /entity/unsupported_claims?uri=[canonical URI]
   def unsupported_claims
     uri = params[:uri]
-    @entity = Entity.new(entity_uri: uri)
-    @entity.load_claims
+    @entity = Rails.cache.fetch(["entity_unsupported_claims", uri, I18n.locale], expires_in: 10.minutes) do
+      entity = Entity.new(entity_uri: uri)
+      entity.load_claims
+      entity
+    end
   end
 
   # authorized_external_identifiers
   # /entity/authorized_external_identifiers?uri=[canonical URI]
   def authorized_external_identifiers
     uri = params[:uri]
-    @entity = Entity.new(entity_uri: uri)
-    @entity.load_authorized_external_identifiers
+    @entity = Rails.cache.fetch(["entity_authorized_external_identifiers", uri, I18n.locale], expires_in: 10.minutes) do
+      entity = Entity.new(entity_uri: uri)
+      entity.load_authorized_external_identifiers
+      entity
+    end
   end
 
   # derived statements (inverse path)
   # /entity/derived_statements?uri=[canonical URI]
   def derived_statements
     uri = params[:uri]
-    @entity = Entity.new(entity_uri: uri)
-    @entity.load_derived_statements
+    @entity = Rails.cache.fetch(["entity_derived_statements", uri, I18n.locale], expires_in: 10.minutes) do
+      entity = Entity.new(entity_uri: uri)
+      entity.load_derived_statements
+      entity
+    end
   end
 
   # DELETE /entity
