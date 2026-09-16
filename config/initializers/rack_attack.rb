@@ -35,15 +35,23 @@ end
 # with the URI and a short error instead, so the throttling is visible
 # rather than looking like the card failed to load for no reason.
 Rack::Attack.throttled_responder = lambda do |request|
+  # Throttle windows are fixed, epoch-aligned periods (see
+  # Rack::Attack::Cache#key_and_expiry), not rolling from the client's
+  # first request - so the wait until the count resets is whatever's
+  # left of the *current* period, not the full period every time.
+  match_data = request.env["rack.attack.match_data"]
+  retry_after = match_data[:period] - (match_data[:epoch_time] % match_data[:period])
+  headers = { "Retry-After" => retry_after.to_s }
+
   frame_id = request.get_header("HTTP_TURBO_FRAME")
   if frame_id.present?
     body = TurboFrameError.html(
       frame_id: frame_id,
-      message: "Too many requests - please slow down and try again.",
+      message: "Too many requests - please try again in #{retry_after}s.",
       detail: request.params["uri"]
     )
-    [429, { "Content-Type" => "text/html" }, [body]]
+    [429, headers.merge("Content-Type" => "text/html"), [body]]
   else
-    [429, { "Content-Type" => "text/plain" }, ["Too many requests. Please slow down.\n"]]
+    [429, headers.merge("Content-Type" => "text/plain"), ["Too many requests. Please try again in #{retry_after}s.\n"]]
   end
 end
