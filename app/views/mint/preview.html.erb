@@ -3,10 +3,11 @@
 </h1>
 <div class="row">
   <div class="col-md">
+    <% external_uri_frame_id = random_frame_id %>
     <p>
       <turbo-frame
-        id='card-2'
-        src="<%= dereference_card_path(uri: @externalUri, frame_id: "2")%>"
+        id='card-<%= external_uri_frame_id %>'
+        src="<%= dereference_card_path(uri: @externalUri, frame_id: external_uri_frame_id)%>"
         loading="lazy"
         target="_top"
       >

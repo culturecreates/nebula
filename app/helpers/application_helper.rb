@@ -164,15 +164,21 @@ module ApplicationHelper
 
   
 
+  # A value safe to use as (part of) a turbo-frame DOM id, wide enough that
+  # two independent frame_id draws on the same page are effectively
+  # guaranteed not to collide. A page can have several independent card
+  # frames (statement tables, annotation rows, reconciliation candidates,
+  # duplicate-check cards, etc.), each needing their own id - a collision
+  # gives two different turbo-frames the same DOM id, so a click meant for
+  # one (e.g. a card's refresh button) resolves to whichever one the
+  # browser finds first, silently affecting the wrong card.
+  def random_frame_id
+    rand(100_000_000...999_999_999)
+  end
+
   # sets a limit on the number of dereferences per table.
   # Note that derived statements are a separate table.
   # The offset is used to ensure that multiple tables have different frame_ids.
-  # A page can have several independent tables (statement tables, annotation
-  # rows, reconciliation candidates, etc.) each drawing their own offset, so
-  # the range needs to be wide enough that two of them landing on the same
-  # frame_id - which would give two different turbo-frames the same DOM id,
-  # making a click on one (e.g. a card's refresh button) resolve to whichever
-  # one the browser happens to find first - is effectively impossible.
   def auto_dereference(string)
     @max ||= 3
     if @frame_id
@@ -180,7 +186,7 @@ module ApplicationHelper
       return false if @frame_id >  @offset +  @max
       return false if string.include?("wikidata.org")
     else
-      @offset = rand(100_000_000...999_999_999)
+      @offset = random_frame_id
       @frame_id = @offset
     end
     return true
