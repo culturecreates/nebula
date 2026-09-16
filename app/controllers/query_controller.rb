@@ -22,8 +22,20 @@ class QueryController < ApplicationController
     template = params[:template]
     uri = params[:uri]
     construct_files = params[:constructs].split(",") if params[:constructs]
-    
-    @query =  SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "TEMPLATE_PLACEHOLDER", template, "URI_PLACEHOLDER", uri])
+
+    begin
+      @query = SparqlLoader.load(sparql_file, ["GRAPH_PLACEHOLDER", graph, "TEMPLATE_PLACEHOLDER", template, "URI_PLACEHOLDER", uri])
+    rescue Errno::ENOENT
+      # sparql= (or a file in constructs=) names a .sparql file that's been
+      # removed/renamed since the link was shared - a 500 for a report that
+      # simply doesn't exist anymore isn't useful to whoever followed it.
+      # Suggest similarly-named reports from the same GitHub-hosted list
+      # GithubController#sparqls already shows, in case this one was just renamed.
+      @missing_sparql = sparql_file
+      @suggestions = suggest_similar_sparqls(sparql_file)
+      return render(plain: "This report is no longer available.", status: :not_found) if request.format.symbol == :csv
+      return render(:not_found, status: :not_found)
+    end
 
     solutions = if !construct_files
                   begin
@@ -87,6 +99,39 @@ class QueryController < ApplicationController
   def term_value(term)
     return nil if term.nil?
     term.respond_to?(:value) ? term.value : term.to_s
+  end
+
+  # Same GitHub-hosted list GithubController#sparqls shows, fuzzy-matched
+  # against the missing report's name so a broken/renamed link can still
+  # point at whatever's closest today. Best-effort: an unreachable GitHub
+  # just means no suggestions, not another error on top of the first one.
+  def suggest_similar_sparqls(missing_name, limit: 5)
+    uri = URI("https://api.github.com/repos/artsdata-stewards/artsdata-actions/contents/queries")
+    candidates = GithubService.info(nil, uri)
+    return [] unless candidates.is_a?(Array)
+
+    candidates = candidates.select { |c| c["download_url"].present? } # skip directories
+    missing_tokens = tokenize(missing_name)
+
+    candidates
+      .map { |c| [sparql_name_similarity(missing_tokens, c["name"]), c] }
+      .select { |score, _| score > 0 }
+      .sort_by { |score, _| -score }
+      .first(limit)
+      .map(&:last)
+  rescue StandardError
+    []
+  end
+
+  def sparql_name_similarity(missing_tokens, candidate_filename)
+    candidate_tokens = tokenize(candidate_filename.to_s.sub(/\.sparql\z/, ""))
+    return 0.0 if missing_tokens.empty? || candidate_tokens.empty?
+
+    (missing_tokens & candidate_tokens).size.to_f / (missing_tokens | candidate_tokens).size
+  end
+
+  def tokenize(name)
+    name.to_s.downcase.split(/[^a-z0-9]+/).reject(&:empty?).uniq
   end
 
 end
