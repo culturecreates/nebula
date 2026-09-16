@@ -14,14 +14,14 @@ class Rack::Attack
   # General ceiling on all requests.
   # (~1/sec sustained, generous enough for scripted/automated dereferencing
   # of entity URIs, but stops broad floods).
-  throttle("req/ip", limit: 100, period: 5.minutes) do |req|
+  throttle("req/ip", limit: 300, period: 5.minutes) do |req|
     req.ip
   end
 
   # Stricter ceiling on the homepage specifically, since that's the page
   # being repeatedly hit by bot traffic.
   # No normal visitor reloads the homepage that often.
-  throttle("home/ip", limit: 10, period: 1.minute) do |req|
+  throttle("home/ip", limit: 20, period: 1.minute) do |req|
     req.ip if req.get? && req.path =~ %r{\A/(en|fr)?/?\z}
   end
 end
