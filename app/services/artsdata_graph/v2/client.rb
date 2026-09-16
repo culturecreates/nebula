@@ -146,7 +146,7 @@ module ArtsdataGraph
       def client
         @client ||= Faraday.new(@api_endpoint) do |client|
           client.request :url_encoded
-          client.adapter Faraday.default_adapter
+          client.adapter :net_http_persistent
           client.headers['Authorization'] = "Basic #{@oauth_token}" if @oauth_token.present?
           default_agent = Faraday::VERSION ? "Faraday v#{Faraday::VERSION}" : "Faraday"
           client.headers['User-Agent'] = "#{default_agent} (compatible; ArtsdataGraph::V2::Client; +https://artsdata.ca)"

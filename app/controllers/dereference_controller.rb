@@ -15,6 +15,9 @@ class DereferenceController < ApplicationController
   def card
     @frame_id = params[:frame_id]
     @uri = params[:uri]
+    # The refresh button on the card bypasses the cache by clearing it
+    # first, so the fetch below always reloads on this request.
+    Rails.cache.delete(["dereference_card", @uri]) if params[:refresh].present?
     # Card data (name, dates, address) doesn't need per-request freshness,
     # and the same popular URIs (venues, performers, organizations) get
     # dereferenced repeatedly across many different pages - cache the

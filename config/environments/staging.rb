@@ -70,8 +70,12 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
-  # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store
+  # Explicit :file_store (matches Rails' implicit default) rather than
+  # leaving this unset. Note this is per-dyno/ephemeral - not shared across
+  # web dynos and wiped on every deploy. Revisit with a shared store (e.g.
+  # Redis) if load reduction from caching/Puma tuning isn't enough on its
+  # own.
+  config.cache_store = :file_store, "#{Rails.root}/tmp/cache"
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque

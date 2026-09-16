@@ -79,6 +79,7 @@ group :test do
 end
 
 gem 'faraday'
+gem 'faraday-net_http_persistent'
 gem 'rack-attack'
 gem 'oj'
 gem 'nokogiri'
