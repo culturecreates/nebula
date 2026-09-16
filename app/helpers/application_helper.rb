@@ -166,15 +166,21 @@ module ApplicationHelper
 
   # sets a limit on the number of dereferences per table.
   # Note that derived statements are a separate table.
-  # The offset is used to ensure that multiple tables have different frame_ids
+  # The offset is used to ensure that multiple tables have different frame_ids.
+  # A page can have several independent tables (statement tables, annotation
+  # rows, reconciliation candidates, etc.) each drawing their own offset, so
+  # the range needs to be wide enough that two of them landing on the same
+  # frame_id - which would give two different turbo-frames the same DOM id,
+  # making a click on one (e.g. a card's refresh button) resolve to whichever
+  # one the browser happens to find first - is effectively impossible.
   def auto_dereference(string)
     @max ||= 3
     if @frame_id
-      @frame_id += 1 
+      @frame_id += 1
       return false if @frame_id >  @offset +  @max
       return false if string.include?("wikidata.org")
     else
-      @offset = rand(1000..9999)
+      @offset = rand(100_000_000...999_999_999)
       @frame_id = @offset
     end
     return true
