@@ -86,10 +86,22 @@ gem 'nokogiri'
 gem 'redcarpet', '~>  3.6.0'
 gem 'httparty'
 gem 'rack-cors'
-gem 'linkeddata', '~> 3.3.1'
-# gem 'rdf', '~> 3.2'
-# gem 'json-ld', '~> 3.2.4'
-# gem 'sparql', '~> 3.1.3'
+# linkeddata is a meta-gem pulling in the entire RDF.rb ecosystem
+# (reasoner, microdata, tabular, RDFa, TriG/TriX, N3, alternate
+# repository backends, ld-patch, ShEx...) at boot, most of it unused -
+# this app only needs Turtle/Turtle-star, RDF/XML, and JSON-LD/JSON-LD-star
+# (see CLAUDE.md's documented format list, and JSON-LD framing via
+# JSON::LD::API.frame in entity_controller#show) plus SPARQL and SHACL.
+# Depend on just those directly instead, to keep boot-time memory down
+# (loaded fresh into every clustered Puma worker process).
+gem 'rdf', '~> 3.3'
+gem 'rdf-turtle', '~> 3.3'
+gem 'rdf-rdfxml', '~> 3.3'
+gem 'json-ld', '~> 3.3'
+gem 'json-ld-preloaded', '~> 3.3'
+gem 'rdf-vocab', '~> 3.3'
+gem 'sparql', '~> 3.3'
+gem 'shacl', '~> 0.4'
 # gem 'rdf-turtle', '~> 3.2'
 # gem 'rdf-rdfa', '~> 3.3'
 # gem 'rdf-microdata'
