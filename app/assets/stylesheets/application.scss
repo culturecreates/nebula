@@ -33,6 +33,17 @@ a:hover {
   border-style: solid;
   border-color: #bfbebe;
   margin: 5px 0px;
+
+  // The object column (the un-classed d-flex.flex-column.w-100 wrapper
+  // rendered by _statements_table.html.erb) is a flex item of .statement.
+  // A flex item's default min-width is auto (its content's own width), not
+  // 0 - so a long, unbreakable value (a URI with no spaces) grew this
+  // column wider than the row before overflow: hidden further down the
+  // chain ever got a chance to clip anything. min-width: 0 lets it actually
+  // shrink to the available width instead.
+  > .d-flex.flex-column.w-100 {
+    min-width: 0;
+  }
 }
 
 .statement_buttons {
@@ -55,6 +66,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 
 }
 
@@ -66,7 +78,17 @@ a:hover {
   border-width: 0.5px;
   border-style: dashed;
   overflow: hidden;
+  min-width: 0;
 
+  // The value itself (the w-100.overflow-hidden div rendered by
+  // _statement_objects.html.erb) is a flex item of its own d-flex row
+  // (alongside the delete button) - same min-width: auto issue as above,
+  // plus overflow-wrap so a long unbroken token (a URI) wraps onto
+  // multiple lines within the box instead of forcing it wider.
+  > .d-flex.justify-content-between > .w-100.overflow-hidden {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
 }
 
 .annotation {
