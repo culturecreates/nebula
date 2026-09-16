@@ -1,8 +1,9 @@
 <div class="position-relative">
 
+  <% result_frame_id = random_frame_id %>
   <turbo-frame
-    id='card-<%=result["id"] %>'
-    src="<%= dereference_card_path(uri: "http://kg.artsdata.ca/resource/#{result["id"]}", frame_id: result["id"])%>"
+    id='card-<%= result_frame_id %>'
+    src="<%= dereference_card_path(uri: "http://kg.artsdata.ca/resource/#{result["id"]}", frame_id: result_frame_id)%>"
     loading="lazy"
     target="_top"
   >
