@@ -64,6 +64,20 @@ class DereferenceController < ApplicationController
       render json: { error: exception }, status: :internal_server_error
       return
     end
+
+    # A redirect (the fallback below) has no matching <turbo-frame>, so
+    # Turbo can't find anything to swap into a frame-scoped request like
+    # this one - render the error into the frame it was headed for instead
+    # of silently leaving it blank.
+    if turbo_frame_request?
+      render html: TurboFrameError.html(
+        frame_id: turbo_frame_request_id,
+        message: "Could not load: #{exception.message}",
+        detail: params[:uri]
+      ).html_safe, status: :ok
+      return
+    end
+
     flash[:alert] = exception
     redirect_back(fallback_location: root_path)
   end

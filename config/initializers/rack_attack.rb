@@ -27,6 +27,23 @@ class Rack::Attack
 end
 
 # Keep the throttled response itself cheap - plain text, no view rendering.
-Rack::Attack.throttled_responder = lambda do |_request|
-  [429, { "Content-Type" => "text/plain" }, ["Too many requests. Please slow down.\n"]]
+# Exception: a throttled turbo-frame request (e.g. one of the many
+# /dereference/card fan-out requests on a busy entity page) expects a
+# response containing a matching <turbo-frame id="..."> to swap in: a
+# plain-text body has no such element, so Turbo can't find anything to
+# swap and the frame is silently left blank. Echo back a minimal frame
+# with the URI and a short error instead, so the throttling is visible
+# rather than looking like the card failed to load for no reason.
+Rack::Attack.throttled_responder = lambda do |request|
+  frame_id = request.get_header("HTTP_TURBO_FRAME")
+  if frame_id.present?
+    body = TurboFrameError.html(
+      frame_id: frame_id,
+      message: "Too many requests - please slow down and try again.",
+      detail: request.params["uri"]
+    )
+    [429, { "Content-Type" => "text/html" }, [body]]
+  else
+    [429, { "Content-Type" => "text/plain" }, ["Too many requests. Please slow down.\n"]]
+  end
 end

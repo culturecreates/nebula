@@ -39,4 +39,25 @@ class DereferenceControllerTest < ActionDispatch::IntegrationTest
     get dereference_card_path(uri: uri, frame_id: "1", refresh: true)
     assert_response :success
   end
+
+  test "card renders an error inside the frame when it fails during a turbo-frame request" do
+    uri = "http://kg.artsdata.ca/resource/K23-300"
+    Entity.any_instance.stubs(:load_card).raises(StandardError, "boom")
+
+    get dereference_card_path(uri: uri, frame_id: "1"), headers: { "Turbo-Frame" => "card-1" }
+
+    assert_response :success
+    assert_select "turbo-frame#card-1 .text-danger", text: /Could not load: boom/
+    assert_match "K23-300", response.body
+  end
+
+  test "card redirects instead of rendering blank when it fails outside a turbo-frame request" do
+    uri = "http://kg.artsdata.ca/resource/K23-300"
+    Entity.any_instance.stubs(:load_card).raises(StandardError, "boom")
+
+    get dereference_card_path(uri: uri, frame_id: "1")
+
+    assert_redirected_to root_path
+    assert_match "boom", flash[:alert].message
+  end
 end
