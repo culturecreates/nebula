@@ -71,6 +71,7 @@ class MaintenanceController < ApplicationController
       if response.code != 200
         flash[:alert] = "Failed. Error: #{response.body.truncate(1000)}"
       else
+        expire_entity_view_caches(artsdata_uri)
         flash[:notice] = "Successfully refreshed #{artsdata_uri}."
       end
       render json: { redirect_url: entity_path(uri: artsdata_uri) }
@@ -103,6 +104,7 @@ class MaintenanceController < ApplicationController
     elsif response.code != 202 && response.code != 200
       flash[:alert] = "Batch refresh failed. Error: #{response.body.truncate(1000)}"
     else
+      uris.each { |uri| expire_entity_view_caches(uri) }
       flash[:notice] = "Successfully queued refresh for #{uris.length} #{"entity".pluralize(uris.length)}."
     end
     render json: { redirect_url: redirect_url }

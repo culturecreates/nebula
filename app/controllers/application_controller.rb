@@ -160,6 +160,24 @@ class ApplicationController < ActionController::Base
     I18n.locale = params[:locale] || I18n.default_locale
   end
 
+  # Any action that mutates an entity's data (deleting/reranking a
+  # statement, deleting the entity, refreshing it from source) needs to
+  # clear that URI's cached views, or the page's turbo-frames - and any
+  # other page dereferencing the same URI as a card - would keep serving
+  # the pre-edit data for up to their cache's TTL. Keyed the same way as
+  # `dereference_controller#card`, `entity_controller`'s
+  # unsupported_claims/authorized_external_identifiers/derived_statements,
+  # and `source_graph_controller#show`.
+  def expire_entity_view_caches(uri)
+    Rails.cache.delete(["dereference_card", uri])
+    I18n.available_locales.each do |locale|
+      Rails.cache.delete(["entity_unsupported_claims", uri, locale])
+      Rails.cache.delete(["entity_authorized_external_identifiers", uri, locale])
+      Rails.cache.delete(["entity_derived_statements", uri, locale])
+      Rails.cache.delete(["source_graph_show", uri, locale])
+    end
+  end
+
   # TODO: Figure out if this is needed
   # def default_url_options
   #   { locale: I18n.locale }

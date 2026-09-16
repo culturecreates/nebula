@@ -137,6 +137,7 @@ class EntityController < ApplicationController
     uri = params[:uri]
     @entity = Entity.new(entity_uri: uri)
     if @entity.delete
+      expire_entity_view_caches(uri)
       flash.notice = "Deleted entity #{uri}."
     else
       flash.alert = "Could not delete entity #{uri}."
@@ -159,6 +160,7 @@ class EntityController < ApplicationController
       root_subject: params[:root_subject_ntriples],
       path_predicates: Array(params[:path_predicates])
     )
+      expire_entity_view_caches(entity_uri)
       flash.notice = "Deleted statement in graph"
       flash[:notice_uri] = params[:graph_name_uri]
     else
@@ -182,6 +184,7 @@ class EntityController < ApplicationController
       root_subject: params[:root_subject_ntriples],
       path_predicates: Array(params[:path_predicates])
     )
+      expire_entity_view_caches(entity_uri)
       flash.notice = "Updated statement rank"
       flash[:notice_uri] = params[:graph_name_uri]
     else
