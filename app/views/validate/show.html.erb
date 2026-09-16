@@ -21,9 +21,10 @@
       <div class="alert alert-info">
         <strong>Potential Duplicates</strong>
         <% duplicates.each do |dup| %>
+          <% dup_frame_id = random_frame_id %>
           <turbo-frame
-            id='card-2'
-            src="<%= dereference_card_path(uri: dup.value, frame_id: "2")%>"
+            id='card-<%= dup_frame_id %>'
+            src="<%= dereference_card_path(uri: dup.value, frame_id: dup_frame_id)%>"
             loading="lazy"
             target="_top"
           >
