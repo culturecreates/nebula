@@ -3,7 +3,16 @@ Test:
 <turbo-frame id="card-<%= @frame_id %>">
 
   <div class="statement-object">
-    <b><%= display_object(@entity.label) %></b>
+    <div class="d-flex justify-content-between align-items-start gap-2">
+      <b><%= display_object(@entity.label) %></b>
+      <%= link_to dereference_card_path(uri: @entity.entity_uri, frame_id: @frame_id, refresh: true),
+          data: { turbo_frame: "card-#{@frame_id}", controller: "card-refresh", action: "click->card-refresh#spin" },
+          class: "btn btn-sm p-0 refresh-card-icon flex-shrink-0",
+          title: "Refresh cache",
+          aria: { label: "Refresh cache" } do %>
+        <i class="fa-solid fa-arrows-rotate" data-card-refresh-target="icon"></i>
+      <% end %>
+    </div>
     <div class="alternate-name">
       <% type = @entity.type %>
       <%= type.value&.split("/").last unless type == "http://schema.org/Thing" %>
