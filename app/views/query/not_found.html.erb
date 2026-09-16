@@ -1,0 +1,20 @@
+<% provide(:title, "Report not found") %>
+<div class="container">
+  <h1>This report is no longer available.</h1>
+  <p class="text-muted"><code><%= @missing_sparql %></code> could not be found.</p>
+
+  <% if @suggestions.present? %>
+    <p>Did you mean one of these?</p>
+    <ul>
+      <% @suggestions.each do |suggestion| %>
+        <li>
+          <a href="/query/show?sparql=<%= suggestion["download_url"] %>" target="_top">
+            <%= humanize_url(suggestion["download_url"]) %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <p><%= link_to "Back to home", root_path %></p>
+</div>

@@ -82,4 +82,50 @@ class QueryControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, "_:node3975930"
     assert_includes @response.body, "Some Org"
   end
+
+  test "missing sparql file renders a friendly not-found page with fuzzy-matched suggestions" do
+    GithubService.stubs(:info).returns([
+      { "name" => "lavitrine-sources-refresh-rate.sparql", "download_url" => "https://raw.githubusercontent.com/artsdata-stewards/artsdata-actions/main/queries/lavitrine-sources-refresh-rate.sparql" },
+      { "name" => "totally-unrelated-report.sparql", "download_url" => "https://raw.githubusercontent.com/artsdata-stewards/artsdata-actions/main/queries/totally-unrelated-report.sparql" },
+      { "name" => "some-subfolder", "download_url" => nil } # directory entry, should be skipped
+    ])
+
+    get query_show_path, params: {
+      sparql: "custom/lavitrine_sources_refresh_rate",
+      title: "LaVitrine Pipeline"
+    }
+
+    assert_response :not_found
+    assert_includes @response.body, "This report is no longer available"
+    assert_includes @response.body, "lavitrine-sources-refresh-rate"
+    assert_not_includes @response.body, "totally-unrelated-report"
+  end
+
+  test "missing sparql file with no GitHub match still renders the not-found page" do
+    GithubService.stubs(:info).returns([
+      { "name" => "totally-unrelated-report.sparql", "download_url" => "https://raw.githubusercontent.com/artsdata-stewards/artsdata-actions/main/queries/totally-unrelated-report.sparql" }
+    ])
+
+    get query_show_path, params: { sparql: "custom/does_not_exist_anywhere" }
+
+    assert_response :not_found
+    assert_includes @response.body, "This report is no longer available"
+    assert_not_includes @response.body, "Did you mean"
+  end
+
+  test "missing sparql file as csv returns a plain-text not-found response" do
+    get query_show_path(format: :csv), params: { sparql: "custom/does_not_exist_anywhere" }
+
+    assert_response :not_found
+    assert_equal "This report is no longer available.", @response.body
+  end
+
+  test "GitHub being unreachable degrades to the plain not-found message" do
+    GithubService.stubs(:info).raises(StandardError, "connection failed")
+
+    get query_show_path, params: { sparql: "custom/does_not_exist_anywhere" }
+
+    assert_response :not_found
+    assert_includes @response.body, "This report is no longer available"
+  end
 end
