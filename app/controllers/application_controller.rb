@@ -3,6 +3,15 @@ class ApplicationController < ActionController::Base
   before_action :set_locale, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
 
+  # A failed turbo-frame request (an exception raised while handling it)
+  # has no matching <turbo-frame id="..."> in Rails' default error
+  # response, so Turbo has nothing to swap in and the frame is silently
+  # left blank. Applies app-wide; a controller that wants its own
+  # handling (e.g. DereferenceController#failed_dereference, which also
+  # covers a non-turbo-frame jsonld format) can still define its own
+  # `rescue_from StandardError`, which takes precedence over this one.
+  rescue_from StandardError, with: :render_turbo_frame_error
+
   def announcement_flash
     if Rails.application.config.announcement_enabled &&
        Rails.application.config.announcement_message.present?
@@ -176,6 +185,21 @@ class ApplicationController < ActionController::Base
       Rails.cache.delete(["entity_derived_statements", uri, locale])
       Rails.cache.delete(["source_graph_show", uri, locale])
     end
+  end
+
+  # Non-frame requests are unaffected: the exception is re-raised, so
+  # Rails' normal error handling runs exactly as it did before this
+  # rescue_from existed.
+  def render_turbo_frame_error(exception)
+    raise exception unless turbo_frame_request?
+
+    Rails.logger.error("#{exception.class}: #{exception.message}\n#{exception.backtrace&.first(10)&.join("\n")}")
+
+    render html: TurboFrameError.html(
+      frame_id: turbo_frame_request_id,
+      message: "Could not load: #{exception.message}",
+      detail: params[:uri]
+    ).html_safe, status: :ok
   end
 
   # TODO: Figure out if this is needed

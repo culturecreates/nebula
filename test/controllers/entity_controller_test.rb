@@ -13,6 +13,16 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
+  test "unsupported_claims renders an error inside the frame instead of going blank on failure" do
+    uri = "http://kg.artsdata.ca/resource/K23-300"
+    Entity.any_instance.stubs(:load_claims).raises(StandardError, "boom")
+
+    get entity_unsupported_claims_path(uri: uri), headers: { "Turbo-Frame" => "unsupported-claims" }
+
+    assert_response :success
+    assert_select "turbo-frame#unsupported-claims .text-danger", text: /Could not load: boom/
+  end
+
   test "delete_statement redirects with notice on success" do
     @mock_update_client.stubs(:update).returns(true)
 
