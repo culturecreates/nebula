@@ -72,12 +72,21 @@ class QueryController < ApplicationController
       solutions.each do |solution|
         row = []
         keys.each do |key|
-          row << sanitize(solution[key]&.value, tags: ['p','br','em','strong','h1','h2','h3','h4','h5','h6','ul','ol','li','blockquote','code'])
+          row << sanitize(term_value(solution[key]), tags: ['p','br','em','strong','h1','h2','h3','h4','h5','h6','ul','ol','li','blockquote','code'])
         end
         csv << row
       end
     end
-    
+
+  end
+
+  # A bound SPARQL variable isn't always an RDF::Literal/RDF::URI (both
+  # define #value) - a query can legitimately bind a blank node too (e.g.
+  # list_organizations.sparql's ?uri), and RDF::Node has no #value, which
+  # raised NoMethodError and 500'd the whole CSV export over one row.
+  def term_value(term)
+    return nil if term.nil?
+    term.respond_to?(:value) ? term.value : term.to_s
   end
 
 end

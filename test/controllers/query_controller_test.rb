@@ -63,4 +63,23 @@ class QueryControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, "fa-brands fa-github"
     assert_includes @response.body, "https://github.com/culturecreates/nebula/issues/123"
   end
+
+  test "csv export handles a blank-node value instead of raising NoMethodError" do
+    node = RDF::Node.new("node3975930")
+    mock_solution = { uri: node, name: RDF::Literal("Some Org") }
+    mock_solutions = [mock_solution]
+    mock_solutions.stubs(:variable_names).returns([:uri, :name])
+    mock_result = mock("query_result")
+    mock_result.stubs(:limit).returns(mock_solutions)
+    @mock_client.stubs(:query).returns(mock_result)
+
+    get query_show_path(format: :csv), params: {
+      sparql: "list_organizations",
+      title: "Organizations"
+    }
+
+    assert_response :success
+    assert_includes @response.body, "_:node3975930"
+    assert_includes @response.body, "Some Org"
+  end
 end
