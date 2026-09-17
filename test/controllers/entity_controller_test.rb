@@ -13,6 +13,12 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
+  test "show raises a clear parameter-missing error instead of NoMethodError when uri param is missing" do
+    assert_raises(ActionController::ParameterMissing) do
+      get entity_path
+    end
+  end
+
   test "unsupported_claims renders an error inside the frame instead of going blank on failure" do
     uri = "http://kg.artsdata.ca/resource/K23-300"
     Entity.any_instance.stubs(:load_claims).raises(StandardError, "boom")

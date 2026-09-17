@@ -16,7 +16,7 @@ class EntityController < ApplicationController
   # /entity.jsonlds?uri=  --> JSON-LD Star
   # /entity.rdf?uri=  --> RDF/XML
   def show
-    uri = params[:uri] 
+    uri = params.required(:uri)
     uri = "http://kg.artsdata.ca/resource/#{uri}" if !uri.starts_with?(/http:|https:|urn:/)
     uri.gsub!(' ', '+')
     @entity = Entity.new(entity_uri: uri)
