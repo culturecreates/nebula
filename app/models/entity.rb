@@ -1,4 +1,11 @@
 require 'timeout'
+# RDF::Term#to_ntriples (used by _statement_objects.html.erb to serialize a
+# triple's subject/predicate/object into hidden fields whenever a page shows
+# statements from an Entity's graph) lives in rdf/ntriples, which the base
+# rdf gem doesn't require automatically - load it here, where the graphs
+# that feed those views are actually built, instead of unconditionally for
+# every process (rake tasks, console, background jobs) via an initializer.
+require 'rdf/ntriples'
 
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
