@@ -9,7 +9,7 @@ class FootlightController < ApplicationController
     solutions = ArtsdataGraph::SparqlService.client.query(select_query)
     source = solutions.first.graph.value if solutions.first&.bound?(:graph)
 
-    redirect_to home_path, alert: "No source graph found for URI: #{uri}" and return if source.blank?
+    redirect_to root_path, alert: "No source graph found for URI: #{uri}" and return if source.blank?
     
     # source = "http://kg.artsdata.ca/culture-creates/artsdata-planet-ville-de-laval/calendrier-activites"
     version = params[:version] || "v3"
