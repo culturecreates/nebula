@@ -45,10 +45,12 @@ preload_app!
 # each worker lazily rebuilds its own connection on first use.
 before_fork do
   Entity.send(:class_variable_set, :@@artsdata_client, nil) if Entity.class_variable_defined?(:@@artsdata_client)
+  Entity.send(:class_variable_set, :@@wikidata_client, nil) if Entity.class_variable_defined?(:@@wikidata_client)
 end
 
 on_worker_boot do
   Entity.send(:class_variable_set, :@@artsdata_client, nil) if Entity.class_variable_defined?(:@@artsdata_client)
+  Entity.send(:class_variable_set, :@@wikidata_client, nil) if Entity.class_variable_defined?(:@@wikidata_client)
   ArtsdataGraph::SparqlService.instance_variable_set(:@client, nil) if ArtsdataGraph::SparqlService.instance_variable_defined?(:@client)
 end
 
