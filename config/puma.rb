@@ -39,6 +39,16 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }
 #
 preload_app!
 
+# Ruby's GC touches every live object's header on each collection, which
+# dirties pages that would otherwise stay copy-on-write-shared after
+# preload_app! forks - eroding the memory savings preload_app! is meant to
+# provide within the first few GC cycles of each worker's life.
+# nakayoshi_fork runs a full GC (and compaction, on Ruby versions that
+# support it) right before forking, so more of the preloaded heap is
+# already compacted and quiescent, maximizing what actually stays shared
+# across workers after fork.
+nakayoshi_fork true
+
 # preload_app! forks a booted process, so any memoized SPARQL/HTTP client
 # built before the fork would have its underlying connection shared across
 # worker processes. Drop those memoized clients before/after forking so
