@@ -27,6 +27,22 @@ This app is used to remotely run workflows in other Github repos. For example, t
 
 Ensure your Github repo has [granted access](https://github.com/organizations/culturecreates/settings/installations/52160418) to the Artsdata Nebula Github App.
 
+# Heroku Production Configuration
+
+Production runs on 2 Standard-2X dynos (1024MB RAM each), configured with:
+
+- `WEB_CONCURRENCY=1` — one Puma worker process per dyno
+- `RAILS_MAX_THREADS=10` — Puma's per-worker thread pool
+- `MALLOC_ARENA_MAX=2` — caps glibc malloc arenas, reducing memory fragmentation from Puma's threads
+
+**Why one worker per dyno, not two:** `config/puma.rb` uses `preload_app!` to share memory between forked workers via copy-on-write, but in practice 2 workers left only ~100MB of headroom under the 1024MB dyno quota. When tested under heavy load the app sat there continuously tripping Heroku's `R14 (Memory quota exceeded)`.
+
+Dropping to 1 worker per dyno (with `RAILS_MAX_THREADS` raised from 3 to 10 to keep total in-flight request capacity comparable) brought steady-state memory down to ~650-900MB per dyno with real headroom, and extended monitoring after the change showed no `R14` recurrence.
+
+**Why `MALLOC_ARENA_MAX=2`:** glibc's default `malloc` gives each thread its own memory "arena" (up to 8 × the number of CPU cores) so concurrent threads don't contend on the same allocator lock. That's a reasonable tradeoff for a C program, but Ruby's own GC already does most of the work of managing object memory, so paying for many separate glibc arenas on top of that mostly buys fragmentation: each arena keeps its own free list and can hold onto pages it's freed without returning them to the OS or letting another arena reuse them, so measured process RSS can run well above what's actually reachable/live. With `RAILS_MAX_THREADS=10`, an uncapped worker could spin up several arenas, each fragmenting independently — directly working against the memory headroom this section is trying to protect. Setting `MALLOC_ARENA_MAX=2` caps glibc to 2 arenas per process, trading a small amount of allocator lock contention (threads occasionally waiting on each other to allocate) for meaningfully lower memory overhead. This is a well-known tuning knob for any multi-threaded Ruby server (Puma, Sidekiq, etc.) on glibc-based systems like Heroku's.
+
+**Why 2 dynos, not 1 bigger one:** redundancy. With one worker per dyno, if that single worker hangs, Heroku's router still has a second, fully independent dyno to route to while Puma's cluster monitor restarts the stuck one. Scaling this app for more capacity should mean adding another dyno (`heroku ps:scale web=N`), not raising `WEB_CONCURRENCY` back up — see the memory analysis above for why that doesn't pay off on this workload. A Performance-tier dyno with dedicated cores and more headroom could change this calculus, but that hasn't been tested.
+
 # Steps to run locally
 
   1. clone repo
