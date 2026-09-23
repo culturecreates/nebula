@@ -59,13 +59,7 @@
       <% end %>
     <% end %>
     <% if user_has_access?("refresh_entity") %>
-      <a 
-        rel="nofollow"
-        class="text-decoration-none ms-2 me-2"
-        data-controller="refresh-entity"
-        data-action="click->refresh-entity#refresh"
-        data-refresh-entity-uri-value="<%= @entity.entity_uri %>"
-      >Refresh</a>
+      <%= render partial: "entity/refresh_dropdown", locals: { entity: @entity } %>
       |
     <% end %>
 

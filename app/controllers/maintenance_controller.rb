@@ -4,17 +4,23 @@ class MaintenanceController < ApplicationController
   def refresh_entity
     artsdata_uri = params[:uri]
     dryrun = ActiveModel::Type::Boolean.new.cast(params[:dryrun])
+    # Present only when the refresh was triggered from a single external identifier in the
+    # refresh dropdown (see entity/_refresh_dropdown.html.erb); scopes the refresh to that
+    # source instead of pulling from all of the entity's sources.
+    source = params[:source].presence
     publisher = user_uri
     timeout_seconds = 15
     # Call Artsdata API to refresh entity data
     api_endpoint = Rails.application.config.artsdata_maintenance_endpoint + "/refresh_entity"
     begin
+      body = {
+        uri: artsdata_uri,
+        publisher: publisher,
+        dryrun: dryrun
+      }
+      body[:source] = source if source
       response = HTTParty.post(api_endpoint,
-        body: {
-          uri: artsdata_uri,
-          publisher: publisher,
-          dryrun: dryrun
-        }.to_json,
+        body: body.to_json,
         headers: { 'Content-Type' => 'application/json' },
          timeout: timeout_seconds
       )
@@ -39,19 +45,34 @@ class MaintenanceController < ApplicationController
       else
         items = JSON.parse(response.body)['logs']
         formated_items = ""
-        add_list = items.select{ |item| item["action"] == "add" }
+        # update_assertions distinguishes an asserted triple actually inserted/deleted in the
+        # store (true) from an unasserted claim change (false, e.g. a non-winning source's
+        # value) - shown separately below so a refresh that only touches claims isn't shown as
+        # if it changed nothing, without implying those claims changed the entity itself.
+        asserted_items = items.select { |item| item["update_assertions"] }
+        claimed_items = items.reject { |item| item["update_assertions"] }
+        add_list = asserted_items.select{ |item| item["action"] == "add" }
         unless add_list.empty?
           formated_items << "<h4>Updates</h5> <ul>"
-          items.select{ |item| item["action"] == "add" }.each do |item|
-            formated_items << format_display(item) 
+          add_list.each do |item|
+            formated_items << format_display(item)
           end
           formated_items << "</ul>"
         end
-        delete_list = items.select{ |item| item["action"] == "delete" }
+        delete_list = asserted_items.select{ |item| item["action"] == "delete" }
         unless delete_list.empty?
           formated_items << "<h4>Deletes</h5> <ul>"
           delete_list.each do |item|
-            formated_items << format_display(item) 
+            formated_items << format_display(item)
+          end
+          formated_items << "</ul>"
+        end
+        unless claimed_items.empty?
+          formated_items << "<h4>Claims</h5> <ul>"
+          claimed_items.each do |item|
+            # Unlike Updates/Deletes above, claims are all listed under one shared header, so
+            # each line needs its own +/- to tell an added claim from a removed one.
+            formated_items << format_display(item, show_sign: true)
           end
           formated_items << "</ul>"
         end
@@ -72,7 +93,7 @@ class MaintenanceController < ApplicationController
         flash[:alert] = "Failed. Error: #{response.body.truncate(1000)}"
       else
         expire_entity_view_caches(artsdata_uri)
-        flash[:notice] = "Successfully refreshed #{artsdata_uri}."
+        flash[:notice] = source ? "Successfully refreshed #{artsdata_uri} from #{source}." : "Successfully refreshed #{artsdata_uri}."
       end
       render json: { redirect_url: entity_path(uri: artsdata_uri) }
     end
@@ -116,18 +137,32 @@ class MaintenanceController < ApplicationController
     ensure_access("refresh_entity")
   end
 
-  def format_display(item)
+  # show_sign: prefix the predicate with +/- (item["action"] == "add"/"delete") - used for the
+  # Claims section, where adds and removes are listed together under one header, unlike the
+  # asserted Updates/Deletes sections which already say which they are via their own header.
+  def format_display(item, show_sign: false)
     id = item["source"].to_s.split("/").last
-    claim = item["claim"] == "derived" ? "(secondary #{id})" : "(#{id})"
-    if item["object"].to_s.start_with?("_") 
-      "<li>#{item["predicate"].to_s.split("/").last} #{claim}:</li>"
+    # A blank source (e.g. no current claim annotation for this change - see
+    # history_logs.sparql's ?source comment for why that happens) would otherwise render as
+    # empty brackets "()" or "(secondary )"; omit the claim entirely instead of showing them.
+    claim = if id.blank?
+              nil
+            elsif item["claim"] == "derived"
+              "(secondary #{id})"
+            else
+              "(#{id})"
+            end
+    claim_suffix = claim ? " #{claim}" : ""
+    sign = show_sign ? (item["action"] == "add" ? "+" : "-") : ""
+    if item["object"].to_s.start_with?("_")
+      "<li>#{sign}#{item["predicate"].to_s.split("/").last}#{claim_suffix}:</li>"
     elsif item["object"].to_s.include?("#")
-      "<li>#{item["predicate"].to_s.split("/").last}: <b>#{item["object"].to_s.split("#").last}</b>  #{claim}</li>"
+      "<li>#{sign}#{item["predicate"].to_s.split("/").last}: <b>#{item["object"].to_s.split("#").last}</b>#{claim_suffix}</li>"
     else
       if item["subject"].to_s.start_with?("_") || item["subject"].to_s.include?("#")
-        "<li class='ms-4'>nested #{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b> #{claim}</li>"
+        "<li class='ms-4'>nested #{sign}#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{item["object"].to_s.split("/").last}</b>#{claim_suffix}</li>"
       else
-        "<li>#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{ActionController::Base.helpers.strip_tags(item["object"].to_s).truncate(50)}</b> #{claim}</li>"
+        "<li>#{sign}#{item["predicate"].to_s.split("/").last.split("#").last}: <b>#{ActionController::Base.helpers.strip_tags(item["object"].to_s).truncate(50)}</b>#{claim_suffix}</li>"
       end
     end
   end

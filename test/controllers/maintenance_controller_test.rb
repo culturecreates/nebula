@@ -54,6 +54,142 @@ class MaintenanceControllerTest < ActionDispatch::IntegrationTest
     assert flash[:alert].present?
   end
 
+  test "refresh_entity forwards source param to the maintenance API when scoped to one identifier" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    source = "http://www.wikidata.org/entity/Q1"
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .with(body: hash_including("source" => source))
+      .to_return(status: 200, body: { logs: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: false, source: source }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    assert_match "Successfully refreshed #{uri} from #{source}.", flash[:notice]
+  end
+
+  test "refresh_entity omits source param when refreshing all sources" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .with { |request| !JSON.parse(request.body).key?("source") }
+      .to_return(status: 200, body: { logs: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: false }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    assert_match "Successfully refreshed #{uri}.", flash[:notice]
+  end
+
+  test "refresh_entity dryrun preview omits empty brackets when a log item has no source" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    logs = [{
+      "action" => "add",
+      "update_assertions" => true,
+      "claim" => nil,
+      "source" => "",
+      "subject" => uri,
+      "predicate" => "http://schema.org/name",
+      "object" => "New Name"
+    }]
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .to_return(status: 200, body: { logs: logs, rescues: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute_match(/\(\)/, json["message"])
+    assert_match "<li>name: <b>New Name</b></li>", json["message"]
+  end
+
+  test "refresh_entity dryrun preview keeps the source in brackets when present" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    logs = [{
+      "action" => "add",
+      "update_assertions" => true,
+      "claim" => nil,
+      "source" => "http://www.wikidata.org/entity/Q1",
+      "subject" => uri,
+      "predicate" => "http://schema.org/name",
+      "object" => "New Name"
+    }]
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .to_return(status: 200, body: { logs: logs, rescues: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_match "<li>name: <b>New Name</b> (Q1)</li>", json["message"]
+  end
+
+  test "refresh_entity dryrun preview marks added and removed claims with +/- in the Claims section" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    logs = [
+      {
+        "action" => "add",
+        "update_assertions" => false,
+        "claim" => "primary",
+        "source" => "http://www.wikidata.org/entity/Q1",
+        "subject" => uri,
+        "predicate" => "http://schema.org/image",
+        "object" => "http://example.org/new.jpg"
+      },
+      {
+        "action" => "delete",
+        "update_assertions" => false,
+        "claim" => "derived",
+        "source" => "http://www.wikidata.org/entity/Q2",
+        "subject" => uri,
+        "predicate" => "http://schema.org/image",
+        "object" => "http://example.org/old.jpg"
+      }
+    ]
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .to_return(status: 200, body: { logs: logs, rescues: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_match "<h4>Claims</h5>", json["message"]
+    assert_match "<li>+image: <b>http://example.org/new.jpg</b> (Q1)</li>", json["message"]
+    assert_match "<li>-image: <b>http://example.org/old.jpg</b> (secondary Q2)</li>", json["message"]
+  end
+
+  test "refresh_entity dryrun preview does not add a sign to the Updates/Deletes sections" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    logs = [{
+      "action" => "add",
+      "update_assertions" => true,
+      "claim" => nil,
+      "source" => "http://www.wikidata.org/entity/Q1",
+      "subject" => uri,
+      "predicate" => "http://schema.org/name",
+      "object" => "New Name"
+    }]
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .to_return(status: 200, body: { logs: logs, rescues: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_match "<li>name: <b>New Name</b> (Q1)</li>", json["message"]
+    refute_match "<li>+name", json["message"]
+  end
+
   test "batch_refresh_entity uses root_path when no redirect_url given" do
     uris = ["http://kg.artsdata.ca/resource/K1"]
     stub_request(:post, MAINTENANCE_ENDPOINT)

@@ -178,6 +178,21 @@ module EntityHelper
     return "http://api.artsdata.ca/resource?uri=#{CGI.escape(entity.entity_uri)}"
   end
 
+  # External URIs that assert schema:sameAs this entity (Wikidata, VIAF, etc.) - i.e. the
+  # entity's validated/authorized external identifiers, used to build the refresh dropdown so
+  # a refresh can be scoped to a single source. Shares its cache key with
+  # EntityController#authorized_external_identifiers (see
+  # ApplicationController#expire_entity_view_caches), so this doesn't cost an extra SPARQL
+  # round trip beyond what that turbo-frame already runs.
+  def authorized_external_identifier_sources(entity)
+    cached_entity = Rails.cache.fetch(["entity_authorized_external_identifiers", entity.entity_uri, I18n.locale], expires_in: 10.minutes) do
+      e = Entity.new(entity_uri: entity.entity_uri)
+      e.load_authorized_external_identifiers
+      e
+    end
+    cached_entity.graph.query([RDF::URI(entity.entity_uri), RDF::URI("http://schema.org/sameAs"), nil]).map(&:object).uniq
+  end
+
   def is_authoritative(uri)
     if uri.starts_with?("http://kg.artsdata.ca")
       true
