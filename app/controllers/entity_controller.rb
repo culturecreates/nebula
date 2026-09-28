@@ -91,6 +91,7 @@ class EntityController < ApplicationController
     uri = params[:subject]
     @predicate = RDF::URI(params[:predicate])
     @graph_name_uri = params[:graph_name_uri]
+    @triple_inverted = params[:triple_inverted]
     @entity = Entity.new(entity_uri: uri)
     @entity.property_claims(predicate: @predicate)
   end
