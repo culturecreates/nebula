@@ -166,6 +166,80 @@ class MaintenanceControllerTest < ActionDispatch::IntegrationTest
     assert_match "<li>-image: <b>http://example.org/old.jpg</b> (secondary Q2)</li>", json["message"]
   end
 
+  test "refresh_entity dryrun preview omits a claim already shown in the Updates section" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    logs = [
+      {
+        "action" => "add",
+        "update_assertions" => true,
+        "claim" => nil,
+        "source" => "http://www.wikidata.org/entity/Q1",
+        "subject" => uri,
+        "predicate" => "http://schema.org/name",
+        "object" => "New Name"
+      },
+      # asserting a value also writes its own matching claim annotation (see
+      # artsdata-api's MaintenanceService#add_to_log), so the same change can arrive a second
+      # time here with update_assertions: false
+      {
+        "action" => "add",
+        "update_assertions" => false,
+        "claim" => "primary",
+        "source" => "http://www.wikidata.org/entity/Q1",
+        "subject" => uri,
+        "predicate" => "http://schema.org/name",
+        "object" => "New Name"
+      }
+    ]
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .to_return(status: 200, body: { logs: logs, rescues: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_match "<h4>Updates</h5>", json["message"]
+    refute_match "<h4>Claims</h5>", json["message"]
+    assert_equal 1, json["message"].scan("New Name").length
+  end
+
+  test "refresh_entity dryrun preview still shows a claim with no matching asserted change" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    logs = [
+      {
+        "action" => "add",
+        "update_assertions" => true,
+        "claim" => nil,
+        "source" => "http://www.wikidata.org/entity/Q1",
+        "subject" => uri,
+        "predicate" => "http://schema.org/name",
+        "object" => "New Name"
+      },
+      {
+        "action" => "add",
+        "update_assertions" => false,
+        "claim" => "derived",
+        "source" => "http://www.wikidata.org/entity/Q2",
+        "subject" => uri,
+        "predicate" => "http://schema.org/name",
+        "object" => "Alternate Name"
+      }
+    ]
+    stub_request(:post, MAINTENANCE_ENDPOINT)
+      .to_return(status: 200, body: { logs: logs, rescues: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    post maintenance_refresh_entity_url,
+      params: { uri: uri, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_match "<h4>Claims</h5>", json["message"]
+    assert_match "<li>+name: <b>Alternate Name</b> (secondary Q2)</li>", json["message"]
+  end
+
   test "refresh_entity dryrun preview does not add a sign to the Updates/Deletes sections" do
     uri = "http://kg.artsdata.ca/resource/K1"
     logs = [{

@@ -1,51 +1,24 @@
 # history_logs
 #
 # Refresh activity for an entity, as written by artsdata-api's
-# MaintenanceService#add_dataset_log (refresh-in-memory refactor). Each refresh_entity call links
-# <URI_PLACEHOLDER_dataset> to a new prov:Activity via prov:wasInfluencedBy - not wasGeneratedBy,
-# since the dataset entity already existed before the refresh and keeps existing after, so no
-# activity "generates" it (see add_dataset_log's comment for the reasoning). Nothing ever removes
+# MaintenanceService#add_dataset_log. Each refresh_entity call links
+# <URI_PLACEHOLDER_dataset> to a new prov:Activity via prov:wasInfluencedBy,
+# since the dataset entity already existed before the refresh and keeps existing after. Nothing ever removes
 # a prior activity's wasInfluencedBy link, so this naturally accumulates the full history across
-# refreshes. Both the link and the activities themselves live in the logs graph now (the link used
-# to be wasGeneratedBy in the core graph).
+# refreshes. Both the link and the activities themselves live in the logs graph.
 #
 # Per activity:
-#   - a single rdfs:comment listing every claim-only change ("Updated claims:\n+predicate: value
-#     (source)\n..."), plus one rdfs:comment per ignored/rescued source - asserted changes are
-#     NOT repeated here since they're already visible via the annotations below
 #   - a native RDF-star annotation per top-level asserted add/delete:
 #     <<<entity> ?property ?value>> prov:wasGeneratedBy|wasInvalidatedBy <activity>
-#     (nested blank-node property changes aren't annotated this way - see add_to_log/
-#     RdfStarSparql - so they only show up via the comment text, not as their own row)
 #
-# so each activity surfaces as one row per direct asserted property change (?action/?property/
-# ?value bound, ?comment unbound), one row per comment (?comment bound, ?action/?property/?value
-# unbound), and - if it has neither (e.g. a refresh that changed nothing) - a single bare row with
-# just its ?log_date/?agent, via the OPTIONAL below.
+# Note: ?source only resolves for a property/value that's still the live asserted value; a
+# later refresh overwriting it (or a delete row for whatever it replaced) leaves ?source unbound
+# here - that's a real gap in what's persisted, not a bug in this query.
 #
-# ?source (asserted rows only, best-effort): add_dataset_log never persists a source annotation
-# for the log_block entries themselves (only claim-only changes get their source folded into the
-# comment text) - the only place a source for an asserted change survives is the entity's own
-# CURRENT claim annotation in the core graph, <<entity property value>> prov:wasDerivedFrom|
-# hadPrimarySource ?source, which reflects the *latest* refresh's winning source. So ?source only
-# resolves for a property/value that's still the live asserted value; a later refresh overwriting
-# it (or a delete row for whatever it replaced) leaves ?source unbound here - that's a real gap in
-# what's persisted, not a bug in this query.
-#
-# Notes on the shape below:
-#  - deliberately not a FILTER(?action IN (prov:wasGeneratedBy, prov:wasInvalidatedBy)) - that
-#    form silently drops the whole UNION branch under this repo's sparql-star grammar (verified
-#    against test/services/sparqls/query_controller/history_logs_test.rb), so each action is its
-#    own UNION branch with the action BOUND directly instead of filtered.
-#  - each GRAPH <...> block is a sibling, never nested inside a differently-named GRAPH block -
-#    nesting GRAPH <core> inside GRAPH <logs> (even under OPTIONAL) silently matches nothing under
-#    this repo's sparql-star grammar, so the ?source lookup opens its own top-level GRAPH <core>
-#    per UNION branch instead.
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?log_date ?agent ?action ?property ?value ?source ?comment WHERE {
+SELECT ?log_date ?agent ?action ?property ?value ?source ?activity WHERE {
     GRAPH <http://kg.artsdata.ca/logs> {
         <URI_PLACEHOLDER_dataset> prov:wasInfluencedBy ?activity .
         ?activity prov:startedAtTime ?log_date ;
@@ -79,10 +52,6 @@ SELECT ?log_date ?agent ?action ?property ?value ?source ?comment WHERE {
                         <<<URI_PLACEHOLDER> ?property ?value>> prov:hadPrimarySource ?source .
                     }
                 }
-            }
-        } UNION {
-            GRAPH <http://kg.artsdata.ca/logs> {
-                ?activity rdfs:comment ?comment .
             }
         }
     }

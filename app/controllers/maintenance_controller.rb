@@ -50,7 +50,13 @@ class MaintenanceController < ApplicationController
         # value) - shown separately below so a refresh that only touches claims isn't shown as
         # if it changed nothing, without implying those claims changed the entity itself.
         asserted_items = items.select { |item| item["update_assertions"] }
-        claimed_items = items.reject { |item| item["update_assertions"] }
+        # Asserting a value also writes its own matching claim annotation (see artsdata-api's
+        # MaintenanceService#add_to_log), so the same subject/predicate/object/action can arrive
+        # here twice - once with update_assertions: true, once without. Only the second (falsy)
+        # copy is filtered out by the update_assertions reject below, so also drop anything that
+        # already appears in the Updates/Deletes list, or it'd show up a second time under Claims.
+        asserted_keys = asserted_items.map { |item| item.values_at("subject", "predicate", "object", "action") }.to_set
+        claimed_items = items.reject { |item| item["update_assertions"] || asserted_keys.include?(item.values_at("subject", "predicate", "object", "action")) }
         add_list = asserted_items.select{ |item| item["action"] == "add" }
         unless add_list.empty?
           formated_items << "<h4>Updates</h5> <ul>"
