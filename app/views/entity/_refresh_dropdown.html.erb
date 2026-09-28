@@ -1,0 +1,46 @@
+<div
+  class="dropdown d-inline-block"
+  data-controller="refresh-entity"
+  data-refresh-entity-uri-value="<%= entity.entity_uri %>"
+>
+  <a
+    class="dropdown-toggle text-decoration-none me-2"
+    href="#"
+    role="button"
+    id="refreshDropdownLink"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    rel="nofollow"
+  >
+    Refresh
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="refreshDropdownLink">
+    <li>
+      <a
+        href="#"
+        class="dropdown-item"
+        rel="nofollow"
+        data-action="click->refresh-entity#refresh"
+      >
+        Refresh all
+      </a>
+    </li>
+    <% sources = authorized_external_identifier_sources(entity) %>
+    <% if sources.any? %>
+      <li><hr class="dropdown-divider"></li>
+      <% sources.each do |source| %>
+        <li>
+          <a
+            href="#"
+            class="dropdown-item"
+            rel="nofollow"
+            data-action="click->refresh-entity#refresh"
+            data-refresh-entity-source-param="<%= source %>"
+          >
+            <%= use_prefix(source) %>
+          </a>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>

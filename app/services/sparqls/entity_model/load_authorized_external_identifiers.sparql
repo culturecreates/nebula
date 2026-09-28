@@ -29,6 +29,7 @@ WHERE {
     # quoted triple
     OPTIONAL {
         <<?s schema:sameAs ?o>> ?a ?b .
+        FILTER NOT EXISTS { GRAPH <http://kg.artsdata.ca/logs> { <<?s schema:sameAs ?o>> ?a ?b } }
         # quoted triple labels
         OPTIONAL {
             ?a schema:name ?a_label .
@@ -37,6 +38,7 @@ WHERE {
     # quoted triple blank nodes
     OPTIONAL {
         <<?s schema:sameAs ?o>> ?a ?qbns .
+        FILTER NOT EXISTS { GRAPH <http://kg.artsdata.ca/logs> { <<?s schema:sameAs ?o>> ?a ?qbns } }
         filter(isBLANK(?qbns))
         ?qbns ?qbnp ?qbno .
         OPTIONAL {

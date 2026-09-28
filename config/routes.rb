@@ -34,7 +34,7 @@ Rails.application.routes.draw do
 
     resources :artifact do 
       collection do
-        post :push_latest, :push_version, :toggle_auto_minting, :update_graph_metadata
+        post :push_version, :toggle_auto_minting, :update_graph_metadata
       end
     end
 

@@ -5,7 +5,7 @@ select ?event (sample(?name_lang) as ?name) ?mintDate  ?dataFeed where {
        schema:name ?name_lang ;
        prov:generatedAtTime ?mintDate .
        OPTIONAL {
-            << ?event schema:name ?name_lang >> prov:hadPrimarySource ?dataFeed .
+            << ?event schema:name ?name_lang >> prov:wasDerivedFrom|prov:hadPrimarySource ?dataFeed .
        }
    } 
 group by ?event ?mintDate ?dataFeed 

@@ -6,6 +6,7 @@ export default class extends Controller {
 
   connect() {
     this.modal = new bootstrap.Modal(document.getElementById("dryrunModal"))
+    this.modalLabel = document.getElementById("dryrunModalLabel")
     this.modalBody = document.getElementById("dryrunModalBody")
     this.okBtn = document.getElementById("dryrunModalOk")
     this.okBtn.disabled = true // Disable the update button at first
@@ -13,18 +14,13 @@ export default class extends Controller {
 
   refresh(event) {
     event.preventDefault()
+    const source = event.params.source
+    this.modalLabel.textContent = source ? `Refresh Preview — ${event.target.textContent.trim()}` : "Refresh Preview"
     this.modalBody.innerHTML = "<div class='text-center'><span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Calculating...</div>"
     this.okBtn.disabled = true // Ensure button is disabled on each refresh
     this.modal.show()
 
-    fetch("/maintenance/refresh_entity", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-      },
-      body: JSON.stringify({ uri: this.uriValue, dryrun: true })
-    })
+    this.postRefresh({ dryrun: true, source })
       .then(response => response.json())
       .then(data => {
         if (!data) return;
@@ -42,14 +38,7 @@ export default class extends Controller {
         this.okBtn.disabled = false; // Enable the update button if fetch is successful
         this.okBtn.onclick = () => {
           this.modal.hide();
-          fetch("/maintenance/refresh_entity", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({ uri: this.uriValue, dryrun: false })
-          })
+          this.postRefresh({ dryrun: false, source })
             .then(response => response.json())
             .then(result => {
               window.location.href = result.redirect_url;
@@ -59,5 +48,18 @@ export default class extends Controller {
       .catch(error => {
         alert("Error: " + error.message)
       });
+  }
+
+  postRefresh({ dryrun, source }) {
+    const body = { uri: this.uriValue, dryrun }
+    if (source) body.source = source
+    return fetch("/maintenance/refresh_entity", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify(body)
+    })
   }
 }

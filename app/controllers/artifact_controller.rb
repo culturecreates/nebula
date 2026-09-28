@@ -179,18 +179,6 @@ class ArtifactController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
 
-  # POST /artifact/push_latest
-  def push_latest
-    @artifact_uri = params[:artifactUri]
-    databus_service = DatabusService.new(@artifact_uri, user_uri)
-    if databus_service.push_lastest_artifact(@artifact_uri) 
-      flash.notice = "Pushed latest artifact '#{databus_service.latest_version}' to Artsdata."
-    else
-      flash.alert = "Error pushing '#{databus_service.latest_version}' : #{databus_service.errors}."
-    end
-    redirect_back(fallback_location: root_path)
-  end
-
   # POST /artifact/push_version
   def push_version
     @artifact_uri = params[:artifactUri]

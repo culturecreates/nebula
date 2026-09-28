@@ -47,6 +47,7 @@ WHERE {
         # quoted triple
         OPTIONAL {
             <<?s ?p ?o>> ?a ?b .
+            FILTER NOT EXISTS { GRAPH <http://kg.artsdata.ca/logs> { <<?s ?p ?o>> ?a ?b } }
             # quoted triple labels
             OPTIONAL {
                 ?a rdfs:label ?a_label .
@@ -55,6 +56,7 @@ WHERE {
         # quoted triple blank nodes
         OPTIONAL {
             <<?s ?p ?o>> ?a ?qbns .
+            FILTER NOT EXISTS { GRAPH <http://kg.artsdata.ca/logs> { <<?s ?p ?o>> ?a ?qbns } }
             filter(isBLANK(?qbns))
             ?qbns ?qbnp ?qbno .
             OPTIONAL {
@@ -72,6 +74,7 @@ WHERE {
             # quoted triple
             OPTIONAL {
                 <<?bns ?bnp ?bno>> ?bna ?bnb .
+                FILTER NOT EXISTS { GRAPH <http://kg.artsdata.ca/logs> { <<?bns ?bnp ?bno>> ?bna ?bnb } }
                 # quoted triple labels
                 OPTIONAL {
                     ?bna rdfs:label ?bna_label .

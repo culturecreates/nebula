@@ -329,43 +329,6 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
   end
 
   # ---------------------------------------------------------------------------
-  # push_latest action
-  # ---------------------------------------------------------------------------
-
-  test "push_latest should redirect with a success notice when the push succeeds" do
-    mock_databus = mock('databus_service')
-    # NOTE: 'push_lastest_artifact' is intentionally misspelled to match the
-    # method name in DatabusService.
-    mock_databus.stubs(:push_lastest_artifact).returns(true)
-    mock_databus.stubs(:latest_version).returns("2024-01-01")
-    DatabusService.stubs(:new).returns(mock_databus)
-
-    post push_latest_artifact_index_path, params: {
-      artifactUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact"
-    }
-
-    assert_match(/Pushed latest artifact/, flash[:notice])
-    assert_response :redirect
-  end
-
-  test "push_latest should redirect with an error alert when the push fails" do
-    mock_databus = mock('databus_service')
-    # NOTE: 'push_lastest_artifact' is intentionally misspelled to match the
-    # method name in DatabusService.
-    mock_databus.stubs(:push_lastest_artifact).returns(false)
-    mock_databus.stubs(:latest_version).returns(nil)
-    mock_databus.stubs(:errors).returns(["API Error: 500"])
-    DatabusService.stubs(:new).returns(mock_databus)
-
-    post push_latest_artifact_index_path, params: {
-      artifactUri: "http://kg.artsdata.ca/databus/testaccount/group/artifact"
-    }
-
-    assert_match(/Error pushing/, flash[:alert])
-    assert_response :redirect
-  end
-
-  # ---------------------------------------------------------------------------
   # push_version action
   # ---------------------------------------------------------------------------
 
