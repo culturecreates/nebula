@@ -32,6 +32,7 @@ WHERE {
     OPTIONAL {
         select * where {
             << ?z ?x <entity_uri_placeholder> >> ?a ?b .
+            FILTER NOT EXISTS { GRAPH <http://kg.artsdata.ca/logs> { << ?z ?x <entity_uri_placeholder> >> ?a ?b } }
             OPTIONAL {
                 filter(isBlank(?b))
                 ?b ?b2 ?b3 .
