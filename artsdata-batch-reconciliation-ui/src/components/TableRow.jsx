@@ -339,7 +339,7 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
             <div className="table-scroll-wrapper">
               <table className="table table-hover table-borderless nested-table">
               <thead className="sticky-top" ref={headerRef}>
-                <tr>
+                <tr className="align-top">
                   {/* Only show action column header for entities that need user actions */}
                   {!(currentStatus === 'reconciled' || currentStatus === 'judgment-ready' || currentStatus === 'mint-ready' || currentStatus === 'flagged') && <th style={{width: '100px'}}></th>}
                   <th style={{width: '60px'}}>ID</th>
@@ -349,9 +349,17 @@ const TableRow = ({ item, onAction, onRefresh, parentRowIndex, displayIndex, con
                   {/* Show EndDate column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">End Date</th>}
                   {/* Show Location column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Location</th>}
+                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Place name</th>}
                   {/* Show Location ID column for Event entities */}
-                  {item.type?.toLowerCase().includes('event') && <th className="text-nowrap">Location ID</th>}
+                  {/* Show Location ID column for Event entities */}
+                  {item.type?.toLowerCase().includes('event') && (
+                      <th className="text-nowrap">
+                        Place
+                        <div style={{ fontSize: '0.7em', opacity: 0.7, fontWeight: 'normal', lineHeight: 1.1 }}>
+                          ( same as )
+                        </div>
+                      </th>
+                  )}
                   {/* Show PostalCode column for Event entities */}
                   {item.type?.toLowerCase().includes('event') && <th>PostalCode</th>}
                   <th>URL</th>
