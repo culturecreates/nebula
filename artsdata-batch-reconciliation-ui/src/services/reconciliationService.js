@@ -158,7 +158,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         if (entity.locationName && entity.locationName.trim() !== '') {
           conditions.push({
             matchType: "property",
-            propertyId: "<https://schema.org/location>/<https://schema.org/name>",
+            propertyId: "<http://schema.org/location>/<http://schema.org/name>",
             propertyValue: entity.locationName,
             required: false,
             matchQuantifier: "any"
@@ -169,7 +169,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         if (entity.postalCode && entity.postalCode.trim() !== '') {
           conditions.push({
             matchType: "property",
-            propertyId: "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>",
+            propertyId: "<http://schema.org/location>/<http://schema.org/address>/<http://schema.org/postalCode>",
             propertyValue: entity.postalCode,
             required: false,
             matchQuantifier: "any"
@@ -180,7 +180,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         if (entity.locationArtsdataUri && entity.locationArtsdataUri.trim() !== '') {
           conditions.push({
             matchType: "property",
-            propertyId: "<https://schema.org/location>/<https://schema.org/sameAs>",
+            propertyId: "<http://schema.org/location>/<http://schema.org/sameAs>",
             propertyValue: entity.locationArtsdataUri,
             required: false,
             matchQuantifier: "any"
@@ -191,7 +191,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         if (entity.performerName && entity.performerName.trim() !== '') {
           conditions.push({
             matchType: "property",
-            propertyId: "<https://schema.org/performer>/<https://schema.org/name>",
+            propertyId: "<http://schema.org/performer>/<http://schema.org/name>",
             propertyValue: entity.performerName,
             required: false,
             matchQuantifier: "any"
@@ -202,7 +202,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         if (entity.startDate && entity.startDate.trim() !== '') {
           conditions.push({
             matchType: "property",
-            propertyId: "https://schema.org/startDate",
+            propertyId: "http://schema.org/startDate",
             propertyValue: entity.startDate,
             required: false,
             matchQuantifier: "any"
@@ -213,7 +213,7 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
         if (entity.endDate && entity.endDate.trim() !== '') {
           conditions.push({
             matchType: "property",
-            propertyId: "https://schema.org/endDate",
+            propertyId: "http://schema.org/endDate",
             propertyValue: entity.endDate,
             required: false,
             matchQuantifier: "any"
