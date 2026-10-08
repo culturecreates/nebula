@@ -62,14 +62,13 @@ class HistoryLogsSparqlTest < ActiveSupport::TestCase
     refute_match(/URI_PLACEHOLDER/, load_sparql)
   end
 
-  test "returns one row per direct asserted property change with the activity's date, agent and uri" do
+  test "returns one row per direct asserted property change with the activity's date and uri" do
     solutions = execute
 
     added_row = solutions.find { |s| s[:action] == RDF::Vocab::PROV.wasGeneratedBy }
     assert added_row, "expected a row for the added statement"
     assert_equal RDF::URI("http://schema.org/name"), added_row[:property]
     assert_equal RDF::Literal("New Name"), added_row[:value]
-    assert_equal @agent, added_row[:agent]
     assert_equal RDF::Literal::DateTime.new("2026-01-01T00:00:00Z"), added_row[:log_date]
     assert_equal @activity, added_row[:activity]
 

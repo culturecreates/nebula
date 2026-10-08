@@ -18,11 +18,10 @@
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 
-SELECT ?log_date ?agent ?action ?property ?value ?source ?activity WHERE {
+SELECT ?log_date ?property ?value ?action ?source ?activity WHERE {
     GRAPH <http://kg.artsdata.ca/logs> {
         <URI_PLACEHOLDER_dataset> prov:wasInfluencedBy ?activity .
-        ?activity prov:startedAtTime ?log_date ;
-            prov:wasAssociatedWith ?agent .
+        ?activity prov:startedAtTime ?log_date  .
     }
     OPTIONAL {
         {
