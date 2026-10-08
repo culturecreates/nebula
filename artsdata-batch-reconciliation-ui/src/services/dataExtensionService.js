@@ -638,7 +638,7 @@ export function getEntityTypeFromUrl(typeUrl) {
   }
 
   // Handle direct type names
-  const directTypes = ['Event', 'Person', 'Organization', 'Place', 'Agent'];
+  const directTypes = ['Event', 'Person', 'Organization', 'Place', 'PerformanceWork', 'Agent'];
 
   // Check for PerformingGroup specifically
   if (typeUrl.toLowerCase().includes('performinggroup')) {

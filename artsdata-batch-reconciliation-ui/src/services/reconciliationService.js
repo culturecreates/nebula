@@ -27,8 +27,8 @@ export async function getMatchCandidates(entities, entityType, config = {}) {
     // Determine reconciliation type - use dbo:Agent as default except for Place/Event
     const getReconciliationType = (type) => {
       const normalizedType = type.toLowerCase().replace('schema:', '');
-      if (normalizedType === 'place' || normalizedType === 'event') {
-        return type; // Use original type for Place and Event
+      if (normalizedType === 'place' || normalizedType === 'event' || normalizedType === 'performancework') {
+        return type; // Use original type for Place, Event and PerformanceWork
       }
       return 'dbo:Agent'; // Use dbo:Agent for Person, Organization, and others
     };

@@ -245,6 +245,7 @@ export function getAvailableTypes() {
     { value: 'Event', label: 'Event' },
     { value: 'Person', label: 'Person' },
     { value: 'Organization', label: 'Organization' },
-    { value: 'Place', label: 'Place' }
+    { value: 'Place', label: 'Place' },
+    { value: 'PerformanceWork', label: 'PerformanceWork' }
   ];
 }

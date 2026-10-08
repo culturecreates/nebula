@@ -13,7 +13,7 @@ const MintConfirmPopup = ({
 }) => {
   // Smart type matching function
   const getMatchingType = (entityType) => {
-    const availableTypes = ['Event', 'Person', 'Organization', 'Place'];
+    const availableTypes = ['Event', 'Person', 'Organization', 'Place', 'PerformanceWork'];
     const normalizedEntityType = entityType?.split('/').pop(); // Handle schema.org URLs
     return availableTypes.includes(normalizedEntityType) ? normalizedEntityType : null;
   };
@@ -89,6 +89,7 @@ const MintConfirmPopup = ({
                   <option value="Person">Person</option>
                   <option value="Organization">Organization</option>
                   <option value="Place">Place</option>
+                  <option value="PerformanceWork">PerformanceWork</option>
                 </select>
               </div>
               {error && (
