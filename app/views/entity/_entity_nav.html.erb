@@ -62,6 +62,10 @@
       <%= render partial: "entity/refresh_dropdown", locals: { entity: @entity } %>
       |
     <% end %>
+    <% if user_has_access?("merge_entity") %>
+      <%= render partial: "entity/merge_button", locals: { entity: @entity } %>
+      |
+    <% end %>
 
   <% end %>
   <a

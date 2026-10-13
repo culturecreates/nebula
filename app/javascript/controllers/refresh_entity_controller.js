@@ -5,7 +5,7 @@ export default class extends Controller {
   static values = { uri: String }
 
   connect() {
-    this.modal = new bootstrap.Modal(document.getElementById("dryrunModal"))
+    this.modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("dryrunModal"))
     this.modalLabel = document.getElementById("dryrunModalLabel")
     this.modalBody = document.getElementById("dryrunModalBody")
     this.okBtn = document.getElementById("dryrunModalOk")
