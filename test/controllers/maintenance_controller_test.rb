@@ -277,5 +277,61 @@ class MaintenanceControllerTest < ActionDispatch::IntegrationTest
     json = JSON.parse(response.body)
     assert_not_nil json["redirect_url"]
   end
-end
 
+  MERGE_ENDPOINT = "#{Rails.application.config.artsdata_maintenance_endpoint}/merge_entities"
+
+  test "merge_entity dryrun previews the merge entity changes" do
+    a = "http://kg.artsdata.ca/resource/K1"
+    b = "http://kg.artsdata.ca/resource/K2"
+    logs = [{ "action" => "add", "update_assertions" => true, "source" => "http://www.wikidata.org/entity/Q1", "claim" => "derived",
+              "subject" => b, "predicate" => "http://schema.org/name", "object" => "Hall" }]
+    deprecated_logs = { a => [{ "action" => "delete", "update_assertions" => true, "subject" => a, "predicate" => "http://schema.org/name", "object" => "Hall" }] }
+    stub_request(:post, MERGE_ENDPOINT)
+      .with(body: hash_including("uri" => [a, b], "dryrun" => true))
+      .to_return(status: 200, headers: { 'Content-Type' => 'application/json' },
+                 body: { merge_uri: b, deprecated_uris: [a], incoming_links: { a => 1, b => 4 }, logs: logs, deprecated_logs: deprecated_logs, rescues: [] }.to_json)
+
+    post maintenance_merge_entity_url, params: { uri: a, other_uri: b, dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    message = JSON.parse(response.body)["message"]
+    assert_match "into <b>#{b}</b>", message
+    assert_match "<li>name: <b>Hall</b>", message
+    assert_match "will be deprecated (1 triple removed)", message
+  end
+
+  test "merge_entity applies the merge and redirects to the merge entity" do
+    a = "http://kg.artsdata.ca/resource/K1"
+    b = "http://kg.artsdata.ca/resource/K2"
+    stub_request(:post, MERGE_ENDPOINT)
+      .with(body: hash_including("dryrun" => false))
+      .to_return(status: 200, headers: { 'Content-Type' => 'application/json' },
+                 body: { merge_uri: b, deprecated_uris: [a], logs: [] }.to_json)
+
+    post maintenance_merge_entity_url, params: { uri: a, other_uri: b, dryrun: false }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+
+    assert_response :success
+    assert_equal entity_path(uri: b), JSON.parse(response.body)["redirect_url"]
+    assert_match "merged", flash[:notice]
+  end
+
+  test "merge_entity rejects a non-Artsdata or identical uri" do
+    a = "http://kg.artsdata.ca/resource/K1"
+    [["http://example.com/x"], [a]].each do |(other)|
+      post maintenance_merge_entity_url, params: { uri: a, other_uri: other, dryrun: true }.to_json,
+        headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      assert_response :unprocessable_entity
+    end
+  end
+
+  test "merge_entity reports API failure" do
+    a = "http://kg.artsdata.ca/resource/K1"
+    stub_request(:post, MERGE_ENDPOINT).to_return(status: 500, body: "boom")
+    post maintenance_merge_entity_url, params: { uri: a, other_uri: "http://kg.artsdata.ca/resource/K2", dryrun: true }.to_json,
+      headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+    assert_response :service_unavailable
+    assert_match "Merge failed", JSON.parse(response.body)["message"]
+  end
+end
