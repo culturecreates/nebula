@@ -326,8 +326,7 @@ export function processExtendedData(extendedData, properties) {
       entityRow.properties.forEach(propertyData => {
         const propertyId = propertyData.id;
 
-        // Find the matching property configuration to get the type
-        const propertyConfig = properties.find(p => p.id === propertyId);
+        const propertyConfig = properties.find(p => p.id === propertyId || p.name === propertyId);
         if (!propertyConfig) {
           return;
         }
