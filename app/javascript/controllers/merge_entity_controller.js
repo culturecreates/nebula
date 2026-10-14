@@ -6,11 +6,14 @@ export default class extends Controller {
 
   connect() {
     // Move the prompt modal to <body> so no ancestor's stacking context can put the backdrop over it.
-    // On a Turbo cache restore the modal may already live in <body> (not inside this element): reuse it then.
-    const promptEl = this.element.querySelector("#mergeModal") || document.querySelector("body > #mergeModal")
+    // Turbo snapshots the page for back/forward navigation, so it is put back inside this element
+    // on turbo:before-cache and a restored page looks like a fresh render.
+    const promptEl = this.element.querySelector("#mergeModal")
     if (!promptEl) return
-    document.querySelectorAll("body > #mergeModal").forEach(el => { if (el !== promptEl) el.remove() }) // stale copies
-    if (promptEl.parentElement !== document.body) document.body.appendChild(promptEl)
+    document.querySelectorAll("body > #mergeModal").forEach(el => el.remove()) // stale copies
+    document.body.appendChild(promptEl)
+    this.onBeforeCache = () => this.restoreModal()
+    document.addEventListener("turbo:before-cache", this.onBeforeCache)
     this.promptEl = promptEl
     // Moved outside this controller's element, so Stimulus actions/targets no longer reach it: wire it up by hand.
     this.input = promptEl.querySelector("input")
@@ -27,7 +30,22 @@ export default class extends Controller {
     this.okBtn = document.getElementById("dryrunModalOk")
   }
 
+  restoreModal() {
+    if (!this.promptEl) return
+    this.promptModal?.dispose()
+    this.promptEl.classList.remove("show")
+    this.promptEl.style.display = ""
+    this.promptEl.removeAttribute("aria-modal")
+    this.promptEl.setAttribute("aria-hidden", "true")
+    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove())
+    document.body.classList.remove("modal-open")
+    document.body.style.removeProperty("overflow")
+    document.body.style.removeProperty("padding-right")
+    this.element.appendChild(this.promptEl)
+  }
+
   disconnect() {
+    document.removeEventListener("turbo:before-cache", this.onBeforeCache)
     this.promptEl?.querySelector("[data-role='preview']")?.removeEventListener("click", this.onPreview)
     this.input?.removeEventListener("keydown", this.onEnter)
     this.promptModal?.dispose()
