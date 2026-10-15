@@ -8,29 +8,29 @@
     class="text-decoration-none ms-2 me-2"
     rel="nofollow"
     data-action="click->merge-entity#open"
-  >Merge</a>
+  ><%= t("entity.merge.link") %></a>
 
   <!-- Merge URI prompt -->
   <div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="mergeModalLabel">Merge duplicate</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="mergeModalLabel"><%= t("entity.merge.title") %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<%= t("entity.merge.close") %>"></button>
         </div>
         <div class="modal-body">
-          <label for="mergeOtherUri" class="form-label">URI of the duplicate Artsdata entity</label>
+          <label for="mergeOtherUri" class="form-label"><%= t("entity.merge.uri_label") %></label>
           <input
             type="text"
             class="form-control"
             id="mergeOtherUri"
-            placeholder="http://kg.artsdata.ca/resource/K..."
+            placeholder="<%= t("entity.merge.uri_placeholder") %>"
           >
-          <div class="form-text">Everything is merged into the entity with the most incoming links. You will see a preview first.</div>
+          <div class="form-text"><%= t("entity.merge.help") %></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" data-role="preview">Preview</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t("entity.merge.cancel") %></button>
+          <button type="button" class="btn btn-primary" data-role="preview"><%= t("entity.merge.preview") %></button>
         </div>
       </div>
     </div>

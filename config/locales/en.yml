@@ -111,6 +111,15 @@ en:
       title: "Validated External Identifiers"
       description: "Identifiers listed here will refresh claims in Artsdata core entities when external data changes. Delete an external identifier sameAs to block it from updating the Artsdata core entity."
     for: "for"
+    merge:
+      link: "Merge"
+      title: "Merge duplicate"
+      close: "Close"
+      uri_label: "Enter URI of the duplicate Artsdata entity"
+      uri_placeholder: "http://kg.artsdata.ca/resource/K..."
+      help: "Everything is merged into the entity with the most incoming links. You will see a preview first."
+      cancel: "Cancel"
+      preview: "Preview"
     nav:
       dereference: "Dereference"
       cms_v3: "CMS v3"

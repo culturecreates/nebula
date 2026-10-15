@@ -79,6 +79,15 @@ fr:
     authorized_external_identifiers:
       title: "Identifiants externes validés"
       description: "Les identifiants listés ici mettront à jour les informations dans les entités principales d'Artsdata lorsque les données externes changent. Supprimez un identifiant externe sameAs pour empêcher sa mise à jour dans l'entité principale d'Artsdata."
+    merge:
+      link: "Fusionner"
+      title: "Fusionner un doublon"
+      close: "Fermer"
+      uri_label: "Entrez l'URI de l'entité Artsdata en double"
+      uri_placeholder: "http://kg.artsdata.ca/resource/K..."
+      help: "Tout est fusionné dans l'entité ayant le plus de liens entrants. Un aperçu vous sera présenté d'abord."
+      cancel: "Annuler"
+      preview: "Aperçu"
     nav:
       dereference: "Déréférencer"
       cms_v3: "CMS v3"
