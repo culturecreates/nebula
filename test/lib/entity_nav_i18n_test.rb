@@ -10,7 +10,6 @@ class EntityNavI18nTest < ActiveSupport::TestCase
     entity.nav.history_log_title
     entity.nav.ranked
     entity.nav.ranked_properties
-    entity.nav.aggregator_place_v2
   ].freeze
 
   test "entity nav labels are translated for english and french" do

@@ -168,12 +168,6 @@ module EntityHelper
       end
   end
 
-  def aggregator_place_v2_link(entity)
-      if entity.type == "http://schema.org/Place"
-       return "http://api.artsdata.ca/query?uri=http://kg.artsdata.ca/resource/#{entity.k_number}&format=jsonld&frame=ranked_place_footlight&sparql=https://raw.githubusercontent.com/culturecreates/footlight-aggregator/main/sparql/query-place-v2.sparql"
-      end
-  end
-
   def cms_link(entity) # for non-artsdata URIs
     return "http://api.artsdata.ca/resource?uri=#{CGI.escape(entity.entity_uri)}"
   end
