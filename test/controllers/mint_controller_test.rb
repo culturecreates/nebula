@@ -70,9 +70,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
 
   test "wikidata mint falls back to the tab class when the subclass lookup times out" do
     stub_wikidata_label_query
-    stub_request(:post, "https://query.wikidata.org/sparql")
-      .with { |request| decoded_sparql_query(request).include?("wdt:P279") }
-      .to_timeout
+    stub_request(:get, WIKIDATA_API).with(query: hash_including("props" => "claims")).to_timeout
 
     get mint_wikidata_url, params: { uri: "Q1329623", type: "Q1329623", tab_type: "Q17350442" }
 
@@ -81,7 +79,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "wikidata mint still renders when the label lookup fails" do
-    stub_request(:post, "https://query.wikidata.org/sparql").to_timeout
+    stub_request(:get, WIKIDATA_API).with(query: hash_including({})).to_timeout
 
     get mint_wikidata_url, params: { uri: "Q42", type: "Q5", tab_type: "Q5" }
 
@@ -90,12 +88,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
 
   test "wikidata mint walks up multiple subclass levels to find the broad type" do
     stub_wikidata_label_query
-    stub_request(:post, "https://query.wikidata.org/sparql")
-      .with { |request| decoded_sparql_query(request).include?("wd:Q1329623") }
-      .to_return(wikidata_parents_response("Q999"))
-    stub_request(:post, "https://query.wikidata.org/sparql")
-      .with { |request| decoded_sparql_query(request).include?("wd:Q999") }
-      .to_return(wikidata_parents_response("Q43229"))
+    stub_wikidata_parents("Q1329623" => ["Q999"], "Q999" => ["Q43229"])
 
     get mint_wikidata_url, params: { uri: "Q1329623", type: "Q1329623" }
 
@@ -105,45 +98,43 @@ class MintControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def wikidata_parents_response(*qids)
-    {
-      status: 200,
-      headers: { "Content-Type" => "application/sparql-results+json" },
-      body: {
-        head: { vars: ["parent"] },
-        results: { bindings: qids.map { |q| { "parent" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/#{q}" } } } }
-      }.to_json
-    }
-  end
+  WIKIDATA_API = "https://www.wikidata.org/w/api.php".freeze
 
   def stub_wikidata_label_query
-    stub_request(:post, "https://query.wikidata.org/sparql")
-      .with { |request| decoded_sparql_query(request).include?("rdfs:label") }
-      .to_return(
-        status: 200,
-        headers: { "Content-Type" => "application/sparql-results+json" },
-        body: {
-          head: { vars: ["label"] },
-          results: { bindings: [{ "label" => { "type" => "literal", "value" => "The Beatles", "xml:lang" => "en" } }] }
-        }.to_json
-      )
+    stub_request(:get, WIKIDATA_API)
+      .with(query: hash_including("props" => "labels|descriptions"))
+      .to_return do |request|
+        entities = requested_wikidata_ids(request).to_h do |id|
+          [id, { "labels" => { "en" => { "language" => "en", "value" => "The Beatles" } },
+                 "descriptions" => { "en" => { "language" => "en", "value" => "band" } } }]
+        end
+        wikidata_json(entities)
+      end
   end
 
+  # Every requested type is a direct subclass of the given broad type.
   def stub_wikidata_broad_type_query(broad_qid)
-    stub_request(:post, "https://query.wikidata.org/sparql")
-      .with { |request| decoded_sparql_query(request).include?("wdt:P279") }
-      .to_return(
-        status: 200,
-        headers: { "Content-Type" => "application/sparql-results+json" },
-        body: {
-          head: { vars: ["parent"] },
-          results: { bindings: [{ "parent" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/#{broad_qid}" } }] }
-        }.to_json
-      )
+    stubs = Hash.new([broad_qid])
+    stub_wikidata_parents(stubs)
   end
 
-  def decoded_sparql_query(request)
-    URI.decode_www_form(request.body).to_h["query"].to_s
+  def stub_wikidata_parents(parents_by_id)
+    stub_request(:get, WIKIDATA_API)
+      .with(query: hash_including("props" => "claims"))
+      .to_return do |request|
+        entities = requested_wikidata_ids(request).to_h do |id|
+          claims = parents_by_id[id].map { |q| { "mainsnak" => { "datavalue" => { "value" => { "id" => q } } } } }
+          [id, { "claims" => { "P279" => claims } }]
+        end
+        wikidata_json(entities)
+      end
   end
 
+  def requested_wikidata_ids(request)
+    Rack::Utils.parse_query(URI(request.uri).query)["ids"].split("|")
+  end
+
+  def wikidata_json(entities)
+    { status: 200, headers: { "Content-Type" => "application/json" }, body: { entities: entities }.to_json }
+  end
 end
