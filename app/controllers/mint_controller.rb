@@ -204,19 +204,9 @@ class MintController < ApplicationController
       resolve_class_to_mint
 
       # call wikidata sparql to get more data
-      select_query = <<-SPARQL
-        select * where {
-          <http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label .
-          OPTIONAL {
-            <http://www.wikidata.org/entity/#{params[:uri]}> schema:description ?desc . 
-            filter (lang(?desc) = 'en' || lang(?desc) = 'fr') 
-          }
-          filter (lang(?label) = 'en' || lang(?label) = 'fr' || lang(?label) = 'mul' )
-        }
-      SPARQL
-      solutions = wikidata_query(select_query) || []
-      @label = solutions.map { |s| s.label.to_s if s.bound?(:label) }.first || params[:uri]
-      @description = solutions.map { |s| s.desc.to_s if s.bound?(:desc) }.first
+      entity = wikidata_entities([params[:uri]], props: "labels|descriptions")&.dig(params[:uri])
+      @label = wikidata_text(entity, "labels", %w[en fr mul]) || params[:uri]
+      @description = wikidata_text(entity, "descriptions", %w[en fr])
       @language = "en"
       @dataset = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
@@ -256,9 +246,8 @@ class MintController < ApplicationController
   end
 
   def convert_id_to_name(wikidata_id)
-    select_query = "select * where {<http://www.wikidata.org/entity/#{wikidata_id}> rdfs:label ?label. filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
-    solutions = wikidata_query(select_query)
-    solutions.first.label.to_s if solutions&.first&.bound?(:label)
+    entity = wikidata_entities([wikidata_id], props: "labels")&.dig(wikidata_id)
+    wikidata_text(entity, "labels", %w[en fr])
   end
 
   def map_wikidata_type_to_schema(wikidata_type)
@@ -277,25 +266,43 @@ class MintController < ApplicationController
     end
   end
 
-  WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql".freeze
+  WIKIDATA_API_ENDPOINT = "https://www.wikidata.org/w/api.php".freeze
   WIKIDATA_TIMEOUT = 5 # seconds; Wikidata can hang, and Heroku kills requests at 30s
   WIKIDATA_MAX_SUBCLASS_DEPTH = 5
 
-  # Runs a query against Wikidata with a short timeout. Returns nil (and logs)
-  # if Wikidata is slow or unavailable so callers can degrade gracefully.
-  def wikidata_query(query)
-    SPARQL::Client.new(WIKIDATA_SPARQL_ENDPOINT, read_timeout: WIKIDATA_TIMEOUT).query(query)
+  # Fetches entities from the Wikidata Action API (much more reliable than the
+  # query service, query.wikidata.org, which often times out). Returns a hash
+  # of QID => entity, or nil (and logs) if Wikidata is slow or unavailable so
+  # callers can degrade gracefully.
+  def wikidata_entities(qids, props:)
+    response = HTTParty.get(
+      WIKIDATA_API_ENDPOINT,
+      query: { action: "wbgetentities", ids: qids.join("|"), props: props, languages: "en|fr|mul", format: "json" },
+      timeout: WIKIDATA_TIMEOUT
+    )
+    raise "HTTP #{response.code}" unless response.code == 200
+
+    entities = JSON.parse(response.body)["entities"]
+    raise "unexpected response" unless entities.is_a?(Hash)
+
+    entities
   rescue StandardError => e
-    Rails.logger.warn("Wikidata query failed (#{e.class}): #{e.message}")
+    Rails.logger.warn("Wikidata request failed (#{e.class}): #{e.message}")
+    nil
+  end
+
+  # First available text from an entity's labels/descriptions, in language order.
+  def wikidata_text(entity, field, languages)
+    values = entity&.dig(field) || {}
+    languages.each { |lang| return values[lang]["value"] if values[lang] }
     nil
   end
 
   # Resolves a Wikidata type QID to one of the 3 broad types (person,
-  # organization, place) by following subclass-of (P279) up the chain.
-  # Walks one level per query, up to WIKIDATA_MAX_SUBCLASS_DEPTH, instead of
-  # using a transitive `P279*` path, which times out on Wikidata for some
-  # types (e.g. Q1329623). Returns nil if not found or Wikidata is unavailable.
-  # Results are cached, including "not found", but not failures.
+  # organization, place) by following subclass-of (P279) up the chain, one
+  # level per request, up to WIKIDATA_MAX_SUBCLASS_DEPTH. Returns nil if not
+  # found or Wikidata is unavailable. Results are cached, including "not
+  # found", but not failures.
   def broad_wikidata_type(wikidata_type)
     return nil unless wikidata_type =~ /\AQ\d+\z/
 
@@ -314,18 +321,13 @@ class MintController < ApplicationController
     seen = Set.new(current)
 
     WIKIDATA_MAX_SUBCLASS_DEPTH.times do
-      values = current.map { |qid| "wd:#{qid}" }.join(" ")
-      solutions = wikidata_query(<<-SPARQL)
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-        SELECT DISTINCT ?parent WHERE {
-          VALUES ?type { #{values} }
-          ?type wdt:P279 ?parent .
-        } LIMIT 200
-      SPARQL
-      return :failed if solutions.nil?
+      entities = wikidata_entities(current.first(50), props: "claims")
+      return :failed if entities.nil?
 
-      parents = solutions.map { |s| s.parent.to_s.split("/").last }.uniq
+      parents = entities.values.flat_map do |entity|
+        (entity.dig("claims", "P279") || []).filter_map { |claim| claim.dig("mainsnak", "datavalue", "value", "id") }
+      end.uniq
+
       found = broad_ids.find { |id| parents.include?(id) }
       return found if found
 

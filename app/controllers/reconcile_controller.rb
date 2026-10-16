@@ -50,8 +50,15 @@ class ReconcileController < ApplicationController
       @query.squish! 
       
       recon_service = ReconService.new(recon_uri)
-      response = recon_service.query_party(query: @query, type: @type, postalCode: @postalCode)
-    
+      begin
+        response = recon_service.query_party(query: @query, type: @type, postalCode: @postalCode)
+      rescue Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
+        return render_recon_error(t("reconcile.timeout"), :gateway_timeout)
+      rescue StandardError => e
+        Rails.logger.warn("Reconciliation request failed (#{e.class}): #{e.message}")
+        return render_recon_error(t("reconcile.unavailable"), :bad_gateway)
+      end
+
       if response.code.to_s.include?("200")
         @result = JSON.parse(response.body)
         @result = @result["q0"]["result"] if @result["q0"] 
@@ -59,8 +66,7 @@ class ReconcileController < ApplicationController
           @result.select! { |r| r["match"] == true }
         end
       else
-        flash.alert = "Error: #{response.code} - #{response.message}"
-        redirect_back(fallback_location: root_path)
+        render_recon_error("Error: #{response.code} - #{response.message}", :bad_gateway)
       end
     else
       flash.alert = "Missing a required param. Required list: #{required}"
@@ -69,6 +75,13 @@ class ReconcileController < ApplicationController
   end
 
   private
+
+  # Render the error inside the page/turbo-frame (rather than redirecting,
+  # which makes a turbo-frame show "Content missing").
+  def render_recon_error(message, status)
+    @error = message
+    render :query, status: status
+  end
 
   # Check if the user has access the the minting feature
   def check_minting_access

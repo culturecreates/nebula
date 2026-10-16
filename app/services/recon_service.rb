@@ -1,4 +1,6 @@
 class ReconService
+  TIMEOUT = 10 # seconds; keep well under Heroku's 30s request limit
+
   def initialize(recon_uri)
     @recon_uri = URI.parse(recon_uri)
   end
@@ -32,7 +34,7 @@ class ReconService
    puts "URL: #{@recon_uri}"
    
    # TODO: bring back  Net::HTTP::Get.new(uri) native solution instead of HTTParty
-   HTTParty.get(@recon_uri, :headers => headers)
+   HTTParty.get(@recon_uri, :headers => headers, :timeout => TIMEOUT)
     
   end
 
