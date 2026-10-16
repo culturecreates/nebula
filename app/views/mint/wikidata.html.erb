@@ -53,7 +53,8 @@
     </p>
 
     <div>
-      <p>
+      <%# Not a <p>: the spinner contains a <div>, which makes the HTML parser close a <p> (and the turbo-frame inside it) early, leaving the spinner outside the frame. %>
+      <div>
         <turbo-frame
           id='card-validation'
           src="<%= validate_path(uri: @external_uri, classToMint: @class_to_mint)%>"
@@ -67,7 +68,7 @@
             <p class="mt-2 text-muted">Validating...</p>
           </div>
         </turbo-frame>
-      </p>
+      </div>
     </div>
     <hr class="my-4">
     <h3>Step 2</h3>
