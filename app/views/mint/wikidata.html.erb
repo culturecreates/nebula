@@ -59,8 +59,13 @@
           src="<%= validate_path(uri: @external_uri, classToMint: @class_to_mint)%>"
           target="_top"
           loading="lazy"
-          validating...
         >
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden"><%= t("loading") %></span>
+            </div>
+            <p class="mt-2 text-muted">Validating...</p>
+          </div>
         </turbo-frame>
       </p>
     </div>
