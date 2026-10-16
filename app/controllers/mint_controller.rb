@@ -204,7 +204,6 @@ class MintController < ApplicationController
       resolve_class_to_mint
 
       # call wikidata sparql to get more data
-      sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
       select_query = <<-SPARQL
         select * where {
           <http://www.wikidata.org/entity/#{params[:uri]}> rdfs:label ?label .
@@ -215,9 +214,9 @@ class MintController < ApplicationController
           filter (lang(?label) = 'en' || lang(?label) = 'fr' || lang(?label) = 'mul' )
         }
       SPARQL
-      solutions = sparql.query(select_query)
-      @label = solutions.map { |s| s.label.to_s if s.bound?(:label) }.first 
-      @description = solutions.map { |s| s.desc.to_s if s.bound?(:desc) }.first 
+      solutions = wikidata_query(select_query) || []
+      @label = solutions.map { |s| s.label.to_s if s.bound?(:label) }.first || params[:uri]
+      @description = solutions.map { |s| s.desc.to_s if s.bound?(:desc) }.first
       @language = "en"
       @dataset = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
@@ -257,10 +256,9 @@ class MintController < ApplicationController
   end
 
   def convert_id_to_name(wikidata_id)
-    sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
     select_query = "select * where {<http://www.wikidata.org/entity/#{wikidata_id}> rdfs:label ?label. filter (lang(?label) = 'en' || lang(?label) = 'fr') }"
-    solutions = sparql.query(select_query)
-    solutions.first.label.to_s if solutions.first&.bound?(:label)
+    solutions = wikidata_query(select_query)
+    solutions.first.label.to_s if solutions&.first&.bound?(:label)
   end
 
   def map_wikidata_type_to_schema(wikidata_type)
@@ -279,23 +277,62 @@ class MintController < ApplicationController
     end
   end
 
+  WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql".freeze
+  WIKIDATA_TIMEOUT = 5 # seconds; Wikidata can hang, and Heroku kills requests at 30s
+  WIKIDATA_MAX_SUBCLASS_DEPTH = 5
+
+  # Runs a query against Wikidata with a short timeout. Returns nil (and logs)
+  # if Wikidata is slow or unavailable so callers can degrade gracefully.
+  def wikidata_query(query)
+    SPARQL::Client.new(WIKIDATA_SPARQL_ENDPOINT, read_timeout: WIKIDATA_TIMEOUT).query(query)
+  rescue StandardError => e
+    Rails.logger.warn("Wikidata query failed (#{e.class}): #{e.message}")
+    nil
+  end
+
   # Resolves a Wikidata type QID to one of the 3 broad types (person,
-  # organization, place) by checking if it is a subclass of one of them.
+  # organization, place) by following subclass-of (P279) up the chain.
+  # Walks one level per query, up to WIKIDATA_MAX_SUBCLASS_DEPTH, instead of
+  # using a transitive `P279*` path, which times out on Wikidata for some
+  # types (e.g. Q1329623). Returns nil if not found or Wikidata is unavailable.
+  # Results are cached, including "not found", but not failures.
   def broad_wikidata_type(wikidata_type)
     return nil unless wikidata_type =~ /\AQ\d+\z/
 
-    sparql = SPARQL::Client.new("https://query.wikidata.org/sparql")
-    select_query = <<-SPARQL
-      PREFIX wd: <http://www.wikidata.org/entity/>
-      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-      SELECT ?broad WHERE {
-        VALUES ?broad { wd:#{@wikidata_person_type} wd:#{@wikidata_organization_type} wd:#{@wikidata_place_type} }
-        wd:#{wikidata_type} wdt:P279* ?broad .
-      } LIMIT 1
-    SPARQL
-    solutions = sparql.query(select_query)
-    solutions.first&.broad&.to_s&.split("/")&.last
+    broad_ids = [@wikidata_person_type, @wikidata_organization_type, @wikidata_place_type]
+    cache_key = ["wikidata_broad_type", wikidata_type]
+    cached = Rails.cache.read(cache_key)
+    return cached.presence if cached
+
+    result = lookup_broad_wikidata_type(wikidata_type, broad_ids)
+    Rails.cache.write(cache_key, result || "", expires_in: 1.day) unless result == :failed
+    result == :failed ? nil : result
   end
 
+  def lookup_broad_wikidata_type(wikidata_type, broad_ids)
+    current = [wikidata_type]
+    seen = Set.new(current)
 
+    WIKIDATA_MAX_SUBCLASS_DEPTH.times do
+      values = current.map { |qid| "wd:#{qid}" }.join(" ")
+      solutions = wikidata_query(<<-SPARQL)
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        SELECT DISTINCT ?parent WHERE {
+          VALUES ?type { #{values} }
+          ?type wdt:P279 ?parent .
+        } LIMIT 200
+      SPARQL
+      return :failed if solutions.nil?
+
+      parents = solutions.map { |s| s.parent.to_s.split("/").last }.uniq
+      found = broad_ids.find { |id| parents.include?(id) }
+      return found if found
+
+      current = parents.reject { |qid| seen.include?(qid) }
+      seen.merge(current)
+      return nil if current.empty?
+    end
+    nil
+  end
 end

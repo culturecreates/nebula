@@ -68,7 +68,53 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Step 1"
   end
 
+  test "wikidata mint falls back to the tab class when the subclass lookup times out" do
+    stub_wikidata_label_query
+    stub_request(:post, "https://query.wikidata.org/sparql")
+      .with { |request| decoded_sparql_query(request).include?("wdt:P279") }
+      .to_timeout
+
+    get mint_wikidata_url, params: { uri: "Q1329623", type: "Q1329623", tab_type: "Q17350442" }
+
+    assert_response :success
+    assert_includes response.body, "schema:Place"
+  end
+
+  test "wikidata mint still renders when the label lookup fails" do
+    stub_request(:post, "https://query.wikidata.org/sparql").to_timeout
+
+    get mint_wikidata_url, params: { uri: "Q42", type: "Q5", tab_type: "Q5" }
+
+    assert_response :success
+  end
+
+  test "wikidata mint walks up multiple subclass levels to find the broad type" do
+    stub_wikidata_label_query
+    stub_request(:post, "https://query.wikidata.org/sparql")
+      .with { |request| decoded_sparql_query(request).include?("wd:Q1329623") }
+      .to_return(wikidata_parents_response("Q999"))
+    stub_request(:post, "https://query.wikidata.org/sparql")
+      .with { |request| decoded_sparql_query(request).include?("wd:Q999") }
+      .to_return(wikidata_parents_response("Q43229"))
+
+    get mint_wikidata_url, params: { uri: "Q1329623", type: "Q1329623" }
+
+    assert_response :success
+    assert_includes response.body, "schema:Organization"
+  end
+
   private
+
+  def wikidata_parents_response(*qids)
+    {
+      status: 200,
+      headers: { "Content-Type" => "application/sparql-results+json" },
+      body: {
+        head: { vars: ["parent"] },
+        results: { bindings: qids.map { |q| { "parent" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/#{q}" } } } }
+      }.to_json
+    }
+  end
 
   def stub_wikidata_label_query
     stub_request(:post, "https://query.wikidata.org/sparql")
@@ -85,13 +131,13 @@ class MintControllerTest < ActionDispatch::IntegrationTest
 
   def stub_wikidata_broad_type_query(broad_qid)
     stub_request(:post, "https://query.wikidata.org/sparql")
-      .with { |request| decoded_sparql_query(request).include?("wdt:P279*") }
+      .with { |request| decoded_sparql_query(request).include?("wdt:P279") }
       .to_return(
         status: 200,
         headers: { "Content-Type" => "application/sparql-results+json" },
         body: {
-          head: { vars: ["broad"] },
-          results: { bindings: [{ "broad" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/#{broad_qid}" } }] }
+          head: { vars: ["parent"] },
+          results: { bindings: [{ "parent" => { "type" => "uri", "value" => "http://www.wikidata.org/entity/#{broad_qid}" } }] }
         }.to_json
       )
   end
