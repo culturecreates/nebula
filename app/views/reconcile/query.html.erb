@@ -4,6 +4,9 @@
   </h1>
 
   <turbo-frame id="recon_results" target="_top">
+    <% if @error %>
+      <div class="alert alert-danger" role="alert"><%= @error %></div>
+    <% else %>
     <ul class="list-group ">
       <% @result.each do |result| %>
         <% if result["id"].start_with?("K") %>
@@ -27,5 +30,6 @@
       <% end %>
       <%= "No matches for #{@query}" if @result.count == 0 %>
     </ul>
+    <% end %>
   </turbo-frame>
 </div>

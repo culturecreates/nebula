@@ -1,6 +1,9 @@
 fr:
   search_for: "Nom, URI ou page Web"
   search: "Rechercher"
+  reconcile:
+    timeout: "Le service de réconciliation a mis trop de temps à répondre. Veuillez réessayer."
+    unavailable: "Le service de réconciliation est actuellement indisponible. Veuillez réessayer plus tard."
   search_results: "Résultats de recherche"
   loading: "Chargement..."
   dashboard_title: Tableau de bord pour

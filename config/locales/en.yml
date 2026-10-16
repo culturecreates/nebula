@@ -32,6 +32,9 @@
 en:
   search_for: "Name, URI or Web Page"
   search: "Search"
+  reconcile:
+    timeout: "The reconciliation service took too long to respond. Please try again."
+    unavailable: "The reconciliation service is currently unavailable. Please try again later."
   search_results: "Search Results"
   loading: "Loading..."
   dashboard_title: "Dashboard for "
