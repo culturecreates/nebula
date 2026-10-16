@@ -110,7 +110,6 @@ en:
     authorized_external_identifiers:
       title: "Validated External Identifiers"
       description: "Identifiers listed here will refresh claims in Artsdata core entities when external data changes. Delete an external identifier sameAs to block it from updating the Artsdata core entity."
-    for: "for"
     merge:
       link: "Merge"
       title: "Merge duplicate"
@@ -129,7 +128,6 @@ en:
       history_log_title: "Revisions for "
       ranked: "Ranked"
       ranked_properties: "Ranked (properties)"
-      aggregator_place_v2: "Aggregator Place V2"
     download:
       jsonld_for_schema_org: "JSON-LD using Schema.org @context. It can be copy/pasted into HTML Webpages."
       copy_button: "Copy"

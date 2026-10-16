@@ -97,7 +97,6 @@ fr:
       history_log_title: "Révisions pour "
       ranked: "Classé"
       ranked_properties: "Classé (propriétés)"
-      aggregator_place_v2: "Aggregator Place V2"
     download:
       jsonld_for_schema_org: "JSON-LD utilisant le @context de Schema.org. Il peut être copié-collé dans des pages Web HTML."
       copy_button: "Copier"
