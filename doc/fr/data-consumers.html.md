@@ -17,4 +17,5 @@
 | Signé Laval | Culture Laval | [signelaval.com](https://signelaval.com/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Tourisme Mauricie | Calendrier des événements en Mauricie | [tourismemauricie.com/evenements](https://tourismemauricie.com/evenements) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Tout Culture |  Culture Outaouais | [toutculture.ca/](https://toutculture.ca/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
+| Voir | Voir / L'actualité | [voir.com](https://voir.lactualite.com/) | s.o. |
 | Wikidata | Foundation Wikimedia | [wikidata.org](https://www.wikidata.org/) | [artsdata-planet-wikidata](https://github.com/culturecreates/artsdata-planet-wikidata) |
