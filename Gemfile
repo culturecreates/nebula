@@ -103,8 +103,8 @@ gem 'rdf-vocab', '~> 3.3'
 gem 'sparql', '~> 3.3'
 gem 'shacl', '~> 0.4'
 # gem 'rdf-turtle', '~> 3.2'
-# gem 'rdf-rdfa', '~> 3.3'
-# gem 'rdf-microdata'
+gem 'rdf-rdfa', '~> 3.3'
+gem 'rdf-microdata', '~> 3.3'
 
 gem "ffi", "< 1.17.0" # until Heroku upgrades to rubygems version 3.3.22.
 
