@@ -167,6 +167,13 @@ class Entity
     begin
       options = { rdfstar: true, headers: {"User-Agent" => "artsdata-crawler" } }
       @graph = RDF::Graph.load(self.entity_uri, **options)
+      # An HTML page may be matched by only one of the RDFa/microdata readers
+      # and miss embedded JSON-LD, so always read all three from HTML.
+      @graph = load_html_structured_data(options) if @graph.empty? || html_content_type?(options)
+      raise "No JSON-LD, RDFa or microdata found on this page" if @graph.empty?
+    rescue RDF::FormatError
+      @graph = load_html_structured_data(options)
+      raise StandardError, "Could not detect structured data (JSON-LD, RDFa or microdata) on this page." if @graph.empty?
     rescue StandardError => e
       msg = "Could not detect structured data. #{e}"
       if msg.end_with?("Connection reset by peer")
@@ -176,6 +183,37 @@ class Entity
     end
   end
 
+
+  # Extract JSON-LD, RDFa and microdata from an HTML web page.
+  def load_html_structured_data(options)
+    response = HTTParty.get(self.entity_uri, headers: options[:headers], timeout: 30)
+    html = response.body.to_s
+    base = self.entity_uri
+    graph = RDF::Graph.new
+
+    Nokogiri::HTML(html).css('script[type="application/ld+json"]').each do |script|
+      begin
+        JSON::LD::Reader.new(script.text, base_uri: base, rdfstar: true) { |reader| graph << reader }
+      rescue StandardError => e
+        Rails.logger.warn("Skipping invalid JSON-LD block at #{base}: #{e.message}")
+      end
+    end
+
+    [RDF::RDFa::Reader, RDF::Microdata::Reader].each do |reader_class|
+      begin
+        reader_class.new(html, base_uri: base) { |reader| graph << reader }
+      rescue StandardError => e
+        Rails.logger.warn("#{reader_class} failed at #{base}: #{e.message}")
+      end
+    end
+    graph
+  end
+
+  def html_content_type?(options)
+    HTTParty.head(self.entity_uri, headers: options[:headers], timeout: 15).headers['content-type'].to_s.include?('html')
+  rescue StandardError
+    false
+  end
 
   def property_claims(predicate:)
     sparql =  SparqlLoader.load('entity_model/property_claims', [

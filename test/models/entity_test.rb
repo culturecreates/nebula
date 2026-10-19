@@ -57,3 +57,58 @@ class EntityResolveSubjectPathTest < ActiveSupport::TestCase
     assert_equal "<http://kg.artsdata.ca/resource/K23-300> <http://schema.org/address> ?bnode_path_0 .\n?bnode_path_0 <http://schema.org/geo> ?bnode_path_1 .", where
   end
 end
+class EntityDereferenceHtmlTest < ActiveSupport::TestCase
+  URL = "https://example.org/event/1"
+
+  def stub_page(body, content_type: "text/html")
+    stub_request(:any, URL).to_return(status: 200, body: body, headers: { "Content-Type" => content_type })
+  end
+
+  def dereference
+    VCR.turned_off do
+      entity = Entity.new(entity_uri: URL)
+      entity.dereference
+      entity.graph
+    end
+  end
+
+  test "extracts JSON-LD embedded in an HTML page" do
+    stub_page(<<~HTML)
+      <html><head><script type="application/ld+json">
+        {"@context":"https://schema.org","@id":"#{URL}","@type":"Event","name":"JSON-LD Event"}
+      </script></head><body></body></html>
+    HTML
+
+    graph = dereference
+    assert_includes graph.query([RDF::URI(URL), RDF::Vocab::SCHEMA.name, nil]).objects.map(&:value), "JSON-LD Event"
+  end
+
+  test "extracts microdata embedded in an HTML page" do
+    stub_page(<<~HTML)
+      <html><body itemscope itemtype="https://schema.org/Event" itemid="#{URL}">
+        <span itemprop="name">Microdata Event</span>
+      </body></html>
+    HTML
+
+    graph = dereference
+    assert_includes graph.objects.map(&:to_s), "Microdata Event"
+  end
+
+  test "extracts RDFa embedded in an HTML page" do
+    stub_page(<<~HTML)
+      <html><body vocab="https://schema.org/" typeof="Event" resource="#{URL}">
+        <span property="name">RDFa Event</span>
+      </body></html>
+    HTML
+
+    graph = dereference
+    assert_includes graph.objects.map(&:to_s), "RDFa Event"
+  end
+
+  test "raises when an HTML page has no structured data" do
+    stub_page("<html><body><p>Nothing here</p></body></html>")
+
+    error = assert_raises(StandardError) { dereference }
+    assert_match(/Could not detect structured data/, error.message)
+  end
+end
