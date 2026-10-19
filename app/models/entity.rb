@@ -191,7 +191,9 @@ class Entity
     base = self.entity_uri
     graph = RDF::Graph.new
 
-    Nokogiri::HTML(html).css('script[type="application/ld+json"]').each do |script|
+    doc = Nokogiri::HTML(html)
+    scripts = doc.css('script[type="application/ld+json"]')
+    scripts.each do |script|
       begin
         JSON::LD::Reader.new(script.text, base_uri: base, rdfstar: true) { |reader| graph << reader }
       rescue StandardError => e
@@ -199,9 +201,14 @@ class Entity
       end
     end
 
+    # The RDFa reader also parses embedded JSON-LD, which would duplicate the
+    # blank nodes read above, so hand the HTML readers a copy without scripts.
+    scripts.each(&:remove)
+    markup = doc.to_html
+
     [RDF::RDFa::Reader, RDF::Microdata::Reader].each do |reader_class|
       begin
-        reader_class.new(html, base_uri: base) { |reader| graph << reader }
+        reader_class.new(markup, base_uri: base) { |reader| graph << reader }
       rescue StandardError => e
         Rails.logger.warn("#{reader_class} failed at #{base}: #{e.message}")
       end
