@@ -83,6 +83,18 @@ class EntityDereferenceHtmlTest < ActiveSupport::TestCase
     assert_includes graph.query([RDF::URI(URL), RDF::Vocab::SCHEMA.name, nil]).objects.map(&:value), "JSON-LD Event"
   end
 
+  test "does not duplicate nested JSON-LD nodes" do
+    stub_page(<<~HTML)
+      <html><head><script type="application/ld+json">
+        {"@context":"https://schema.org","@id":"#{URL}","@type":"Event","name":"E",
+         "location":{"@type":"Place","name":"Venue"}}
+      </script></head><body></body></html>
+    HTML
+
+    graph = dereference
+    assert_equal 1, graph.query([RDF::URI(URL), RDF::Vocab::SCHEMA.location, nil]).count
+  end
+
   test "extracts microdata embedded in an HTML page" do
     stub_page(<<~HTML)
       <html><body itemscope itemtype="https://schema.org/Event" itemid="#{URL}">
