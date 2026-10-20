@@ -1,0 +1,8 @@
+<turbo-frame id="date-modified">
+  <% if @date_modified.present? %>
+    <small class="text-muted">
+      <%= t("entity.modified") %>:
+      <%= link_to l(@date_modified.to_date, format: :long), "#{@entity.entity_uri}_dataset", data: { turbo_frame: "_top" } %>
+    </small>
+  <% end %>
+</turbo-frame>

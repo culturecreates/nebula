@@ -255,6 +255,21 @@ class Entity
     return response
   end
 
+  # schema:dateModified is stored on the <uri>_dataset resource, not on the entity
+  def date_modified
+    return @date_modified if defined?(@date_modified)
+
+    sparql = SparqlLoader.load('entity_model/load_date_modified', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    response = artsdata_client.execute_sparql(sparql)
+    value = response[:code] == 200 ? response.dig(:message, 0, "date_modified", "value") : nil
+    @date_modified = value.present? ? Time.zone.parse(value) : nil
+  rescue StandardError => e
+    Rails.logger.error("Entity#date_modified failed for #{entity_uri}: #{e.message}")
+    @date_modified = nil
+  end
+
   def load_authorized_external_identifiers
     sparql =  SparqlLoader.load('entity_model/load_authorized_external_identifiers', [
       'entity_uri_placeholder', self.entity_uri

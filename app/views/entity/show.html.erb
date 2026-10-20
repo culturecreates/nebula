@@ -10,7 +10,13 @@
       </h1>
       <%= render partial: "shared/clipboard", locals: { uri: @entity.entity_uri } %>
       <%= render partial: "entity_nav" %>
-      <% if !is_authoritative(@entity.entity_uri) %>
+      <% if is_authoritative(@entity.entity_uri) %>
+        <turbo-frame    id='date-modified'
+                        src="<%= entity_date_modified_path(uri: @entity.entity_uri) %>"
+                        loading="lazy"
+                        target="_top">
+        </turbo-frame>
+      <% else %>
         <%= "Non-authoritative".html_safe %>
         <turbo-frame    id='source-graph-info'
                         src="<%= source_graph_show_path(uri: @entity.entity_uri) %>"

@@ -1,0 +1,9 @@
+PREFIX schema: <http://schema.org/>
+SELECT ?date_modified
+WHERE {
+    GRAPH <http://kg.artsdata.ca/core> {
+        <entity_uri_placeholder_dataset> schema:dateModified ?date_modified .
+    }
+}
+ORDER BY DESC(?date_modified)
+LIMIT 1

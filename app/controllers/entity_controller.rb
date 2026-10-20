@@ -107,6 +107,13 @@ class EntityController < ApplicationController
     end
   end
 
+  # modified date of an Artsdata entity, linked to <uri>_dataset
+  # /entity/date_modified?uri=[canonical URI]
+  def date_modified
+    @entity = Entity.new(entity_uri: params[:uri])
+    @date_modified = @entity.date_modified if @entity.entity_uri.starts_with?("http://kg.artsdata.ca")
+  end
+
   # authorized_external_identifiers
   # /entity/authorized_external_identifiers?uri=[canonical URI]
   def authorized_external_identifiers

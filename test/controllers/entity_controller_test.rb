@@ -19,6 +19,34 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "date_modified links the modified date to the _dataset resource for Artsdata entities" do
+    uri = "http://kg.artsdata.ca/resource/K23-3076"
+    Entity.any_instance.stubs(:date_modified).returns(Time.zone.parse("2024-08-25T05:55:40.492Z"))
+
+    get entity_date_modified_path(uri: uri), headers: { "Turbo-Frame" => "date-modified" }
+
+    assert_response :success
+    assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
+  end
+
+  test "date_modified renders nothing when there is no date" do
+    Entity.any_instance.stubs(:date_modified).returns(nil)
+
+    get entity_date_modified_path(uri: "http://kg.artsdata.ca/resource/K23-300"), headers: { "Turbo-Frame" => "date-modified" }
+
+    assert_response :success
+    assert_select "turbo-frame#date-modified a", count: 0
+  end
+
+  test "date_modified does not query non-Artsdata entities" do
+    Entity.any_instance.expects(:date_modified).never
+
+    get entity_date_modified_path(uri: "http://example.org/thing"), headers: { "Turbo-Frame" => "date-modified" }
+
+    assert_response :success
+    assert_select "turbo-frame#date-modified a", count: 0
+  end
+
   test "unsupported_claims renders an error inside the frame instead of going blank on failure" do
     uri = "http://kg.artsdata.ca/resource/K23-300"
     Entity.any_instance.stubs(:load_claims).raises(StandardError, "boom")
