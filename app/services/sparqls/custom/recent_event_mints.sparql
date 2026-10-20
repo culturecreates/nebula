@@ -9,6 +9,6 @@ select ?event (sample(?name_lang) as ?name) ?mintDate  ?sourceEvent where {
             << ?event schema:name ?name_lang >> prov:wasDerivedFrom|prov:hadPrimarySource ?sourceEvent .
        }
    }
-group by ?event ?mintDate ?dataFeed
+group by ?event ?mintDate ?sourceEvent
 order by desc(?mintDate)
 limit 500
