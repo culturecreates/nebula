@@ -1,4 +1,8 @@
 fr:
+  date:
+    formats:
+      long: "%-d %B %Y"
+    month_names: [~, janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
   search_for: "Nom, URI ou page Web"
   search: "Rechercher"
   reconcile:

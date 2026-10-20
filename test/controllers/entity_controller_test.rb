@@ -30,6 +30,15 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#date-modified a.btn", text: "Revisions"
   end
 
+  test "date_modified formats the date in French" do
+    Entity.any_instance.stubs(:date_modified).returns(Time.zone.parse("2024-08-25T05:55:40.492Z"))
+
+    get entity_date_modified_path(locale: :fr, uri: "http://kg.artsdata.ca/resource/K23-3076"), headers: { "Turbo-Frame" => "date-modified" }
+
+    assert_response :success
+    assert_select "turbo-frame#date-modified small", text: /25 août 2024/
+  end
+
   test "date_modified renders nothing when there is no date" do
     Entity.any_instance.stubs(:date_modified).returns(nil)
 
