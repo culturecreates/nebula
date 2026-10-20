@@ -1,13 +1,14 @@
 PREFIX schema: <http://schema.org/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
-select ?event (sample(?name_lang) as ?name) ?mintDate  ?dataFeed where {
-    ?event a schema:Event ;
-       schema:name ?name_lang ;
+select ?event (sample(?name_lang) as ?name) ?mintDate  ?sourceEvent where {
+    ?mint schema:about ?event ;
        prov:generatedAtTime ?mintDate .
+    ?event a schema:Event ;
+       schema:name ?name_lang .
        OPTIONAL {
-            << ?event schema:name ?name_lang >> prov:wasDerivedFrom|prov:hadPrimarySource ?dataFeed .
+            << ?event schema:name ?name_lang >> prov:wasDerivedFrom|prov:hadPrimarySource ?sourceEvent .
        }
-   } 
-group by ?event ?mintDate ?dataFeed 
-order by desc(?mintDate)  
+   }
+group by ?event ?mintDate ?dataFeed
+order by desc(?mintDate)
 limit 500
