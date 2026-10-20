@@ -1,0 +1,9 @@
+PREFIX schema: <http://schema.org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+SELECT (MAX(?modified) AS ?date_modified) (MAX(?generated) AS ?date_generated)
+WHERE {
+    GRAPH <http://kg.artsdata.ca/core> {
+        OPTIONAL { <entity_uri_placeholder_dataset> schema:dateModified ?modified . }
+        OPTIONAL { <entity_uri_placeholder_dataset> prov:generatedAtTime ?generated . }
+    }
+}

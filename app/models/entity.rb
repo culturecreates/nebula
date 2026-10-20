@@ -255,6 +255,37 @@ class Entity
     return response
   end
 
+  # schema:dateModified and prov:generatedAtTime are stored on the <uri>_dataset
+  # resource, not on the entity
+  def date_modified
+    dataset_dates[:modified]
+  end
+
+  def date_generated
+    dataset_dates[:generated]
+  end
+
+  def dataset_dates
+    return @dataset_dates if defined?(@dataset_dates)
+
+    sparql = SparqlLoader.load('entity_model/load_date_modified', [
+      'entity_uri_placeholder', self.entity_uri
+    ])
+    response = artsdata_client.execute_sparql(sparql)
+    row = response[:code] == 200 ? response.dig(:message, 0) : nil
+    @dataset_dates = {
+      modified: parse_dataset_date(row&.dig("date_modified", "value")),
+      generated: parse_dataset_date(row&.dig("date_generated", "value"))
+    }
+  rescue StandardError => e
+    Rails.logger.error("Entity#dataset_dates failed for #{entity_uri}: #{e.message}")
+    @dataset_dates = { modified: nil, generated: nil }
+  end
+
+  def parse_dataset_date(value)
+    value.present? ? Time.zone.parse(value) : nil
+  end
+
   def load_authorized_external_identifiers
     sparql =  SparqlLoader.load('entity_model/load_authorized_external_identifiers', [
       'entity_uri_placeholder', self.entity_uri

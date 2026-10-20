@@ -1,0 +1,24 @@
+<turbo-frame id="date-modified" style="display: block; min-height: 1.75rem;">
+  <% date = @date_modified.presence || @date_generated.presence %>
+  <% if date %>
+    <small class="text-muted d-flex align-items-center gap-2 mb-1">
+      <span>
+        <i class="fa-regular fa-clock"></i>
+        <%= @date_modified.present? ? t("entity.modified") : t("entity.generated") %>:
+        <time datetime="<%= date.iso8601 %>" title="<%= date.utc.strftime("%Y-%m-%d %H:%M UTC") %>">
+          <%= link_to l(date.to_date, format: :long), "#{@entity.entity_uri}_dataset",
+              title: t("entity.view_dataset"), data: { turbo_frame: "_top" } %>
+        </time>
+      </span>
+      <% if @date_modified.present? %>
+      <span aria-hidden="true">·</span>
+      <%= link_to query_show_path(sparql: "query_controller/history_logs", title: "#{t("entity.nav.history_log_title")} #{@entity.entity_uri}", params: { uri: @entity.entity_uri }),
+          class: "text-muted text-decoration-none",
+          rel: "nofollow",
+          data: { turbo_frame: "_top" } do %>
+        <i class="fa-solid fa-clock-rotate-left"></i> <%= t("entity.revisions") %>
+      <% end %>
+      <% end %>
+    </small>
+  <% end %>
+</turbo-frame>
