@@ -5,9 +5,10 @@
         <%= t("entity.modified") %>:
         <%= link_to l(@date_modified.to_date, format: :long), "#{@entity.entity_uri}_dataset", data: { turbo_frame: "_top" } %>
       </small>
-      <%= link_to t("entity.history"),
+      <%= link_to t("entity.revisions"),
           query_show_path(sparql: "query_controller/history_logs", title: "#{t("entity.nav.history_log_title")} #{@entity.entity_uri}", params: { uri: @entity.entity_uri }),
-          class: "btn btn-outline-secondary btn-sm py-0",
+          class: "btn btn-outline-secondary py-0 px-1",
+          style: "font-size: 0.7rem; line-height: 1.4;",
           rel: "nofollow",
           data: { turbo_frame: "_top" } %>
     </div>

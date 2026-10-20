@@ -27,7 +27,7 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
-    assert_select "turbo-frame#date-modified a.btn", text: "History"
+    assert_select "turbo-frame#date-modified a.btn", text: "Revisions"
   end
 
   test "date_modified renders nothing when there is no date" do
