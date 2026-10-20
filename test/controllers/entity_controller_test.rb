@@ -37,7 +37,7 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "turbo-frame#date-modified small", count: 0
-    assert_select "turbo-frame#date-modified a.btn", text: "History"
+    assert_select "turbo-frame#date-modified a.btn", count: 0
   end
 
   test "date_modified does not query non-Artsdata entities" do
