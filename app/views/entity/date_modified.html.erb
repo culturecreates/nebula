@@ -1,16 +1,21 @@
-<turbo-frame id="date-modified">
+<turbo-frame id="date-modified" style="display: block; min-height: 1.75rem;">
   <% if @date_modified.present? %>
-    <div class="d-flex align-items-center gap-2 mb-2">
-      <small class="text-muted">
+    <small class="text-muted d-flex align-items-center gap-2 mb-1">
+      <span>
+        <i class="fa-regular fa-clock"></i>
         <%= t("entity.modified") %>:
-        <%= link_to l(@date_modified.to_date, format: :long), "#{@entity.entity_uri}_dataset", data: { turbo_frame: "_top" } %>
-      </small>
-      <%= link_to t("entity.revisions"),
-          query_show_path(sparql: "query_controller/history_logs", title: "#{t("entity.nav.history_log_title")} #{@entity.entity_uri}", params: { uri: @entity.entity_uri }),
-          class: "btn btn-outline-secondary py-0 px-1",
-          style: "font-size: 0.7rem; line-height: 1.4;",
+        <time datetime="<%= @date_modified.iso8601 %>" title="<%= @date_modified.utc.strftime("%Y-%m-%d %H:%M UTC") %>">
+          <%= link_to l(@date_modified.to_date, format: :long), "#{@entity.entity_uri}_dataset",
+              title: t("entity.view_dataset"), data: { turbo_frame: "_top" } %>
+        </time>
+      </span>
+      <span aria-hidden="true">·</span>
+      <%= link_to query_show_path(sparql: "query_controller/history_logs", title: "#{t("entity.nav.history_log_title")} #{@entity.entity_uri}", params: { uri: @entity.entity_uri }),
+          class: "text-muted text-decoration-none",
           rel: "nofollow",
-          data: { turbo_frame: "_top" } %>
-    </div>
+          data: { turbo_frame: "_top" } do %>
+        <i class="fa-solid fa-clock-rotate-left"></i> <%= t("entity.revisions") %>
+      <% end %>
+    </small>
   <% end %>
 </turbo-frame>

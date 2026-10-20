@@ -27,7 +27,8 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
-    assert_select "turbo-frame#date-modified a.btn", text: "Revisions"
+    assert_select "turbo-frame#date-modified time[datetime='2024-08-25T05:55:40Z']"
+    assert_select "turbo-frame#date-modified a", text: /Revisions/
   end
 
   test "date_modified formats the date in French" do
@@ -46,7 +47,7 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "turbo-frame#date-modified small", count: 0
-    assert_select "turbo-frame#date-modified a.btn", count: 0
+    assert_select "turbo-frame#date-modified a", count: 0
   end
 
   test "date_modified does not query non-Artsdata entities" do
