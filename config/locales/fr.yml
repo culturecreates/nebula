@@ -85,6 +85,7 @@ fr:
   entity:
     view_dataset: "Voir le jeu de données"
     revisions: "Révisions"
+    generated: "Créé"
     modified: "Modifié"
     authorized_external_identifiers:
       title: "Identifiants externes validés"

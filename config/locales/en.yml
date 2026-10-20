@@ -112,6 +112,7 @@ en:
   entity:
     view_dataset: "View dataset"
     revisions: "Revisions"
+    generated: "Created"
     modified: "Modified"
     authorized_external_identifiers:
       title: "Validated External Identifiers"

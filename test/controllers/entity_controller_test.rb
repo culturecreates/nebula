@@ -40,8 +40,23 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#date-modified small", text: /25 août 2024/
   end
 
+  test "date_modified falls back to the generated date without a revisions link" do
+    uri = "http://kg.artsdata.ca/resource/K23-300"
+    Entity.any_instance.stubs(:date_modified).returns(nil)
+    Entity.any_instance.stubs(:date_generated).returns(Time.zone.parse("2023-05-02T17:58:22.150Z"))
+
+    get entity_date_modified_path(uri: uri), headers: { "Turbo-Frame" => "date-modified" }
+
+    assert_response :success
+    assert_select "turbo-frame#date-modified small", text: /Created:/
+    assert_select "turbo-frame#date-modified time[datetime='2023-05-02T17:58:22Z']"
+    assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
+    assert_select "turbo-frame#date-modified a", text: /Revisions/, count: 0
+  end
+
   test "date_modified renders nothing when there is no date" do
     Entity.any_instance.stubs(:date_modified).returns(nil)
+    Entity.any_instance.stubs(:date_generated).returns(nil)
 
     get entity_date_modified_path(uri: "http://kg.artsdata.ca/resource/K23-300"), headers: { "Turbo-Frame" => "date-modified" }
 
