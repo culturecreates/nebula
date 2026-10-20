@@ -27,6 +27,7 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
+    assert_select "turbo-frame#date-modified a.btn", text: "History"
   end
 
   test "date_modified renders nothing when there is no date" do
@@ -35,7 +36,8 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     get entity_date_modified_path(uri: "http://kg.artsdata.ca/resource/K23-300"), headers: { "Turbo-Frame" => "date-modified" }
 
     assert_response :success
-    assert_select "turbo-frame#date-modified a", count: 0
+    assert_select "turbo-frame#date-modified small", count: 0
+    assert_select "turbo-frame#date-modified a.btn", text: "History"
   end
 
   test "date_modified does not query non-Artsdata entities" do

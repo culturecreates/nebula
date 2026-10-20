@@ -1,8 +1,17 @@
 <turbo-frame id="date-modified">
-  <% if @date_modified.present? %>
-    <small class="text-muted">
-      <%= t("entity.modified") %>:
-      <%= link_to l(@date_modified.to_date, format: :long), "#{@entity.entity_uri}_dataset", data: { turbo_frame: "_top" } %>
-    </small>
+  <% if is_authoritative(@entity.entity_uri) %>
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <% if @date_modified.present? %>
+      <small class="text-muted">
+        <%= t("entity.modified") %>:
+        <%= link_to l(@date_modified.to_date, format: :long), "#{@entity.entity_uri}_dataset", data: { turbo_frame: "_top" } %>
+      </small>
+    <% end %>
+    <%= link_to t("entity.history"),
+        query_show_path(sparql: "query_controller/history_logs", title: "#{t("entity.nav.history_log_title")} #{@entity.entity_uri}", params: { uri: @entity.entity_uri }),
+        class: "btn btn-outline-secondary btn-sm py-0",
+        rel: "nofollow",
+        data: { turbo_frame: "_top" } %>
+  </div>
   <% end %>
 </turbo-frame>
