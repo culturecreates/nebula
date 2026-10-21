@@ -238,3 +238,17 @@ a:hover {
   }
 }
 
+
+// Subtitle under the entity label (schema:disambiguatingDescription)
+.entity-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  max-width: 65ch;
+  margin: -0.25rem 0 0.5rem;
+  // clamp very long descriptions; full value is still in the statements table
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,7 +1,7 @@
-<turbo-frame id="date-modified" style="display: block; min-height: 1.75rem;">
+<turbo-frame id="date-modified" style="display: flex; align-items: center; min-height: 1.75rem;">
   <% date = @date_modified.presence || @date_generated.presence %>
   <% if date %>
-    <small class="text-muted d-flex align-items-center gap-2 mb-1">
+    <small class="text-muted d-flex align-items-center gap-2 mb-0">
       <span>
         <i class="fa-regular fa-clock"></i>
         <%= @date_modified.present? ? t("entity.modified") : t("entity.generated") %>:

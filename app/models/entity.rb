@@ -1,9 +1,4 @@
 require 'timeout'
-# RDF::Term#to_ntriples (used by _statement_objects.html.erb to serialize a
-# triple's subject/predicate/object into hidden fields whenever a page shows
-# statements from an Entity's graph) lives in rdf/ntriples, which the base
-# rdf gem doesn't require automatically unless you actually use RDF::NTriples.serialize(value) first.
-require 'rdf/ntriples'
 
 class Entity
   attr_accessor :entity_uri, :graph, :start_date, :card, :graph_uri, :errors
@@ -31,6 +26,22 @@ class Entity
     solution = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://www.w3.org/2004/02/skos/core#prefLabel"), nil])
     return solution.first.object if solution.count > 0
     return nil
+  end
+
+  # schema:disambiguatingDescription as an RDF::Literal (may carry a language).
+  # Prefers the UI locale, then English, then any value.
+  def disambiguating_description
+    return nil if @graph.nil?
+
+    literals = @graph.query([RDF::URI(@entity_uri), RDF::URI("http://schema.org/disambiguatingDescription"), nil])
+                     .objects.select { |o| o.literal? && o.value.present? }
+    return nil if literals.empty?
+
+    [I18n.locale.to_s, "en"].each do |lang|
+      match = literals.find { |l| l.language.to_s == lang }
+      return match if match
+    end
+    literals.first
   end
 
   def k_number

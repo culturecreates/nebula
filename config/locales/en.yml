@@ -133,8 +133,6 @@ en:
       minter: "Reconcile"
       history_logs: "View History"
       history_log_title: "Revisions for "
-      ranked: "Ranked"
-      ranked_properties: "Ranked (properties)"
     download:
       jsonld_for_schema_org: "JSON-LD using Schema.org @context. It can be copy/pasted into HTML Webpages."
       copy_button: "Copy"

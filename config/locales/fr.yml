@@ -106,8 +106,6 @@ fr:
       minter: "Réconcilier"
       history_logs: "Historique"
       history_log_title: "Révisions pour "
-      ranked: "Classé"
-      ranked_properties: "Classé (propriétés)"
     download:
       jsonld_for_schema_org: "JSON-LD utilisant le @context de Schema.org. Il peut être copié-collé dans des pages Web HTML."
       copy_button: "Copier"
