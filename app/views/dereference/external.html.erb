@@ -1,6 +1,7 @@
 <% provide(:title, @entity.label&.value) %>
 <div class="container">
   <h1><%= @entity.label&.value %></h1>
+  <%= render partial: "entity/disambiguating_description", locals: { entity: @entity } %>
   <div class="d-flex justify-content-between">
     <div class="p-2">
       Crawled data from

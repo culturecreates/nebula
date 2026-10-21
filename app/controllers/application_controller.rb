@@ -130,8 +130,6 @@ class ApplicationController < ActionController::Base
     return false unless session[:teams].present?
 
     case feature
-    when "ranked_links" # Level 2 or Level 1
-      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") } 
     when "cms_links" # Level 2
       return session[:teams].any? { |team| team.key?("10808270") }
     when "minting" 

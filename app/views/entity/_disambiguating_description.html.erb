@@ -1,0 +1,8 @@
+<%# Short "who/what is this?" subtitle shown under the main label. Expects local: entity %>
+<% description = entity.disambiguating_description %>
+<% if description %>
+  <p class="entity-subtitle"
+     <%= %(lang="#{description.language}").html_safe if description.language %>>
+    <%= description.value %>
+  </p>
+<% end %>

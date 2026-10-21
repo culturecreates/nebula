@@ -124,3 +124,26 @@ class EntityDereferenceHtmlTest < ActiveSupport::TestCase
     assert_match(/Could not detect structured data/, error.message)
   end
 end
+
+class EntityDisambiguatingDescriptionTest < ActiveSupport::TestCase
+  URI = "http://example.org/e".freeze
+  PRED = RDF::URI("http://schema.org/disambiguatingDescription")
+
+  def entity_with(*literals)
+    graph = RDF::Graph.new
+    literals.each { |l| graph << [RDF::URI(URI), PRED, l] }
+    Entity.new(entity_uri: URI, graph: graph)
+  end
+
+  test "returns nil when absent" do
+    assert_nil entity_with.disambiguating_description
+  end
+
+  test "prefers the UI locale, then English, then any" do
+    fr = RDF::Literal("Chanteur", language: :fr)
+    en = RDF::Literal("Singer", language: :en)
+    de = RDF::Literal("Sänger", language: :de)
+    assert_equal "Singer", entity_with(fr, en).disambiguating_description.value
+    assert_equal "Sänger", entity_with(de).disambiguating_description.value
+  end
+end
