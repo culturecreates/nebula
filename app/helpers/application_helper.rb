@@ -179,17 +179,30 @@ module ApplicationHelper
   # sets a limit on the number of dereferences per table.
   # Note that derived statements are a separate table.
   # The offset is used to ensure that multiple tables have different frame_ids.
-  def auto_dereference(string)
-    @max ||= 3
+  # Rows with an rdf:type or schema:url predicate are never auto-dereferenced
+  # and do not count toward the limit (they still get a unique frame_id).
+  NO_AUTO_DEREFERENCE_PREDICATES = [
+    RDF.type.to_s,
+    "http://schema.org/url"
+  ].freeze
+
+  def auto_dereference(string, predicate = nil)
+    @max ||= 7
     if @frame_id
       @frame_id += 1
-      return false if @frame_id >  @offset +  @max
-      return false if string.include?("wikidata.org")
     else
       @offset = random_frame_id
       @frame_id = @offset
+      @deref_calls = 0
     end
-    return true
+    return false if NO_AUTO_DEREFERENCE_PREDICATES.include?(predicate.to_s)
+
+    @deref_calls = (@deref_calls || 0) + 1
+    # the first candidate is always expanded, then up to @max more
+    return true if @deref_calls == 1
+    return false if @deref_calls > @max + 1
+    return false if string.include?("wikidata.org")
+    true
   end
 
   # For UI portion of schema:Action

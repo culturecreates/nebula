@@ -74,4 +74,34 @@ class ApplicationHelperTest < ActiveSupport::TestCase
   end
 
   # Add more tests for ApplicationHelper methods here
+
+  test "auto_dereference skips rdf:type rows without using up the limit" do
+    helper = Object.new.extend(ApplicationHelper)
+    helper.instance_variable_set(:@max, 3)
+    type = RDF.type
+    other = RDF::Vocab::SCHEMA.location
+    uri = "http://example.org/x"
+
+    # type rows are never expanded, however many there are
+    5.times { assert_equal false, helper.auto_dereference(uri, type) }
+
+    # the usual budget (first + 3 more) is still available afterwards
+    results = 6.times.map { helper.auto_dereference(uri, other) }
+    assert_equal [true, true, true, true, false, false], results
+  end
+
+  test "auto_dereference skips schema:url rows without using up the limit" do
+    helper = Object.new.extend(ApplicationHelper)
+    uri = "http://example.org/x"
+    3.times { assert_equal false, helper.auto_dereference(uri, RDF::URI("http://schema.org/url")) }
+    assert_equal true, helper.auto_dereference(uri, RDF::Vocab::SCHEMA.location)
+  end
+
+  test "auto_dereference gives type rows unique frame ids" do
+    helper = Object.new.extend(ApplicationHelper)
+    helper.auto_dereference("http://example.org/a", RDF.type)
+    first = helper.instance_variable_get(:@frame_id)
+    helper.auto_dereference("http://example.org/b", RDF.type)
+    assert_equal first + 1, helper.instance_variable_get(:@frame_id)
+  end
 end
