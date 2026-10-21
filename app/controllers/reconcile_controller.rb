@@ -52,8 +52,8 @@ class ReconcileController < ApplicationController
       recon_service = ReconService.new(recon_uri)
       begin
         response = recon_service.query_party(query: @query, type: @type, postalCode: @postalCode)
-      rescue Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
-        return render_recon_error(t("reconcile.timeout"), :gateway_timeout)
+      rescue Net::OpenTimeout, Net::ReadTimeout, Timeout::Error => e
+        return render_recon_error("#{t("reconcile.timeout")} (#{e.class}: #{e.message})", :gateway_timeout)
       rescue StandardError => e
         Rails.logger.warn("Reconciliation request failed (#{e.class}): #{e.message}")
         return render_recon_error(t("reconcile.unavailable"), :bad_gateway)
