@@ -51,7 +51,7 @@
     <% end %>
   </head>
 
-  <body>
+  <body class="<%= yield(:body_class) %>">
     <%= render partial: "layouts/nav" %>
     <% if flash[:alert] %>
       <div

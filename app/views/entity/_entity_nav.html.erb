@@ -10,7 +10,7 @@
       class="text-decoration-none ms-2 me-2"
       rel="nofollow"
     >
-      Visit
+      <%= t("entity.nav.visit") %>
     </a>
     |
     <% if user_has_access?("cms_links") %>
@@ -45,34 +45,34 @@
     class="text-decoration-none ms-2 me-2"
     rel="nofollow"
     id="graphdb"
-  >GraphDB</a>
+  ><%= t("entity.nav.graphdb") %></a>
   <% if session[:name] %>
     |
-    <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: "Delete all triples in subject and object positions?" } } do |form| %>
+    <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: t("entity.nav.delete_confirm") } } do |form| %>
       <%= form.hidden_field :uri, value: @entity.entity_uri %>
-      <%= form.submit "Delete",
+      <%= form.submit t("entity.nav.delete"),
                   class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
                   data: {
-                    disable_with: "Deleting...",
+                    disable_with: t("entity.nav.deleting"),
                   } %>
     <% end %>
   <% end %>
  
 </div>
-<!-- Refresh Modal -->
+<%# Refresh modal %>
 <div class="modal fade" id="dryrunModal" tabindex="-1" aria-labelledby="dryrunModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="dryrunModalLabel">Refresh Preview</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="dryrunModalLabel"><%= t("entity.refresh.preview_title") %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<%= t("entity.refresh.close") %>"></button>
       </div>
       <div class="modal-body" id="dryrunModalBody">
         <!-- Dryrun response will be inserted here -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="dryrunModalOk">Update</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t("entity.refresh.cancel") %></button>
+        <button type="button" class="btn btn-primary" id="dryrunModalOk"><%= t("entity.refresh.update") %></button>
       </div>
     </div>
   </div>

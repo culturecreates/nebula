@@ -1,3 +1,4 @@
+<% provide(:body_class, "non-authoritative") unless is_authoritative(@entity.entity_uri.to_s) %>
 <% provide(:title, @entity.label&.value) %>
 <div class="container">
   <h1><%= @entity.label&.value %></h1>

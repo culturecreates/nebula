@@ -252,3 +252,8 @@ a:hover {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+// Entity pages for URIs outside Artsdata (non-authoritative)
+body.non-authoritative {
+  background-color: rgba(223, 234, 234, 0.4); // artsdata.ca pale teal (#dfeaea) at 40%
+}

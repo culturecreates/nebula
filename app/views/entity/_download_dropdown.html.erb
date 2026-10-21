@@ -7,10 +7,10 @@
     data-bs-toggle="dropdown"
     aria-expanded="false"
   >
-    Download
+    <%= t("entity.download.title") %>
   </a>
   <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-    <li><%= link_to "JSON-LD for schema.org",
+    <li><%= link_to t("entity.download.menu_jsonld_schema_org"),
       entity_path(
         uri: entity.entity_uri,
         format: :jsonld,
@@ -20,19 +20,19 @@
       data: {
         turbo_prefetch: false,
       } %></li>
-    <li><%= link_to "JSON-LD 1.0",
+    <li><%= link_to t("entity.download.menu_jsonld_1_0"),
       entity_path(uri: entity.entity_uri, format: :jsonld),
       class: "dropdown-item",
       data: {
         turbo_prefetch: false,
       } %></li>
-    <li><%= link_to "JSON-LD 1.2 with annotations",
+    <li><%= link_to t("entity.download.menu_jsonld_1_2_annotations"),
       entity_path(uri: entity.entity_uri, format: :jsonlds),
       class: "dropdown-item",
       data: {
         turbo_prefetch: false,
       } %></li>
-    <li><%= link_to "Turtle",
+    <li><%= link_to t("entity.download.menu_turtle"),
       entity_path(uri: entity.entity_uri, format: :ttl),
       class: "dropdown-item",
       data: {

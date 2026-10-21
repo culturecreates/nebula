@@ -2,6 +2,10 @@
   class="dropdown d-inline-block"
   data-controller="refresh-entity"
   data-refresh-entity-uri-value="<%= entity.entity_uri %>"
+  data-refresh-entity-preview-title-value="<%= t("entity.refresh.preview_title") %>"
+  data-refresh-entity-calculating-value="<%= t("entity.refresh.calculating") %>"
+  data-refresh-entity-nothing-to-update-value="<%= t("entity.refresh.nothing_to_update") %>"
+  data-refresh-entity-error-value="<%= t("entity.refresh.error") %>"
 >
   <a
     class="dropdown-toggle text-decoration-none me-2"
@@ -12,7 +16,7 @@
     aria-expanded="false"
     rel="nofollow"
   >
-    Refresh
+    <%= t("entity.refresh.title") %>
   </a>
   <ul class="dropdown-menu" aria-labelledby="refreshDropdownLink">
     <li>
@@ -22,7 +26,7 @@
         rel="nofollow"
         data-action="click->refresh-entity#refresh"
       >
-        Refresh all
+        <%= t("entity.refresh.all") %>
       </a>
     </li>
     <% sources = authorized_external_identifier_sources(entity) %>

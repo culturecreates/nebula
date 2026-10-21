@@ -2,7 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 import * as bootstrap from "bootstrap"
 
 export default class extends Controller {
-  static values = { uri: String }
+  static values = {
+    uri: String,
+    previewTitle: String,
+    calculating: String,
+    nothingToUpdate: String,
+    error: String
+  }
 
   connect() {
     this.modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("dryrunModal"))
@@ -15,8 +21,8 @@ export default class extends Controller {
   refresh(event) {
     event.preventDefault()
     const source = event.params.source
-    this.modalLabel.textContent = source ? `Refresh Preview — ${event.target.textContent.trim()}` : "Refresh Preview"
-    this.modalBody.innerHTML = "<div class='text-center'><span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Calculating...</div>"
+    this.modalLabel.textContent = source ? `${this.previewTitleValue} — ${event.target.textContent.trim()}` : this.previewTitleValue
+    this.modalBody.innerHTML = `<div class='text-center'><span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> ${this.calculatingValue}</div>`
     this.okBtn.disabled = true // Ensure button is disabled on each refresh
     this.modal.show()
 
@@ -30,7 +36,7 @@ export default class extends Controller {
           return;
         }
         if (data.message.trim() === "") {
-          this.modalBody.innerHTML = "<p>Nothing to update.</p>" + (data.rescues ? data.rescues : "");
+          this.modalBody.innerHTML = `<p>${this.nothingToUpdateValue}</p>` + (data.rescues ? data.rescues : "");
           this.okBtn.disabled = true;
           return;
         }
@@ -46,7 +52,7 @@ export default class extends Controller {
         };
       })
       .catch(error => {
-        alert("Error: " + error.message)
+        alert(`${this.errorValue}: ${error.message}`)
       });
   }
 
