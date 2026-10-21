@@ -1,5 +1,8 @@
 <%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container', data: { controller: "wikidata-type" }) do |form| %>
   <% selected_type = type.presence || @wikidata_person_type %>
+  <%# Label submitted with the form so the reloaded page can show it without asking the suggest service %>
+  <% type_label = params[:type_label].to_s %>
+  <% type_label = selected_type unless type_label == selected_type || type_label.end_with?("(#{selected_type})") %>
   <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
       <%= form.radio_button :tab_type,
@@ -109,10 +112,19 @@
           type="text"
           class="form-control"
           autocomplete="off"
-          value="<%= selected_type %>"
+          name="type_label"
+          value="<%= type_label %>"
           data-recon-suggest-target="input"
           data-action="input->recon-suggest#search keydown.esc->recon-suggest#closeResults"
         >
+        <div
+          class="position-absolute top-0 bottom-0 end-0 d-flex align-items-center pe-3 d-none"
+          data-recon-suggest-target="spinner"
+        >
+          <div class="spinner-border spinner-border-sm text-secondary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
         <ul class="dropdown-menu" data-recon-suggest-target="results"></ul>
       </div>
     </div>

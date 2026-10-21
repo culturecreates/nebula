@@ -17,7 +17,7 @@ class MintController < ApplicationController
       @classToMint = params[:classToMint]
 
       @label = params[:label]
-      @dataset =  params[:dataset]
+      @dataset = params[:dataset].presence
       @user_uri = user_uri
 
       # get extra data about the entity when only externalUri is provided
@@ -35,6 +35,11 @@ class MintController < ApplicationController
       if !@dataset
         datasets = [RDF::URI(@externalUri), RDF::URI("http://rdfs.org/ns/void#inDataset"), nil]
         @dataset =  @entity.graph.query(datasets)&.first&.object&.value
+      end
+
+      # Wikidata entities carry no void:inDataset; use the Artsdata Wikidata dataset
+      if @dataset.blank? && @externalUri.start_with?("http://www.wikidata.org/entity/")
+        @dataset = "http://kg.artsdata.ca/resource/K1-20"
       end
 
       if !@label
@@ -66,7 +71,7 @@ class MintController < ApplicationController
   # GET /mint/link
   def link 
     required = [:externalUri, :classToMint, :adUri, :dataset]
-    if required.all? { |k| params.key? k } 
+    if required.all? { |k| params[k].present? }
       @externalUri = params[:externalUri]
       @classToMint =  if params[:classToMint].starts_with?("http") 
                         params[:classToMint]
