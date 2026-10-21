@@ -22,7 +22,7 @@
                 <%= display_object(triple.object) %>
               <% end %>
             <% elsif triple.object.uri? %>
-              <% if auto_dereference(triple.object.to_s) %>
+              <% if auto_dereference(triple.object.to_s, triple.predicate) %>
                 <turbo-frame
                   id='card-<%= @frame_id %>'
                   src="<%= dereference_card_path(uri: triple.object.to_s, frame_id: @frame_id)%>"
