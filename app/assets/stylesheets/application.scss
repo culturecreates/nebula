@@ -55,7 +55,8 @@ a:hover {
 .statement-predicate {
   background-color: rgb(246, 243, 243);
   width: 20%;
-  word-break:break-all;
+  word-break: normal;
+  overflow-wrap: anywhere; // wrap at spaces; only split a long word if it can't fit
   flex-shrink: 0;
   overflow: auto;
   padding: 15px;
@@ -245,7 +246,7 @@ a:hover {
   font-size: 1.1rem;
   line-height: 1.4;
   max-width: 65ch;
-  margin: -0.25rem 0 0.5rem;
+  margin: -0.25rem 0 0.15rem;
   // clamp very long descriptions; full value is still in the statements table
   display: -webkit-box;
   -webkit-line-clamp: 3;
