@@ -85,6 +85,8 @@ fr:
   entity:
     view_dataset: "Voir le jeu de données"
     non_authoritative: "Non autoritaire"
+    non_authoritative_tooltip: "Cet URI provient d'un flux de données externe"
+    in_dataset: "Dans le jeu de données"
     revisions: "Révisions"
     generated: "Créé"
     modified: "Modifié"

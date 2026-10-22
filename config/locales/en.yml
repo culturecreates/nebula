@@ -112,6 +112,8 @@ en:
   entity:
     view_dataset: "View dataset"
     non_authoritative: "Non-authoritative"
+    non_authoritative_tooltip: "This URI comes from an external data feed"
+    in_dataset: "In dataset"
     revisions: "Revisions"
     generated: "Created"
     modified: "Modified"

@@ -19,17 +19,21 @@
                           loading="lazy"
                           target="_top">
           </turbo-frame>
+        <% else %>
+          <small class="text-muted">
+            <span title="<%= t("entity.non_authoritative_tooltip") %>">
+              <i class="fa-solid fa-circle-info"></i>
+              <%= t("entity.non_authoritative") %>
+            </span>
+            <turbo-frame    id='source-graph-info'
+                            src="<%= source_graph_show_path(uri: @entity.entity_uri) %>"
+                            loading="lazy"
+                            target="_top">
+            </turbo-frame>
+          </small>
         <% end %>
       </div>
       <%= render partial: "entity_nav" %>
-      <% if !is_authoritative(@entity.entity_uri) %>
-        <%= t("entity.non_authoritative") %>
-        <turbo-frame    id='source-graph-info'
-                        src="<%= source_graph_show_path(uri: @entity.entity_uri) %>"
-                        loading="lazy"
-                        target="_top">
-        </turbo-frame>
-      <% end %>
     </div>
     <% if @entity.image.present? %>
       <a href="<%= @entity.image %>"><img
