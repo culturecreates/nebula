@@ -63,9 +63,16 @@ export default class extends Controller {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json",
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
       body: JSON.stringify(body)
+    }).then(response => {
+      // Error pages (HTML) would make response.json() throw an opaque parse error (Safari: "The string did not match the expected pattern")
+      if (!(response.headers.get("Content-Type") || "").includes("json")) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      return response
     })
   }
 }

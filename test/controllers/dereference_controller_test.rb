@@ -1,6 +1,8 @@
 require "test_helper"
 
 class DereferenceControllerTest < ActionDispatch::IntegrationTest
+  TURBO = { "Turbo-Frame" => "card-1" }.freeze
+
   setup do
     Entity.any_instance.stubs(:label).returns(nil)
     Entity.any_instance.stubs(:type).returns(RDF::URI("http://schema.org/Thing"))
@@ -22,21 +24,22 @@ class DereferenceControllerTest < ActionDispatch::IntegrationTest
     uri = "http://kg.artsdata.ca/resource/K23-300"
     Entity.any_instance.expects(:load_card).once
 
-    get dereference_card_path(uri: uri, frame_id: "1")
+    get dereference_card_path(uri: uri, frame_id: "1"), headers: TURBO
     assert_response :success
 
-    get dereference_card_path(uri: uri, frame_id: "2")
+    get dereference_card_path(uri: uri, frame_id: "2"), headers: TURBO
     assert_response :success
   end
 
-  test "card with refresh param bypasses the cache and reloads" do
+  test "card with refresh param bypasses the cache and reloads for signed-in users" do
+    ApplicationController.any_instance.stubs(:user_signed_in?).returns(true)
     uri = "http://kg.artsdata.ca/resource/K23-300"
     Entity.any_instance.expects(:load_card).twice
 
-    get dereference_card_path(uri: uri, frame_id: "1")
+    get dereference_card_path(uri: uri, frame_id: "1"), headers: TURBO
     assert_response :success
 
-    get dereference_card_path(uri: uri, frame_id: "1", refresh: true)
+    get dereference_card_path(uri: uri, frame_id: "1", refresh: true), headers: TURBO
     assert_response :success
   end
 
@@ -51,13 +54,20 @@ class DereferenceControllerTest < ActionDispatch::IntegrationTest
     assert_match "K23-300", response.body
   end
 
-  test "card redirects instead of rendering blank when it fails outside a turbo-frame request" do
+  test "card refresh param does not bypass the cache for anonymous users" do
     uri = "http://kg.artsdata.ca/resource/K23-300"
-    Entity.any_instance.stubs(:load_card).raises(StandardError, "boom")
+    Entity.any_instance.expects(:load_card).once
 
-    get dereference_card_path(uri: uri, frame_id: "1")
+    get dereference_card_path(uri: uri, frame_id: "1"), headers: TURBO
+    get dereference_card_path(uri: uri, frame_id: "1", refresh: true), headers: TURBO
+    assert_response :success
+  end
 
-    assert_redirected_to root_path
-    assert_match "boom", flash[:alert].message
+  test "card rejects requests that are not turbo-frame fetches" do
+    Entity.any_instance.expects(:load_card).never
+
+    get dereference_card_path(uri: "http://kg.artsdata.ca/resource/K23-300", frame_id: "1")
+
+    assert_response :forbidden
   end
 end

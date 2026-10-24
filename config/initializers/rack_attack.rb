@@ -24,6 +24,17 @@ class Rack::Attack
   throttle("home/ip", limit: 20, period: 1.minute) do |req|
     req.ip if req.get? && req.path =~ %r{\A/(en|fr)?/?\z}
   end
+
+  # /dereference/card fans out once per URI triple on an entity page, so allow
+  # a busy page's burst but stop crawlers; /dereference/external fetches a
+  # third-party site per request.
+  throttle("dereference_card/ip", limit: 60, period: 1.minute) do |req|
+    req.ip if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/card\z}
+  end
+
+  throttle("dereference_external/ip", limit: 10, period: 1.minute) do |req|
+    req.ip if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/external}
+  end
 end
 
 # Keep the throttled response itself cheap - plain text, no view rendering.

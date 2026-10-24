@@ -2,3 +2,7 @@
 
 User-agent: *
 Crawl-delay: 10
+Disallow: /dereference/
+Disallow: /*/dereference/
+Disallow: /maintenance/
+Disallow: /*refresh=

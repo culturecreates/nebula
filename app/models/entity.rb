@@ -5,6 +5,7 @@ class Entity
 
   # Timeout to dereference Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
   WIKIDATA_QUERY_TIMEOUT = 2 # seconds
+  DEREFERENCE_TIMEOUT = 15 # seconds
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
@@ -177,7 +178,8 @@ class Entity
     # first try proper content negotiation
     begin
       options = { rdfstar: true, headers: {"User-Agent" => "artsdata-crawler" } }
-      @graph = RDF::Graph.load(self.entity_uri, **options)
+      # RDF::Graph.load has no timeout of its own; don't let one slow site hold a worker.
+      @graph = Timeout.timeout(DEREFERENCE_TIMEOUT) { RDF::Graph.load(self.entity_uri, **options) }
       # An HTML page may be matched by only one of the RDFa/microdata readers
       # and miss embedded JSON-LD, so always read all three from HTML.
       @graph = load_html_structured_data(options) if @graph.empty? || html_content_type?(options)

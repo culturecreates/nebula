@@ -10,6 +10,9 @@ class DereferenceController < ApplicationController
   # since a single busy entity page can fan out into many card requests
   # (one per triple whose object is a URI).
   layout "embed", only: [:card]
+  # Crawlers follow these links as plain GETs; each one can cost a SPARQL
+  # round-trip, so reject anything that isn't a turbo-frame fetch.
+  before_action :require_turbo_frame, only: [:card]
 
   # /dereference/card?uri=
   def card
@@ -17,7 +20,9 @@ class DereferenceController < ApplicationController
     @uri = params[:uri]
     # The refresh button on the card bypasses the cache by clearing it
     # first, so the fetch below always reloads on this request.
-    Rails.cache.delete(["dereference_card", @uri]) if params[:refresh].present?
+    # Signed-in users only: bots following the refresh link would otherwise
+    # bypass the cache on every request.
+    Rails.cache.delete(["dereference_card", @uri]) if params[:refresh].present? && user_signed_in?
     # Card data (name, dates, address) doesn't need per-request freshness,
     # and the same popular URIs (venues, performers, organizations) get
     # dereferenced repeatedly across many different pages - cache the
@@ -57,6 +62,10 @@ class DereferenceController < ApplicationController
   end
 
   private
+  def require_turbo_frame
+    head :forbidden unless turbo_frame_request?
+  end
+
   def failed_dereference(exception)
      # Get the format of the initial request
     request_format = request.format.symbol

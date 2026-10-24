@@ -41,7 +41,8 @@ class MaintenanceController < ApplicationController
     end
     if dryrun
       if response.code != 200
-        message =  "#{CGI.escapeHTML(response["message"])}"
+        # The API's error body may not be JSON (e.g. an HTML 502 page), so response["message"] can be nil
+        message = CGI.escapeHTML((response.parsed_response.is_a?(Hash) && response["message"]) || "Artsdata Maintenance API returned #{response.code}: #{response.body.to_s.truncate(300)}")
         render json: { message: message }, status: :service_unavailable
       else
         formated_items = format_logs(JSON.parse(response.body)['logs'])
