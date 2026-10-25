@@ -65,11 +65,16 @@ class EntityDereferenceHtmlTest < ActiveSupport::TestCase
   end
 
   def dereference
-    VCR.turned_off do
-      entity = Entity.new(entity_uri: URL)
-      entity.dereference
-      entity.graph
+    graph = nil
+    # the RDF readers print parse warnings (e.g. legal doctype) to stderr; keep the test output clean
+    capture_io do
+      VCR.turned_off do
+        entity = Entity.new(entity_uri: URL)
+        entity.dereference
+        graph = entity.graph
+      end
     end
+    graph
   end
 
   test "extracts JSON-LD embedded in an HTML page" do
