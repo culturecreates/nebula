@@ -30,8 +30,7 @@ class ReconService
    # Build the URL
    @recon_uri.query = "queries=" + CGI.escape(query.to_json)
 
-   # Print the URL
-   puts "URL: #{@recon_uri}"
+   Rails.logger.debug { "Recon URL: #{@recon_uri}" }
    
    # TODO: bring back  Net::HTTP::Get.new(uri) native solution instead of HTTParty
    HTTParty.get(@recon_uri, :headers => headers, :timeout => TIMEOUT)
