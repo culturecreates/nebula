@@ -187,7 +187,7 @@ module ApplicationHelper
   ].freeze
 
   def auto_dereference(string, predicate = nil)
-    @max ||= 7
+    @max ||= 5
     if @frame_id
       @frame_id += 1
     else
