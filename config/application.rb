@@ -39,6 +39,9 @@ module Nebula
     config.i18n.default_locale = :en
     config.i18n.available_locales = [:en, :fr]
     config.artsdata_mcp_endpoint = ENV.fetch("ARTSDATA_MCP_ENDPOINT", "https://mcp.artsdata.ca/mcp")
+    # GraphDB repository name (not a secret) - appended to graph_api_endpoint
+    # as /repositories/<name>. Override per environment if one ever differs.
+    config.graph_repository = "artsdata"
 
   end
 end
