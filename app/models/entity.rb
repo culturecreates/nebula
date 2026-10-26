@@ -626,7 +626,7 @@ class Entity
 
   def artsdata_client
     @@artsdata_client ||= ArtsdataGraph::V2::Client.new(
-        graph_repository: Rails.application.credentials.graph_repository, 
+        graph_repository: Rails.application.config.graph_repository, 
         api_endpoint: Rails.application.config.graph_api_endpoint)
   end
 
