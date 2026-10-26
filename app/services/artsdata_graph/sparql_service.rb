@@ -20,7 +20,7 @@ module ArtsdataGraph
     end
 
     def self.sparql_endpoint
-      "#{Rails.application.config.graph_api_endpoint}/repositories/#{Rails.application.credentials.graph_repository}"
+      "#{Rails.application.config.graph_api_endpoint}/repositories/#{Rails.application.config.graph_repository}"
     end
 
     def self.user_agent
