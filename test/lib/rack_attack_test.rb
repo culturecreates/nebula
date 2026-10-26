@@ -41,3 +41,28 @@ class RackAttackThrottledResponderTest < ActiveSupport::TestCase
     assert_match "200s", body.first
   end
 end
+
+class RackAttackThrottleLoggingTest < ActiveSupport::TestCase
+  test "a throttle notification logs the rule, IP, counts, path and user agent" do
+    env = Rack::MockRequest.env_for("/dereference/card", "REMOTE_ADDR" => "1.2.3.4", "HTTP_USER_AGENT" => "TestBot/1.0")
+    env["rack.attack.matched"] = "dereference_card/ip"
+    env["rack.attack.match_data"] = { count: 61, limit: 60, period: 60, epoch_time: 30 }
+    request = Rack::Attack::Request.new(env)
+
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      ActiveSupport::Notifications.instrument("throttle.rack_attack", request: request)
+    ensure
+      Rails.logger = original_logger
+    end
+
+    line = io.string
+    assert_match "rack_attack throttle rule=dereference_card/ip", line
+    assert_match "ip=1.2.3.4", line
+    assert_match "count=61 limit=60 period=60", line
+    assert_match "path=/dereference/card", line
+    assert_match 'ua="TestBot/1.0"', line
+  end
+end

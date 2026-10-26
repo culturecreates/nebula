@@ -66,3 +66,17 @@ Rack::Attack.throttled_responder = lambda do |request|
     [429, headers.merge("Content-Type" => "text/plain"), ["Too many requests. Please try again in #{retry_after}s.\n"]]
   end
 end
+
+# Log each throttled request so the throttles' impact shows up in the app log
+# (Heroku's router only records a bare status=429). One line per request,
+# tagged with the rule name so it's easy to grep/count, e.g.
+#   heroku logs | grep "rack_attack throttle" | grep dereference_card
+ActiveSupport::Notifications.subscribe("throttle.rack_attack") do |_name, _start, _finish, _id, payload|
+  req = payload[:request]
+  match_data = req.env["rack.attack.match_data"] || {}
+  Rails.logger.warn(
+    "rack_attack throttle rule=#{req.env['rack.attack.matched']} ip=#{req.ip} " \
+    "count=#{match_data[:count]} limit=#{match_data[:limit]} period=#{match_data[:period]} " \
+    "path=#{req.path} ua=#{req.user_agent.inspect}"
+  )
+end
