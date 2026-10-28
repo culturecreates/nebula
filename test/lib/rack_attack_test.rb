@@ -66,3 +66,47 @@ class RackAttackThrottleLoggingTest < ActiveSupport::TestCase
     assert_match 'ua="TestBot/1.0"', line
   end
 end
+
+class RackAttackEntitySerialisationsThrottleTest < ActiveSupport::TestCase
+  setup do
+    @original_store = Rack::Attack.cache.store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+    @app = Rack::Attack.new(->(_env) { [200, {}, ["ok"]] })
+  end
+
+  teardown do
+    Rack::Attack.cache.store = @original_store
+  end
+
+  # Each request comes from a different IP, as in a distributed crawl.
+  def statuses(path, count, method: "GET")
+    (1..count).map do |i|
+      env = Rack::MockRequest.env_for(path, method: method, "REMOTE_ADDR" => "10.0.#{i / 250}.#{i % 250 + 1}")
+      @app.call(env).first
+    end
+  end
+
+  test "entity.jsonld is throttled globally once the limit is passed, whatever the IP" do
+    result = statuses("/en/entity.jsonld?uri=http://example.org/x", 121)
+
+    assert_equal [200], result.first(120).uniq
+    assert_equal 429, result.last
+  end
+
+  test "entity.ttl and locale-less paths share the same global counter" do
+    statuses("/entity.ttl?uri=http://example.org/x", 60)
+    statuses("/fr/entity.jsonld?uri=http://example.org/x", 60)
+
+    assert_equal [429], statuses("/entity.ttl?uri=http://example.org/x", 1)
+  end
+
+  test "the HTML entity page and its fragments are never throttled by this rule" do
+    %w[/entity /en/entity /entity/property_claims].each do |path|
+      assert_equal [200], statuses("#{path}?uri=http://example.org/x", 130).uniq, path
+    end
+  end
+
+  test "non-GET requests are not counted" do
+    assert_equal [200], statuses("/entity.jsonld", 130, method: "POST").uniq
+  end
+end
