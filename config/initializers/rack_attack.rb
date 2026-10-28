@@ -35,6 +35,14 @@ class Rack::Attack
   throttle("dereference_external/ip", limit: 10, period: 1.minute) do |req|
     req.ip if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/external}
   end
+
+  # Distributed crawlers stay under every per-IP limit, so cap the machine-readable
+  # entity serialisations globally (keyed on a constant, not the IP). These are the
+  # expensive requests (graph load + framing; .jsonld also self-fetches /context.jsonld).
+  # The HTML /entity page and its fragments are deliberately not included.
+  throttle("entity_serialisations/global", limit: 120, period: 1.minute) do |req|
+    "all" if req.get? && req.path =~ %r{\A/(en|fr)?/?entity\.(jsonld|jsonlds|ttl|ttls|rdf)\z}
+  end
 end
 
 # Keep the throttled response itself cheap - plain text, no view rendering.
