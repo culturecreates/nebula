@@ -50,6 +50,17 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "Step 1"
   end
 
+  test "wikidata form keeps the original tab and type so the next search can detect a mismatch" do
+    stub_wikidata_label_query
+
+    get mint_wikidata_url, params: { uri: "Q1", type: "Q5", tab_type: "Q43229", classToMint: "schema:Person" }
+
+    assert_response :success
+    assert_select "input#organization[checked]"
+    assert_select "input#person[checked]", false
+    assert_select "input[name=type][value=Q5]"
+  end
+
   test "wikidata mint proceeds directly once the user confirms classToMint" do
     stub_wikidata_label_query
 

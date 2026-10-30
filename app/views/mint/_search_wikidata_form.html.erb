@@ -1,5 +1,8 @@
 <%= form_with(url: mint_wikidata_path, method: :get, local: true, class: 'container', data: { controller: "wikidata-type" }) do |form| %>
-  <% selected_type = type.presence || @wikidata_person_type %>
+  <% broad_types = [@wikidata_person_type, @wikidata_organization_type, @wikidata_place_type] %>
+  <%# The tab the user started from, kept separate from the (possibly custom) type so a class mismatch is still detected on the next search %>
+  <% selected_tab = tab_type.presence || (type if broad_types.include?(type)) || @wikidata_person_type %>
+  <% selected_type = type.presence || selected_tab %>
   <%# Label submitted with the form so the reloaded page can show it without asking the suggest service %>
   <% type_label = params[:type_label].to_s %>
   <% type_label = selected_type unless type_label == selected_type || type_label.end_with?("(#{selected_type})") %>
@@ -9,7 +12,7 @@
                        @wikidata_person_type,
                        class: "d-none",
                        id: "person",
-                       checked: selected_type == @wikidata_person_type,
+                       checked: selected_tab == @wikidata_person_type,
                        data: {
                          action: "change->wikidata-type#updateType",
                          wikidata_type_target: "tabType",
@@ -17,7 +20,7 @@
       <%= form.label :person,
                  t("minting_wikidata.person_tab"),
                  class:
-                   "nav-link #{"active" if selected_type == @wikidata_person_type}",
+                   "nav-link #{"active" if selected_tab == @wikidata_person_type}",
                  data: {
                    bs_toggle: "tab",
                    bs_target: "#person-content",
@@ -28,14 +31,14 @@
                        @wikidata_organization_type,
                        class: "d-none",
                        id: "organization",
-                       checked: selected_type == @wikidata_organization_type,
+                       checked: selected_tab == @wikidata_organization_type,
                        data: {
                          action: "change->wikidata-type#updateType",
                          wikidata_type_target: "tabType",
                        } %>
       <%= form.label :organization,
                  t("minting_wikidata.organization_tab"),
-                 class: "nav-link #{"active" if selected_type == @wikidata_organization_type}",
+                 class: "nav-link #{"active" if selected_tab == @wikidata_organization_type}",
                  data: {
                   bs_toggle: "tab",
                   bs_target: "#organization-content",
@@ -46,14 +49,14 @@
                        @wikidata_place_type,
                        class: "d-none",
                        id: "place",
-                       checked: selected_type == @wikidata_place_type,
+                       checked: selected_tab == @wikidata_place_type,
                        data: {
                          action: "change->wikidata-type#updateType",
                          wikidata_type_target: "tabType",
                        } %>
       <%= form.label :place,
                  t("minting_wikidata.place_tab"),
-                 class: "nav-link #{"active" if selected_type == @wikidata_place_type}",
+                 class: "nav-link #{"active" if selected_tab == @wikidata_place_type}",
                  data: {
                   bs_toggle: "tab",
                   bs_target: "#place-content",
@@ -64,7 +67,7 @@
   <div class="tab-content" id="myTabContent">
 
     <div
-      class="tab-pane fade <%= "show active" if selected_type == @wikidata_person_type %>"
+      class="tab-pane fade <%= "show active" if selected_tab == @wikidata_person_type %>"
       id="person-content"
       role="tabpanel"
     >
@@ -74,7 +77,7 @@
       </p>
     </div>
     <div
-      class="tab-pane fade <%= "show active" if selected_type == @wikidata_organization_type %>"
+      class="tab-pane fade <%= "show active" if selected_tab == @wikidata_organization_type %>"
       id="organization-content"
       role="tabpanel"
     >
@@ -84,7 +87,7 @@
       </p>
     </div>
     <div
-      class="tab-pane fade <%= "show active" if selected_type == @wikidata_place_type %>"
+      class="tab-pane fade <%= "show active" if selected_tab == @wikidata_place_type %>"
       id="place-content"
       role="tabpanel"
     >

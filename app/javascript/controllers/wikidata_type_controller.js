@@ -14,7 +14,7 @@ export default class extends Controller {
 
   updateTypeFromSelectedTab() {
     const selectedTab = this.tabTypeTargets.find((tabType) => tabType.checked)
-    if (selectedTab && this.hasTypeFieldTarget) {
+    if (selectedTab && this.hasTypeFieldTarget && !this.typeFieldTarget.value) {
       this.typeFieldTarget.value = selectedTab.value
     }
   }
