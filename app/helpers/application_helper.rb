@@ -179,11 +179,14 @@ module ApplicationHelper
   # sets a limit on the number of dereferences per table.
   # Note that derived statements are a separate table.
   # The offset is used to ensure that multiple tables have different frame_ids.
-  # Rows with an rdf:type or schema:url predicate are never auto-dereferenced
+  # Rows with an rdf:type, schema:url, schema:eventStatus or
+  # schema:eventAttendanceMode predicate are never auto-dereferenced
   # and do not count toward the limit (they still get a unique frame_id).
   NO_AUTO_DEREFERENCE_PREDICATES = [
     RDF.type.to_s,
-    "http://schema.org/url"
+    "http://schema.org/url",
+    "http://schema.org/eventStatus",
+    "http://schema.org/eventAttendanceMode"
   ].freeze
 
   def auto_dereference(string, predicate = nil)
