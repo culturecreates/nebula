@@ -6,6 +6,9 @@ class Entity
   # Timeout to dereference Wikidata entities not in Artsdata, to prevent bottlenecks if Wikidata is slow.
   WIKIDATA_QUERY_TIMEOUT = 2 # seconds
   DEREFERENCE_TIMEOUT = 15 # seconds
+  # Largest external page /dereference/external will read into memory.
+  MAX_DEREFERENCE_BYTES = 5 * 1024 * 1024
+  DEREFERENCE_ACCEPT = "application/ld+json, text/turtle, application/rdf+xml, application/n-triples, text/html;q=0.8".freeze
 
   def initialize(**h) 
     @entity_uri = h[:entity_uri]
@@ -173,20 +176,18 @@ class Entity
   end
 
   # load rdf from external URL
+  # The page is fetched once, with a byte cap, and parsed from memory so a huge
+  # or hostile response can't balloon the worker's heap.
   def dereference
-    @graph = RDF::Graph.new 
-    # first try proper content negotiation
+    headers = { "User-Agent" => "artsdata-crawler" }
     begin
-      options = { rdfstar: true, headers: {"User-Agent" => "artsdata-crawler" } }
-      # RDF::Graph.load has no timeout of its own; don't let one slow site hold a worker.
-      @graph = Timeout.timeout(DEREFERENCE_TIMEOUT) { RDF::Graph.load(self.entity_uri, **options) }
-      # An HTML page may be matched by only one of the RDFa/microdata readers
-      # and miss embedded JSON-LD, so always read all three from HTML.
-      @graph = load_html_structured_data(options) if @graph.empty? || html_content_type?(options)
+      body, content_type = fetch_limited(headers)
+      @graph = parse_dereferenced(body, content_type)
       raise "No JSON-LD, RDFa or microdata found on this page" if @graph.empty?
+    rescue ResponseTooLarge => e
+      raise StandardError, e.message
     rescue RDF::FormatError
-      @graph = load_html_structured_data(options)
-      raise StandardError, "Could not detect structured data (JSON-LD, RDFa or microdata) on this page." if @graph.empty?
+      raise StandardError, "Could not detect structured data (JSON-LD, RDFa or microdata) on this page."
     rescue StandardError => e
       msg = "Could not detect structured data. #{e}"
       if msg.end_with?("Connection reset by peer")
@@ -196,11 +197,39 @@ class Entity
     end
   end
 
+  class ResponseTooLarge < StandardError; end
+
+  # Stream the response and abort as soon as it exceeds MAX_DEREFERENCE_BYTES.
+  # Returns [body, content_type].
+  def fetch_limited(headers)
+    body = String.new
+    headers = headers.merge("Accept" => DEREFERENCE_ACCEPT)
+    response = Timeout.timeout(DEREFERENCE_TIMEOUT) do
+      HTTParty.get(self.entity_uri, headers: headers, timeout: 15) do |fragment|
+        body << fragment
+        raise ResponseTooLarge, "The page is larger than #{MAX_DEREFERENCE_BYTES / 1.megabyte}MB and was not loaded." if body.bytesize > MAX_DEREFERENCE_BYTES
+      end
+    end
+    [body.force_encoding(Encoding::UTF_8), response.headers["content-type"].to_s]
+  end
+
+  # Parse an RDF serialization by content type, otherwise (HTML, or a type with
+  # no reader) look for embedded JSON-LD, RDFa and microdata.
+  def parse_dereferenced(body, content_type)
+    reader_class = RDF::Reader.for(content_type: content_type.split(";").first.to_s.strip) unless content_type.include?("html")
+    return load_html_structured_data(body) unless reader_class
+
+    graph = RDF::Graph.new
+    begin
+      reader_class.new(body, base_uri: self.entity_uri, rdfstar: true) { |reader| graph << reader }
+    rescue RDF::FormatError
+      return load_html_structured_data(body)
+    end
+    graph
+  end
 
   # Extract JSON-LD, RDFa and microdata from an HTML web page.
-  def load_html_structured_data(options)
-    response = HTTParty.get(self.entity_uri, headers: options[:headers], timeout: 30)
-    html = response.body.to_s
+  def load_html_structured_data(html)
     base = self.entity_uri
     graph = RDF::Graph.new
 
@@ -227,12 +256,6 @@ class Entity
       end
     end
     graph
-  end
-
-  def html_content_type?(options)
-    HTTParty.head(self.entity_uri, headers: options[:headers], timeout: 15).headers['content-type'].to_s.include?('html')
-  rescue StandardError
-    false
   end
 
   def property_claims(predicate:)

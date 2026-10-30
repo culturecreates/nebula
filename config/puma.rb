@@ -55,6 +55,23 @@ nakayoshi_fork true
 # worker processes. Drop those memoized clients before/after forking so
 # each worker lazily rebuilds its own connection on first use.
 before_fork do
+  # A worker that grows past the dyno quota starts swapping and drags every
+  # request on that dyno with it (Heroku R14). puma_worker_killer watches
+  # total memory from the master and SIGTERMs the largest worker when it
+  # crosses the threshold; Puma finishes in-flight requests, then the master
+  # boots a fresh worker. Tune with PUMA_RAM_MB / PUMA_RAM_PERCENT, or set
+  # PUMA_WORKER_KILLER=off to disable.
+  if %w[production staging].include?(ENV["RAILS_ENV"]) && ENV["PUMA_WORKER_KILLER"] != "off"
+    require "puma_worker_killer"
+    PumaWorkerKiller.config do |config|
+      config.ram           = Integer(ENV.fetch("PUMA_RAM_MB", 1024)) # Standard-2X quota
+      config.percent_usage = Float(ENV.fetch("PUMA_RAM_PERCENT", 0.92)) # ~940MB; steady state is ~780MB
+      config.frequency     = 20 # seconds between checks
+      config.reaper_status_logs = true
+      config.rolling_restart_frequency = false # with 1 worker per dyno a scheduled restart means a gap in service
+    end
+    PumaWorkerKiller.start
+  end
   Entity.send(:class_variable_set, :@@artsdata_client, nil) if Entity.class_variable_defined?(:@@artsdata_client)
   Entity.send(:class_variable_set, :@@wikidata_client, nil) if Entity.class_variable_defined?(:@@wikidata_client)
 end
