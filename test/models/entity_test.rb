@@ -128,6 +128,31 @@ class EntityDereferenceHtmlTest < ActiveSupport::TestCase
     error = assert_raises(StandardError) { dereference }
     assert_match(/Could not detect structured data/, error.message)
   end
+
+  test "parses a Turtle response without an HTML fallback" do
+    stub_page("<#{URL}> <http://schema.org/name> \"Turtle Event\" .", content_type: "text/turtle")
+
+    graph = dereference
+    assert_includes graph.objects.map(&:to_s), "Turtle Event"
+  end
+
+  test "rejects a response larger than the byte cap" do
+    stub_const_cap(100) { stub_page("<html><body>#{"x" * 500}</body></html>") }
+    error = assert_raises(StandardError) { stub_const_cap(100) { dereference } }
+    assert_match(/larger than/, error.message)
+  end
+
+  private
+
+  def stub_const_cap(bytes)
+    old = Entity::MAX_DEREFERENCE_BYTES
+    Entity.send(:remove_const, :MAX_DEREFERENCE_BYTES)
+    Entity.const_set(:MAX_DEREFERENCE_BYTES, bytes)
+    yield
+  ensure
+    Entity.send(:remove_const, :MAX_DEREFERENCE_BYTES)
+    Entity.const_set(:MAX_DEREFERENCE_BYTES, old)
+  end
 end
 
 class EntityDisambiguatingDescriptionTest < ActiveSupport::TestCase

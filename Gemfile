@@ -14,6 +14,8 @@ gem "sprockets-rails"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 5.0"
+# Restarts a Puma worker that outgrows the dyno's memory quota (see config/puma.rb)
+gem "puma_worker_killer"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
