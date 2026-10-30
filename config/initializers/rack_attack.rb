@@ -36,6 +36,14 @@ class Rack::Attack
     req.ip if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/external}
   end
 
+  # /dereference/external fetches a third-party site per request and each fetch
+  # holds a Puma thread, so a distributed crawl (many IPs, each under the per-IP
+  # limit above) can still exhaust them. Cap it globally too. /dereference/card
+  # is deliberately not capped globally.
+  throttle("dereference_external/global", limit: 60, period: 1.minute) do |req|
+    "all" if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/external}
+  end
+
   # Distributed crawlers stay under every per-IP limit, so cap the machine-readable
   # entity serialisations globally (keyed on a constant, not the IP). These are the
   # expensive requests (graph load + framing; .jsonld also self-fetches /context.jsonld).

@@ -109,4 +109,15 @@ class RackAttackEntitySerialisationsThrottleTest < ActiveSupport::TestCase
   test "non-GET requests are not counted" do
     assert_equal [200], statuses("/entity.jsonld", 130, method: "POST").uniq
   end
+
+  test "dereference/external is throttled globally once the limit is passed, whatever the IP" do
+    result = statuses("/en/dereference/external?uri=http://example.org/x", 61)
+
+    assert_equal [200], result.first(60).uniq
+    assert_equal 429, result.last
+  end
+
+  test "dereference/card has no global cap" do
+    assert_equal [200], statuses("/dereference/card?uri=http://example.org/x", 130).uniq
+  end
 end
