@@ -146,8 +146,8 @@ class ApplicationController < ActionController::Base
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
     when "refresh_entity"
       return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293")  }
-    when "merge_entity" # Level 2
-      return session[:teams].any? { |team| team.key?("10808270") }
+    when "merge_entity" # Level 1 and 2
+      return session[:teams].any? { |team| team.key?("10808270") || team.key?("10808293") }
     when "batch_operations"
       return session[:teams].any? { |team| team.key?("10808270") }
     else
