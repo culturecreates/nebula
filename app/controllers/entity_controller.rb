@@ -1,4 +1,6 @@
 class EntityController < ApplicationController
+  LOCAL_CONTEXT_DOCUMENT = JSON.parse(File.read(Rails.root.join("public", "context.jsonld"))).freeze
+
   before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
   before_action :check_delete_statement_access, only: [:delete_statement] # ensure user has permissions to delete statement like sameAs
   before_action :check_update_statement_rank_access, only: [:update_statement_rank] # ensure user has permissions to change an annotation's rank
@@ -265,12 +267,28 @@ class EntityController < ApplicationController
         '@embed'=> '@once' # Default is @once
       }
       # use artsdata @context if no valid frame is provided
-      context = "#{request.scheme}://#{request.host_with_port}/context.jsonld"
+      context = preload_local_context("#{request.scheme}://#{request.host_with_port}/context.jsonld")
       # use graph without any transforms if no valid frame is provided
       jsonld = JSON::LD::API::fromRdf(@entity.graph)
     end
 
     return [frame, context, jsonld]
+  end
+
+  # The JSON-LD gem would fetch our own /context.jsonld over HTTP from inside the
+  # request, which needs a second free Puma thread and stalls the app (30s H12
+  # timeouts) once every thread is busy. Register the file from public/ as a
+  # preloaded context for that URL so it is read from disk; the URL is still what
+  # appears in the output. Returns the URL.
+  def preload_local_context(url)
+    key = RDF::URI(url).canonicalize
+    key.scheme = "http" if key.scheme == "https" # same key the gem looks up
+    unless JSON::LD::Context::PRELOADED.key?(key.to_s)
+      JSON::LD::Context.add_preloaded(key.to_s) do
+        JSON::LD::Context.new(unfrozen: true).parse(LOCAL_CONTEXT_DOCUMENT["@context"])
+      end
+    end
+    url
   end
 
   def transform_image(graph)
