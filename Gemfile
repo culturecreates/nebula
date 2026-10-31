@@ -16,6 +16,8 @@ gem "sprockets-rails"
 gem "puma", "~> 5.0"
 # Restarts a Puma worker that outgrows the dyno's memory quota (see config/puma.rb)
 gem "puma_worker_killer"
+# Aborts a request that outlives the Heroku router's 30s limit so its Puma thread is freed
+gem "rack-timeout"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
