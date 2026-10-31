@@ -77,6 +77,20 @@ before_fork do
 end
 
 on_worker_boot do
+  # Thread dump on demand: `kill -WINCH <worker pid>` (heroku ps:exec, pid from
+  # `ps -eo pid,cmd | grep "cluster worker"`) writes every thread's Ruby
+  # backtrace to the logs. Puma 5 on Linux has no built-in way to do this.
+  # Work happens in a new thread because trap handlers can't take locks.
+  Signal.trap("WINCH") do
+    Thread.new do
+      dump = Thread.list.map do |t|
+        "#{t.inspect}\n  #{(t.backtrace || []).first(30).join("\n  ")}"
+      end
+      $stdout.write("THREAD DUMP pid=#{Process.pid} threads=#{dump.size}\n#{dump.join("\n\n")}\nEND THREAD DUMP\n")
+      $stdout.flush
+    end
+  end
+
   Entity.send(:class_variable_set, :@@artsdata_client, nil) if Entity.class_variable_defined?(:@@artsdata_client)
   Entity.send(:class_variable_set, :@@wikidata_client, nil) if Entity.class_variable_defined?(:@@wikidata_client)
   ArtsdataGraph::SparqlService.instance_variable_set(:@client, nil) if ArtsdataGraph::SparqlService.instance_variable_defined?(:@client)

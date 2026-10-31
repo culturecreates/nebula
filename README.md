@@ -43,6 +43,12 @@ Dropping to 1 worker per dyno (with `RAILS_MAX_THREADS` raised from 3 to 10 to k
 
 **Why 2 dynos, not 1 bigger one:** redundancy. With one worker per dyno, if that single worker hangs, Heroku's router still has a second, fully independent dyno to route to while Puma's cluster monitor restarts the stuck one. Scaling this app for more capacity should mean adding another dyno (`heroku ps:scale web=N`), not raising `WEB_CONCURRENCY` back up — see the memory analysis above for why that doesn't pay off on this workload. A Performance-tier dyno with dedicated cores and more headroom could change this calculus, but that hasn't been tested.
 
+**Memory guard and slow-request tools:**
+
+- `puma_worker_killer` (see `config/puma.rb`) terminates the worker when the dyno nears its quota; set `PUMA_WORKER_KILLER=off` to disable, or tune with `PUMA_RAM_MB` / `PUMA_RAM_PERCENT`.
+- `rack-timeout` aborts any request running longer than `RACK_TIMEOUT_SERVICE_TIMEOUT` (default 25s, just under the router's 30s H12) and logs `source=rack-timeout id=<request_id> ... state=timed_out`. Find the path by searching the logs for that request id.
+- Thread dump of a slow dyno: `heroku ps:exec -a artsdata-nebula --dyno=web.N`, find the worker pid with `ps -eo pid,cmd | grep "cluster worker"`, then `kill -WINCH <pid>`. The backtraces appear in `heroku logs` between `THREAD DUMP` and `END THREAD DUMP`. Take the dump before restarting a slow dyno.
+
 # Steps to run locally
 
   1. clone repo
