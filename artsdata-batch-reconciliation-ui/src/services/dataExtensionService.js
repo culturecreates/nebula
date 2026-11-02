@@ -192,7 +192,8 @@ export function filterTargetProperties(properties, entityType, config = {}) {
       if (id === 'address' || name === 'address') {
         targetProperties.push({
           ...property,
-          type: 'address'
+          type: 'address',
+          expandable: true
         });
       }
       // URL property for Places
@@ -252,7 +253,7 @@ export async function extendEntities(entityIds, properties, config = {}) {
         const propertyObj = { id: prop.id };
         // Only add expand property if the property is marked as expandable from the propose API
         if (prop.expandable === true) {
-          propertyObj.expand = true;
+          propertyObj.settings = {content: "expand"};
         }
         return propertyObj;
       })
