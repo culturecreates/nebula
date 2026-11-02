@@ -79,9 +79,10 @@ class RackAttackEntitySerialisationsThrottleTest < ActiveSupport::TestCase
   end
 
   # Each request comes from a different IP, as in a distributed crawl.
-  def statuses(path, count, method: "GET")
+  def statuses(path, count, method: "GET", cookie: nil)
     (1..count).map do |i|
       env = Rack::MockRequest.env_for(path, method: method, "REMOTE_ADDR" => "10.0.#{i / 250}.#{i % 250 + 1}")
+      env["HTTP_COOKIE"] = cookie if cookie
       @app.call(env).first
     end
   end
@@ -111,10 +112,15 @@ class RackAttackEntitySerialisationsThrottleTest < ActiveSupport::TestCase
   end
 
   test "dereference/external is throttled globally once the limit is passed, whatever the IP" do
-    result = statuses("/en/dereference/external?uri=http://example.org/x", 61)
+    result = statuses("/en/dereference/external?uri=http://example.org/x", 61, cookie: "_nebula_session=abc")
 
     assert_equal [200], result.first(60).uniq
     assert_equal 429, result.last
+  end
+
+  test "anonymous dereference/external requests (no session cookie) do not use up the global cap" do
+    assert_equal [200], statuses("/dereference/external?uri=http://example.org/x", 130).uniq
+    assert_equal [200], statuses("/dereference/external?uri=http://example.org/x", 1, cookie: "_nebula_session=abc")
   end
 
   test "dereference/card has no global cap" do

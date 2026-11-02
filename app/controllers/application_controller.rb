@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  helper_method :ensure_access, :user_has_access?, :level_2_access?
+  helper_method :ensure_access, :user_has_access?, :level_2_access?, :user_signed_in?
   before_action :set_locale, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
 
