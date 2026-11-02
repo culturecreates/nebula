@@ -40,8 +40,14 @@ class Rack::Attack
   # holds a Puma thread, so a distributed crawl (many IPs, each under the per-IP
   # limit above) can still exhaust them. Cap it globally too. /dereference/card
   # is deliberately not capped globally.
+  # Only requests carrying a session cookie count: the action requires a login, so
+  # anonymous crawler hits are just redirected to the homepage (cheap) and must not
+  # use up the cap that signed-in users share. (Rack::Attack runs before the
+  # session is decoded, so the cookie's presence is the best signal available.)
   throttle("dereference_external/global", limit: 60, period: 1.minute) do |req|
-    "all" if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/external}
+    if req.get? && req.path =~ %r{\A/(en|fr)?/?dereference/external} && req.cookies["_nebula_session"].present?
+      "all"
+    end
   end
 
   # Distributed crawlers stay under every per-IP limit, so cap the machine-readable

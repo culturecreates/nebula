@@ -1,25 +1,37 @@
+<% external_entity = !@entity.entity_uri.starts_with?("http://kg.artsdata.ca/") %>
+<%#
+  Links by visitor. Dereference requires a login, and hiding the links also keeps crawlers off them.
+
+  External URI (not kg.artsdata.ca):
+    Not signed in: no links.
+    Signed in:     Dereference | Visit | [CMS v3 | CMS v4 if cms_links access] | Reconcile (mint) | GraphDB | [Delete if delete_entity access]
+
+  Artsdata entity (kg.artsdata.ca):
+    Not signed in: Download only (no trailing bar).
+    Signed in:     Download | [Refresh if refresh_entity access] | [Merge if merge_entity access] | GraphDB | [Delete if delete_entity access]
+%>
 <div class="alternate-name d-flex align-items-center mt-1">
-  <% if !@entity.entity_uri.starts_with?("http://kg.artsdata.ca/") %>
-    <%= link_to t("entity.nav.dereference"),
-    dereference_external_path(uri: @entity.entity_uri),
-    class: "text-decoration-none me-2",
-    rel: "nofollow" %>
-    |
-    <a
-      href="<%= @entity.entity_uri %>"
-      class="text-decoration-none ms-2 me-2"
-      rel="nofollow"
-    >
-      <%= t("entity.nav.visit") %>
-    </a>
-    |
-    <% if user_has_access?("cms_links") %>
-      <%= link_to t("entity.nav.cms_v3"), footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+  <% if external_entity %>
+    <% if user_signed_in? %>
+      <%= link_to t("entity.nav.dereference"),
+      dereference_external_path(uri: @entity.entity_uri),
+      class: "text-decoration-none me-2",
+      rel: "nofollow" %>
       |
-      <%= link_to t("entity.nav.cms_v4"), footlight_export_path(uri: @entity.entity_uri, version: "v4") %>
+      <a
+        href="<%= @entity.entity_uri %>"
+        class="text-decoration-none ms-2 me-2"
+        rel="nofollow"
+      >
+        <%= t("entity.nav.visit") %>
+      </a>
       |
-    <% end %>
-    <% if session[:name] %>
+      <% if user_has_access?("cms_links") %>
+        <%= link_to t("entity.nav.cms_v3"), footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+        |
+        <%= link_to t("entity.nav.cms_v4"), footlight_export_path(uri: @entity.entity_uri, version: "v4") %>
+        |
+      <% end %>
       <%= link_to t("entity.nav.minter"),
       mint_preview_path(externalUri: @entity.entity_uri, label: @entity.label&.value),
       class: "ms-2 me-2",
@@ -29,7 +41,10 @@
     
   <% else %>
     <%= render partial: "entity/download_dropdown", locals: { entity: @entity } %>
-    |
+    <%# The bar separates Download from what follows; anonymous users only get Download. %>
+    <% if user_signed_in? %>
+      |
+    <% end %>
     <% if user_has_access?("refresh_entity") %>
       <%= render partial: "entity/refresh_dropdown", locals: { entity: @entity } %>
       |
@@ -40,21 +55,23 @@
     <% end %>
 
   <% end %>
-  <a
-    href="<%= graphdb_link(@entity.entity_uri) %>"
-    class="text-decoration-none ms-2 me-2"
-    rel="nofollow"
-    id="graphdb"
-  ><%= t("entity.nav.graphdb") %></a>
-  <% if session[:name] %>
-    |
-    <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: t("entity.nav.delete_confirm") } } do |form| %>
-      <%= form.hidden_field :uri, value: @entity.entity_uri %>
-      <%= form.submit t("entity.nav.delete"),
-                  class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
-                  data: {
-                    disable_with: t("entity.nav.deleting"),
-                  } %>
+  <% if user_signed_in? %>
+    <a
+      href="<%= graphdb_link(@entity.entity_uri) %>"
+      class="text-decoration-none ms-2 me-2"
+      rel="nofollow"
+      id="graphdb"
+    ><%= t("entity.nav.graphdb") %></a>
+    <% if user_has_access?("delete_entity") %>
+      |
+      <%= form_with url: destroy_entity_path, method: :delete, local: true, html: { data: { controller: "confirm", action: "submit->confirm#confirm", confirm: t("entity.nav.delete_confirm") } } do |form| %>
+        <%= form.hidden_field :uri, value: @entity.entity_uri %>
+        <%= form.submit t("entity.nav.delete"),
+                    class: "btn mt-0 ps-2 pe-2 p-0 alternate-name text-decoration-none",
+                    data: {
+                      disable_with: t("entity.nav.deleting"),
+                    } %>
+      <% end %>
     <% end %>
   <% end %>
  
