@@ -23,11 +23,11 @@ class FootlightController < ApplicationController
 
 
   def cms_link_v4(uri, source)
-    "https://api.artsdata.ca/query?frame=event_footlight&format=jsonld&sparql=https://raw.githubusercontent.com/culturecreates/footlight-aggregator/main/sparql/query-event-uri-v4.sparql&uri=#{CGI.escape(uri)}&source=#{CGI.escape(source)}"
+    "#{Rails.application.config.artsdata_api_endpoint}/query?frame=event_footlight&format=jsonld&sparql=https://raw.githubusercontent.com/culturecreates/footlight-aggregator/main/sparql/query-event-uri-v4.sparql&uri=#{CGI.escape(uri)}&source=#{CGI.escape(source)}"
   end
 
   def cms_link_v3(uri, source)
-    "https://api.artsdata.ca/query?frame=event_footlight&format=jsonld&sparql=https://raw.githubusercontent.com/culturecreates/footlight-aggregator/main/sparql/query-event-uri-v3.sparql&uri=#{CGI.escape(uri)}&source=#{CGI.escape(source)}"
+    "#{Rails.application.config.artsdata_api_endpoint}/query?frame=event_footlight&format=jsonld&sparql=https://raw.githubusercontent.com/culturecreates/footlight-aggregator/main/sparql/query-event-uri-v3.sparql&uri=#{CGI.escape(uri)}&source=#{CGI.escape(source)}"
   end
 
 end
