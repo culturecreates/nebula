@@ -153,7 +153,7 @@ module EntityHelper
   end
 
   def cms_link(entity) # for non-artsdata URIs
-    return "http://api.artsdata.ca/resource?uri=#{CGI.escape(entity.entity_uri)}"
+    return "#{Rails.application.config.artsdata_api_endpoint}/resource?uri=#{CGI.escape(entity.entity_uri)}"
   end
 
   # External URIs that assert schema:sameAs this entity (Wikidata, VIAF, etc.) - i.e. the
