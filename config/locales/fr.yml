@@ -37,6 +37,7 @@ fr:
     login_using_github: "Connexion avec Github"
     login: "Connexion"
     logout: "Déconnexion"
+    session_expired: "Votre session GitHub a expiré. Veuillez vous reconnecter."
   minting_wikidata:
     title: "Réconcilier avec Wikidata"
     sub_title: "Ajoutez/liez des personnes, des lieux et des organisations de Wikidata à Artsdata. Commencez par sélectionner le type et saisir le nom ou l’identifiant Wikidata. Il vous sera demandé de confirmer l’entité Wikidata avant de procéder à la création d’un identifiant Artsdata."

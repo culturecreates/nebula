@@ -83,7 +83,7 @@
   >
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-        <% if session[:handle] %>
+        <% if user_signed_in? %>
           <a class="nav-link" href="<%= github_url %>"><%= session[:handle] %></a>
         <% else %>
           <a class="nav-link" href="<%= github_url %>"><%= t("nav.login_using_github") %></a>
@@ -190,7 +190,7 @@
             <%= t("nav.reports") %>
           </a>
           <ul class="dropdown-menu">
-            <% if !session[:handle] %>
+            <% if !user_signed_in? %>
               <li>
                 <a class="dropdown-item disabled text-wrap" aria-disabled="true"><%= t("nav.login_to_view_reports") %></a>
               </li>
@@ -273,7 +273,7 @@
         </li>
 
         <li class="nav-item">
-          <% if session[:handle] %>
+          <% if user_signed_in? %>
             <a class="nav-link" href="<%= logout_url %>"><%= t("nav.logout") %></a>
           <% else %>
             <a class="nav-link" href="<%= github_url %>"><%= t("nav.login") %></a>
