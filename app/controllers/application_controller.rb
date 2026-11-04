@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   helper_method :ensure_access, :user_has_access?, :level_2_access?, :user_signed_in?
-  before_action :set_locale, :maintenance_mode?, :announcement_flash
+  before_action :set_locale, :check_session_expiry, :maintenance_mode?, :announcement_flash
   append_view_path "doc"
 
   # A failed turbo-frame request (an exception raised while handling it)
@@ -41,6 +41,16 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  # The session cookie keeps the handle after the GitHub token expires, which
+  # makes the user look signed in. Clear it and tell the user.
+  def check_session_expiry
+    return if controller_name == "github" && action_name == "callback"
+    return unless session[:handle].present? && !user_signed_in?
+
+    logout
+    flash.now[:alert] = t("nav.session_expired")
+  end
+
   # Check if user is signed in and has a valid session
   def user_signed_in?
     return false unless session[:handle].present?

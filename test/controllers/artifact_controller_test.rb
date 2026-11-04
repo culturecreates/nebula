@@ -9,7 +9,8 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
 
     # Stub session to provide the account required by the controller
     ArtifactController.any_instance.stubs(:session).returns(
-      { 'accounts' => ['testaccount'], 'handle' => 'testuser' }.with_indifferent_access
+      { 'accounts' => ['testaccount'], 'handle' => 'testuser',
+        'github_authenticated_time' => Time.now.utc.iso8601, 'github_expires_in' => 3600 }.with_indifferent_access
     )
   end
 

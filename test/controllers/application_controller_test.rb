@@ -80,4 +80,30 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, "/fr/data-dumps"
   end
 
+  test "expired GitHub session is cleared and the user is told" do
+    PagesController.any_instance.stubs(:session).returns(
+      { 'handle' => 'testuser', 'github_authenticated_time' => 2.hours.ago.utc.iso8601,
+        'github_expires_in' => 3600 }.with_indifferent_access
+    )
+
+    get root_path
+
+    assert_response :success
+    assert_includes @response.body, "Your GitHub session has expired"
+    assert_not_includes @response.body, "testuser"
+  end
+
+  test "valid GitHub session is not reported as expired" do
+    PagesController.any_instance.stubs(:session).returns(
+      { 'handle' => 'testuser', 'github_authenticated_time' => Time.now.utc.iso8601,
+        'github_expires_in' => 3600 }.with_indifferent_access
+    )
+
+    get root_path
+
+    assert_response :success
+    assert_not_includes @response.body, "Your GitHub session has expired"
+    assert_includes @response.body, "testuser"
+  end
+
 end
