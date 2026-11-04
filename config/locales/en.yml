@@ -36,6 +36,7 @@ en:
     timeout: "The reconciliation service took too long to respond. Please try again."
     unavailable: "The reconciliation service is currently unavailable. Please try again later."
   search_results: "Search Results"
+  search_entities_to_link: "Link to an existing entity:"
   loading: "Loading..."
   dashboard_title: "Dashboard for "
   favourite_reports: "Favourite Reports"

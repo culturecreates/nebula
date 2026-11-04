@@ -9,6 +9,7 @@ fr:
     timeout: "Le service de réconciliation a mis trop de temps à répondre. Veuillez réessayer."
     unavailable: "Le service de réconciliation est actuellement indisponible. Veuillez réessayer plus tard."
   search_results: "Résultats de recherche"
+  search_entities_to_link: "Lier une entité existante :"
   loading: "Chargement..."
   dashboard_title: Tableau de bord pour
   favourite_reports: "Rapports favoris"
