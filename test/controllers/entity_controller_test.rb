@@ -19,14 +19,14 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "date_modified links the modified date to the _dataset resource for Artsdata entities" do
+  test "date_modified links the modified date to the _dataset resource on the entity page of the current host" do
     uri = "http://kg.artsdata.ca/resource/K23-3076"
     Entity.any_instance.stubs(:date_modified).returns(Time.zone.parse("2024-08-25T05:55:40.492Z"))
 
     get entity_date_modified_path(uri: uri), headers: { "Turbo-Frame" => "date-modified" }
 
     assert_response :success
-    assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
+    assert_select "turbo-frame#date-modified a[href=?]", entity_path(uri: "#{uri}_dataset")
     assert_select "turbo-frame#date-modified time[datetime='2024-08-25T05:55:40Z']"
     assert_select "turbo-frame#date-modified a", text: /Revisions/
   end
@@ -50,7 +50,7 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "turbo-frame#date-modified small", text: /Created:/
     assert_select "turbo-frame#date-modified time[datetime='2023-05-02T17:58:22Z']"
-    assert_select "turbo-frame#date-modified a[href=?]", "#{uri}_dataset"
+    assert_select "turbo-frame#date-modified a[href=?]", entity_path(uri: "#{uri}_dataset")
     assert_select "turbo-frame#date-modified a", text: /Revisions/, count: 0
   end
 
