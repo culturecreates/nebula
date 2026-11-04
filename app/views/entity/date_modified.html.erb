@@ -6,7 +6,7 @@
         <i class="fa-regular fa-clock"></i>
         <%= @date_modified.present? ? t("entity.modified") : t("entity.generated") %>:
         <time datetime="<%= date.iso8601 %>" title="<%= date.utc.strftime("%Y-%m-%d %H:%M UTC") %>">
-          <%= link_to l(date.to_date, format: :long), "#{@entity.entity_uri}_dataset",
+          <%= link_to l(date.to_date, format: :long), entity_path(uri: "#{@entity.entity_uri}_dataset"),
               title: t("entity.view_dataset"), data: { turbo_frame: "_top" } %>
         </time>
       </span>
