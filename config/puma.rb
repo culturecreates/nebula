@@ -81,13 +81,16 @@ on_worker_boot do
   # `ps -eo pid,cmd | grep "cluster worker"`) writes every thread's Ruby
   # backtrace to the logs. Puma 5 on Linux has no built-in way to do this.
   # Work happens in a new thread because trap handlers can't take locks.
-  Signal.trap("WINCH") do
-    Thread.new do
-      dump = Thread.list.map do |t|
-        "#{t.inspect}\n  #{(t.backtrace || []).first(30).join("\n  ")}"
+  # Skipped in development: terminals send WINCH whenever they are resized.
+  if ENV.fetch("RAILS_ENV", "development") != "development"
+    Signal.trap("WINCH") do
+      Thread.new do
+        dump = Thread.list.map do |t|
+          "#{t.inspect}\n  #{(t.backtrace || []).first(30).join("\n  ")}"
+        end
+        $stdout.write("THREAD DUMP pid=#{Process.pid} threads=#{dump.size}\n#{dump.join("\n\n")}\nEND THREAD DUMP\n")
+        $stdout.flush
       end
-      $stdout.write("THREAD DUMP pid=#{Process.pid} threads=#{dump.size}\n#{dump.join("\n\n")}\nEND THREAD DUMP\n")
-      $stdout.flush
     end
   end
 
