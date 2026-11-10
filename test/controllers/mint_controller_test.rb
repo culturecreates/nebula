@@ -89,12 +89,63 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "schema:Place"
   end
 
-  test "wikidata mint still renders when the label lookup fails" do
-    stub_request(:get, WIKIDATA_API).with(query: hash_including({})).to_timeout
+  test "wikidata mint uses the label from Wikidata to reconcile with Artsdata" do
+    stub_wikidata_label_query
+
+    get mint_wikidata_url, params: { uri: "Q42", label: "Old candidate name", type: "Q5", tab_type: "Q5" }
+
+    assert_response :success
+    assert_select "input[name=query][value=?]", "The Beatles"
+    assert_select "[data-artsdata-label-value=?]", "The Beatles"
+  end
+
+  test "wikidata mint sends a descriptive User-Agent to Wikidata" do
+    stub_wikidata_label_query
 
     get mint_wikidata_url, params: { uri: "Q42", type: "Q5", tab_type: "Q5" }
 
+    assert_requested(:get, WIKIDATA_API, query: hash_including({}),
+                     headers: { "User-Agent" => /ArtsdataNebula/ })
+  end
+
+  test "wikidata mint falls back to the candidate's name when the label lookup fails" do
+    stub_request(:get, WIKIDATA_API).with(query: hash_including({})).to_timeout
+
+    get mint_wikidata_url, params: { uri: "Q134552151", label: "Jazz Festivals Canada",
+                                     description: "arts service organization", type: "Q43229", tab_type: "Q43229" }
+
     assert_response :success
+    assert_select "input[name=query][value=?]", "Jazz Festivals Canada"
+    assert_select "[data-artsdata-label-value=?]", "Jazz Festivals Canada"
+    assert_includes response.body, "arts service organization"
+    assert_includes response.body, "query=Jazz+Festivals+Canada"
+    assert_not_includes response.body, "query=Q134552151"
+  end
+
+  test "wikidata mint never uses the QID as the name and disables minting when no label is available" do
+    stub_request(:get, WIKIDATA_API).with(query: hash_including({})).to_timeout
+
+    get mint_wikidata_url, params: { uri: "Q134552151", type: "Q43229", tab_type: "Q43229" }
+
+    assert_response :success
+    assert_select "input[name=query][value=?]", "Q134552151", false
+    assert_select "[data-controller=artsdata]", false
+    assert_includes response.body, "could not be loaded from Wikidata"
+  end
+
+  test "reconciliation candidates link to the mint page with their name and description" do
+    stub_request(:get, %r{\Ahttps://wikidata.reconci.link/en/api}).to_return(
+      status: 200, headers: { "Content-Type" => "application/json" },
+      body: { q0: { result: [{ id: "Q134552151", name: "Jazz Festivals Canada", description: "arts service organization",
+                               type: [{ id: "Q43229", name: "organization" }], match: true }] } }.to_json
+    )
+
+    get reconcile_query_url, params: { reconEndpoint: "https://wikidata.reconci.link/en/api", routeName: "mint_wikidata_path",
+                                       query: "Jazz Festivals Canada", type: "Q43229", tabType: "Q43229" }
+
+    assert_response :success
+    assert_select "a[href*=?]", "label=Jazz+Festivals+Canada"
+    assert_select "a[href*=?]", "description=arts+service+organization"
   end
 
   test "wikidata mint walks up multiple subclass levels to find the broad type" do

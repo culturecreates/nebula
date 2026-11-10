@@ -208,10 +208,13 @@ class MintController < ApplicationController
       @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
       resolve_class_to_mint
 
-      # call wikidata sparql to get more data
+      # Get the current label and description from Wikidata. If Wikidata is
+      # unavailable, fall back to the name and description of the
+      # reconciliation candidate the user picked (passed in the link). Never
+      # fall back to the QID: it would be reconciled and minted as the name.
       entity = wikidata_entities([params[:uri]], props: "labels|descriptions")&.dig(params[:uri])
-      @label = wikidata_text(entity, "labels", %w[en fr mul]) || params[:uri]
-      @description = wikidata_text(entity, "descriptions", %w[en fr])
+      @label = wikidata_text(entity, "labels", %w[en fr mul]) || params[:label].presence
+      @description = wikidata_text(entity, "descriptions", %w[en fr]) || params[:description].presence
       @language = "en"
       @dataset = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
@@ -274,6 +277,9 @@ class MintController < ApplicationController
   WIKIDATA_API_ENDPOINT = "https://www.wikidata.org/w/api.php".freeze
   WIKIDATA_TIMEOUT = 5 # seconds; Wikidata can hang, and Heroku kills requests at 30s
   WIKIDATA_MAX_SUBCLASS_DEPTH = 5
+  # Wikimedia throttles or blocks clients without a descriptive User-Agent
+  # (https://meta.wikimedia.org/wiki/User-Agent_policy).
+  WIKIDATA_USER_AGENT = "ArtsdataNebula/1.0 (+https://kg.artsdata.ca)".freeze
 
   # Fetches entities from the Wikidata Action API (much more reliable than the
   # query service, query.wikidata.org, which often times out). Returns a hash
@@ -283,9 +289,10 @@ class MintController < ApplicationController
     response = HTTParty.get(
       WIKIDATA_API_ENDPOINT,
       query: { action: "wbgetentities", ids: qids.join("|"), props: props, languages: "en|fr|mul", format: "json" },
+      headers: { "User-Agent" => WIKIDATA_USER_AGENT },
       timeout: WIKIDATA_TIMEOUT
     )
-    raise "HTTP #{response.code}" unless response.code == 200
+    raise "HTTP #{response.code}: #{response.body.to_s[0, 200]}" unless response.code == 200
 
     entities = JSON.parse(response.body)["entities"]
     raise "unexpected response" unless entities.is_a?(Hash)

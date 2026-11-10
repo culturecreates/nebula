@@ -53,6 +53,7 @@ fr:
     type_mismatch_message: "Le type Wikidata utilisé pour la recherche correspond à %{wikidata_type}, ce qui diffère de l'onglet %{tab_type} de départ. Quel type doit être utilisé pour créer cette entité?"
     use_wikidata_type: "Utiliser %{type}"
     keep_tab_type: "Conserver %{type}"
+    label_unavailable: "Le nom de %{uri} n'a pas pu être chargé depuis Wikidata; l'entité ne peut donc pas être créée. Revenez en arrière et sélectionnez de nouveau l'entité, ou réessayez plus tard."
   ical:
     ical_feeds: "Flux iCal"
     description: |

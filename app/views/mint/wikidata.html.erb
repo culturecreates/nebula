@@ -37,10 +37,10 @@
               tab_type: @tab_class_choice) %>
       </p>
       <%= link_to t("minting_wikidata.use_wikidata_type", type: @wikidata_class_choice),
-      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], classToMint: @wikidata_class_choice),
+      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], label: params[:label], description: params[:description], classToMint: @wikidata_class_choice),
       class: "btn btn-sm btn-primary me-2" %>
       <%= link_to t("minting_wikidata.keep_tab_type", type: @tab_class_choice),
-      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], classToMint: @tab_class_choice),
+      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], label: params[:label], description: params[:description], classToMint: @tab_class_choice),
       class: "btn btn-sm btn-outline-secondary" %>
     </div>
   <% end %>
@@ -113,11 +113,13 @@
       <p>
         <turbo-frame
           id='recon_results'
+          <% if @label.present? %>
           src="<%= reconcile_query_path(query: @label, type: @class_to_mint, externalUri: @external_uri, dataset: "http://kg.artsdata.ca/resource/K1-20")%>"
           loading="lazy"
+          <% end %>
           target="_top"
         >
-          loading...
+          <%= @label.present? ? "loading..." : t("minting_wikidata.label_unavailable", uri: @external_uri) %>
         </turbo-frame>
       </p>
     </div>
@@ -159,6 +161,11 @@
         will be recorded as the publisher.
       </p>
 
+      <% if @label.blank? %>
+        <div class="alert alert-warning">
+          <%= t("minting_wikidata.label_unavailable", uri: @external_uri) %>
+        </div>
+      <% else %>
       <div
         data-controller="artsdata"
         data-artsdata-mintendpoint-value="<%= Rails.application.config.artsdata_mint_endpoint %>"
@@ -179,6 +186,7 @@
         <p data-artsdata-target="uri">
         </p>
       </div>
+      <% end %>
     </div>
   <% end %>
 </div>

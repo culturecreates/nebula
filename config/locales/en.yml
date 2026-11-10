@@ -77,6 +77,7 @@ en:
     type_mismatch_message: "The Wikidata type you searched with resolves to %{wikidata_type}, which differs from the %{tab_type} tab you started from. Which type should be used to mint this entity?"
     use_wikidata_type: "Use %{type}"
     keep_tab_type: "Keep %{type}"
+    label_unavailable: "The name of %{uri} could not be loaded from Wikidata, so it cannot be minted. Go back and select the entity again, or try again later."
   ical:
     ical_feeds: "iCal Feeds"
     description: |
