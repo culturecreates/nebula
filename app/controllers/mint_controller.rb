@@ -1,6 +1,14 @@
 class MintController < ApplicationController
   before_action :check_minting_access # ensure user has permission
 
+  # The Artsdata types a Wikidata entity can be linked or minted as, mapped
+  # to the broad Wikidata type (and search tab) each one corresponds to.
+  ARTSDATA_TYPES = {
+    "schema:Organization" => "Q43229",
+    "schema:Place" => "Q17350442",
+    "schema:Person" => "Q5"
+  }.freeze
+
   # Preview data and SHACL report before minting a new Artsdata URI
   # GET /mint/preview
   #   - externalUri (required)
@@ -207,11 +215,17 @@ class MintController < ApplicationController
     if params[:uri].present?
       @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
       resolve_class_to_mint
+      # Keep the search tabs in step with the Artsdata type, so the next
+      # search starts from the type the user chose.
+      @search_tab_type = ARTSDATA_TYPES[@class_to_mint]
 
-      # call wikidata sparql to get more data
+      # Get the current label and description from Wikidata. If Wikidata is
+      # unavailable, fall back to the name and description of the
+      # reconciliation candidate the user picked (passed in the link). Never
+      # fall back to the QID: it would be reconciled and minted as the name.
       entity = wikidata_entities([params[:uri]], props: "labels|descriptions")&.dig(params[:uri])
-      @label = wikidata_text(entity, "labels", %w[en fr mul]) || params[:uri]
-      @description = wikidata_text(entity, "descriptions", %w[en fr])
+      @label = wikidata_text(entity, "labels", %w[en fr mul]) || params[:label].presence
+      @description = wikidata_text(entity, "descriptions", %w[en fr]) || params[:description].presence
       @language = "en"
       @dataset = "http://kg.artsdata.ca/resource/K1-20"
       @group = 'http://wikidata.org'
@@ -223,13 +237,19 @@ class MintController < ApplicationController
 
   private
 
-  # Determines @class_to_mint from the (possibly custom) type ID the user
-  # searched with. If that type resolves to a broad type (person/org/place)
-  # different from the tab the user started from, don't guess: set
-  # @tab_class_choice / @wikidata_class_choice so the view can ask the user
-  # which one to use, unless they already answered via params[:classToMint].
+  # Determines @class_to_mint, the Artsdata type to link or mint as. The view
+  # shows it as a dropdown so the user can always override it.
+  #   1. An explicit choice from that dropdown (params[:classToMint]) wins.
+  #   2. Otherwise preselect the tab the user searched from. If the
+  #      (possibly custom) Wikidata type resolves to a different broad type,
+  #      e.g. "cultural center" is a subclass of organization but was
+  #      searched from the Place tab, keep the tab and set
+  #      @wikidata_class_suggestion so the view can point out the difference.
+  #   3. Otherwise use the broad type the Wikidata type resolves to.
+  # Leaves @class_to_mint nil when no type can be determined; the view then
+  # asks the user to choose one.
   def resolve_class_to_mint
-    if params[:classToMint].present?
+    if ARTSDATA_TYPES.key?(params[:classToMint])
       @class_to_mint = params[:classToMint]
       return
     end
@@ -237,12 +257,8 @@ class MintController < ApplicationController
     wikidata_class = map_wikidata_type_to_schema(params[:type])
     tab_class = map_wikidata_type_to_schema(params[:tab_type]) if params[:tab_type].present?
 
-    if tab_class.present? && wikidata_class.present? && tab_class != wikidata_class
-      @tab_class_choice = tab_class
-      @wikidata_class_choice = wikidata_class
-    else
-      @class_to_mint = wikidata_class || tab_class
-    end
+    @class_to_mint = tab_class || wikidata_class
+    @wikidata_class_suggestion = wikidata_class if wikidata_class.present? && wikidata_class != @class_to_mint
   end
 
   # Check if the user has access the the minting feature
@@ -274,6 +290,9 @@ class MintController < ApplicationController
   WIKIDATA_API_ENDPOINT = "https://www.wikidata.org/w/api.php".freeze
   WIKIDATA_TIMEOUT = 5 # seconds; Wikidata can hang, and Heroku kills requests at 30s
   WIKIDATA_MAX_SUBCLASS_DEPTH = 5
+  # Wikimedia throttles or blocks clients without a descriptive User-Agent
+  # (https://meta.wikimedia.org/wiki/User-Agent_policy).
+  WIKIDATA_USER_AGENT = "ArtsdataNebula/1.0 (+https://kg.artsdata.ca)".freeze
 
   # Fetches entities from the Wikidata Action API (much more reliable than the
   # query service, query.wikidata.org, which often times out). Returns a hash
@@ -283,9 +302,10 @@ class MintController < ApplicationController
     response = HTTParty.get(
       WIKIDATA_API_ENDPOINT,
       query: { action: "wbgetentities", ids: qids.join("|"), props: props, languages: "en|fr|mul", format: "json" },
+      headers: { "User-Agent" => WIKIDATA_USER_AGENT },
       timeout: WIKIDATA_TIMEOUT
     )
-    raise "HTTP #{response.code}" unless response.code == 200
+    raise "HTTP #{response.code}: #{response.body.to_s[0, 200]}" unless response.code == 200
 
     entities = JSON.parse(response.body)["entities"]
     raise "unexpected response" unless entities.is_a?(Hash)

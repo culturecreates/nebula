@@ -74,9 +74,12 @@ en:
     place_description: "Wikidata entities that are instances of type venue (Q17350442): place used for some activity."
     type_id: "Wikidata type"
     search_placeholder: "Name or Wikidata ID"
-    type_mismatch_message: "The Wikidata type you searched with resolves to %{wikidata_type}, which differs from the %{tab_type} tab you started from. Which type should be used to mint this entity?"
-    use_wikidata_type: "Use %{type}"
-    keep_tab_type: "Keep %{type}"
+    artsdata_type: "Artsdata type"
+    artsdata_type_help: "The type of the Artsdata entity to link to or mint. It is preselected from the search tab and the Wikidata type; change it if it is wrong."
+    artsdata_type_suggestion: "The Wikidata type %{wikidata_type} corresponds to %{suggested_type}, but %{selected_type} was preselected from the tab you searched from. Change the Artsdata type above if %{suggested_type} is correct."
+    choose_artsdata_type: "Choose a type"
+    change_artsdata_type: "Change"
+    label_unavailable: "The name of %{uri} could not be loaded from Wikidata, so it cannot be minted. Go back and select the entity again, or try again later."
   ical:
     ical_feeds: "iCal Feeds"
     description: |

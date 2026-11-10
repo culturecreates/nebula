@@ -50,9 +50,12 @@ fr:
     place_description: "Entités Wikidata qui sont des instances de lieu (Q17350442) : lieu utilisé pour une activité."
     type_id: "type Wikidata"
     search_placeholder: "Nom ou identifiant Wikidata"
-    type_mismatch_message: "Le type Wikidata utilisé pour la recherche correspond à %{wikidata_type}, ce qui diffère de l'onglet %{tab_type} de départ. Quel type doit être utilisé pour créer cette entité?"
-    use_wikidata_type: "Utiliser %{type}"
-    keep_tab_type: "Conserver %{type}"
+    artsdata_type: "Type Artsdata"
+    artsdata_type_help: "Le type de l'entité Artsdata à lier ou à créer. Il est présélectionné selon l'onglet de la recherche et le type Wikidata; modifiez-le s'il est incorrect."
+    artsdata_type_suggestion: "Le type Wikidata %{wikidata_type} correspond à %{suggested_type}, mais %{selected_type} a été présélectionné selon l'onglet de la recherche. Modifiez le type Artsdata ci-dessus si %{suggested_type} est le bon type."
+    choose_artsdata_type: "Choisissez un type"
+    change_artsdata_type: "Modifier"
+    label_unavailable: "Le nom de %{uri} n'a pas pu être chargé depuis Wikidata; l'entité ne peut donc pas être créée. Revenez en arrière et sélectionnez de nouveau l'entité, ou réessayez plus tard."
   ical:
     ical_feeds: "Flux iCal"
     description: |
