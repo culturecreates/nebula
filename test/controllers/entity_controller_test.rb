@@ -561,4 +561,29 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     assert_includes partial, "dereference_card_path"
     assert_includes partial, "auto_dereference"
   end
+
+  test "refresh dropdown does not query external identifiers when rendered; a lazy turbo-frame loads them" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    Entity.any_instance.expects(:load_authorized_external_identifiers).never
+
+    html = EntityController.render(partial: "entity/refresh_dropdown", locals: { entity: Entity.new(entity_uri: uri) })
+
+    frame = Nokogiri::HTML5.fragment(html).at_css("turbo-frame#refresh-sources")
+    assert_equal "lazy", frame["loading"]
+    assert_equal entity_refresh_sources_path(uri: uri), frame["src"]
+  end
+
+  test "refresh_sources renders one refresh item per external identifier" do
+    uri = "http://kg.artsdata.ca/resource/K1"
+    source = "http://www.wikidata.org/entity/Q1"
+    Entity.any_instance.stubs(:load_authorized_external_identifiers)
+    Entity.any_instance.stubs(:graph).returns(
+      RDF::Graph.new << RDF::Statement(RDF::URI(uri), RDF::URI("http://schema.org/sameAs"), RDF::URI(source))
+    )
+
+    get entity_refresh_sources_path(uri: uri), headers: { "Turbo-Frame" => "refresh-sources" }
+
+    assert_response :success
+    assert_select "turbo-frame#refresh-sources a.dropdown-item[data-refresh-entity-source-param=?]", source
+  end
 end

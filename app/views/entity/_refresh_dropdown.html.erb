@@ -29,22 +29,18 @@
         <%= t("entity.refresh.all") %>
       </a>
     </li>
-    <% sources = authorized_external_identifier_sources(entity) %>
-    <% if sources.any? %>
-      <li><hr class="dropdown-divider"></li>
-      <% sources.each do |source| %>
-        <li>
-          <a
-            href="#"
-            class="dropdown-item"
-            rel="nofollow"
-            data-action="click->refresh-entity#refresh"
-            data-refresh-entity-source-param="<%= source %>"
-          >
-            <%= use_prefix(source) %>
-          </a>
-        </li>
-      <% end %>
-    <% end %>
+    <%# Per-source items load when the dropdown is first opened: a lazy turbo-frame only
+        fetches once visible, and the menu is display:none until then. %>
+    <li>
+      <turbo-frame
+        id="refresh-sources"
+        src="<%= entity_refresh_sources_path(uri: entity.entity_uri) %>"
+        loading="lazy"
+      >
+        <span class="dropdown-item-text text-center">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </span>
+      </turbo-frame>
+    </li>
   </ul>
 </div>
