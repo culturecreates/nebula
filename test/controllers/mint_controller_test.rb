@@ -36,7 +36,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "schema:Organization"
   end
 
-  test "wikidata mint asks the user to choose when the resolved type differs from the tab" do
+  test "wikidata mint preselects the tab type and points out a different Wikidata type" do
     stub_wikidata_label_query
     stub_wikidata_broad_type_query("Q43229")
 
@@ -45,20 +45,87 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     get mint_wikidata_url, params: { uri: "Q215380", type: "Q215380", tab_type: "Q5" }
 
     assert_response :success
-    assert_includes response.body, "schema:Organization"
-    assert_includes response.body, "schema:Person"
-    assert_not_includes response.body, "Step 1"
+    assert_select "select[name=classToMint] option[selected]", text: "schema:Person"
+    assert_select ".alert-warning", text: /schema:Organization/
+    assert_select "turbo-frame#card-validation"
+    assert_select "[data-artsdata-classtomint-value=?]", "schema:Person"
   end
 
-  test "wikidata form keeps the original tab and type so the next search can detect a mismatch" do
+  test "wikidata mint of a cultural centre from the Place tab uses schema:Place, not its Organization superclass" do
     stub_wikidata_label_query
+    stub_wikidata_broad_type_query("Q43229") # cultural center (Q1329623) is a subclass of organization
 
-    get mint_wikidata_url, params: { uri: "Q1", type: "Q5", tab_type: "Q43229", classToMint: "schema:Person" }
+    get mint_wikidata_url, params: { uri: "Q20435679", type: "Q1329623", tab_type: "Q17350442" }
 
     assert_response :success
-    assert_select "input#organization[checked]"
-    assert_select "input#person[checked]", false
-    assert_select "input[name=type][value=Q5]"
+    assert_select "select[name=classToMint] option[selected]", text: "schema:Place"
+    assert_select "turbo-frame#recon_results[src*=?]", "type=schema%3APlace"
+    assert_select "[data-artsdata-classtomint-value=?]", "schema:Place"
+  end
+
+  test "the Artsdata type dropdown offers Organization, Place and Person and keeps the selected entity" do
+    stub_wikidata_label_query
+
+    get mint_wikidata_url, params: { uri: "Q42", type: "Q5", tab_type: "Q5", label: "Candidate", description: "desc" }
+
+    assert_response :success
+    assert_select "select[name=classToMint] option", 3
+    %w[schema:Organization schema:Place schema:Person].each do |type|
+      assert_select "select[name=classToMint] option[value=?]", type
+    end
+    assert_select "form:has(select[name=classToMint])" do
+      assert_select "input[type=hidden][name=uri][value=Q42]"
+      assert_select "input[type=hidden][name=type][value=Q5]"
+      assert_select "input[type=hidden][name=tab_type][value=Q5]"
+      assert_select "input[type=hidden][name=label][value=Candidate]"
+      assert_select "input[type=hidden][name=description][value=desc]"
+    end
+  end
+
+  test "wikidata mint uses the Artsdata type the user chose in the dropdown" do
+    stub_wikidata_label_query
+    stub_wikidata_broad_type_query("Q43229")
+
+    get mint_wikidata_url, params: { uri: "Q20435679", type: "Q1329623", tab_type: "Q43229", classToMint: "schema:Place" }
+
+    assert_response :success
+    assert_select "select[name=classToMint] option[selected]", text: "schema:Place"
+    assert_select ".alert-warning", false
+    assert_select "turbo-frame#recon_results[src*=?]", "type=schema%3APlace"
+    assert_select "[data-artsdata-classtomint-value=?]", "schema:Place"
+    assert_not_requested(:get, WIKIDATA_API, query: hash_including("props" => "claims"))
+  end
+
+  test "wikidata mint ignores a classToMint that is not an Artsdata type" do
+    stub_wikidata_label_query
+
+    get mint_wikidata_url, params: { uri: "Q42", type: "Q5", tab_type: "Q5", classToMint: "schema:Event" }
+
+    assert_response :success
+    assert_select "select[name=classToMint] option[selected]", text: "schema:Person"
+  end
+
+  test "wikidata mint asks for an Artsdata type when none can be determined" do
+    stub_wikidata_label_query
+    stub_wikidata_parents(Hash.new([]))
+
+    get mint_wikidata_url, params: { uri: "Q1", type: "Q123" }
+
+    assert_response :success
+    assert_select "select[name=classToMint] option[value='']", text: "Choose a type"
+    assert_select "turbo-frame#card-validation", false
+    assert_not_includes response.body, "Step 2"
+  end
+
+  test "wikidata search tabs follow the chosen Artsdata type" do
+    stub_wikidata_label_query
+
+    get mint_wikidata_url, params: { uri: "Q20435679", type: "Q1329623", tab_type: "Q43229", classToMint: "schema:Place" }
+
+    assert_response :success
+    assert_select "input#place[checked]"
+    assert_select "input#organization[checked]", false
+    assert_select "input[name=type][value=Q1329623]"
   end
 
   test "wikidata mint proceeds directly once the user confirms classToMint" do
@@ -67,7 +134,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     get mint_wikidata_url, params: { uri: "Q215380", type: "Q215380", tab_type: "Q5", classToMint: "schema:Organization" }
 
     assert_response :success
-    assert_includes response.body, "Step 1"
+    assert_select "turbo-frame#card-validation"
   end
 
   test "wikidata mint does not ask when the type field matches the tab" do
@@ -76,7 +143,7 @@ class MintControllerTest < ActionDispatch::IntegrationTest
     get mint_wikidata_url, params: { uri: "Q42", type: "Q5", tab_type: "Q5" }
 
     assert_response :success
-    assert_includes response.body, "Step 1"
+    assert_select "turbo-frame#card-validation"
   end
 
   test "wikidata mint falls back to the tab class when the subclass lookup times out" do

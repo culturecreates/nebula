@@ -9,7 +9,7 @@
   <%= render partial: "search_wikidata_form",
   locals: {
     type: params[:type],
-    tab_type: params[:tab_type],
+    tab_type: @search_tab_type || params[:tab_type],
     wikidata_place_type: @wikidata_place_type,
     wikidata_search: params[:wikidata_search],
   } %>
@@ -29,24 +29,7 @@
     </turbo-frame>
   <% end %>
 
-  <% if @wikidata_class_choice %>
-    <div class="alert alert-warning">
-      <p>
-        <%= t("minting_wikidata.type_mismatch_message",
-              wikidata_type: @wikidata_class_choice,
-              tab_type: @tab_class_choice) %>
-      </p>
-      <%= link_to t("minting_wikidata.use_wikidata_type", type: @wikidata_class_choice),
-      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], label: params[:label], description: params[:description], classToMint: @wikidata_class_choice),
-      class: "btn btn-sm btn-primary me-2" %>
-      <%= link_to t("minting_wikidata.keep_tab_type", type: @tab_class_choice),
-      mint_wikidata_path(uri: params[:uri], type: params[:type], tab_type: params[:tab_type], label: params[:label], description: params[:description], classToMint: @tab_class_choice),
-      class: "btn btn-sm btn-outline-secondary" %>
-    </div>
-  <% end %>
-
-  <% if @external_uri && @class_to_mint %>
-
+  <% if @external_uri %>
     <h3>Step 1</h3>
     <p>Preview the transformed data from Wikidata that will be added to
       Artsdata. There should be no errors in the following table. If there are
@@ -54,6 +37,32 @@
       Artsdata.
     </p>
 
+    <%# Explicit Artsdata type: the class used to validate (step 1), reconcile (step 2) and mint (step 3). Changing it reloads the page with that class. %>
+    <%= form_with url: mint_wikidata_path, method: :get, local: true, class: "col-12 col-lg-8 mb-4", data: { controller: "auto-submit" } do |form| %>
+      <%= form.hidden_field :uri, value: params[:uri] %>
+      <%= form.hidden_field :type, value: params[:type] %>
+      <%= form.hidden_field :tab_type, value: params[:tab_type] %>
+      <%= form.hidden_field :label, value: params[:label] %>
+      <%= form.hidden_field :description, value: params[:description] %>
+      <%= form.label :classToMint, t("minting_wikidata.artsdata_type"), class: "form-label fw-bold" %>
+      <div class="input-group">
+        <%= form.select :classToMint,
+                        MintController::ARTSDATA_TYPES.keys,
+                        { selected: @class_to_mint, include_blank: (t("minting_wikidata.choose_artsdata_type") if @class_to_mint.blank?) },
+                        class: "form-select",
+                        data: { action: "change->auto-submit#submit" } %>
+        <noscript><%= form.submit t("minting_wikidata.change_artsdata_type"), name: nil, class: "btn btn-outline-secondary" %></noscript>
+      </div>
+      <div class="form-text"><%= t("minting_wikidata.artsdata_type_help") %></div>
+      <% if @wikidata_class_suggestion %>
+        <div class="alert alert-warning mt-2 mb-0">
+          <%= t("minting_wikidata.artsdata_type_suggestion", wikidata_type: params[:type], suggested_type: @wikidata_class_suggestion, selected_type: @class_to_mint) %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if @external_uri && @class_to_mint %>
     <div>
       <%# Not a <p>: the spinner contains a <div>, which makes the HTML parser close a <p> (and the turbo-frame inside it) early, leaving the spinner outside the frame. %>
       <div>

@@ -1,6 +1,14 @@
 class MintController < ApplicationController
   before_action :check_minting_access # ensure user has permission
 
+  # The Artsdata types a Wikidata entity can be linked or minted as, mapped
+  # to the broad Wikidata type (and search tab) each one corresponds to.
+  ARTSDATA_TYPES = {
+    "schema:Organization" => "Q43229",
+    "schema:Place" => "Q17350442",
+    "schema:Person" => "Q5"
+  }.freeze
+
   # Preview data and SHACL report before minting a new Artsdata URI
   # GET /mint/preview
   #   - externalUri (required)
@@ -207,6 +215,9 @@ class MintController < ApplicationController
     if params[:uri].present?
       @external_uri = "http://www.wikidata.org/entity/#{params[:uri]}"
       resolve_class_to_mint
+      # Keep the search tabs in step with the Artsdata type, so the next
+      # search starts from the type the user chose.
+      @search_tab_type = ARTSDATA_TYPES[@class_to_mint]
 
       # Get the current label and description from Wikidata. If Wikidata is
       # unavailable, fall back to the name and description of the
@@ -226,13 +237,19 @@ class MintController < ApplicationController
 
   private
 
-  # Determines @class_to_mint from the (possibly custom) type ID the user
-  # searched with. If that type resolves to a broad type (person/org/place)
-  # different from the tab the user started from, don't guess: set
-  # @tab_class_choice / @wikidata_class_choice so the view can ask the user
-  # which one to use, unless they already answered via params[:classToMint].
+  # Determines @class_to_mint, the Artsdata type to link or mint as. The view
+  # shows it as a dropdown so the user can always override it.
+  #   1. An explicit choice from that dropdown (params[:classToMint]) wins.
+  #   2. Otherwise preselect the tab the user searched from. If the
+  #      (possibly custom) Wikidata type resolves to a different broad type,
+  #      e.g. "cultural center" is a subclass of organization but was
+  #      searched from the Place tab, keep the tab and set
+  #      @wikidata_class_suggestion so the view can point out the difference.
+  #   3. Otherwise use the broad type the Wikidata type resolves to.
+  # Leaves @class_to_mint nil when no type can be determined; the view then
+  # asks the user to choose one.
   def resolve_class_to_mint
-    if params[:classToMint].present?
+    if ARTSDATA_TYPES.key?(params[:classToMint])
       @class_to_mint = params[:classToMint]
       return
     end
@@ -240,12 +257,8 @@ class MintController < ApplicationController
     wikidata_class = map_wikidata_type_to_schema(params[:type])
     tab_class = map_wikidata_type_to_schema(params[:tab_type]) if params[:tab_type].present?
 
-    if tab_class.present? && wikidata_class.present? && tab_class != wikidata_class
-      @tab_class_choice = tab_class
-      @wikidata_class_choice = wikidata_class
-    else
-      @class_to_mint = wikidata_class || tab_class
-    end
+    @class_to_mint = tab_class || wikidata_class
+    @wikidata_class_suggestion = wikidata_class if wikidata_class.present? && wikidata_class != @class_to_mint
   end
 
   # Check if the user has access the the minting feature
