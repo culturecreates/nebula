@@ -185,13 +185,12 @@ class ApplicationController < ActionController::Base
   # other page dereferencing the same URI as a card - would keep serving
   # the pre-edit data for up to their cache's TTL. Keyed the same way as
   # `dereference_controller#card`, `entity_controller`'s
-  # unsupported_claims/authorized_external_identifiers/derived_statements,
+  # unsupported_claims/derived_statements,
   # and `source_graph_controller#show`.
   def expire_entity_view_caches(uri)
     Rails.cache.delete(["dereference_card", uri])
     I18n.available_locales.each do |locale|
       Rails.cache.delete(["entity_unsupported_claims", uri, locale])
-      Rails.cache.delete(["entity_authorized_external_identifiers", uri, locale])
       Rails.cache.delete(["entity_derived_statements", uri, locale])
       Rails.cache.delete(["source_graph_show", uri, locale])
     end

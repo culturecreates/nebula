@@ -4,6 +4,7 @@ class EntityController < ApplicationController
   before_action :check_delete_entity_access, only: [:destroy] # ensure user has permissions to delete entity
   before_action :check_delete_statement_access, only: [:delete_statement] # ensure user has permissions to delete statement like sameAs
   before_action :check_update_statement_rank_access, only: [:update_statement_rank] # ensure user has permissions to change an annotation's rank
+  before_action :check_refresh_entity_access, only: [:refresh_sources] # ensure user has permissions to refresh an entity
 
   # Show an entity's asserted statements
   # /entity?uri=  --> HTML
@@ -122,13 +123,20 @@ class EntityController < ApplicationController
 
   # authorized_external_identifiers
   # /entity/authorized_external_identifiers?uri=[canonical URI]
+  # Deliberately not cached: links are created by the external link API,
+  # which can't expire Nebula's cache, and a newly linked entity must show
+  # up right away.
   def authorized_external_identifiers
-    uri = params[:uri]
-    @entity = Rails.cache.fetch(["entity_authorized_external_identifiers", uri, I18n.locale], expires_in: 10.minutes) do
-      entity = Entity.new(entity_uri: uri)
-      entity.load_authorized_external_identifiers
-      entity
-    end
+    @entity = Entity.new(entity_uri: params[:uri])
+    @entity.load_authorized_external_identifiers
+  end
+
+  # per-source items of the refresh dropdown, loaded in a lazy turbo-frame
+  # when the dropdown is first opened so the SPARQL query stays off the
+  # entity page load (see entity/_refresh_dropdown.html.erb)
+  # /entity/refresh_sources?uri=[canonical URI]
+  def refresh_sources
+    @entity = Entity.new(entity_uri: params.required(:uri))
   end
 
   # derived statements (inverse path)
@@ -220,6 +228,10 @@ class EntityController < ApplicationController
 
   def check_update_statement_rank_access
     ensure_access("update_statement_rank")
+  end
+
+  def check_refresh_entity_access
+    ensure_access("refresh_entity")
   end
 
   # determine the shape for JSON-LD output

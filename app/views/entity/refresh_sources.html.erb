@@ -1,0 +1,18 @@
+<turbo-frame id="refresh-sources">
+  <% sources = authorized_external_identifier_sources(@entity) %>
+  <% if sources.any? %>
+    <hr class="dropdown-divider">
+    <% sources.each do |source| %>
+      <a
+        href="#"
+        class="dropdown-item"
+        rel="nofollow"
+        data-turbo="false"
+        data-action="click->refresh-entity#refresh"
+        data-refresh-entity-source-param="<%= source %>"
+      >
+        <%= use_prefix(source) %>
+      </a>
+    <% end %>
+  <% end %>
+</turbo-frame>
