@@ -96,7 +96,7 @@ fr:
     generated: "Créé"
     modified: "Modifié"
     derived_statements:
-      heading: "Énoncés dérivés"
+      heading: "Déclarations dérivées"
     authorized_external_identifiers:
       title: "Identifiants externes validés"
       description: "Les identifiants listés ici mettront à jour les informations dans les entités principales d'Artsdata lorsque les données externes changent. Supprimez un identifiant externe sameAs pour empêcher sa mise à jour dans l'entité principale d'Artsdata."
