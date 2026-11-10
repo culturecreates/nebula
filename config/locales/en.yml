@@ -120,7 +120,6 @@ en:
     generated: "Created"
     modified: "Modified"
     derived_statements:
-      title: "Derived (inverse) Statements for"
       heading: "Derived Statements"
     authorized_external_identifiers:
       title: "Validated External Identifiers"

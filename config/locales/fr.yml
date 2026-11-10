@@ -93,7 +93,6 @@ fr:
     generated: "Créé"
     modified: "Modifié"
     derived_statements:
-      title: "Énoncés dérivés (inverses) pour"
       heading: "Énoncés dérivés"
     authorized_external_identifiers:
       title: "Identifiants externes validés"
