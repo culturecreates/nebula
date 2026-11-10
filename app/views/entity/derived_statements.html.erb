@@ -1,12 +1,11 @@
-<h1>Derived (inverse) Statements for
+<h1><%= t("entity.derived_statements.title") %>
   <%= @entity.label&.value %>
 </h1>
 <a><%= use_prefix(@entity.entity_uri) %></a>
 
 <turbo-frame id="reverse-statements">
   <% if @entity.graph.count > 0 %>
-    <h4>Derived statements
-    </h4>
+    <h4><%= t("entity.derived_statements.heading") %></h4>
     <%= render partial: "statements_table",
     locals: {
       triples: @entity.graph.query([RDF.URI(@entity.entity_uri), nil, nil]),

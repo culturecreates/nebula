@@ -119,6 +119,9 @@ en:
     revisions: "Revisions"
     generated: "Created"
     modified: "Modified"
+    derived_statements:
+      title: "Derived (inverse) Statements for"
+      heading: "Derived Statements"
     authorized_external_identifiers:
       title: "Validated External Identifiers"
       description: "Identifiers listed here will refresh claims in Artsdata core entities when external data changes. Delete an external identifier sameAs to block it from updating the Artsdata core entity."
