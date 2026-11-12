@@ -91,6 +91,9 @@ fr:
     view_dataset: "Voir le jeu de données"
     non_authoritative: "Non autoritaire"
     non_authoritative_tooltip: "Cet URI provient d'un flux de données externe"
+    unknown_external:
+      title: "Absent d'Artsdata"
+      message: "Artsdata ne contient aucune donnée sur cet URI. Les utilisateurs connectés peuvent le déréférencer pour consulter ses données liées."
     in_dataset: "Dans le jeu de données"
     revisions: "Révisions"
     generated: "Créé"

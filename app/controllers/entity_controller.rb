@@ -67,6 +67,17 @@ class EntityController < ApplicationController
       # render in entity view
       format.all { 
         @entity.load_graph
+
+        # Crawlers request /entity?uri= for spam URLs (shorteners, redirect
+        # chains, SEO pages) that Artsdata has never seen. Answer those with
+        # a small 404 instead of the full page, whose lazy frames would each
+        # run another SPARQL query.
+        if unknown_external_uri?(@entity)
+          response.headers["X-Robots-Tag"] = "noindex"
+          render "unknown_external", formats: [:html], status: :not_found
+          next
+        end
+
         if @entity.errors.any?
           flash.alert = @entity.errors.join(", ")
         end
@@ -217,6 +228,18 @@ class EntityController < ApplicationController
   end
 
   private
+
+  # An external URI Artsdata has no statements about or references, requested
+  # by an anonymous visitor. Signed-in users still get the External Resource
+  # page so they can dereference it. A failed graph load never counts, so a
+  # GraphDB problem doesn't turn real pages into 404s.
+  def unknown_external_uri?(entity)
+    return false if user_signed_in?
+    return false if entity.entity_uri.start_with?("http://kg.artsdata.ca/")
+    return false if entity.errors.any? || entity.graph.count > 0
+
+    !entity.referenced_as_object?
+  end
 
   def check_delete_entity_access
     ensure_access("delete_entity")

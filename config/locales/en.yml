@@ -118,6 +118,9 @@ en:
     view_dataset: "View dataset"
     non_authoritative: "Non-authoritative"
     non_authoritative_tooltip: "This URI comes from an external data feed"
+    unknown_external:
+      title: "Not in Artsdata"
+      message: "Artsdata has no data about this URI. Signed-in users can dereference it to view its linked data."
     in_dataset: "In dataset"
     revisions: "Revisions"
     generated: "Created"

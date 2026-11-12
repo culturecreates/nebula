@@ -586,4 +586,48 @@ class EntityControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "turbo-frame#refresh-sources a.dropdown-item[data-refresh-entity-source-param=?]", source
   end
+
+  test "show answers an unknown external URI with a noindex 404 for anonymous visitors" do
+    Entity.any_instance.stubs(:construct_turtle).returns(RDF::Graph.new)
+    Entity.any_instance.expects(:referenced_as_object?).returns(false)
+
+    get entity_path(uri: "https://linkypay.com/BNCZj")
+
+    assert_response :not_found
+    assert_equal "noindex", response.headers["X-Robots-Tag"]
+    assert_select "h1", I18n.t("entity.unknown_external.title")
+    # The nav bar's own frame stays; none of the entity page's SPARQL-backed frames load.
+    assert_select "turbo-frame#source-graph-info, turbo-frame#reverse-statements, turbo-frame#date-modified", count: 0
+    assert_select "a[href^='https://linkypay.com']", count: 0
+  end
+
+  test "show renders the normal page for an external URI Artsdata references as an object" do
+    Entity.any_instance.stubs(:construct_turtle).returns(RDF::Graph.new)
+    Entity.any_instance.stubs(:referenced_as_object?).returns(true)
+
+    get entity_path(uri: "http://www.wikidata.org/entity/Q1")
+
+    assert_response :success
+    assert_select "turbo-frame#reverse-statements"
+  end
+
+  test "show renders the normal page for signed-in users even when the URI is unknown" do
+    EntityController.any_instance.stubs(:user_signed_in?).returns(true)
+    Entity.any_instance.stubs(:construct_turtle).returns(RDF::Graph.new)
+    Entity.any_instance.expects(:referenced_as_object?).never
+
+    get entity_path(uri: "https://linkypay.com/BNCZj")
+
+    assert_response :success
+  end
+
+  test "show does not 404 when the graph failed to load" do
+    Entity.any_instance.stubs(:construct_turtle).returns(RDF::Graph.new)
+    Entity.any_instance.stubs(:errors).returns(["Failed to construct graph: timeout"])
+    Entity.any_instance.expects(:referenced_as_object?).never
+
+    get entity_path(uri: "https://example.org/event/1")
+
+    assert_response :success
+  end
 end
