@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for Codex (and other devs) working in this repo.
+Guidance for coding agents (Codex, Claude Code) and other devs working in this repo.
 
 ## What this app is
 
