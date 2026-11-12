@@ -181,4 +181,26 @@ class EntityDisambiguatingDescriptionTest < ActiveSupport::TestCase
       assert_equal "Chanteur", entity_with(fr, en).disambiguating_description.value
     end
   end
+
+  test "referenced_as_object? asks GraphDB whether the URI is the object of any statement" do
+    client = mock("sparql_client")
+    client.expects(:query).with("ASK { ?s ?p <http://www.wikidata.org/entity/Q1> }").returns(true)
+    ArtsdataGraph::SparqlService.stubs(:client).returns(client)
+
+    assert Entity.new(entity_uri: "http://www.wikidata.org/entity/Q1").referenced_as_object?
+  end
+
+  test "referenced_as_object? is false for a URI that isn't a valid IRI, without querying" do
+    ArtsdataGraph::SparqlService.expects(:client).never
+
+    refute Entity.new(entity_uri: "https://example.org/a b>").referenced_as_object?
+  end
+
+  test "referenced_as_object? counts a query error as referenced" do
+    client = mock("sparql_client")
+    client.stubs(:query).raises(StandardError, "timeout")
+    ArtsdataGraph::SparqlService.stubs(:client).returns(client)
+
+    assert Entity.new(entity_uri: "http://www.wikidata.org/entity/Q1").referenced_as_object?
+  end
 end

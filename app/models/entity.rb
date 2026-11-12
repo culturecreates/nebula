@@ -494,6 +494,22 @@ class Entity
     @graph = construct_turtle(sparql)
   end
 
+  # Whether the URI appears as the object of any statement, e.g. a Wikidata
+  # item linked by schema:sameAs or a venue website in schema:url. With an
+  # empty load_graph (no statements about it as subject), this tells a URI
+  # Artsdata only references from one it has never seen. A URI that isn't a
+  # valid IRI can't be in the graph; any query error counts as referenced,
+  # so a GraphDB problem never hides a real page.
+  def referenced_as_object?
+    uri = RDF::URI.new(entity_uri)
+    return false unless uri.valid?
+
+    ArtsdataGraph::SparqlService.client.query("ASK { ?s ?p #{uri.to_ntriples} }") == true
+  rescue StandardError => e
+    Rails.logger.warn("referenced_as_object? failed for #{entity_uri}: #{e.message}")
+    true
+  end
+
   def graph_uri
     return @graph_uri if @graph_uri.present?
     
