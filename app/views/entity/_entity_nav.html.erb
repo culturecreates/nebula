@@ -1,6 +1,9 @@
 <% external_entity = !@entity.entity_uri.starts_with?("http://kg.artsdata.ca/") %>
 <%#
   Links by visitor. Dereference requires a login, and hiding the links also keeps crawlers off them.
+  Dereference and CMS v3/v4 fetch the external page, so they opt out of Turbo's hover prefetch:
+  otherwise hovering on the way to another link crawls the site, and a failure's flash alert
+  shows up on whatever page loads next.
 
   External URI (not kg.artsdata.ca):
     Not signed in: no links.
@@ -16,7 +19,8 @@
       <%= link_to t("entity.nav.dereference"),
       dereference_external_path(uri: @entity.entity_uri),
       class: "text-decoration-none me-2",
-      rel: "nofollow" %>
+      rel: "nofollow",
+      data: { turbo_prefetch: false } %>
       |
       <a
         href="<%= @entity.entity_uri %>"
@@ -27,9 +31,9 @@
       </a>
       |
       <% if user_has_access?("cms_links") %>
-        <%= link_to t("entity.nav.cms_v3"), footlight_export_path(uri: @entity.entity_uri, version: "v3") %>
+        <%= link_to t("entity.nav.cms_v3"), footlight_export_path(uri: @entity.entity_uri, version: "v3"), data: { turbo_prefetch: false } %>
         |
-        <%= link_to t("entity.nav.cms_v4"), footlight_export_path(uri: @entity.entity_uri, version: "v4") %>
+        <%= link_to t("entity.nav.cms_v4"), footlight_export_path(uri: @entity.entity_uri, version: "v4"), data: { turbo_prefetch: false } %>
         |
       <% end %>
       <%= link_to t("entity.nav.minter"),

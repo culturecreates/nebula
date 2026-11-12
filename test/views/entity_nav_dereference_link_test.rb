@@ -19,6 +19,19 @@ class EntityNavDereferenceLinkTest < ActionView::TestCase
     assert_select "a#graphdb"
   end
 
+  # Turbo prefetches links on hover; these fetch the external page, so a
+  # hover on the way to another link would crawl the site.
+  test "links that dereference the external page opt out of Turbo prefetch" do
+    @entity = Entity.new(entity_uri: "https://example.org/event/1", graph: RDF::Graph.new)
+    view.define_singleton_method(:user_signed_in?) { true }
+    view.define_singleton_method(:user_has_access?) { |feature| feature == "cms_links" }
+    view.define_singleton_method(:graphdb_link) { |uri| "http://graphdb.example/#{uri}" }
+    view.assign(entity: @entity)
+    render partial: "entity/entity_nav"
+    assert_select "a[href^='/dereference/external'][data-turbo-prefetch='false']", count: 1
+    assert_select "a[href^='/footlight'][data-turbo-prefetch='false']", count: 2
+  end
+
   test "Artsdata entities also hide the GraphDB link from anonymous users" do
     @entity = Entity.new(entity_uri: "http://kg.artsdata.ca/resource/K1-1", graph: RDF::Graph.new)
     view.define_singleton_method(:user_signed_in?) { false }
