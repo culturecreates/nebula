@@ -11,6 +11,18 @@ class Rack::Attack
     ["127.0.0.1", "::1"].include?(req.ip)
   end
 
+  # Reject /query/show without a sparql= param before it reaches Rails. A
+  # crawler on rotating IPs requests ~2,500 truncated Data Feeds links
+  # (e.g. /query/show?title=Event) in a single minute around 15:30 UTC most days; each one
+  # only raised ParameterMissing (400), but the burst filled Puma's threads
+  # and queued every other request behind it (30s H12 timeouts on
+  # 2026-11-11). No real request omits sparql=, so this is safe and costs
+  # almost nothing. Per-IP throttles can't catch it: every request has a
+  # different IP.
+  blocklist("query_show/missing_sparql") do |req|
+    req.get? && req.path =~ %r{\A/(en|fr)?/?query/show(\.\w+)?\z} && req.params["sparql"].blank?
+  end
+
   # General ceiling on all requests.
   # (~1/sec sustained, generous enough for scripted/automated dereferencing
   # of entity URIs, but stops broad floods).
@@ -87,6 +99,13 @@ Rack::Attack.throttled_responder = lambda do |request|
   else
     [429, headers.merge("Content-Type" => "text/plain"), ["Too many requests. Please try again in #{retry_after}s.\n"]]
   end
+end
+
+# Same cheap plain-text style for blocklisted requests. 400 rather than
+# Rack::Attack's default 403: the request is malformed, not forbidden. Not
+# logged, so a burst doesn't flood the log either.
+Rack::Attack.blocklisted_responder = lambda do |_request|
+  [400, { "Content-Type" => "text/plain" }, ["Missing required parameter: sparql\n"]]
 end
 
 # Log each throttled request so the throttles' impact shows up in the app log

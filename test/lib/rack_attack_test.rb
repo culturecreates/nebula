@@ -127,3 +127,33 @@ class RackAttackEntitySerialisationsThrottleTest < ActiveSupport::TestCase
     assert_equal [200], statuses("/dereference/card?uri=http://example.org/x", 130).uniq
   end
 end
+
+class RackAttackQueryShowBlocklistTest < ActiveSupport::TestCase
+  setup do
+    @app = Rack::Attack.new(->(_env) { [200, {}, ["ok"]] })
+  end
+
+  def call(path, method: "GET")
+    @app.call(Rack::MockRequest.env_for(path, method: method, "REMOTE_ADDR" => "10.0.0.1"))
+  end
+
+  test "query/show without sparql is rejected with a plain 400 before reaching the app" do
+    %w[/en/query/show?title=Event /fr/query/show?title=Types /query/show /query/show.csv?title=Place /en/query/show?sparql=].each do |path|
+      status, headers, body = call(path)
+      assert_equal 400, status, path
+      assert_equal "text/plain", headers["Content-Type"]
+      assert_match "sparql", body.first
+    end
+  end
+
+  test "query/show with sparql reaches the app" do
+    %w[/en/query/show?title=Event&sparql=list_events /query/show.csv?sparql=feeds_all].each do |path|
+      assert_equal 200, call(path).first, path
+    end
+  end
+
+  test "other paths without sparql are unaffected" do
+    assert_equal 200, call("/en/query").first
+    assert_equal 200, call("/en/entity?title=Event").first
+  end
+end
