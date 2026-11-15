@@ -67,15 +67,31 @@ class ArtifactController < ApplicationController
   def get_graph_metadata(graph)
     subject = RDF::URI(graph)
     schema = RDF::Vocab::SCHEMA
-    rating_node = get_object_term(subject, schema.contentRating)
+    rating = get_graph_rating(subject)
 
     {
       name: get_object_value(subject, schema.name),
       maintainer: get_object_value(subject, schema.maintainer),
       github_issue: get_object_value(subject, schema.discussionUrl),
-      rating_value: rating_node ? get_object_value(rating_node, schema.ratingValue) : nil,
-      rating_explanation: rating_node ? get_object_value(rating_node, schema.ratingExplanation) : nil
+      rating_value: rating&.bound?(:value) ? rating[:value].value : nil,
+      rating_explanation: rating&.bound?(:explanation) ? rating[:explanation].value : nil
     }
+  end
+
+  # Follow contentRating to the rating's value and explanation in one query.
+  # The rating is often a blank node, and a blank node passed into a second
+  # query acts as a variable, matching every rating in the triplestore.
+  def get_graph_rating(subject)
+    query = <<~SPARQL
+      PREFIX schema: <http://schema.org/>
+      SELECT ?value ?explanation WHERE {
+        #{subject.to_ntriples} schema:contentRating ?rating .
+        OPTIONAL { ?rating schema:ratingValue ?value . }
+        OPTIONAL { ?rating schema:ratingExplanation ?explanation . }
+      }
+      LIMIT 1
+    SPARQL
+    ArtsdataGraph::SparqlService.client.query(query).first
   end
 
   def update_graph_metadata
@@ -255,11 +271,6 @@ class ArtifactController < ApplicationController
       flash.alert = "Error loading loaded artifact version: #{e.message[0..100]}#{e.message.length > 100 ? '...' : ''}"
       nil
     end
-  end
-
-  def get_object_term(subject, predicate)
-    response = ArtsdataGraph::SparqlService.client.select.where([subject, predicate, :o]).execute
-    response.first&.o
   end
 
   def sparql_string_literal(value)
