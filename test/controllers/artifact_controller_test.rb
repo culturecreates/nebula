@@ -131,7 +131,6 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
   test "show should display graph metadata values when available" do
     artifact_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact"
     graph_uri = "http://kg.artsdata.ca/testaccount/group/artifact"
-    rating_uri = RDF::URI("#{graph_uri}#endorsementRating")
     mock_select = Object.new
     mock_select.define_singleton_method(:where) do |triple_pattern|
       @last_subject = triple_pattern[0]
@@ -153,18 +152,14 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
         literal_solution.call("https://example.org/maintainer")
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.discussionUrl
         literal_solution.call("https://github.com/culturecreates/nebula/issues/123")
-      elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.contentRating
-        [solution_class.new(rating_uri)]
-      elsif @last_subject == rating_uri && @last_predicate == schema.ratingValue
-        literal_solution.call("4")
-      elsif @last_subject == rating_uri && @last_predicate == schema.ratingExplanation
-        literal_solution.call("Trusted source")
       else
         []
       end
     end
     @mock_client.stubs(:select).returns(mock_select)
     @mock_client.stubs(:query).returns([])
+    rating = RDF::Query::Solution.new(value: RDF::Literal("4"), explanation: RDF::Literal("Trusted source"))
+    @mock_client.stubs(:query).with { |query| query.include?("schema:contentRating") }.returns([rating])
 
     get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
 
@@ -179,6 +174,27 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "https://example.org/maintainer"
     assert_includes response.body, "https://github.com/culturecreates/nebula/issues/123"
     assert_match(/Trusted source/, response.body)
+    assert_select "input#rating_value[value='4']"
+  end
+
+  test "show reads the rating through contentRating in a single query, so blank-node ratings resolve" do
+    artifact_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact"
+    graph_uri = "http://kg.artsdata.ca/testaccount/group/artifact"
+    mock_select = mock("select_query")
+    mock_select.stubs(:where).returns(mock_select)
+    mock_select.stubs(:execute).returns([])
+    @mock_client.stubs(:select).returns(mock_select)
+    @mock_client.stubs(:query).returns([])
+    rating = RDF::Query::Solution.new(value: RDF::Literal("203"))
+    @mock_client.expects(:query).with do |query|
+      query.include?("<#{graph_uri}> schema:contentRating ?rating") &&
+        query.include?("?rating schema:ratingValue ?value")
+    end.returns([rating])
+
+    get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
+
+    assert_response :success
+    assert_select "input#rating_value[value='203']"
   end
 
   test "show should display the loaded artifact version and version actions" do
@@ -199,6 +215,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     @mock_client.stubs(:select).returns(mock_select)
     @mock_client.stubs(:query).with { |query| query.include?("prov:wasDerivedFrom/foaf:primaryTopic") }.returns([loaded_version])
     @mock_client.stubs(:query).with { |query| query.include?("dataid:artifact") }.returns([artifact_version])
+    @mock_client.stubs(:query).with { |query| query.include?("schema:contentRating") }.returns([])
 
     get artifact_path(id: "show"), params: { artifactUri: artifact_uri }
 
