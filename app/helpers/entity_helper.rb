@@ -2,13 +2,16 @@ module EntityHelper
 
   # Try to find a label or name for the URI
   # Otherwise display the URI
-  def display_label(uri, check_shacl: true)
+  # focus_node is the subject whose property is being labelled; SHACL results
+  # are only shown when they were reported on that node (defaults to the page entity).
+  def display_label(uri, check_shacl: true, focus_node: nil)
     return nil unless uri
 
     if check_shacl
+      focus_node ||= RDF::URI(@entity.entity_uri)
       # Check for SHACL errors 
       query = RDF::Query.new
-      query.patterns << RDF::Query::Pattern.new(:shacl, RDF::URI("http://www.w3.org/ns/shacl#focusNode"), RDF::URI(@entity.entity_uri) )
+      query.patterns << RDF::Query::Pattern.new(:shacl, RDF::URI("http://www.w3.org/ns/shacl#focusNode"), focus_node )
       query.patterns << RDF::Query::Pattern.new(:shacl, RDF::URI("http://www.w3.org/ns/shacl#resultPath"), RDF::URI(uri) )
       query.patterns << RDF::Query::Pattern.new(:shacl, RDF::URI("http://www.w3.org/ns/shacl#resultMessage"), :message )
       solution = @entity.graph.query(query)
