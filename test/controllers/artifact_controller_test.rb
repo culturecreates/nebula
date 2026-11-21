@@ -286,6 +286,31 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test "update_graph_metadata should store the rating value as an integer" do
+    integer_rating = '"203"^^<http://www.w3.org/2001/XMLSchema#integer>'
+    @mock_update_client.expects(:update).with { |query| query.include?(integer_rating) }
+
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      rating_value: " 203 ",
+      rating_explanation: "Footlight source auto-assigned"
+    }
+
+    assert_match(/updated/, flash[:notice])
+  end
+
+  test "update_graph_metadata should reject a rating value that is not a whole number" do
+    @mock_update_client.expects(:update).never
+
+    post update_graph_metadata_artifact_index_path, params: {
+      graph: "http://kg.artsdata.ca/testaccount/group/artifact",
+      rating_value: "2.5"
+    }
+
+    assert_match(/Rating Value must be a whole number/, flash[:alert])
+    assert_response :redirect
+  end
+
   test "update_graph_metadata should reject invalid maintainer URL" do
     post update_graph_metadata_artifact_index_path, params: {
       graph: "http://kg.artsdata.ca/testaccount/group/artifact",

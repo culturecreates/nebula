@@ -118,6 +118,11 @@ class ArtifactController < ApplicationController
       return redirect_back(fallback_location: root_path)
     end
 
+    if !deleting && rating_value.present? && !rating_value.match?(/\A\d+\z/)
+      flash.alert = "Failed to update graph metadata: Rating Value must be a whole number."
+      return redirect_back(fallback_location: root_path)
+    end
+
     graph_name = "" if deleting
     maintainer = "" if deleting
     github_issue = "" if deleting
@@ -143,7 +148,10 @@ class ArtifactController < ApplicationController
     if rating_value.present? || rating_explanation.present?
       insert_triples << "#{graph_term} #{schema_content_rating} #{rating_term} ."
       insert_triples << "#{rating_term} #{rdf_type} #{schema_endorsement_rating} ."
-      insert_triples << "#{rating_term} #{schema_rating_value} #{sparql_string_literal(rating_value)} ." if rating_value.present?
+      # Stored as xsd:integer: ranking takes MIN(ratingValue), and GraphDB
+      # orders every number before every string, so a string rating would
+      # rank below all integer ratings (and "50" after "203").
+      insert_triples << "#{rating_term} #{schema_rating_value} #{RDF::Literal::Integer.new(rating_value.to_i).to_ntriples} ." if rating_value.present?
       insert_triples << "#{rating_term} #{schema_rating_explanation} #{sparql_string_literal(rating_explanation)} ." if rating_explanation.present?
     end
 
