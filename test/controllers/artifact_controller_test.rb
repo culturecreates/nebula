@@ -120,6 +120,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
 
     mock_select = mock('select_query')
     mock_select.stubs(:where).returns(mock_select)
+    mock_select.stubs(:graph).returns(mock_select)
     mock_select.stubs(:execute).returns([])
     @mock_client.stubs(:select).returns(mock_select)
     @mock_client.stubs(:query).returns([])
@@ -132,20 +133,32 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     artifact_uri = "http://kg.artsdata.ca/databus/testaccount/group/artifact"
     graph_uri = "http://kg.artsdata.ca/testaccount/group/artifact"
     mock_select = Object.new
+    # Records the GRAPH a query is limited to; metadata values below are
+    # only returned for reads limited to Graph_Ranking.
+    mock_select.define_singleton_method(:graph) do |graph|
+      @graph = graph
+      self
+    end
     mock_select.define_singleton_method(:where) do |triple_pattern|
       @last_subject = triple_pattern[0]
       @last_predicate = triple_pattern[1]
+      @last_graph = @graph
+      @graph = nil
       self
     end
     mock_select.define_singleton_method(:execute) do
       schema = RDF::Vocab::SCHEMA
       automint = RDF::URI("http://kg.artsdata.ca/ontology/automint")
+      graph_ranking = RDF::URI("http://kg.artsdata.ca/Graph_Ranking")
       solution_class = Struct.new(:o)
       literal_class = Struct.new(:value)
       literal_solution = ->(value) { [solution_class.new(literal_class.new(value))] }
 
       if @last_predicate == automint
         literal_solution.call("true")
+      elsif @last_graph != graph_ranking
+        # A data feed graph's own schema:name (the artifact name) must not be read.
+        @last_predicate == schema.name ? literal_solution.call("artifact") : []
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.name
         literal_solution.call("Graph Name")
       elsif @last_subject == RDF::URI(graph_uri) && @last_predicate == schema.maintainer
@@ -171,6 +184,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     assert_match(/Rating Value/, response.body)
     assert_match(/Rating Explanation/, response.body)
     assert_includes response.body, "Graph Name"
+    assert_select "input#graph_name[value='Graph Name']"
     assert_includes response.body, "https://example.org/maintainer"
     assert_includes response.body, "https://github.com/culturecreates/nebula/issues/123"
     assert_match(/Trusted source/, response.body)
@@ -182,12 +196,14 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
     graph_uri = "http://kg.artsdata.ca/testaccount/group/artifact"
     mock_select = mock("select_query")
     mock_select.stubs(:where).returns(mock_select)
+    mock_select.stubs(:graph).returns(mock_select)
     mock_select.stubs(:execute).returns([])
     @mock_client.stubs(:select).returns(mock_select)
     @mock_client.stubs(:query).returns([])
     rating = RDF::Query::Solution.new(value: RDF::Literal("203"))
     @mock_client.expects(:query).with do |query|
-      query.include?("<#{graph_uri}> schema:contentRating ?rating") &&
+      query.include?("GRAPH <http://kg.artsdata.ca/Graph_Ranking>") &&
+        query.include?("<#{graph_uri}> schema:contentRating ?rating") &&
         query.include?("?rating schema:ratingValue ?value")
     end.returns([rating])
 
@@ -211,6 +227,7 @@ class ArtifactControllerTest < ActionDispatch::IntegrationTest
 
     mock_select = mock("select_query")
     mock_select.stubs(:where).returns(mock_select)
+    mock_select.stubs(:graph).returns(mock_select)
     mock_select.stubs(:execute).returns([])
     @mock_client.stubs(:select).returns(mock_select)
     @mock_client.stubs(:query).with { |query| query.include?("prov:wasDerivedFrom/foaf:primaryTopic") }.returns([loaded_version])

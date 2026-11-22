@@ -1,5 +1,9 @@
 class ArtifactController < ApplicationController
   GRAPH_METADATA_RATING_FRAGMENT = "endorsementRating".freeze
+  # Graph metadata (name, maintainer, source log, rating) is stored and
+  # updated here. Reads must be limited to it: each data feed graph also
+  # describes itself (e.g. its own schema:name, the artifact name).
+  GRAPH_RANKING = "http://kg.artsdata.ca/Graph_Ranking".freeze
 
   before_action :authenticate_databus_user! # ensure user has permissions
 
@@ -85,9 +89,11 @@ class ArtifactController < ApplicationController
     query = <<~SPARQL
       PREFIX schema: <http://schema.org/>
       SELECT ?value ?explanation WHERE {
-        #{subject.to_ntriples} schema:contentRating ?rating .
-        OPTIONAL { ?rating schema:ratingValue ?value . }
-        OPTIONAL { ?rating schema:ratingExplanation ?explanation . }
+        GRAPH #{RDF::URI(GRAPH_RANKING).to_ntriples} {
+          #{subject.to_ntriples} schema:contentRating ?rating .
+          OPTIONAL { ?rating schema:ratingValue ?value . }
+          OPTIONAL { ?rating schema:ratingExplanation ?explanation . }
+        }
       }
       LIMIT 1
     SPARQL
@@ -254,8 +260,9 @@ class ArtifactController < ApplicationController
     params.permit(:name, :description, :type, :sheet_url, :webpage_url, :link_identifier)
   end
 
+  # Reads a graph metadata value from Graph_Ranking only (see GRAPH_RANKING).
   def get_object_value(subject, predicate)
-    response = ArtsdataGraph::SparqlService.client.select.where([subject, predicate, :o]).execute
+    response = ArtsdataGraph::SparqlService.client.select.graph(RDF::URI(GRAPH_RANKING)).where([subject, predicate, :o]).execute
     response.first&.o&.value
   end
 
