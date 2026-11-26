@@ -1,6 +1,8 @@
 
 # Liste des consommateurs de données d'Artsdata
 
+Voici une liste de consommateurs de données connus. Les données d'Artsdata étant sous licence libre, n'importe qui peut naviguer l'interface ou appeler les APIs sans s'identifier. Le nombre réel de consommateurs pourrait donc être considérablement plus élevé.
+
 | Application | Gérée par | Site web officiel | Référentiel Github |
 | --- | --- | --- | --- |
 | ArtsCultureNB | Gouvernement du Nouveau-Brunswick  | [artsculturenb.ca](https://artsculturenb.ca/) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
@@ -9,6 +11,7 @@
 | Calendrier de représentations d'artistes autochtones | Lodge Pole Alliance | [lodgepolearts.ca/events](https://lodgepolearts.ca/events/#national) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | Canada à Expo 2025 Osaka | Gouvernment du Canada, National Arts Centre et Destination Canada | [canadaexpo2025.ca](https://www.canadaexpo2025.ca/en-ca/programming) | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
 | DICI | Culture Mauricie | https://dici.ca/ | [footlight-calendar-api](https://github.com/culturecreates/footlight-calendar-api) |
+| Gatinapp | Gatinapp | [gatinapp.com](https://gatinapp.com/fr/) | N/A |
 | IPAA Member Directory | Indigenous Performing Arts Alliance (IPAA) | [ipaa.ca/indigenous-artists/](https://ipaa.ca/indigenous-artists/) | [artsdata-planet-ipaa](https://github.com/culturecreates/artsdata-planet-ipaa) |
 | I Want To Showcase | Organization of Saskatchewan Arts Councils | [iwanttoshowcase.ca](https://iwanttoshowcase.ca) | [artsdata-planet-iwts](https://github.com/culturecreates/artsdata-planet-iwts) |
 | La Vitrine | La Vitrine | [artsdata-planet-lavitrine](https://github.com/culturecreates/artsdata-planet-lavitrine) | [artsdata-planet-lavitrine](https://github.com/culturecreates/artsdata-planet-lavitrine) |
